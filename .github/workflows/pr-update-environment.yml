@@ -37,7 +37,7 @@ jobs:
   format:
     name: Print Pull Request Info
     runs-on: ubuntu-24.04
-    depends-on: image-build
+    needs: image-build
     steps:
       # Print out the pull request event type
       - name: Print out pull request event type
@@ -47,7 +47,7 @@ jobs:
   update-pr-environment:
     name: Update Pull Request environment in GitOps repo
     runs-on: ubuntu-24.04
-    depends-on: format
+    needs: format
     steps:
       # After we build the Docker image, we create a pull request to update the GitOps repository
       # This will allow us to update the Helm chart with the new Docker image tag.
