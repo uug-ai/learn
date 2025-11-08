@@ -1,0 +1,59 @@
+# Hugo configuration file
+title: 
+
+# import hextra as module
+module:
+  imports:
+    - path: github.com/imfing/hextra
+
+markup:
+  # allow raw html
+  goldmark:
+    renderer:
+      unsafe: true
+
+  # enable hextra syntax highlight
+  highlight:
+    noClasses: false
+
+menu:
+  main:
+    - name: Documentation
+      pageRef: /docs
+      weight: 1
+    - name: Knowledge base
+      pageRef: /knowledge-base
+      weight: 2
+    - name: Tutorials
+      pageRef: /tutorials
+      weight: 3
+    - name: Support
+      pageRef: /support
+      weight: 4
+    - name: Search
+      weight: 5
+      params:
+        type: search
+    - name: GitHub
+      weight: 6
+      url: "https://github.com/uug-ai/documentation"
+      params:
+        icon: github
+
+params:
+  navbar:
+    displayTitle: true
+    displayLogo: true
+    logo:
+      path: images/logo.svg
+      dark: images/logo-dark.svg
+      link: /
+      width: 40
+
+  footer:
+    displayCopyright: false
+    displayPoweredBy: false
+
+  editURL:
+    enable: true
+    base: "https://github.com/uug-ai/documentation/edit/main/content"

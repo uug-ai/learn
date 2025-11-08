@@ -1,0 +1,80 @@
+name: Build pull request
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+env:
+  PR_NUMBER: ${{ github.event.number }}
+  PROJECT: ${{ github.event.repository.name }}
+  GO_VERSION: "1.24"
+
+jobs:
+  build-amd64:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        architecture: [amd64]
+    steps:
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Checkout
+        uses: actions/checkout@v3
+      # Setup Golang for us in the workflow
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "${{ env.GO_VERSION }}"
+          check-latest: true
+          cache-dependency-path: |
+            app/go.sum
+      # Install Hugo
+      - name: Install Hugo
+        run: |
+          go install -tags extended,withdeploy github.com/gohugoio/hugo@latest
+      # Build the Golang application to the dist folder
+      - name: Build Golang application
+        run: |
+          cd app
+          hugo build
+      - name: Run Build
+        run: |
+          docker build -t ${{matrix.architecture}} -f Dockerfile --pull --no-cache .
+          
+  build-arm64:
+    runs-on: sh-ubuntu-24.04-arm 
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        architecture: [arm64]
+    steps:
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Checkout
+        uses: actions/checkout@v3
+      # Setup Golang for us in the workflow
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "${{ env.GO_VERSION }}"
+          check-latest: true
+          cache-dependency-path: |
+            app/go.sum
+      # Install Hugo
+      - name: Install Hugo
+        run: |
+          go install -tags extended,withdeploy github.com/gohugoio/hugo@latest
+      # Build the Golang application to the dist folder
+      - name: Build Golang application
+        run: |
+          cd app
+          hugo build
+      - name: Run Build
+        run: |
+          docker build -t ${{matrix.architecture}} -f Dockerfile --pull --no-cache .

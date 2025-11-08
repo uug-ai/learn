@@ -1,0 +1,5 @@
+module github.com/uug-ai/documentation
+
+go 1.24.9
+
+require github.com/imfing/hextra v0.11.1 // indirect
