@@ -4,7 +4,8 @@ on:
     types: [opened, synchronize]
 
 env:
-  PROJECT: "documentation"
+  PROJECT: ${{ github.event.repository.name }}
+  GO_VERSION: "1.24"
 
 jobs:
   build-amd64:
@@ -25,7 +26,7 @@ jobs:
       # Setup Golang for us in the workflow
       - uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: "${{ env.GO_VERSION }}"
           check-latest: true
           cache-dependency-path: |
             app/go.sum
@@ -60,7 +61,7 @@ jobs:
       # Setup Golang for us in the workflow
       - uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: "${{ env.GO_VERSION }}"
           check-latest: true
           cache-dependency-path: |
             app/go.sum
