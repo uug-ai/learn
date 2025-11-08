@@ -28,11 +28,7 @@ RUN go mod tidy
 # Install Hugo
 RUN go install -tags extended,withdeploy github.com/gohugoio/hugo@latest && \
     hugo version && \
-
-# Build the app
-    hugo \
-    --gc --minify \
-    --baseURL "https://docs.uug.ai/"
+    hugo --gc --minify --baseURL "https://docs.uug.ai/"
 
 # Copy or create other directories/files your app needs during runtime.
 # E.g. this example uses /data as a working directory that would probably
