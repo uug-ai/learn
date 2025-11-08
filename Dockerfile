@@ -19,7 +19,7 @@ RUN git config --global \
     url."https://${github_username}:${github_token}@github.com/".insteadOf \
     "https://github.com/"
 
-#
+# Set working directory to the app folder
 WORKDIR /build/app
 
 # Install dependencies for building Hugo
@@ -38,8 +38,6 @@ RUN cp -r public /data/site
 
 FROM alpine:latest
 
-COPY --chown=0:0 --from=builder /${APP_NAME} /
-
 RUN apk update && apk add ca-certificates curl libstdc++ libc6-compat --no-cache && rm -rf /var/cache/apk/*
 
 # Set up the app to run as a non-root user inside the /data folder
@@ -51,5 +49,19 @@ WORKDIR /data
 
 # Install nginx
 RUN apk add --no-cache nginx
+
+# The website is exposed at /data/site
+# Create an nginx config file to serve the site
+RUN cat > /etc/nginx/conf.d/default.conf << 'EOF'
+server {
+    listen 80;
+    server_name localhost;
+    root /data/site;
+    index index.html;
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+EOF
 
 ENTRYPOINT ["sh", "-c", "nginx -g 'daemon off;'"]
