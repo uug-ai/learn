@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/go:1.24-bookworm
+FROM mcr.microsoft.com/devcontainers/go:1.24-bookworm as builder
 
 ARG APP_NAME=documentation
 ARG github_username
