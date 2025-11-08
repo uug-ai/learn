@@ -8,11 +8,17 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"dbaeumer.vscode-eslint",
 				"esbenp.prettier-vscode",
 				"GitHub.copilot",
-				"GitHub.vscode-pull-request-github"
+				"GitHub.vscode-pull-request-github",
+				"mhutchie.git-graph",
+				"esbenp.prettier-vscode",
+				"tamasfe.even-better-toml",
+				"budparr.language-hugo-vscode"
 			]
 		}
-	}
+	},
+	"forwardPorts": [
+		1313
+	]
 }
