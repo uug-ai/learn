@@ -1,8 +1,8 @@
 {
     "mdb.presetConnections": [
         {
-            "name": "MongoDB Atlas Production",
-            "connectionString": "mongodb+srv://cedric:UrYMmxnovlcdkm06@kerberos-hub.shhng.mongodb.net/?retryWrites=true&w=majority"
+            "name": "MongoDB Atlas Production"
+            // To connect, use the MongoDB extension's secure connection storage or set the connection string in an environment variable.
         }
     ],
     "git.autofetch": true,
