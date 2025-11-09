@@ -28,7 +28,7 @@ RUN go mod tidy
 # Install Hugo
 RUN go install -tags extended,withdeploy github.com/gohugoio/hugo@latest && \
     hugo version && \
-    hugo --gc --minify --baseURL "https://docs.uug.ai/"
+    hugo --gc --minify
 
 # Copy or create other directories/files your app needs during runtime.
 # E.g. this example uses /data as a working directory that would probably
@@ -36,21 +36,15 @@ RUN go install -tags extended,withdeploy github.com/gohugoio/hugo@latest && \
 RUN mkdir /data
 RUN cp -r public /data/site
 
-FROM alpine:latest
+# ---- Final Stage ----
+FROM nginx:alpine
 
-RUN apk update && apk add ca-certificates curl libstdc++ libc6-compat --no-cache && rm -rf /var/cache/apk/*
+COPY --from=builder /data/site /usr/share/nginx/html
 
-# Install nginx
-RUN apk add --no-cache nginx
+# Permissions for nginx to access the files
+RUN chown -R nginx:nginx /usr/share/nginx/html
 
-# Copy nginx configuration
-COPY --chown=65534:0 nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Set up the app to run as a non-root user inside the /data folder
-# User ID 65534 is usually user 'nobody'.
-# The executor of this image should still specify a user during setup.
-COPY --chown=65534:0 --from=builder /data /data
-USER 65534
-WORKDIR /data
-
-ENTRYPOINT ["sh", "-c", "nginx -g 'daemon off;'"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
