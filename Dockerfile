@@ -44,7 +44,12 @@ RUN apk update && apk add ca-certificates curl libstdc++ libc6-compat --no-cache
 RUN apk add --no-cache nginx
 
 # Copy nginx configuration
-COPY --chown=65534:0 nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chown=65534:0 nginx.conf /etc/nginx/nginx.conf
+
+# Create necessary directories and set permissions
+RUN mkdir -p /tmp /var/cache/nginx /var/run \
+    && chown -R 65534:0 /tmp /var/cache/nginx /var/run \
+    && chmod -R g+w /tmp /var/cache/nginx /var/run
 
 # Set up the app to run as a non-root user inside the /data folder
 # User ID 65534 is usually user 'nobody'.
