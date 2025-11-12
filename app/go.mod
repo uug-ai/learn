@@ -1,5 +1,5 @@
-module github.com/uug-ai/documentation
+module github.com/uug-ai/learn
 
-go 1.24.9
+go 1.24.5
 
 require github.com/imfing/hextra v0.11.1 // indirect
