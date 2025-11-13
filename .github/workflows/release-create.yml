@@ -87,7 +87,7 @@ jobs:
           gitops-file: "environments/staging/${{ env.PROJECT }}/deployment.yaml"
           gitops-pr-branch: "release-${{ env.PROJECT }}-${{ github.event.inputs.tag || github.ref_name }}"
           gitops-key: ".spec.template.spec.containers[0].image"
-          gitops-value: "${{ github.event.inputs.tag || github.ref_name }}"
+          gitops-value: "${{ env.PROJECT }}:${{ github.event.inputs.tag || github.ref_name }}"
           commit-email: "gitops@uug.ai"
           commit-name: "GitOps - UUG.AI"
           commit-message: "A new release for ${{ env.PROJECT }} - ${{ github.event.inputs.tag || github.ref_name }}"
