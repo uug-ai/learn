@@ -84,7 +84,7 @@ jobs:
         with:
           github-token: ${{ secrets.TOKEN }}
           gitops-repo: "uug-ai/gitops"
-          gitops-file: "environments/staging/${{ env.PROJECT }}/values.yaml"
+          gitops-file: "environments/staging/${{ env.PROJECT }}/deployment.yaml"
           gitops-pr-branch: "release-${{ env.PROJECT }}-${{ github.event.inputs.tag || github.ref_name }}"
           gitops-key: ".spec.template.spec.containers[0].image"
           gitops-value: "${{ github.event.inputs.tag || github.ref_name }}"
