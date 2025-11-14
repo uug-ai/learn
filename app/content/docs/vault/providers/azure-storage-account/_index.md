@@ -117,7 +117,8 @@ For S3 compatibility, you may need to use specific tools or SDKs that support Az
 
 **Note**: Azure's native S3 compatibility is limited. For best results, you can:
 1. Use Azure Storage's native API (if Kerberos Vault supports it)
-2. Use a compatibility layer like [MinIO Gateway for Azure](https://docs.min.io/docs/minio-gateway-for-azure.html)
+2. Use a compatibility layer like MinIO Gateway for Azure (**Deprecated**; see [MinIO Gateway Deprecation Notice](https://min.io/docs/minio/linux/reference/minio-gateway.html)).  
+   > **Warning:** MinIO Gateway for Azure is deprecated and may not be available in newer MinIO versions. Refer to the [MinIO documentation](https://min.io/docs/minio/linux/reference/minio-gateway.html) for details and migration guidance.
 3. Configure Azure with S3-compatible tools
 
 ### Step 5: Alternative - Set Up MinIO Gateway for Azure
