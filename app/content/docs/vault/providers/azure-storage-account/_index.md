@@ -9,7 +9,7 @@ draft: false
 
 ## Introduction
 
-[Azure Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/) is Microsoft's object storage solution for the cloud, optimized for storing massive amounts of unstructured data. It provides highly scalable, secure, and cost-effective storage for video recordings from Kerberos Vault.
+[Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs/) is Microsoft's object storage solution for the cloud, optimized for storing massive amounts of unstructured data. It provides highly scalable, secure, and cost-effective storage for video recordings from Kerberos Vault.
 
 ### Key Features
 
