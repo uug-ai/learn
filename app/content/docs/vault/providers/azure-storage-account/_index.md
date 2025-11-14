@@ -424,4 +424,4 @@ For detailed pricing, visit the [Azure Blob Storage Pricing page](https://azure.
 - [Best Practices](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction)
 - [Performance and Scalability Checklist](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-performance-checklist)
 - [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/) - Desktop app for managing storage
-- [MinIO Gateway for Azure](https://docs.min.io/docs/minio-gateway-for-azure.html) - S3 compatibility layer
+<!-- MinIO Gateway for Azure was deprecated in 2022. For S3 compatibility with Azure Blob Storage, consider using Azure Data Lake Storage Gen2 or review current Azure documentation for interoperability options. -->
