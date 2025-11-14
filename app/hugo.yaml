@@ -27,15 +27,18 @@ menu:
     - name: Tutorials
       pageRef: /tutorials
       weight: 3
+    - name: Blog
+      pageRef: /blog
+      weight: 4
     - name: Support
       pageRef: /support
-      weight: 4
-    - name: Search
       weight: 5
+    - name: Search
+      weight: 6
       params:
         type: search
     - name: GitHub
-      weight: 6
+      weight: 7
       url: "https://github.com/uug-ai/documentation"
       params:
         icon: github
