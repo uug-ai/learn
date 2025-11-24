@@ -8,17 +8,13 @@ on:
       - main
 
 env:
-  ORGANIZATION: uugai
-  PROJECT: ${{ github.event.repository.name }}
   PR_NUMBER: ${{ github.event.number }}
+  PROJECT: ${{ github.event.repository.name }}
   SHA: ${{ github.sha }}
 
 jobs:
   security-scan:
     runs-on: ubuntu-latest
-    env:
-      PR_NUMBER: ${{ github.event.number }}
-      COMMIT_SHA: ${{ github.sha }}
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it

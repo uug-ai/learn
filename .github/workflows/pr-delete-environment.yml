@@ -5,9 +5,8 @@ on:
     types: [closed]
 
 env:
-  ORGANIZATION: uugai
-  PROJECT: ${{ github.event.repository.name }}
   PR_NUMBER: ${{ github.event.number }}
+  PROJECT: ${{ github.event.repository.name }}
   
 jobs:
   update-gitops-environment:

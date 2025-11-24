@@ -4,90 +4,96 @@ on:
     types: [created]
 
 env:
-  ORGANIZATION: uugai
+
+  # Build variables
+  ORGANIZATION: uug-ai
   PROJECT: ${{ github.event.repository.name }}
+  GO_VERSION: "1.24"
+  GO_DIR : "./"
+
+  # GitOps variables
+  GITOPS_REPO: "uug-ai/gitops"
+  GITOPS_FILE: "environments/staging/${{ github.event.repository.name }}/deployment.yaml"
+  GITOPS_KEY: ".spec.template.spec.containers[0].image"
+  GITOPS_VALUE: "ghcr.io/uug-ai/${{ github.event.repository.name }}:${{ github.event.inputs.tag || github.ref_name }}"
 
 jobs:
 
-  build-amd64:
-    runs-on: ubuntu-24.04
+  build:
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: write
+      packages: write
     strategy:
       matrix:
-        architecture: [amd64]
+        include:
+          - architecture: amd64
+            runner: ubuntu-24.04
+          - architecture: arm64
+            runner: sh-ubuntu-24.04-arm
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Run Build
-        run: |
-          docker build -t ${{matrix.architecture}}  --pull --no-cache .
-      - name: Build and push Docker image
-        run: |
-          docker tag ${{matrix.architecture}} $ORGANIZATION/$PROJECT-arch:arch-${{matrix.architecture}}-${{github.event.inputs.tag || github.ref_name}}
-          docker push $ORGANIZATION/$PROJECT-arch:arch-${{matrix.architecture}}-${{github.event.inputs.tag || github.ref_name}}
-
-  build-arm64:
-    runs-on: sh-ubuntu-24.04-arm 
-    permissions:
-      contents: write
-    strategy:
-      matrix:
-        architecture: [arm64]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Login to DockerHub
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ghcr.io
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.TOKEN }}
       - name: Run Build
         run: |
-          docker build -t ${{matrix.architecture}} --pull --no-cache .
+          docker build -t ${{matrix.architecture}} \
+          --build-arg github_username=${{ secrets.USERNAME }} \
+          --build-arg github_token=${{ secrets.TOKEN }} .
+
       - name: Build and push Docker image
         run: |
-          docker tag ${{matrix.architecture}} $ORGANIZATION/$PROJECT-arch:arch-${{matrix.architecture}}-${{github.event.inputs.tag || github.ref_name}}
-          docker push $ORGANIZATION/$PROJECT-arch:arch-${{matrix.architecture}}-${{github.event.inputs.tag || github.ref_name}}
+          docker tag ${{matrix.architecture}} ghcr.io/$ORGANIZATION/$PROJECT-platform:${{matrix.architecture}}-${{github.event.inputs.tag || github.ref_name}}
+          docker push ghcr.io/$ORGANIZATION/$PROJECT-platform:${{matrix.architecture}}-${{github.event.inputs.tag || github.ref_name}}
+
 
   create-manifest:
     runs-on: ubuntu-24.04
-    needs: [build-amd64, build-arm64]
+    needs: [build]
+    permissions:
+      packages: write
     steps:
-      - name: Login to DockerHub
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ghcr.io
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.TOKEN }}
+      - name: Wait for image propagation
+        run: sleep 10
       - name: Create and push multi-arch manifest
         run: |
-          docker manifest create $ORGANIZATION/$PROJECT:${{ github.event.inputs.tag || github.ref_name }} \
-            $ORGANIZATION/$PROJECT-arch:arch-amd64-${{github.event.inputs.tag || github.ref_name}} \
-            $ORGANIZATION/$PROJECT-arch:arch-arm64-${{github.event.inputs.tag || github.ref_name}}
-          docker manifest push $ORGANIZATION/$PROJECT:${{ github.event.inputs.tag || github.ref_name }}
+          docker manifest create ghcr.io/$ORGANIZATION/$PROJECT:${{ github.event.inputs.tag || github.ref_name }} \
+            ghcr.io/$ORGANIZATION/$PROJECT-platform:amd64-${{github.event.inputs.tag || github.ref_name}} \
+            ghcr.io/$ORGANIZATION/$PROJECT-platform:arm64-${{github.event.inputs.tag || github.ref_name}}
+          docker manifest push ghcr.io/$ORGANIZATION/$PROJECT:${{ github.event.inputs.tag || github.ref_name }}
       - name: Create and push latest manifest
         run: |
-          docker manifest create $ORGANIZATION/$PROJECT:latest \
-            $ORGANIZATION/$PROJECT-arch:arch-amd64-${{github.event.inputs.tag || github.ref_name}} \
-            $ORGANIZATION/$PROJECT-arch:arch-arm64-${{github.event.inputs.tag || github.ref_name}}
-          docker manifest push $ORGANIZATION/$PROJECT:latest
+          docker manifest create ghcr.io/$ORGANIZATION/$PROJECT:latest \
+            ghcr.io/$ORGANIZATION/$PROJECT-platform:amd64-${{github.event.inputs.tag || github.ref_name}} \
+            ghcr.io/$ORGANIZATION/$PROJECT-platform:arm64-${{github.event.inputs.tag || github.ref_name}}
+          docker manifest push ghcr.io/$ORGANIZATION/$PROJECT:latest
 
+  update-gitops:
+    runs-on: ubuntu-24.04
+    needs: [create-manifest]
+    steps:
       # After we build the Docker image, we create a pull request to update the GitOps repository
       # This will allow us to update the Helm chart with the new Docker image tag.
       - name: Create GitOps Pull Request
         uses: cedricve/gitops-pullrequest-action@master
         with:
           github-token: ${{ secrets.TOKEN }}
-          gitops-repo: "uug-ai/gitops"
-          gitops-file: "environments/staging/${{ env.PROJECT }}/deployment.yaml"
+          gitops-repo: "${{ env.GITOPS_REPO }}"
+          gitops-file: "${{ env.GITOPS_FILE }}"
           gitops-pr-branch: "release-${{ env.PROJECT }}-${{ github.event.inputs.tag || github.ref_name }}"
-          gitops-key: ".spec.template.spec.containers[0].image"
-          gitops-value: "${{ env.ORGANIZATION }}/${{ env.PROJECT }}:${{ github.event.inputs.tag || github.ref_name }}"
+          gitops-key: "${{ env.GITOPS_KEY }}"
+          gitops-value: "${{ env.GITOPS_VALUE }}"
           commit-email: "gitops@uug.ai"
           commit-name: "GitOps - UUG.AI"
-          commit-message: "A new release for ${{ env.ORGANIZATION }}/${{ env.PROJECT }} - ${{ github.event.inputs.tag || github.ref_name }}"
+          commit-message: "A new release for ${{ env.PROJECT }} - ${{ github.event.inputs.tag || github.ref_name }}"
