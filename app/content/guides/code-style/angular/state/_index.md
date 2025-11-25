@@ -1,5 +1,5 @@
 ---
-title: Platform Engineering
+title: Components
 toc: false
 ---
 

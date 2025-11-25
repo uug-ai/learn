@@ -1,5 +1,5 @@
 ---
-title: Style guides
+title: Golang
 toc: false
 ---
 

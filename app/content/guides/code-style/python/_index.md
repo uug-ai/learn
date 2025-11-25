@@ -1,5 +1,5 @@
 ---
-title: Code style
+title: Python
 toc: false
 ---
 
