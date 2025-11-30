@@ -1,0 +1,4 @@
+---
+title: ArgoCD
+toc: false
+---
