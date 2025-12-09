@@ -63,3 +63,9 @@ params:
   editURL:
     enable: true
     base: "https://github.com/uug-ai/documentation/edit/main/app/content"
+
+  hextra:
+    enable: true
+    assets:
+      css:
+        - path: css/custom.css
