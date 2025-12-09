@@ -10,8 +10,6 @@ weight: 2
 
 ---
 
-### Generate default labels
-
 This tool adds starting labels to existing users in the database.
 
 #### Command Line Arguments

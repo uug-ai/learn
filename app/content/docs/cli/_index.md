@@ -10,8 +10,6 @@ weight: 8
 
 ---
 
-# uug-ai/cli
-
 This repository contains CLI tools for performing specific automations.
 - [`vault-to-hub-migration`](vault-to-hub-migration): Migrating data from a Vault database to a Hub database.
 - [`generate-default-labels`](generate-default-labels): Adding labels to existing users.

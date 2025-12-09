@@ -1,5 +1,5 @@
 ---
-title: "Vault to hub migration"
+title: "Vault to Hub migration"
 description: ""
 lead: ""
 date: 2020-10-06T08:49:15+00:00
@@ -10,7 +10,6 @@ weight: 1
 
 ---
 
-### Vault to Hub Migration
 
 This tool migrates data from a Vault database to a Hub database.
 
