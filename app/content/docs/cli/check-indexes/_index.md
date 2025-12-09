@@ -57,7 +57,7 @@ go run main.go -action check-indexes \
 
 ### Index Source File
 
-The source file is a plain text dump of collection names followed by their index definitions from the reference database. Generate it in the MongoDB shell:
+You can find available index versions in the [indexes directory on GitHub](https://github.com/uug-ai/cli/tree/main/indexes). The source file should be a plain text dump of collection names followed by their index definitions from the reference database. To generate it, use the MongoDB shell:
 
 ```
 use("Kerberos");
