@@ -1,5 +1,5 @@
 ---
-title: "Cli"
+title: "CLI"
 description: ""
 lead: ""
 date: 2020-10-06T08:49:15+00:00
@@ -20,13 +20,11 @@ This repository contains CLI tools for performing specific automations.
 
 You can run these jobs in your cluster. The benefit is that you do not need to expose anything, and use the internal Kubernetes dns.
 
+For example: 
 ```sh
 kubectl apply -f jobs/vault-to-hub-migration-job.yaml
 ```
 
-```sh
-kubectl apply -f jobs/generate-default-labels-job.yaml
-```
 
 ## Installation and contributing
 

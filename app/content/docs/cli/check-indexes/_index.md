@@ -14,6 +14,10 @@ weight: 3
 
 Checks a destination MongoDB database for missing indexes against a recommended index set, reports differences, and optionally creates missing indexes.
 
+```sh
+kubectl apply -f jobs/check-indexes.yaml
+```
+
 ### Prerequisites
 
 - A reachable MongoDB instance with appropriate credentials.

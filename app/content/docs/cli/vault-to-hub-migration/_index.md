@@ -10,8 +10,14 @@ weight: 1
 
 ---
 
+### Overview
 
 This tool migrates data from a Vault database to a Hub database.
+
+
+```sh
+kubectl apply -f jobs/vault-to-hub-migration-job.yaml
+```
 
 #### Command Line Arguments
 

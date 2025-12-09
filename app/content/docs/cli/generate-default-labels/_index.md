@@ -10,7 +10,13 @@ weight: 2
 
 ---
 
+### Overview
+
 This tool adds starting labels to existing users in the database.
+
+```sh
+kubectl apply -f jobs/generate-default-labels-job.yaml
+```
 
 #### Command Line Arguments
 
