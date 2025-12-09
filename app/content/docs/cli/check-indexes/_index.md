@@ -14,14 +14,20 @@ weight: 3
 
 Checks a destination MongoDB database for missing indexes against a recommended index set, reports differences, and optionally creates missing indexes.
 
-```sh
-kubectl apply -f jobs/check-indexes.yaml
-```
-
 ### Prerequisites
 
 - A reachable MongoDB instance with appropriate credentials.
 - An index source file exported from a reference database (see below).
+
+### Kubernetes
+
+Run the checker as a Kubernetes Job using the provided template. The Job image wraps the CLI and accepts the same flags via environment variables.
+
+You can find the .yaml template for this job in [this source file.](https://github.com/uug-ai/cli/blob/main/jobs/check-indexes.yaml)
+
+```sh
+kubectl apply -f jobs/check-indexes.yaml
+```
 
 ### Usage
 
