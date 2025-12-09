@@ -23,22 +23,23 @@ Checks a destination MongoDB database for missing indexes against a recommended 
 
 Run in dry-run mode to preview changes:
 
-```
-check-indexes \
+```sh
+go run main.go -action check-indexes \
   -mongodb-uri "mongodb+srv://user:pass@cluster/?retryWrites=true&w=majority" \
-  -mongodb-destination-database "Kerberos" \
-  -index-version "v1.0" \
+  -mongodb-destination-database Kerberos \
+  -collections "" \
+  -index-version hub-08-12-2025 \
   -mode dry-run
 ```
 
 Apply missing indexes in live mode:
 
-```
-check-indexes \
-  -mongodb-uri "mongodb://localhost:27017" \
-  -mongodb-destination-database "Kerberos" \
-  -collections "organisation,cache,counting" \
-  -index-version "v1.0" \
+```sh
+go run main.go -action check-indexes \
+  -mongodb-uri "mongodb+srv://user:pass@cluster/?retryWrites=true&w=majority" \
+  -mongodb-destination-database Kerberos \
+  -collections organisation,cache,counting \
+  -index-version hub-08-12-2025 \
   -mode live
 ```
 
