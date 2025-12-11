@@ -13,15 +13,40 @@ entityStatusCode EntityStatus
     
 ### Levels
 
-- logrus.Trace("Something very low level.")
-- logrus.Debug("Useful debugging information.")
-- logrus.Info("Something noteworthy happened!")
-- logrus.Warn("You should probably take a look at this.")
-- logrus.Error("Something failed but I'm not quitting.")
-    // Calls os.Exit(1) after logging
-- logrus.Fatal("Bye.")
-    // Calls panic() after logging
-- logrus.Panic("I'm bailing.")
+- Trace: Extremely low-level, noisy details.
+    ```go
+    logrus.Trace("cache miss; key=abc123; probing secondary store")
+    ```
+
+- Debug: Developer-focused state inspection.
+    ```go
+    logrus.Debugf("auth flow: user=%s scopes=%v", user.ID, user.Scopes)
+    ```
+
+- Info: Normal operational events.
+    ```go
+    logrus.WithFields(logrus.Fields{"job": "thumbnailer", "file": "video_1733992211.mp4"}).Info("job started")
+    ```
+
+- Warn: Non-fatal anomalies worth attention.
+    ```go
+    logrus.WithField("retry_in_ms", 500).Warn("queue publish failed; will retry")
+    ```
+
+- Error: Failures that didn’t crash the process.
+    ```go
+    logrus.WithError(err).WithField("device_id", device.ID).Error("media transfer failed")
+    ```
+
+- Fatal: Critical error leading to process exit (calls os.Exit(1)).
+    ```go
+    if cfg.DBURI == "" { logrus.Fatal("missing DB URI; cannot start service") }
+    ```
+
+- Panic: Unexpected invariant violation (calls panic() after logging).
+    ```go
+    if bytesRead < 0 { logrus.Panic("negative bytes read; corrupt stream") }
+    ```
 
 ### Usage
 
