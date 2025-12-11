@@ -15,37 +15,73 @@ entityStatusCode EntityStatus
 
 - Trace: Extremely low-level, noisy details.
     ```go
-    logrus.Trace("cache miss; key=abc123; probing secondary store")
+    // Using API wrappers
+    api.LogTrace(logger, api.CreateTrace(
+            api.HttpStatusOK,
+            api.ApplicationStatusSuccess,
+            api.NotificationTracingFailed, // example entity status
+            api.Metadata{TraceId: traceID, Function: "cacheProbe", Data: map[string]any{"key": "abc123"}},
+    ), nil)
     ```
 
 - Debug: Developer-focused state inspection.
     ```go
-    logrus.Debugf("auth flow: user=%s scopes=%v", user.ID, user.Scopes)
+    api.LogDebug(logger, api.CreateDebug(
+            api.HttpStatusOK,
+            api.ApplicationStatusSuccess,
+            api.NotificationTracingFailed,
+            api.Metadata{UserId: user.ID, Function: "authFlow", Data: map[string]any{"scopes": user.Scopes}},
+    ), nil)
     ```
 
 - Info: Normal operational events.
     ```go
-    logrus.WithFields(logrus.Fields{"job": "thumbnailer", "file": "video_1733992211.mp4"}).Info("job started")
+    api.LogInfo(logger, api.CreateSuccess(
+            api.HttpStatusOK,
+            api.ApplicationStatusGetSuccess,
+            api.NotificationTracingFailed,
+            api.Metadata{Function: "thumbnailJob", Data: map[string]any{"file": "video_1733992211.mp4"}},
+    ), map[string]any{"job": "thumbnailer"})
     ```
 
 - Warn: Non-fatal anomalies worth attention.
     ```go
-    logrus.WithField("retry_in_ms", 500).Warn("queue publish failed; will retry")
+    api.LogWarning(logger, api.CreateWarning(
+            api.HttpStatusServiceUnavailable,
+            api.ApplicationStatusGetFailed,
+            api.NotificationTracingFailed,
+            api.Metadata{Function: "publish", Data: map[string]any{"retry_in_ms": 500}},
+    ), nil)
     ```
 
 - Error: Failures that didn’t crash the process.
     ```go
-    logrus.WithError(err).WithField("device_id", device.ID).Error("media transfer failed")
+    api.LogError(logger, api.CreateError(
+            api.HttpStatusInternalServerError,
+            api.ApplicationStatusError,
+            api.NotificationTracingFailed,
+            api.Metadata{DeviceId: device.ID, Error: err.Error(), Function: "mediaTransfer"},
+    ))
     ```
 
 - Fatal: Critical error leading to process exit (calls os.Exit(1)).
     ```go
-    if cfg.DBURI == "" { logrus.Fatal("missing DB URI; cannot start service") }
+    api.LogFatal(logger, api.CreateFatal(
+            api.HttpStatusServiceUnavailable,
+            api.ApplicationStatusError,
+            api.NotificationTracingFailed,
+            api.Metadata{Function: "startup", Error: "missing DB URI"},
+    ), nil)
     ```
 
 - Panic: Unexpected invariant violation (calls panic() after logging).
     ```go
-    if bytesRead < 0 { logrus.Panic("negative bytes read; corrupt stream") }
+    api.LogPanic(logger, api.CreatePanic(
+            api.HttpStatusInternalServerError,
+            api.ApplicationStatusError,
+            api.NotificationTracingFailed,
+            api.Metadata{Function: "streamRead", Error: "negative bytes read"},
+    ), nil)
     ```
 
 ### Usage
