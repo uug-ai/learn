@@ -13,12 +13,15 @@ entityStatusCode EntityStatus
     
 ### Levels
 
-- LogDebug: Detailed information during development.
-- LogInfo: General runtime information about the application.
-- LogWarn: Notifications about potential issues or minor problems.
-- LogError: Logs for significant issues that require attention.
-- LogFatal: Critical errors that terminate the program (exits).
-- LogPanic: Severe issues causing the program to panic (panics).
+- logrus.Trace("Something very low level.")
+- logrus.Debug("Useful debugging information.")
+- logrus.Info("Something noteworthy happened!")
+- logrus.Warn("You should probably take a look at this.")
+- logrus.Error("Something failed but I'm not quitting.")
+    // Calls os.Exit(1) after logging
+- logrus.Fatal("Bye.")
+    // Calls panic() after logging
+- logrus.Panic("I'm bailing.")
 
 ### Usage
 
