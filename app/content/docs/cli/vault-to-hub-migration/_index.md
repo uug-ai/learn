@@ -1,4 +1,3 @@
----
 title: "Vault to Hub migration"
 description: ""
 lead: ""
@@ -12,110 +11,101 @@ weight: 1
 
 ### Overview
 
-This tool migrates data from a Vault database to a Hub database.
+Migrates data from a Vault database to a Hub database. Supports `dry-run` to validate the plan and `live` to execute the migration.
 
+### Prerequisites
+
+- Reachable MongoDB instances (Vault source and Hub destination) with appropriate credentials.
+- Queue integration configured and reachable (e.g., RabbitMQ) when piping events to the Hub pipeline.
+- A target username and time window defining the migration scope.
+
+### Kubernetes
+
+Run the migration as a Kubernetes Job using the provided template. The Job image wraps the CLI and accepts the same flags via environment variables.
+
+You can find the .yaml template for this job in [this source file.](https://github.com/uug-ai/cli/blob/main/jobs/vault-to-hub-migration-job.yaml)
 
 ```sh
 kubectl apply -f jobs/vault-to-hub-migration-job.yaml
 ```
 
-#### Command Line Arguments
+### Usage
 
-- `-action`: The action to take (required). For migration, use `vault-to-hub-migration`.
-- `-mongodb-uri`: The MongoDB URI (optional if host and port are provided).
-- `-mongodb-host`: The MongoDB host (optional if URI is provided).
-- `-mongodb-port`: The MongoDB port (optional if URI is provided).
-- `-mongodb-source-database`: The source database name (required).
-- `-mongodb-destination-database`: The destination database name (required).
-- `-mongodb-database-credentials`: The database credentials (optional).
-- `-mongodb-username`: The MongoDB username (optional).
-- `-mongodb-password`: The MongoDB password (optional).
-- `-username`: The username to filter data (required).
-- `-queue`: The integration used to transfer events to the hub pipeline.
-- `-start-timestamp`: The start timestamp for filtering data (required).
-- `-end-timestamp`: The end timestamp for filtering data (required).
-- `-timezone`: The timezone for converting timestamps (optional, default is `UTC`).
-- `-pipeline`: The pipeline to execute (optional, default is `monitor,sequence`).
-- `-batch-size`: The size of each batch (optional, default is `10`).
-- `-batch-delay`: The delay between batches in milliseconds (optional, default is `1000`).
-- `-mode`: You can choose to run a `dry-run` or `live`.
-
-#### Example
-
-To run the Vault to Hub migration, use the following command:
+Run in dry-run mode to validate the plan:
 
 ```sh
 go run main.go -action vault-to-hub-migration \
-               -mongodb-uri "mongodb+srv://<username>:<password>@<host>/<database>?retryWrites=true&w=majority&appName=<appName>" \
-               -mongodb-source-database=<sourceDatabase> \
-               -mongodb-destination-database=<destinationDatabase> \
-               -queue <rabbitmq-integration> \
-               -username <username> \
-               -start-timestamp <startTimestamp> \
-               -end-timestamp <endTimestamp> \
-               -timezone <timezone> \
-               -pipeline 'monitor,sequence,analysis' \
-               -mode dry-run \
-               -batch-size 100 \
-               -batch-delay 1000
+      -mongodb-uri "mongodb+srv://user:pass@cluster/?retryWrites=true&w=majority" \
+      -mongodb-source-database KerberosStorage \
+      -mongodb-destination-database Kerberos \
+      -queue rabbitmq-default \
+      -username alice \
+      -start-timestamp "2024-04-01T08:47:40" \
+      -end-timestamp "2025-04-06T17:41:00" \
+      -timezone UTC \
+      -pipeline "monitor,sequence" \
+      -batch-size 100 \
+      -batch-delay 1000 \
+      -mode dry-run
 ```
 
-#### Output
+Execute the migration in live mode:
 
-            _    _ _    _  _____     _____ _ _
-            | |  | | |  | |/ ____|   / ____(_) |
-            | |  | | |  | | |  __   | |     _| |
-            | |  | | |  | | | |_ |  | |    | | |
-            | |__| | |__| | |__| |  | |____| | |
-            \____/ \____/ \_____|   \_____|_|_|
+```sh
+go run main.go -action vault-to-hub-migration \
+      -mongodb-uri "mongodb+srv://user:pass@cluster/?retryWrites=true&w=majority" \
+      -mongodb-source-database KerberosStorage \
+      -mongodb-destination-database Kerberos \
+      -queue rabbitmq-default \
+      -username alice \
+      -start-timestamp "2024-04-01T08:47:40" \
+      -end-timestamp "2025-04-06T17:41:00" \
+      -timezone UTC \
+      -pipeline "monitor,sequence,analysis" \
+      -batch-size 100 \
+      -batch-delay 1000 \
+      -mode live
+```
 
+### Arguments
 
-      Starting Vault to Hub migration...
-      2024/12/12 09:37:39 ====================================
-      2024/12/12 09:37:39 Configuration:
-      2024/12/12 09:37:39   MongoDB URI: mongodb+srv://xxxx
-      2024/12/12 09:37:39   MongoDB Host:
-      2024/12/12 09:37:39   MongoDB Port:
-      2024/12/12 09:37:39   MongoDB Source Database: KerberosStorage
-      2024/12/12 09:37:39   MongoDB Destination Database: Kerberos
-      2024/12/12 09:37:39   MongoDB Database Credentials:
-      2024/12/12 09:37:39   MongoDB Username:
-      2024/12/12 09:37:39   MongoDB Password: ************
-      2024/12/12 09:37:39   Queue: rabbitmq-xxxx
-      2024/12/12 09:37:39   Username: xxxx
-      2024/12/12 09:37:39   Start Time 2024-04-01 08:47:40 +0200 CEST
-      2024/12/12 09:37:39   End Time 2025-04-06 17:41:00 +0200 CEST
-      2024/12/12 09:37:39   Pipeline monitor,sequence,analysis
-      2024/12/12 09:37:39 ====================================
+- `-mongodb-uri`: MongoDB connection URI with credentials (optional if host/port are provided).
+- `-mongodb-host`: MongoDB host (optional if URI is provided).
+- `-mongodb-port`: MongoDB port (optional if URI is provided).
+- `-mongodb-source-database`: Source (Vault) database name (required).
+- `-mongodb-destination-database`: Destination (Hub) database name (required).
+- `-mongodb-database-credentials`: Database credentials (optional).
+- `-mongodb-username`: MongoDB username (optional).
+- `-mongodb-password`: MongoDB password (optional).
+- `-username`: Username to filter data (required).
+- `-queue`: Integration used to transfer events to the Hub pipeline (e.g., RabbitMQ).
+- `-start-timestamp`: Start timestamp for filtering data (required).
+- `-end-timestamp`: End timestamp for filtering data (required).
+- `-timezone`: Timezone for converting timestamps (optional, default `UTC`).
+- `-pipeline`: Pipeline stages to execute (optional, default `monitor,sequence`).
+- `-batch-size`: Size of each batch (optional, default `10`).
+- `-batch-delay`: Delay between batches in milliseconds (optional, default `1000`).
+- `-mode`: One of `dry-run` (no changes, report only) or `live` (execute migration).
 
-      >> Please wait while we migrate the data. Press Ctrl+C to stop the process.
-      Vault to Hub: delta complete   42s [====================================================================] 100%
-      Transferring media    1s [====================================================================] 100%
-      2024/12/12 09:38:26
-      2024/12/12 09:38:26 >>Media transferred:
-      2024/12/12 09:38:26
-      2024/12/12 09:38:26   +---------------------------------------------------------------------------------------+-----------------+-----------------+-------------------------------------+
-      2024/12/12 09:38:26   | File Name                                                                             | File Size       | Timestamp       | Device                              |
-      2024/12/12 09:38:26   +---------------------------------------------------------------------------------------+-----------------+-----------------+-------------------------------------+
-      2024/12/12 09:38:26   | xxxxxxxx/1733992176_6-967003_melle-insidegarage_200-200-400-400_25819_769.mp4         | 7261430         | 1733992211      | melle-insidegarage                  |
-      2024/12/12 09:38:26   | xxxxxxxx/1733991780_6-967003_melle-garage_200-200-400-400_256_769.mp4                 | 14206272        | 1733991818      | melle-garage                        |
-      2024/12/12 09:38:26   | xxxxxxxx/1733991781_6-967003_melle-street_200-200-400-400_819_769.mp4                 | 3603494         | 1733991817      | melle-street                        |
-      2024/12/12 09:38:26   | xxxxxxxx/1733991587_6-967003_gb-side_200-200-400-400_342_769.mp4                      | 8167534         | 1733991611      | vSQBjrhqGGOXseLoidIBFhKeJjCjTM      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733991547_6-967003_gb-side_200-200-400-400_883_769.mp4                      | 12197049        | 1733991586      | vSQBjrhqGGOXseLoidIBFhKeJjCjTM      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733991501_6-967003_gb-side_200-200-400-400_1472_769.mp4                     | 12130152        | 1733991538      | vSQBjrhqGGOXseLoidIBFhKeJjCjTM      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733990945_6-967003_gb-side_200-200-400-400_6547_769.mp4                     | 7097803         | 1733990966      | vSQBjrhqGGOXseLoidIBFhKeJjCjTM      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733990903_6-967003_gb-side_200-200-400-400_9313_769.mp4                     | 7709073         | 1733990928      | vSQBjrhqGGOXseLoidIBFhKeJjCjTM      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733990868_6-967003_gb-frontdoor_200-200-400-400_158_769.mp4                 | 1882747         | 1733990885      | lQtymLrehWpHkTavfcNTFgwfDMoSfg      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733990742_6-967003_gb-side_200-200-400-400_214198_769.mp4                   | 7015592         | 1733990765      | vSQBjrhqGGOXseLoidIBFhKeJjCjTM      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733990698_6-967003_gb-frontdoor_200-200-400-400_155_769.mp4                 | 1487304         | 1733990713      | lQtymLrehWpHkTavfcNTFgwfDMoSfg      |
+### How It Works
+
+- Resolves the time window and converts timestamps using `-timezone`.
+- Scans Vault for user-scoped events/media within the window.
+- Transforms and enqueues events to the Hub pipeline via `-queue`.
+- Persists migrated data into the Hub destination database, respecting configured pipeline stages.
+- In `dry-run`, prints a detailed plan and counts; in `live`, executes the migration with batching and delays.
+
+### Output
+
+- Configuration header showing key parameters.
+- Progress meters for delta calculation and media transfer.
+- Per-stage summaries and totals.
+- A final summary with success and skip/error counts.
+
+### Notes
+
+- Prefer running `live` during low traffic windows to reduce impact.
+- Validate with a short time window and a single user before broader runs.
+- Ensure appropriate roles/permissions on both source and destination databases and access to the queue integration.
       2024/12/12 09:38:26   | xxxxxxxx/1733990683_6-967003_gb-frontdoor_200-200-400-400_177_769.mp4                 | 1966309         | 1733990701      | lQtymLrehWpHkTavfcNTFgwfDMoSfg      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733990499_6-967003_gb-frontdoor_200-200-400-400_176_769.mp4                 | 3430326         | 1733990530      | lQtymLrehWpHkTavfcNTFgwfDMoSfg      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733990314_6-967003_gb-frontdoor_200-200-400-400_168_769.mp4                 | 3667828         | 1733990347      | lQtymLrehWpHkTavfcNTFgwfDMoSfg      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733990130_6-967003_gb-frontdoor_200-200-400-400_153_769.mp4                 | 3839485         | 1733990165      | lQtymLrehWpHkTavfcNTFgwfDMoSfg      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733989945_6-967003_gb-frontdoor_200-200-400-400_151_769.mp4                 | 3590120         | 1733989979      | lQtymLrehWpHkTavfcNTFgwfDMoSfg      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733989761_6-967003_gb-frontdoor_200-200-400-400_164_769.mp4                 | 3730173         | 1733989794      | lQtymLrehWpHkTavfcNTFgwfDMoSfg      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733989573_6-967003_gb-frontdoor_200-200-400-400_154_769.mp4                 | 3878792         | 1733989606      | lQtymLrehWpHkTavfcNTFgwfDMoSfg      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733989397_6-967003_gb-frontdoor_200-200-400-400_166_769.mp4                 | 3846902         | 1733989430      | lQtymLrehWpHkTavfcNTFgwfDMoSfg      |
-      2024/12/12 09:38:26   | xxxxxxxx/1733989379_6-967003_gb-frontdoor_200-200-400-400_162_769.mp4                 | 2107887         | 1733989400      | lQtymLrehWpHkTavfcNTFgwfDMoSfg      |
-      2024/12/12 09:38:26   +---------------------------------------------------------------------------------------+-----------------+-----------------+-------------------------------------+
 
