@@ -1,4 +1,15 @@
 #!/bin/zsh
+
+# Check if private.gpg and github_rsa files exist in the current directory
+if [ ! -f private.gpg ]; then
+    echo "✗ GPG private key file 'private.gpg' not found in the current directory."
+    exit 1
+fi
+if [ ! -f github_rsa ]; then
+    echo "✗ SSH private key file 'github_rsa' not found in the current directory."
+    exit 1
+fi
+
 # Add GPG keys
 gpg --list-secret-keys --keyid-format LONG > /dev/null 2>&1
 if [ $? -ne 0 ]; then
