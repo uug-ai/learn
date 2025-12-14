@@ -14,8 +14,8 @@ Within Augment Vision we are working with the Apple and Google stack, which mean
 
 At Augment Vision, we streamline onboarding through a two-phase provisioning process:
 
-1. **[Dev Machine](./devmachine.md)**: Configure your local development environment with essential tools and dependencies
-2. **[Dev Container](./devcontainers.md)**: Deploy a containerized development environment with pre-configured runtime, dependencies, and debugging tools for project contribution
+1. **[Dev Machine](./dev-machine.md)**: Configure your local development environment with essential tools and dependencies or use GitHub Codespaces
+2. **[Dev Container](./dev-containers.md)**: Deploy a containerized development environment with pre-configured runtime, dependencies, and debugging tools for project contribution
 
 This approach ensures you can contribute effectively to our projects quickly while maintaining consistency across the team.
 
