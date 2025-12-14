@@ -19,3 +19,14 @@ At Augment Vision, we streamline onboarding through a two-phase provisioning pro
 
 This approach ensures you can contribute effectively to our projects quickly while maintaining consistency across the team.
 
+## Supportive tooling
+
+At Augment Vision, we use a suite of integrated tools to streamline code sharing, deployment monitoring, and team collaboration. Each tool is detailed in dedicated guides, but here's a quick overview:
+
+- **Version Control**: GitHub for code management, collaboration, and pull request reviews
+- **CI/CD Pipeline**: GitHub Actions for automated testing and deployment, with GitOps/ArgoCD managing production deployments
+- **Communication**: Slack for team messaging and community engagement
+- **Project Management**: GitHub Projects for tracking issues, pull requests, and development progress
+- **Documentation**: Centralized knowledge base at learn.uug.ai with documentation replicated across local repositories for easy access
+
+Refer to the specific guides in this section for in-depth setup and usage instructions.
