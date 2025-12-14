@@ -1,0 +1,100 @@
+#!/bin/zsh
+# Add GPG keys
+gpg --list-secret-keys --keyid-format LONG > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "✗ No GPG keys found. Please generate a GPG key before proceeding."
+    exit 1
+fi
+# Import GPG key if it doesn't already exist
+if ! gpg --list-secret-keys --keyid-format LONG | grep -q .; then
+    if [ -f private.gpg ]; then
+        gpg --import private.gpg
+    else
+        echo "✗ GPG private key file 'private.gpg' not found."
+    fi
+fi
+# Extract the key ID of the imported key
+KEY_ID=$(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{print $2}' | cut -d'/' -f2 | head -n 1)
+
+# Check if key was already configured
+if git config --global user.signingkey &>/dev/null; then
+    echo "✓ GPG key already configured for Git signing."
+else
+    # Configure Git to use the GPG key for signing commits
+    git config --global user.signingkey $KEY_ID
+    git config --global commit.gpgsign true
+    echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
+    echo "✓ Git configured to use GPG key for signing commits."
+fi
+
+# Add SSH keys
+if [ ! -f github_rsa ]; then
+    echo "✗ SSH private key file 'github_rsa' not found. Please provide the SSH key before proceeding."
+fi
+mkdir -p ~/.ssh
+if [ ! -f ~/.ssh/github_rsa ]; then
+    cp github_rsa ~/.ssh/github_rsa
+    chmod 600 ~/.ssh/github_rsa
+    # Use -K flag to persist key in macOS Keychain across reboots
+    ssh-add -K ~/.ssh/github_rsa 2>/dev/null || ssh-add --apple-use-keychain ~/.ssh/github_rsa
+    echo "✓ SSH key added to Keychain for persistence across reboots."
+else
+    echo "✓ SSH key already exists, skipping."
+fi
+
+# Configure SSH config to use Keychain
+if [ ! -f ~/.ssh/config ]; then
+    cat > ~/.ssh/config << 'EOF'
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/github_rsa
+    UseKeychain yes
+    AddKeysToAgent yes
+EOF
+    chmod 600 ~/.ssh/config
+    echo "✓ SSH config created with Keychain integration."
+else
+    if ! grep -q "UseKeychain yes" ~/.ssh/config; then
+        echo "Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/github_rsa
+    UseKeychain yes
+    AddKeysToAgent yes" >> ~/.ssh/config
+        echo "✓ GitHub SSH config added to existing config."
+    fi
+fi
+if ! grep -q "github.com" ~/.ssh/known_hosts 2>/dev/null; then
+    ssh-keyscan github.com >> ~/.ssh/known_hosts
+    echo "✓ GitHub host key added to known_hosts."
+else
+    echo "✓ GitHub host key already in known_hosts, skipping."
+fi
+
+# Setup base project directories
+mkdir -p ~/Projects/github.com/uug-ai
+echo "✓ Created folder structure at ~/Projects/github.com/uug-ai/"
+
+# Clone essential repositories
+cd ~/Projects/github.com/uug-ai
+repos=(
+    "models"
+    "hub-frontend"
+    "hub-api"
+    "hub-pipeline"
+    "learn"
+    "gitops"
+)
+for repo in "${repos[@]}"; do
+    if [ -d "$repo" ]; then
+        echo "✓ Repository '$repo' already exists, skipping clone."
+    else
+        git clone git@github.com:uug-ai/$repo.git 2>/dev/null
+        if [ $? -eq 0 ]; then
+            echo "✓ Successfully cloned '$repo'."
+        else
+            echo "✗ Failed to clone '$repo'. Check your SSH key and GitHub access."
+        fi
+    fi
+done
