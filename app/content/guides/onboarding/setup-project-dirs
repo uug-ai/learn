@@ -94,6 +94,12 @@ repos=(
     "hub-frontend"
     "hub-api"
     "hub-pipeline"
+    "hub-pipeline-event"
+    "hub-pipeline-monitor"
+    "hub-pipeline-sequence"
+    "hub-pipeline-thumbnail"
+    "hub-pipeline-notification"
+    "hub-pipeline-notification-test"
     "learn"
     "gitops"
 )
