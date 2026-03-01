@@ -26,7 +26,6 @@ fi
 gpg --list-secret-keys --keyid-format LONG > /dev/null 2>&1
 if [ $? -ne 0 ]; then
     echo "✗ No GPG keys found. Please generate a GPG key before proceeding."
-    exit 1
 fi
 # Import GPG key if it doesn't already exist
 if ! gpg --list-secret-keys --keyid-format LONG | grep -q .; then
