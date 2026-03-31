@@ -30,6 +30,7 @@
 
 .hextra-max-page-width {
   max-width: 1200px;
+  padding-top: 0.75rem;
 }
 
 .learn-topbar {
