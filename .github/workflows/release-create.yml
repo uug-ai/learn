@@ -14,7 +14,7 @@ jobs:
       runner_matrix: '[{"architecture":"amd64","runner":"ubuntu-24.04"},{"architecture":"arm64","runner":"ubuntu-24.04-arm"}]'
       create_gitops_pr: true
       gitops_repo: "uug-ai/gitops"
-      gitops_file: "environments/staging/design/deployment.yaml"
+      gitops_file: "environments/staging/learn/deployment.yaml"
       gitops_key: ".spec.template.spec.containers[0].image"
       gitops_value: "ghcr.io/uug-ai/learn:${{ github.event.release.tag_name }}"
     secrets: inherit
