@@ -33,6 +33,14 @@ cd app
 hugo mod get -u github.com/imfing/hextra
 ```
 
+To work on the theme locally, vendor it into the project:
+```bash
+cd app
+hugo mod vendor
+```
+
+This makes the Hextra source available under `app/_vendor/github.com/imfing/hextra/`, including editable CSS files such as `assets/css/styles.css` and `assets/css/custom.css`.
+
 Or if using Git submodules:
 ```bash
 git submodule add https://github.com/imfing/hextra.git app/themes/hextra

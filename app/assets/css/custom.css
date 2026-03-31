@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap');
 
 :root {
+  --hx-text-base: 1rem;
   --primary-hue: 339deg;
   --primary-saturation: 93%;
   --primary-lightness: 50%;
@@ -117,7 +118,7 @@
   color: var(--text-secondary);
   text-decoration: none;
   font-family: var(--font-family-body);
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 500;
   line-height: 1.2;
   white-space: nowrap;
@@ -125,11 +126,15 @@
 }
 
 .learn-topbar-link:hover,
-.learn-topbar-dropdown-toggle:hover,
+.learn-topbar-dropdown-toggle:hover {
+  color: var(--primary-color);
+  background: transparent;
+}
+
 .learn-topbar-link.is-active,
 .learn-topbar-dropdown-toggle.is-active {
   color: var(--primary-color);
-  background: rgba(11, 11, 18, 0.04);
+  background: transparent;
 }
 
 .learn-topbar-link-icon {
