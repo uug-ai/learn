@@ -1,6 +1,8 @@
 #!/bin/zsh
 
 # Example usage:
+# Place your own local `private.gpg` and `github_rsa` files next to this script.
+# These key files are intentionally gitignored and must not be committed.
 # ./setup-project-dirs            # Uses all defaults
 # ./setup-project-dirs private.gpg github_rsa "John Doe" "john@example.com"
 
