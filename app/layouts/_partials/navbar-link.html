@@ -1,0 +1,63 @@
+{{- $currentPage := .currentPage -}}
+{{- $link := .link -}}
+{{- $item := .item -}}
+{{- $icon := .icon -}}
+{{- $external := .external -}}
+
+{{- $active := or ($currentPage.HasMenuCurrent "main" $item) ($currentPage.IsMenuCurrent "main" $item) -}}
+{{- $activeClass := cond $active "is-active" "" -}}
+
+{{- if $item.HasChildren -}}
+<div class="learn-topbar-dropdown">
+  <button
+    title="{{ or (T $item.Identifier) $item.Name | safeHTML }}"
+    data-state="closed"
+    class="hextra-nav-menu-toggle learn-topbar-link learn-topbar-dropdown-toggle {{ $activeClass }}"
+    type="button"
+    aria-label="{{ or (T $item.Identifier) $item.Name | safeHTML }}"
+  >
+    {{- if $icon -}}
+    <span class="learn-topbar-link-icon">
+      {{- partial "utils/icon" (dict "name" $icon "attributes" `height="1em" class="hx:inline-block"`) -}}
+    </span>
+    {{- end -}}
+    <span>{{- or (T $item.Identifier) $item.Name | safeHTML -}}</span>
+    {{- partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "height=12 class=learn-topbar-chevron") -}}
+  </button>
+  <ul class="hextra-nav-menu-items learn-topbar-dropdown-menu hx:hidden" style="min-width: 12rem;">
+    {{ range $item.Children }}
+    {{- $link := .URL -}}
+    {{- $external := strings.HasPrefix $link "http" -}}
+    {{- with .PageRef -}}
+    {{- if hasPrefix . "/" -}}
+    {{- $link = relLangURL (strings.TrimPrefix "/" .) -}}
+    {{- end -}}
+    {{- end -}}
+    <li class="learn-topbar-dropdown-item">
+      <a href="{{ $link }}" {{ if $external }}target="_blank" rel="noreferrer"{{ end }} class="learn-topbar-dropdown-link">
+        {{- if and (eq .Params.type "link") .Params.icon -}}
+        <span class="learn-topbar-link-icon">
+          {{- partial "utils/icon" (dict "name" .Params.icon "attributes" `height="1em" class="hx:inline-block"`) -}}
+        </span>
+        {{- end -}}
+        {{- or (T .Identifier) .Name | safeHTML -}}
+      </a>
+    </li>
+    {{- end -}}
+  </ul>
+</div>
+{{- else -}}
+<a
+  title="{{ or (T .Identifier) .Name | safeHTML }}"
+  href="{{ $link }}"
+  {{ if $external }}target="_blank" rel="noreferrer"{{ end }}
+  class="learn-topbar-link {{ $activeClass }}"
+>
+  {{- if $icon -}}
+  <span class="learn-topbar-link-icon">
+    {{- partial "utils/icon" (dict "name" $icon "attributes" `height="1em" class="hx:inline-block"`) -}}
+  </span>
+  {{- end -}}
+  <span>{{- or (T $item.Identifier) $item.Name | safeHTML -}}</span>
+</a>
+{{- end -}}
