@@ -28,6 +28,10 @@
   --shadow: rgba(20, 11, 59, 0.08);
 }
 
+.hextra-max-page-width {
+  max-width: 1200px;
+}
+
 .learn-topbar {
   position: sticky;
   top: 0;
@@ -43,28 +47,24 @@
   inset: 0 0 auto;
   height: var(--navbar-accent-height);
   background: var(--brand-gradient);
-  z-index: 1;
-}
-
-.learn-topbar-backdrop {
-  background: rgba(255, 255, 255, 0.92) !important;
-  box-shadow: none !important;
-}
-
-.dark .learn-topbar-backdrop {
-  background: rgba(17, 17, 17, 0.86) !important;
+  z-index: 0;
 }
 
 .learn-topbar-inner {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   max-width: 1200px;
   margin: 0 auto;
   min-height: var(--navbar-height);
-  padding: 14px 20px;
+  padding: calc(14px + var(--navbar-accent-height)) 20px 14px;
   display: flex;
   align-items: center;
   gap: 20px;
+}
+
+.learn-topbar-inner > * {
+  position: relative;
+  z-index: 1;
 }
 
 .learn-topbar-brand {
@@ -75,6 +75,12 @@
   color: var(--text-primary);
   text-decoration: none;
   min-width: 0;
+  font-family: var(--font-family-heading);
+  font-size: 1rem;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: 0.1em;
 }
 
 .learn-topbar-brand:hover {
@@ -83,7 +89,7 @@
 
 .learn-topbar-brand-text {
   font-family: var(--font-family-heading);
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 600;
   font-style: normal;
   line-height: 1;
@@ -190,13 +196,14 @@
 
 .learn-topbar .hextra-search-input {
   width: 100%;
-  min-width: 13rem;
+  min-width: 0;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--surface);
   color: var(--text-primary);
   font-family: var(--font-family-body);
   box-shadow: none;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease;
 }
 
 .learn-topbar .hextra-search-input:focus {
@@ -207,6 +214,10 @@
   border-color: var(--border);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.95);
+}
+
+.learn-topbar .hextra-search-results {
+  min-width: min(22rem, calc(100vw - 2rem));
 }
 
 .learn-topbar-icon-link,
@@ -255,7 +266,24 @@
 
   .learn-topbar .hextra-search-wrapper {
     display: inline-block;
+    width: 8rem;
     margin-left: auto;
+    transition: width 0.22s ease;
+  }
+
+  .learn-topbar .hextra-search-wrapper:focus-within {
+    width: 11.75rem;
+  }
+
+  .learn-topbar .hextra-search-results {
+    left: auto;
+    right: 0;
+    width: min(28rem, calc(100vw - 2rem));
+    max-width: min(28rem, calc(100vw - 2rem));
+  }
+
+  .learn-topbar .hextra-search-input:focus {
+    box-shadow: 0 0 0 4px rgba(39, 19, 255, 0.08);
   }
 
   .learn-topbar-toggle {
