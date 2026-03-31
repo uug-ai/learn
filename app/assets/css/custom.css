@@ -9,9 +9,12 @@
   --secondary-saturation: 100%;
   --secondary-lightness: 50%;
 
-  --navbar-height: 4.5rem;
+  --navbar-accent-height: 4px;
+  --navbar-height: calc(4.5rem + var(--navbar-accent-height));
   --font-family-heading: 'Outfit', sans-serif;
   --font-family-body: 'Inter', sans-serif;
+  --hx-font-sans: var(--font-family-body);
+  --hx-default-font-family: var(--font-family-body);
   --primary-color: #2713ff;
   --primary-dark: #1807c7;
   --secondary-color: #ff0059;
@@ -38,7 +41,7 @@
   content: '';
   position: absolute;
   inset: 0 0 auto;
-  height: 4px;
+  height: var(--navbar-accent-height);
   background: var(--brand-gradient);
   z-index: 1;
 }
@@ -67,7 +70,7 @@
 .learn-topbar-brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.65rem;
   margin-right: auto;
   color: var(--text-primary);
   text-decoration: none;
@@ -78,20 +81,13 @@
   color: var(--primary-color);
 }
 
-.learn-topbar-brand-mark {
-  width: auto;
-  max-width: 40px;
-  height: auto;
-  flex: 0 0 auto;
-}
-
 .learn-topbar-brand-text {
   font-family: var(--font-family-heading);
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 600;
+  font-style: normal;
   line-height: 1;
   letter-spacing: 0.12em;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -273,6 +269,19 @@
 
 body {
   font-family: var(--font-family-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.hx\:text-4xl,
+.hx\:text-3xl,
+.hx\:text-2xl,
+.hx\:text-xl {
+  font-family: var(--font-family-heading);
 }
 
 main > h1 {
