@@ -6,7 +6,7 @@
 	],
 	"dockerFile": "Dockerfile",
 	"mounts": [
-		"source=${localWorkspaceFolder}/../design,target=/workspaces/design,type=bind"
+		"source=${localWorkspaceFolder}/../gitops,target=/workspaces/gitops,type=bind"
 	],
 	"customizations": {
 		"vscode": {
