@@ -36,7 +36,7 @@ To define the archiving retention period a new Kerberos Vault has to be created,
 
 ## Define archive provider and account in Kerberos Hub
 
-Now you have properly configured your Kerberos Vault instance for archiving, we need to make aware Kerberos Hub where to archive our recordings (in which provider and through which account). Open up the `values.yaml` and look for the `kerberosvault` section. Here you will find the `archive` property.
+Now you have properly configured your Kerberos Vault instance for archiving, we need to make aware Kerberos Hub where to archive our recordings (in which provider and through which account). Open up the [`values.yaml`](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/values.yaml#L136-L142) and look for the `kerberosvault` section. Here you will find the `archive` property.
 
     # We have a kerberos vault component installed which contains all the
     # recordings. Kerberos vault is queried to retrieve the recordings
