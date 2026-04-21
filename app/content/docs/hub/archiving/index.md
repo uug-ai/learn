@@ -13,11 +13,11 @@ weight: 305
 toc: true
 ---
 
-By default, recordings are persisted for a limited amount of time. Within Kerberos Hub you define a retention period per subscription and assign it to a user. The retention period can be set to 30, 60, 90 days or any custom value. It determines how many days of footage are visible to the end-user after login, and controls when the associated recordings are removed from Vault.
+By default, recordings are persisted for a limited amount of time. Within Hub you define a retention period per subscription and assign it to a user. The retention period can be set to 30, 60, 90 days or any custom value. It determines how many days of footage are visible to the end-user after login, and controls when the associated recordings are removed from Vault.
 
 There are many situations where you may want to retain specific recordings for future inspection, or simply because an event is important. By archiving a recording, it is copied to a separate storage provider in Vault with a longer or non-expiring retention period — for example, 3 years or more.
 
-Cases are the mechanism in Kerberos Hub to trigger this archiving process. Once a case is created, the associated recording is copied from the current storage provider to the designated archive storage provider in Vault.
+Cases are the mechanism in Hub to trigger this archiving process. Once a case is created, the associated recording is copied from the current storage provider to the designated archive storage provider in Vault.
 
 > **Note:** The current archiving feature is designed for individual recordings only. It is not suitable for bulk exports or archiving large volumes of data (e.g. terabytes). We are aware of this limitation and are actively working on a solution to support large-scale archiving and export in a future release.
 
@@ -34,12 +34,12 @@ To set the archiving retention period, a new Vault account must be created, sinc
 {{< figure src="add-account.png" alt="Define a retention period in a new Vault account." caption="Define a retention period in a new Vault account." class="stretch">}}
 
 
-## Define archive provider and account in Kerberos Hub
+## Define archive provider and account in Hub
 
-Now that your Vault instance is configured for archiving, you need to tell Kerberos Hub where to archive recordings — which provider and account to use. Open the [`values.yaml`](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/values.yaml#L136-L142) and locate the `kerberosvault` section. Here you will find the `archive` property.
+Now that your Vault instance is configured for archiving, you need to tell Hub where to archive recordings — which provider and account to use. Open the [`values.yaml`](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/values.yaml#L136-L142) and locate the `kerberosvault` section. Here you will find the `archive` property.
 
-    # We have a kerberos vault component installed which contains all the
-    # recordings. Kerberos vault is queried to retrieve the recordings
+    # We have a Vault component installed which contains all the
+    # recordings. Vault is queried to retrieve the recordings
     # from the appropriate provider.
     kerberosvault:
     uri: "https://api.storage.yourdomain.com"
