@@ -1,7 +1,7 @@
 ---
-title: "Archiving"
-description: "Archiving media through the creation of a task."
-lead: "Archiving media through the creation of a task."
+title: "Cases"
+description: "Archiving media through the creation of a case."
+lead: "Archiving media through the creation of a case."
 date: 2020-10-06T08:49:31+00:00
 lastmod: 2020-10-06T08:49:31+00:00
 draft: false
@@ -17,13 +17,15 @@ By default recordings are persisted for a short amount of time. Within Kerberos 
 
 Many situation exists where you would like to archive recordings for future inspection, or just because you think the event is important. By archiving the relevant recording, the recording will be copied to another storage provider in Kerberos Vault which is not expiring or has a much higher rentention period; for example 3 years or longer.
 
-The process of archiving through Kerberos Hub and Kerberos Vault is done through the creation of a task. Once a task is created in your Kerberos Hub account, the underlaying recording will be copied from the current storage provider to the archiving storage provider.
+The process of archiving through Kerberos Hub and Kerberos Vault is done through the creation of a case. Once a case is created in your Kerberos Hub account, the underlaying recording will be copied from the current storage provider to the archiving storage provider.
 
-{{< figure src="create-task.png" alt="By creating a task, the recording is copied to the archive storage provider in Kerberos Vault." caption="By creating a task, the recording is copied to the archive storage provider in Kerberos Vault." class="stretch">}}
+> **Note:** The current archiving feature is designed for archiving individual recordings on a case-by-case basis. It is not suitable for bulk exports or archiving large volumes of data (e.g. terabytes). We are aware of this limitation and are actively working on a solution to support large-scale archiving and export in a future release.
+
+{{< figure src="create-task.png" alt="By creating a case, the recording is copied to the archive storage provider in Kerberos Vault." caption="By creating a case, the recording is copied to the archive storage provider in Kerberos Vault." class="stretch">}}
 
 ## Creating the archive storage provider and account
 
-To benefit from tasks and the archiving process, an additional storage provider needs to be created in your Kerberos Vault.
+To benefit from cases and the archiving process, an additional storage provider needs to be created in your Kerberos Vault.
 
 {{< figure src="add-storage-provider.png" alt="Create a new storage provider for archiving in Kerberos Vault." caption="Create a new storage provider for archiving in Kerberos Vault." class="stretch">}}
 
@@ -45,7 +47,7 @@ Now you have properly configured your Kerberos Vault instance for archiving, we 
     secretkey: "xxx"
     provider: "a-provider"
 
-    # Archiving is used when creating a task. The underlying recording of the task will be copied from its
+    # Archiving is used when creating a case. The underlying recording of the case will be copied from its
     # existing provider to the below archived provider. Seperate credentials are used, as it makes possible to
     # specify another retention period.
     archive:
@@ -55,4 +57,4 @@ Now you have properly configured your Kerberos Vault instance for archiving, we 
 
 Specify the `accesskey` and `secretkey` of your newly created Kerberos Vault account, and specify the name of your new archive `provider`. Update your helm chart.
 
-{{< figure src="tasks.png" alt="Your tasks showing up on the tasks page are now showing recordings from your archived storage provider." caption="Your tasks showing up on the tasks page are now showing recordings from your archived storage provider." class="stretch">}}
+{{< figure src="tasks.png" alt="Your cases showing up on the cases page are now showing recordings from your archived storage provider." caption="Your cases showing up on the cases page are now showing recordings from your archived storage provider." class="stretch">}}
