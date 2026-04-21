@@ -13,7 +13,7 @@ weight: 305
 toc: true
 ---
 
-By default, recordings are persisted for a limited amount of time. Within Hub you define a retention period per subscription and assign it to a user. The retention period can be set to 30, 60, 90 days or any custom value. It determines how many days of footage are visible to the end-user after login, and controls when the associated recordings are removed from Vault.
+By default, recordings are persisted for a limited amount of time. Within Hub you define a retention period per subscription and assign it to a user. The retention period can be set to 30, 60, 90 days or any custom value. It determines how many days of footage are visible to the end-user after login, and controls when the associated recordings metadata are removed from the database.
 
 There are many situations where you may want to retain specific recordings for future inspection, or simply because an event is important. By archiving a recording, it is copied to a separate storage provider in Vault with a longer or non-expiring retention period — for example, 3 years or more.
 
