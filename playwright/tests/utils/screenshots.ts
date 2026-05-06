@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
+import { prepareForScreenshot } from './chrome';
 
 const DEFAULT_DIR = path.resolve(
   __dirname,
@@ -42,6 +43,9 @@ export async function capture(
 
   // Resize the viewport so the screenshot matches the requested clip exactly.
   await page.setViewportSize({ width, height });
+
+  // Hide non-production banners and other UI chrome we don't want in docs.
+  await prepareForScreenshot(page);
 
   // Give animations / lazy content a moment to settle.
   await page.waitForLoadState('networkidle').catch(() => {
