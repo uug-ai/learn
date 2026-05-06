@@ -1,0 +1,18 @@
+{
+  "name": "learn-playwright",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Playwright scripts that drive the Hub UI to capture screenshots used by the learn documentation.",
+  "scripts": {
+    "install:browsers": "playwright install chromium",
+    "test": "playwright test",
+    "cases": "playwright test tests/cases.spec.ts",
+    "cases:headed": "playwright test tests/cases.spec.ts --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0",
+    "@types/node": "^20.11.0",
+    "dotenv": "^16.4.5",
+    "typescript": "^5.4.0"
+  }
+}
