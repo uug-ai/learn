@@ -13,6 +13,7 @@ spec and the images on disk are overwritten in place.
 ```bash
 cd learn/playwright
 npm install
+npx playwright install-deps         
 npx playwright install chromium
 cp .env.example .env
 ```

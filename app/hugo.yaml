@@ -70,3 +70,7 @@ params:
     assets:
       css:
         - path: css/custom.css
+security:
+  http:
+    urls:
+      - '^https://cdn\.jsdelivr\.net/'
