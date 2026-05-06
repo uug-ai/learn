@@ -35,7 +35,69 @@ without leaving the page.
 
 {{< figure src="hub-cases-opened.png" alt="An expanded case shows the recording, details, and comments." caption="Open a case from the list to inspect the recording and follow up on it." class="stretch">}}
 
-There are different possibilities to create a case..
+## Creating a case
+
+Cases are always created from a recording. The fastest way is to start from
+the **Recordings** page (`/media`) and create the case directly from the
+recording you want to archive.
+
+1. Open **Recordings** in the sidebar.
+2. Click on a recording to open its **side panel** on the right.
+3. In the panel header, open the **Actions** dropdown (top-right).
+4. Choose **New case** to open the *New case* modal.
+
+{{< figure src="hub-media-new-case.png" alt="The New case modal opened from the Actions menu of a recording's side panel." caption="The New case modal, opened from the Actions menu of a recording." class="stretch">}}
+
+The modal has two tabs — **Details** and **Media** — and the following fields:
+
+**Details**
+
+- **Case name** *(required)* — a short, descriptive title for the case. This is
+  the title shown in the cases overview and in any notification sent to
+  assignees.
+- **Notes** — free-form description used to capture context about why the
+  recording is being archived (incident reference, observations, follow-up
+  actions, …).
+
+**Settings**
+
+- **Notify assignees** — when enabled, the assignees you select below receive
+  a notification as soon as the case is created.
+- **Keep this case private** — restricts visibility of the case to its
+  assignees only. Other users in the account will not see the case in the
+  overview.
+
+**Labels**
+
+- **Labels** — pick one or more labels to categorise the case (for example
+  *intrusion*, *false alarm*, *insurance*). Labels can be filtered on from
+  the cases overview.
+
+**Assignees**
+
+- **Assignees** *(required)* — the users responsible for following up on the
+  case. The current user is selected automatically; add or remove members as
+  needed.
+
+**Media**
+
+The **Media** tab shows the recordings that will be attached to the case. When
+the modal is opened from a recording's side panel, that recording is
+pre-selected. You can review the preview and remove individual recordings
+before creating the case.
+
+Once all required fields are filled in and at least one recording is
+attached, click **New case** in the bottom-right of the modal to create it.
+The recording is then queued for archiving to the Vault archive provider you
+configured below.
+
+There are also two other entry points to the same modal:
+
+- From the **Recordings** page header, the **Create case** button creates a
+  case from the currently active filters (useful to attach multiple
+  recordings at once).
+- From the **Watchlist**, every notification row exposes an **Add Case**
+  action that pre-fills the modal with the notification's recording.
 
 ## Configuration
 

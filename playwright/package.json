@@ -7,7 +7,9 @@
     "install:browsers": "playwright install chromium",
     "test": "playwright test",
     "cases": "playwright test tests/cases.spec.ts",
-    "cases:headed": "playwright test tests/cases.spec.ts --headed"
+    "cases:headed": "playwright test tests/cases.spec.ts --headed",
+    "media": "playwright test tests/media.spec.ts",
+    "media:headed": "playwright test tests/media.spec.ts --headed"
   },
   "devDependencies": {
     "@playwright/test": "^1.47.0",
