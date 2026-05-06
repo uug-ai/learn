@@ -22,11 +22,11 @@ export function screenshotDir(): string {
  * the viewport at this size so the resulting images are visually consistent
  * across pages.
  */
-export const SCREENSHOT_WIDTH = 1440;
-export const SCREENSHOT_HEIGHT = 900;
+export const SCREENSHOT_WIDTH = 1400;
+export const SCREENSHOT_HEIGHT = 750;
 
 /**
- * Takes a 1440×900 PNG screenshot of the top of the page and writes it
+ * Takes a 1400×750 PNG screenshot of the top of the page and writes it
  * (overwriting any existing file) to the screenshot directory. Returns the
  * absolute path on disk.
  */

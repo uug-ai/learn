@@ -53,7 +53,7 @@ references them.
 ## How it works
 
 - `playwright.config.ts` loads `.env`, sets `baseURL` to `HUB_BASE_URL`,
-  and uses a single Chromium project at 1440×900 with a 2× device scale
+  and uses a single Chromium project at 1400×750 with a 2× device scale
   factor for crisp screenshots.
 - `tests/utils/auth.ts` submits the login form using the selectors defined
   in `hub-frontend/kerberos.ng/src/app/login/login.component.html`.

@@ -25,7 +25,9 @@
     var modal, stage, imgEl, hintEl;
     var scale = 1, tx = 0, ty = 0;
     var dragging = false, dragStartX = 0, dragStartY = 0, startTx = 0, startTy = 0;
+    var dragMoved = false, suppressNextClick = false;
     var MIN_SCALE = 0.2, MAX_SCALE = 10;
+    var DRAG_THRESHOLD = 4; // px
 
     function buildModal() {
       if (modal) return;
@@ -52,6 +54,11 @@
       hintEl = modal.querySelector('.lightbox-modal__hint');
 
       modal.addEventListener('click', function (e) {
+        if (suppressNextClick) {
+          suppressNextClick = false;
+          e.stopPropagation();
+          return;
+        }
         var btn = e.target.closest('[data-action]');
         if (btn) {
           var action = btn.getAttribute('data-action');
@@ -77,6 +84,7 @@
       stage.addEventListener('mousedown', function (e) {
         if (e.button !== 0) return;
         dragging = true;
+        dragMoved = false;
         dragStartX = e.clientX;
         dragStartY = e.clientY;
         startTx = tx;
@@ -87,14 +95,20 @@
 
       window.addEventListener('mousemove', function (e) {
         if (!dragging) return;
-        tx = startTx + (e.clientX - dragStartX);
-        ty = startTy + (e.clientY - dragStartY);
+        var dx = e.clientX - dragStartX;
+        var dy = e.clientY - dragStartY;
+        if (!dragMoved && (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD)) {
+          dragMoved = true;
+        }
+        tx = startTx + dx;
+        ty = startTy + dy;
         applyTransform();
       });
 
       window.addEventListener('mouseup', function () {
         if (!dragging) return;
         dragging = false;
+        if (dragMoved) suppressNextClick = true;
         stage.classList.remove('is-grabbing');
       });
 
