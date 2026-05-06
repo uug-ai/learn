@@ -21,9 +21,27 @@ Cases are the mechanism in Hub to trigger this archiving process. Once a case is
 
 > **Note:** The current archiving feature is designed for individual recordings only. It is not suitable for bulk exports or archiving large volumes of data (e.g. terabytes). We are aware of this limitation and are actively working on a solution to support large-scale archiving and export in a future release.
 
-{{< figure src="create-task.png" alt="By creating a case, the recording is copied to the archive storage provider in Vault." caption="By creating a case, the recording is copied to the archive storage provider in Vault." class="stretch">}}
+## Introduction 
 
-## Creating the archive storage provider and account
+The cases page is reachable from the main sidebar, under **Cases**. It
+lists every case in your account together with the recordings attached to it,
+the assignee, and any labels.
+
+{{< figure src="hub-cases-list.png" alt="The cases overview lists every case in your account." caption="The cases overview lists every case in your account." class="stretch">}}
+
+Selecting a row expands the case in place so you can review the attached
+recording, edit the title and description, manage labels, and add comments
+without leaving the page.
+
+{{< figure src="hub-cases-opened.png" alt="An expanded case shows the recording, details, and comments." caption="Open a case from the list to inspect the recording and follow up on it." class="stretch">}}
+
+There are different possibilities to create a case..
+
+## Configuration
+
+To start using cases some configurations need to be enabled on Vault and Hub, before you can use it.
+
+### Create archive storage provider in Vault
 
 To use cases and the archiving process, an additional storage provider must be created in Vault.
 
@@ -33,8 +51,7 @@ To set the archiving retention period, a new Vault account must be created, sinc
 
 {{< figure src="add-account.png" alt="Define a retention period in a new Vault account." caption="Define a retention period in a new Vault account." class="stretch">}}
 
-
-## Define archive provider and account in Hub
+### Define archive provider and account in Hub
 
 Now that your Vault instance is configured for archiving, you need to tell Hub where to archive recordings — which provider and account to use. Open the [`values.yaml`](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/values.yaml#L136-L142) and locate the `kerberosvault` section. Here you will find the `archive` property.
 
@@ -56,19 +73,3 @@ Now that your Vault instance is configured for archiving, you need to tell Hub w
         provider: "an-archive-provider"
 
 Set the `accesskey` and `secretkey` of your newly created Vault account, and specify the name of the archive `provider`. Then apply the updated helm chart.
-
-{{< figure src="tasks.png" alt="Your cases showing up on the cases page are now showing recordings from your archived storage provider." caption="Your cases showing up on the cases page are now showing recordings from your archived storage provider." class="stretch">}}
-
-## The cases overview
-
-The cases overview is reachable from the main sidebar, under **Cases**. It
-lists every case in your account together with the recordings attached to it,
-the assignee, and any labels.
-
-{{< figure src="hub-cases-list.png" alt="The cases overview lists every case in your account." caption="The cases overview lists every case in your account." class="stretch">}}
-
-Selecting a row expands the case in place so you can review the attached
-recording, edit the title and description, manage labels, and add comments
-without leaving the page.
-
-{{< figure src="hub-cases-opened.png" alt="An expanded case shows the recording, details, and comments." caption="Open a case from the list to inspect the recording and follow up on it." class="stretch">}}

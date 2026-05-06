@@ -17,7 +17,7 @@ export default defineConfig({
   use: {
     baseURL,
     headless: true,
-    viewport: { width: 1400, height: 750 },
+    viewport: { width: 1450, height: 750 },
     deviceScaleFactor: 2,
     ignoreHTTPSErrors: true,
     actionTimeout: 15_000,

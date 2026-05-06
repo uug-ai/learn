@@ -8,10 +8,19 @@ import { Page } from '@playwright/test';
  *
  * Safe to call multiple times — the injected style block is idempotent and
  * survives client-side navigation because it's added to the document head.
+ *
+ * Uses `page.evaluate` rather than `page.addStyleTag` because the latter
+ * waits for the page's load state, which can hang indefinitely on Hub pages
+ * that keep long-poll connections open.
  */
 export async function hideEnvironmentBar(page: Page): Promise<void> {
-  await page.addStyleTag({
-    content: `.environment { display: none !important; }`,
+  await page.evaluate(() => {
+    const id = '__docs-screenshot-style';
+    if (document.getElementById(id)) return;
+    const style = document.createElement('style');
+    style.id = id;
+    style.textContent = `.environment { display: none !important; }`;
+    document.head.appendChild(style);
   });
 }
 

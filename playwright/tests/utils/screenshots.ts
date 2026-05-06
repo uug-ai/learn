@@ -22,7 +22,7 @@ export function screenshotDir(): string {
  * the viewport at this size so the resulting images are visually consistent
  * across pages.
  */
-export const SCREENSHOT_WIDTH = 1400;
+export const SCREENSHOT_WIDTH = 1450;
 export const SCREENSHOT_HEIGHT = 750;
 
 /**
