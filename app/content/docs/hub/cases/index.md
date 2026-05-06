@@ -1,5 +1,5 @@
 ---
-title: "Cases"
+title: "Manage cases"
 description: "Group recordings into investigable cases and follow them up with the right people."
 lead: "Group recordings into investigable cases and follow them up with the right people."
 date: 2026-05-06T00:00:00+00:00
@@ -8,6 +8,8 @@ draft: false
 images: []
 menu:
   hub:
+    identifier: "manage-cases"
+    name: "Manage cases"
     parent: "hub"
 weight: 360
 toc: true
