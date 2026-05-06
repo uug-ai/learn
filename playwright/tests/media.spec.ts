@@ -162,12 +162,9 @@ test.describe('Hub — media documentation screenshots', () => {
     await viewContextItem.click();
 
     // The context overlay is rendered by <media-container> as a <Modal> with
-    // class `media-container-modal` and header "Context". Target the visible
-    // `.bg.open` overlay (the <modal> host element itself has no display).
-    const contextHost = page
-      .locator('media-container modal, modal.media-container-modal')
-      .filter({ has: page.locator('modalheader, ModalHeader, modal-header').filter({ hasText: /^\s*Context\s*$/i }) })
-      .first();
+    // class `media-container-modal` (the host's only class — Angular replaces
+    // the default `modal` class). Title is "Context" with a subtitle.
+    const contextHost = page.locator('modal.media-container-modal').first();
     const overlay = contextHost.locator('.bg.open').first();
     await expect(overlay).toBeVisible({ timeout: 30_000 });
 

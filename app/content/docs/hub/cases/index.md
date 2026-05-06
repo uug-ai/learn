@@ -99,6 +99,30 @@ There are also two other entry points to the same modal:
 - From the **Watchlist**, every notification row exposes an **Add Case**
   action that pre-fills the modal with the notification's recording.
 
+### Creating a case from the context overlay
+
+Sometimes a single recording is not enough — you may want to archive the
+moments leading up to and following an event. The **View Context** action,
+also available from the **Actions** dropdown of a recording's side panel,
+opens a wider time window of recordings around the selected one.
+
+{{< figure src="hub-media-context.png" alt="The Context overlay shows recordings around the selected one on a timeline." caption="The Context overlay loads recordings before and after the selected one on a shared timeline." class="stretch">}}
+
+In the overlay you can:
+
+- Pan and zoom the **timeline** at the bottom to navigate the surrounding
+  recordings.
+- Use the **filters** (time offset, site, group) to broaden or narrow the
+  set of recordings shown.
+- Click **Create case** in the bottom-right of the overlay to open the same
+  *New case* modal described above, pre-filled with the recordings currently
+  in scope. The fields and validation rules are identical to the standard
+  flow.
+
+This is the recommended way to create a case when the event you want to
+archive spans multiple recordings or you need extra context before and
+after it.
+
 ## Configuration
 
 To start using cases some configurations need to be enabled on Vault and Hub, before you can use it.
