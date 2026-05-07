@@ -17,7 +17,35 @@ Multiple Kerberos Vaults can be installed in your video landscape. You may have 
 
 Kerberos Vaults can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by requesting a forward from Kerberos Hub or building your own forwarding application code.
 
-{{< figure src="deployment-chaining.svg" alt="Synchronise recordings between multiple Kerberos Vault" caption="Synchronise recordings between multiple Kerberos Vault" class="stretch">}}
+{{< rete caption="Synchronise recordings between multiple Kerberos Vault" alt="Synchronise recordings between multiple Kerberos Vault" height="520" >}}
+{
+  "groups": [
+    { "id": "edge",  "label": "Edge",  "x":   0, "y": 20, "w": 320, "h": 460 },
+    { "id": "cloud", "label": "Cloud", "x": 420, "y": 20, "w": 540, "h": 460 }
+  ],
+  "nodes": [
+    { "id": "edge-vault",   "kind": "vault",   "x":  40, "y": 200, "w": 240, "h": 110,
+      "header": "VAULT SOURCE", "title": "Edge Vault",  "subtitle": "On-prem recordings" },
+    { "id": "cloud-vault",  "kind": "hub",     "x": 460, "y": 280, "w": 240, "h": 130,
+      "header": "VAULT TARGET", "title": "Cloud Vault", "subtitle": "Forwarding sink" },
+    { "id": "sink-1", "kind": "carrier", "x": 740, "y": 100, "w": 180, "h": 64,
+      "header": "CARRIER", "title": "SINK 1" },
+    { "id": "sink-2", "kind": "carrier", "x": 740, "y": 190, "w": 180, "h": 64,
+      "header": "CARRIER", "title": "SINK 2" },
+    { "id": "sink-3", "kind": "carrier", "x": 740, "y": 280, "w": 180, "h": 64,
+      "header": "CARRIER", "title": "SINK 3" },
+    { "id": "sink-4", "kind": "carrier", "x": 740, "y": 370, "w": 180, "h": 64,
+      "header": "CARRIER", "title": "SINK 4" }
+  ],
+  "connections": [
+    { "from": "edge-vault",  "to": "cloud-vault", "kind": "thick" },
+    { "from": "cloud-vault", "to": "sink-1" },
+    { "from": "cloud-vault", "to": "sink-2" },
+    { "from": "cloud-vault", "to": "sink-3" },
+    { "from": "cloud-vault", "to": "sink-4" }
+  ]
+}
+{{< /rete >}}
 
 Forwarding can be configured in two modes: continuous forwarding and on-demand recording.
 

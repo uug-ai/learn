@@ -93,7 +93,35 @@ This means that you, and only you, own the data and at the same time doesn't hav
 
 If you need more and better redundancy then the Chained setup might be of interest. In this setup we move data (recordings) from one [Kerberos Vault](/vault/first-things-first/) to another [Kerberos Vault](/vault/first-things-first/).
 
-{{< figure src="deployment-chaining.svg" alt="Kerberos Vault chaining" caption="Kerberos Vault chaining" class="stretch">}}
+{{< rete caption="Kerberos Vault chaining" alt="Kerberos Vault chaining" height="520" >}}
+{
+  "groups": [
+    { "id": "edge",  "label": "Edge",  "x":   0, "y": 20, "w": 320, "h": 460 },
+    { "id": "cloud", "label": "Cloud", "x": 420, "y": 20, "w": 540, "h": 460 }
+  ],
+  "nodes": [
+    { "id": "edge-vault",   "kind": "vault",   "x":  40, "y": 200, "w": 240, "h": 110,
+      "header": "VAULT SOURCE", "title": "Edge Vault",  "subtitle": "On-prem recordings" },
+    { "id": "cloud-vault",  "kind": "hub",     "x": 460, "y": 280, "w": 240, "h": 130,
+      "header": "VAULT TARGET", "title": "Cloud Vault", "subtitle": "Forwarding sink" },
+    { "id": "sink-1", "kind": "carrier", "x": 740, "y": 100, "w": 180, "h": 64,
+      "header": "CARRIER", "title": "SINK 1" },
+    { "id": "sink-2", "kind": "carrier", "x": 740, "y": 190, "w": 180, "h": 64,
+      "header": "CARRIER", "title": "SINK 2" },
+    { "id": "sink-3", "kind": "carrier", "x": 740, "y": 280, "w": 180, "h": 64,
+      "header": "CARRIER", "title": "SINK 3" },
+    { "id": "sink-4", "kind": "carrier", "x": 740, "y": 370, "w": 180, "h": 64,
+      "header": "CARRIER", "title": "SINK 4" }
+  ],
+  "connections": [
+    { "from": "edge-vault",  "to": "cloud-vault", "kind": "thick" },
+    { "from": "cloud-vault", "to": "sink-1" },
+    { "from": "cloud-vault", "to": "sink-2" },
+    { "from": "cloud-vault", "to": "sink-3" },
+    { "from": "cloud-vault", "to": "sink-4" }
+  ]
+}
+{{< /rete >}}
 
 The advantage of [chaining (or forwarding)](/vault/forwarding/) is that you create a cache between two environments. Shown on the architecture above data is first stored at an edge [Kerberos Vault](/vault/first-things-first/), and synchronised with a cloud [Kerberos Vault](/vault/first-things-first/). When the connection goes down between the two [Kerberos Vaults](/vault/first-things-first/), the data will still be stored in the edge [Kerberos Vault](/vault/first-things-first/), and synced to the cloud [Kerberos Vault](/vault/first-things-first/) once the connection is back up.
 
