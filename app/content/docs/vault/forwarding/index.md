@@ -26,18 +26,18 @@ Kerberos Vaults can be chained and configured in forwarding mode. This configura
   "nodes": [
     { "id": "cloud-vault", "kind": "vault", "x":  40, "y": 320, "w": 240, "h": 150,
       "header": "VAULT TARGET", "title": "Vault", "subtitle": "Cloud Storage",
-      "badges": ["aws", "gcp", "azure"] },
-    { "id": "hub", "kind": "hub", "x":  40, "y": 110, "w": 240, "h": 130,
-      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse" },
+      "badges": ["aws", "gcp", "azure", "kubernetes"] },
+    { "id": "hub", "kind": "hub", "x":  40, "y": 110, "w": 240, "h": 150,
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse", "badges": ["kubernetes"] },
     { "id": "edge-vault", "kind": "vault", "x": 460, "y": 320, "w": 240, "h": 150,
       "header": "VAULT SOURCE", "title": "Vault", "subtitle": "Edge Storage",
-      "badges": ["minio", "ceph"] },
-    { "id": "agent-1", "kind": "agent", "x": 860, "y":  60, "w": 260, "h": 130,
-      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
-    { "id": "agent-2", "kind": "agent", "x": 860, "y": 235, "w": 260, "h": 130,
-      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
-    { "id": "agent-3", "kind": "agent", "x": 860, "y": 410, "w": 260, "h": 130,
-      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" }
+      "badges": ["minio", "ceph", "kubernetes"] },
+    { "id": "agent-1", "kind": "agent", "x": 860, "y":  60, "w": 260, "h": 150,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-2", "kind": "agent", "x": 860, "y": 235, "w": 260, "h": 150,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-3", "kind": "agent", "x": 860, "y": 410, "w": 260, "h": 150,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] }
   ],
   "connections": [
     { "from": "cloud-vault", "to": "hub", "fromSide": "top", "toSide": "bottom" },

@@ -33,47 +33,34 @@ We will discuss some of the most common setups we have seen, however this doesn'
 {{< rete caption="The Kerberos.io solution stack" alt="The Kerberos.io solution stack" height="540" >}}
 {
   "groups": [
-    { "id": "capture",     "label": "Camera processing",  "x":    0, "y": 20, "w": 460, "h": 760 },
-    { "id": "persistence", "label": "Persistence",        "x":  560, "y": 20, "w": 320, "h": 760 },
-    { "id": "analyse",     "label": "Analyse and monitor","x":  980, "y": 20, "w": 320, "h": 760 }
+    { "id": "capture",     "label": "Camera processing",  "x":    0, "y": 20, "w": 460, "h": 460 },
+    { "id": "persistence", "label": "Persistence",        "x":  560, "y": 20, "w": 320, "h": 460 },
+    { "id": "analyse",     "label": "Analyse and monitor","x":  980, "y": 20, "w": 320, "h": 460 }
   ],
   "nodes": [
     { "id": "cam-1", "kind": "camera", "x":  40, "y":  80, "w": 180, "h": 130,
       "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
-    { "id": "cam-2", "kind": "camera", "x":  40, "y": 250, "w": 180, "h": 130,
+    { "id": "cam-2", "kind": "camera", "x":  40, "y": 290, "w": 180, "h": 130,
       "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
-    { "id": "cam-3", "kind": "camera", "x":  40, "y": 420, "w": 180, "h": 130,
-      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
-    { "id": "cam-4", "kind": "camera", "x":  40, "y": 590, "w": 180, "h": 130,
-      "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" },
-    { "id": "agent-1", "kind": "agent", "x": 240, "y":  80, "w": 200, "h": 130,
-      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
-    { "id": "agent-2", "kind": "agent", "x": 240, "y": 250, "w": 200, "h": 130,
-      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
-    { "id": "agent-3", "kind": "agent", "x": 240, "y": 420, "w": 200, "h": 130,
-      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
-    { "id": "agent-4", "kind": "agent", "x": 240, "y": 590, "w": 200, "h": 130,
-      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" },
-    { "id": "edge-vault", "kind": "vault", "x": 600, "y": 235, "w": 240, "h": 150,
-      "header": "VAULT", "title": "Vault", "subtitle": "Edge Storage",
-      "badges": ["minio", "ceph"] },
-    { "id": "cloud-vault", "kind": "vault", "x": 600, "y": 415, "w": 240, "h": 150,
-      "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage",
-      "badges": ["aws", "gcp", "azure"] },
-    { "id": "hub", "kind": "hub", "x": 1020, "y": 325, "w": 240, "h": 130,
-      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse" }
+    { "id": "agent-1", "kind": "agent", "x": 240, "y":  70, "w": 200, "h": 150,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-2", "kind": "agent", "x": 240, "y": 280, "w": 200, "h": 150,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "vault", "kind": "vault", "x": 600, "y":  80, "w": 240, "h": 150,
+      "header": "VAULT", "title": "Vault", "subtitle": "Storage interface", "badges": ["kubernetes"] },
+    { "id": "object-storage", "kind": "storage", "x": 600, "y": 290, "w": 240, "h": 150,
+      "header": "OBJECT STORAGE", "title": "Object Storage", "subtitle": "Cloud / Edge",
+      "badges": ["minio", "ceph", "aws", "gcp", "azure"] },
+    { "id": "hub", "kind": "hub", "x": 1020, "y": 185, "w": 240, "h": 150,
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse", "badges": ["kubernetes"] }
   ],
   "connections": [
     { "from": "cam-1", "to": "agent-1", "fromSide": "right", "toSide": "left" },
     { "from": "cam-2", "to": "agent-2", "fromSide": "right", "toSide": "left" },
-    { "from": "cam-3", "to": "agent-3", "fromSide": "right", "toSide": "left" },
-    { "from": "cam-4", "to": "agent-4", "fromSide": "right", "toSide": "left" },
-    { "from": "agent-1", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
-    { "from": "agent-2", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
-    { "from": "agent-3", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
-    { "from": "agent-4", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
-    { "from": "edge-vault", "to": "cloud-vault", "fromSide": "bottom", "toSide": "top", "kind": "thick", "label": "Forwarding" },
-    { "from": "cloud-vault", "to": "hub", "fromSide": "right", "toSide": "left" }
+    { "from": "agent-1", "to": "vault", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-2", "to": "vault", "fromSide": "right", "toSide": "left" },
+    { "from": "vault", "to": "object-storage", "fromSide": "bottom", "toSide": "top", "label": "read/write" },
+    { "from": "vault", "to": "hub", "fromSide": "right", "toSide": "left" }
   ]
 }
 {{< /rete >}}
@@ -96,14 +83,14 @@ If you are starting with a basic deployment - for example for your home - then y
       "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
     { "id": "cam-4", "kind": "camera", "x":  40, "y": 590, "w": 180, "h": 130,
       "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" },
-    { "id": "agent-1", "kind": "agent", "x": 580, "y":  80, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
-    { "id": "agent-2", "kind": "agent", "x": 580, "y": 250, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
-    { "id": "agent-3", "kind": "agent", "x": 580, "y": 420, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
-    { "id": "agent-4", "kind": "agent", "x": 580, "y": 590, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" }
+    { "id": "agent-1", "kind": "agent", "x": 580, "y":  80, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-2", "kind": "agent", "x": 580, "y": 250, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-3", "kind": "agent", "x": 580, "y": 420, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-4", "kind": "agent", "x": 580, "y": 590, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] }
   ],
   "connections": [
     { "from": "cam-1", "to": "agent-1", "fromSide": "right", "toSide": "left" },
@@ -124,7 +111,7 @@ In a home setup you'll probably rely on [`docker`](https://github.com/kerberos-i
 {{< rete caption="Extended setup: a Kerberos Vault at the edge centralises storage for the agents" alt="Extended Kerberos setup" height="540" >}}
 {
   "groups": [
-    { "id": "edge", "label": "Edge", "x": 0, "y": 20, "w": 1200, "h": 760 }
+    { "id": "edge", "label": "Edge", "x": 0, "y": 20, "w": 1400, "h": 760 }
   ],
   "nodes": [
     { "id": "cam-1", "kind": "camera", "x":  40, "y":  80, "w": 180, "h": 130,
@@ -135,16 +122,18 @@ In a home setup you'll probably rely on [`docker`](https://github.com/kerberos-i
       "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
     { "id": "cam-4", "kind": "camera", "x":  40, "y": 590, "w": 180, "h": 130,
       "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" },
-    { "id": "agent-1", "kind": "agent", "x": 460, "y":  80, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
-    { "id": "agent-2", "kind": "agent", "x": 460, "y": 250, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
-    { "id": "agent-3", "kind": "agent", "x": 460, "y": 420, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
-    { "id": "agent-4", "kind": "agent", "x": 460, "y": 590, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" },
-    { "id": "edge-vault", "kind": "vault", "x": 920, "y": 305, "w": 240, "h": 150,
-      "header": "VAULT", "title": "Vault", "subtitle": "Cloud / Edge Storage",
+    { "id": "agent-1", "kind": "agent", "x": 460, "y":  80, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-2", "kind": "agent", "x": 460, "y": 250, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-3", "kind": "agent", "x": 460, "y": 420, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-4", "kind": "agent", "x": 460, "y": 590, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "edge-vault", "kind": "vault", "x": 800, "y": 305, "w": 240, "h": 150,
+      "header": "VAULT", "title": "Vault", "subtitle": "Storage interface", "badges": ["kubernetes"] },
+    { "id": "object-storage", "kind": "storage", "x": 1120, "y": 305, "w": 240, "h": 150,
+      "header": "OBJECT STORAGE", "title": "Object Storage", "subtitle": "Cloud / Edge",
       "badges": ["minio", "ceph", "aws", "gcp", "azure"] }
   ],
   "connections": [
@@ -155,7 +144,8 @@ In a home setup you'll probably rely on [`docker`](https://github.com/kerberos-i
     { "from": "agent-1", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
     { "from": "agent-2", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
     { "from": "agent-3", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
-    { "from": "agent-4", "to": "edge-vault", "fromSide": "right", "toSide": "left" }
+    { "from": "agent-4", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
+    { "from": "edge-vault", "to": "object-storage", "fromSide": "right", "toSide": "left", "label": "read/write" }
   ]
 }
 {{< /rete >}}
@@ -179,11 +169,11 @@ The huge benefit of this approach is that your [Kerberos Agents](/agent/first-th
     { "id": "edge",  "label": "Edge",  "x": 460, "y": 20, "w": 940, "h": 760 }
   ],
   "nodes": [
-    { "id": "hub", "kind": "hub", "x":  60, "y": 165, "w": 240, "h": 130,
-      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse" },
+    { "id": "hub", "kind": "hub", "x":  60, "y": 165, "w": 240, "h": 150,
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse", "badges": ["kubernetes"] },
     { "id": "cloud-vault", "kind": "vault", "x":  60, "y": 485, "w": 240, "h": 150,
       "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage",
-      "badges": ["aws", "gcp", "azure"] },
+      "badges": ["aws", "gcp", "azure", "kubernetes"] },
     { "id": "cam-1", "kind": "camera", "x":  980, "y":  80, "w": 180, "h": 130,
       "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
     { "id": "cam-2", "kind": "camera", "x":  980, "y": 250, "w": 180, "h": 130,
@@ -192,14 +182,14 @@ The huge benefit of this approach is that your [Kerberos Agents](/agent/first-th
       "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
     { "id": "cam-4", "kind": "camera", "x":  980, "y": 590, "w": 180, "h": 130,
       "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" },
-    { "id": "agent-1", "kind": "agent", "x": 500, "y":  80, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
-    { "id": "agent-2", "kind": "agent", "x": 500, "y": 250, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
-    { "id": "agent-3", "kind": "agent", "x": 500, "y": 420, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
-    { "id": "agent-4", "kind": "agent", "x": 500, "y": 590, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" }
+    { "id": "agent-1", "kind": "agent", "x": 500, "y":  80, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-2", "kind": "agent", "x": 500, "y": 250, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-3", "kind": "agent", "x": 500, "y": 420, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-4", "kind": "agent", "x": 500, "y": 590, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] }
   ],
   "connections": [
     { "from": "cloud-vault", "to": "hub", "fromSide": "top", "toSide": "bottom" },
@@ -232,19 +222,19 @@ With this setup we are moving from a Hybrid setup to a complete Cloud approach. 
     { "id": "edge",  "label": "Edge",  "x": 1040, "y": 20, "w": 280, "h": 760 }
   ],
   "nodes": [
-    { "id": "hub", "kind": "hub", "x":  60, "y": 165, "w": 240, "h": 130,
-      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse" },
+    { "id": "hub", "kind": "hub", "x":  60, "y": 165, "w": 240, "h": 150,
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse", "badges": ["kubernetes"] },
     { "id": "cloud-vault", "kind": "vault", "x":  60, "y": 485, "w": 240, "h": 150,
       "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage",
-      "badges": ["aws", "gcp", "azure"] },
-    { "id": "agent-1", "kind": "agent", "x": 580, "y":  80, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
-    { "id": "agent-2", "kind": "agent", "x": 580, "y": 250, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
-    { "id": "agent-3", "kind": "agent", "x": 580, "y": 420, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
-    { "id": "agent-4", "kind": "agent", "x": 580, "y": 590, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" },
+      "badges": ["aws", "gcp", "azure", "kubernetes"] },
+    { "id": "agent-1", "kind": "agent", "x": 580, "y":  80, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-2", "kind": "agent", "x": 580, "y": 250, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-3", "kind": "agent", "x": 580, "y": 420, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-4", "kind": "agent", "x": 580, "y": 590, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
     { "id": "cam-1", "kind": "camera", "x": 1080, "y":  80, "w": 180, "h": 130,
       "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
     { "id": "cam-2", "kind": "camera", "x": 1080, "y": 250, "w": 180, "h": 130,
@@ -287,19 +277,19 @@ As described above you might mix a Hybrid and Cloud setup, in the end you decide
     { "id": "edge",        "label": "Edge",           "x":  840, "y": 410, "w": 700, "h": 370 }
   ],
   "nodes": [
-    { "id": "hub", "kind": "hub", "x":  40, "y": 325, "w": 240, "h": 130,
-      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse" },
+    { "id": "hub", "kind": "hub", "x":  40, "y": 325, "w": 240, "h": 150,
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse", "badges": ["kubernetes"] },
     { "id": "cloud-vault", "kind": "vault", "x": 460, "y": 315, "w": 240, "h": 150,
       "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage",
-      "badges": ["aws", "gcp", "azure"] },
-    { "id": "agent-1", "kind": "agent", "x": 880, "y":  80, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
-    { "id": "agent-2", "kind": "agent", "x": 880, "y": 230, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
-    { "id": "agent-3", "kind": "agent", "x": 880, "y": 470, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
-    { "id": "agent-4", "kind": "agent", "x": 880, "y": 620, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" },
+      "badges": ["aws", "gcp", "azure", "kubernetes"] },
+    { "id": "agent-1", "kind": "agent", "x": 880, "y":  80, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-2", "kind": "agent", "x": 880, "y": 230, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-3", "kind": "agent", "x": 880, "y": 470, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-4", "kind": "agent", "x": 880, "y": 620, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
     { "id": "cam-1", "kind": "camera", "x": 1300, "y":  80, "w": 180, "h": 130,
       "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
     { "id": "cam-2", "kind": "camera", "x": 1300, "y": 230, "w": 180, "h": 130,
@@ -340,18 +330,18 @@ If you need more and better redundancy then the Chained setup might be of intere
   "nodes": [
     { "id": "cloud-vault", "kind": "vault", "x":  40, "y": 320, "w": 240, "h": 150,
       "header": "VAULT TARGET", "title": "Vault", "subtitle": "Cloud Storage",
-      "badges": ["aws", "gcp", "azure"] },
-    { "id": "hub", "kind": "hub", "x":  40, "y": 110, "w": 240, "h": 130,
-      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse" },
+      "badges": ["aws", "gcp", "azure", "kubernetes"] },
+    { "id": "hub", "kind": "hub", "x":  40, "y": 110, "w": 240, "h": 150,
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse", "badges": ["kubernetes"] },
     { "id": "edge-vault", "kind": "vault", "x": 460, "y": 320, "w": 240, "h": 150,
       "header": "VAULT SOURCE", "title": "Vault", "subtitle": "Edge Storage",
-      "badges": ["minio", "ceph"] },
-    { "id": "agent-1", "kind": "agent", "x": 860, "y":  60, "w": 260, "h": 130,
-      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
-    { "id": "agent-2", "kind": "agent", "x": 860, "y": 235, "w": 260, "h": 130,
-      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
-    { "id": "agent-3", "kind": "agent", "x": 860, "y": 410, "w": 260, "h": 130,
-      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" }
+      "badges": ["minio", "ceph", "kubernetes"] },
+    { "id": "agent-1", "kind": "agent", "x": 860, "y":  60, "w": 260, "h": 150,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-2", "kind": "agent", "x": 860, "y": 235, "w": 260, "h": 150,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-3", "kind": "agent", "x": 860, "y": 410, "w": 260, "h": 150,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] }
   ],
   "connections": [
     { "from": "cloud-vault", "to": "hub", "fromSide": "top", "toSide": "bottom" },
