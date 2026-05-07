@@ -6,8 +6,14 @@ import { capture } from './utils/screenshots';
  * Drives the Hub UI to capture screenshots used by the cases documentation.
  * Captured files (overwritten on each run):
  *
- *   - hub-media-new-case.png   — "New case" modal opened from the side panel.
- *   - hub-media-context.png    — "View Context" overlay (a media-container)
+ *   - hub-media-new-case.png         — "New case" modal opened from the side panel.
+ *   - hub-media-add-to-case.png      — "Add to case" modal opened from the side panel.
+ *   - hub-media-create-case-bulk.png — "Create case" modal opened from the
+ *                                      Recordings page header with filters
+ *                                      pre-applied via query params (date,
+ *                                      from, to, devices). Used to document
+ *                                      the bulk-attach create-case flow.
+ *   - hub-media-context.png          — "View Context" overlay (a media-container)
  *                                that shows a wider time window of recordings
  *                                around the selected one. From this overlay
  *                                you can also click "Create case" to open the
@@ -172,6 +178,119 @@ test.describe('Hub — media documentation screenshots', () => {
     await page.waitForTimeout(1_500);
 
     await capture(page, 'hub-media-context.png');
+  });
+
+  test('captures the Add to case modal opened from a media side panel', async ({
+    page,
+  }) => {
+    const opened = await openFirstRecordingActionsMenu(page);
+    if (!opened) {
+      test.info().annotations.push({
+        type: 'skip-no-media',
+        description:
+          'No media available to open — skipping the Add to case modal screenshot.',
+      });
+      return;
+    }
+    const { actionsMenu } = opened;
+
+    // Click "Add to case" — opens the second <Modal> in the panel that lists
+    // the user's existing cases (see media-detail-panel.component.html:
+    // `<Modal [open]="showAddToCase">` with header "Add to case").
+    const addToCaseItem = actionsMenu
+      .locator('buttonfield button, button')
+      .filter({ hasText: /add to case/i })
+      .first();
+
+    const canAddToCase = await addToCaseItem
+      .isEnabled({ timeout: 5_000 })
+      .catch(() => false);
+
+    if (!canAddToCase) {
+      test.info().annotations.push({
+        type: 'skip-no-permission',
+        description:
+          'The current user cannot add this recording to a case — "Add to case" is disabled.',
+      });
+      return;
+    }
+
+    await addToCaseItem.click();
+
+    // Same hidden-host caveat as the New case modal: target the visible
+    // `.bg.open` overlay of the modal whose header is "Add to case".
+    const modalHost = page
+      .locator('modal')
+      .filter({ has: page.locator('modalheader, ModalHeader, modal-header').filter({ hasText: /add to case/i }) })
+      .first();
+    const overlay = modalHost.locator('.bg.open').first();
+    await expect(overlay).toBeVisible({ timeout: 15_000 });
+
+    // Give the cases list a moment to load before screenshotting.
+    await page.waitForTimeout(1_000);
+
+    await capture(page, 'hub-media-add-to-case.png');
+  });
+
+  test('captures the bulk Create case modal opened from the recordings header', async ({
+    page,
+  }) => {
+    // Navigate to /media with a date, time range and device filter pre-applied
+    // via query params. The "Create case" button in the page breadcrumb
+    // (see media.component.html) opens the same Create case modal but
+    // pre-fills it from the currently active filters — useful to attach
+    // multiple recordings at once.
+    await page.goto(
+      '/media?date=2026-05-07&from=1262&to=2574&devices=camera2',
+    );
+
+    // Wait for the grid to render so the total recordings count is known
+    // (the Create case button stays disabled until then — see
+    // CREATE_CASE_PENDING_REASON in media.component.ts).
+    await expect(
+      page.locator('mediagrid, media-grid, MediaGrid').first(),
+    ).toBeVisible({ timeout: 30_000 });
+
+    // The breadcrumb "Create case" button is the first ButtonField with that
+    // label on the page (the others live inside the modal that we're about
+    // to open).
+    const createCaseButton = page
+      .locator('Breadcrumb buttonfield button, breadcrumb buttonfield button, buttonfield button')
+      .filter({ hasText: /^create case$/i })
+      .first();
+
+    await createCaseButton.waitFor({ state: 'visible', timeout: 15_000 });
+
+    const enabled = await createCaseButton
+      .isEnabled({ timeout: 15_000 })
+      .catch(() => false);
+
+    if (!enabled) {
+      test.info().annotations.push({
+        type: 'skip-create-case',
+        description:
+          'The "Create case" button in the recordings header is disabled (feature off, or no recordings match the filter).',
+      });
+      return;
+    }
+
+    await createCaseButton.click();
+
+    // The modal is declared at the top of media.component.html as
+    // <Modal #exportMediaModal> with header "Create case" and an
+    // <ExportMedia> body. Same hidden-host caveat as the other modal
+    // captures: target the visible `.bg.open` overlay.
+    const modalHost = page
+      .locator('modal')
+      .filter({ has: page.locator('modalheader, ModalHeader, modal-header').filter({ hasText: /create case/i }) })
+      .first();
+    const overlay = modalHost.locator('.bg.open').first();
+    await expect(overlay).toBeVisible({ timeout: 15_000 });
+
+    // Give the ExportMedia component a moment to load its preview / scope.
+    await page.waitForTimeout(1_500);
+
+    await capture(page, 'hub-media-create-case-bulk.png');
   });
 });
 

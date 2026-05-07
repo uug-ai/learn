@@ -95,9 +95,13 @@ There are also two other entry points to the same modal:
 
 - From the **Recordings** page header, the **Create case** button creates a
   case from the currently active filters (useful to attach multiple
-  recordings at once).
+  recordings at once). Pick a date, narrow down to a device or site, and
+  drag the timeline to the time window of interest — every recording that
+  matches the active filters will be pre-attached to the new case.
 - From the **Watchlist**, every notification row exposes an **Add Case**
   action that pre-fills the modal with the notification's recording.
+
+{{< figure src="hub-media-create-case-bulk.png" alt="The Create case modal opened from the Recordings page header with a date, device and time range pre-applied via the page filters." caption="The Create case modal opened from the Recordings page header. Every recording matching the active filters (date, device, time range) is attached to the new case in one go." class="stretch">}}
 
 ### Creating a case from the context overlay
 
@@ -122,6 +126,26 @@ In the overlay you can:
 This is the recommended way to create a case when the event you want to
 archive spans multiple recordings or you need extra context before and
 after it.
+
+### Adding a recording to an existing case
+
+Instead of creating a brand-new case, you can attach a recording to a case
+that already exists. From the same **Actions** dropdown of a recording's
+side panel, choose **Add to case**.
+
+{{< figure src="hub-media-add-to-case.png" alt="The Add to case modal lists all accessible cases so you can attach a recording to one." caption="The Add to case modal lists every case you have access to and lets you filter by site, device, assignee, label or status." class="stretch">}}
+
+The modal lists every case you have access to. To find the right one, you
+can:
+
+- **Search** by case title in the search field at the top.
+- Filter by **Sites**, **Devices**, **Assignees**, **Labels** or **Status**
+  using the dropdowns on the filter row.
+
+Click a case in the list to select it (the row becomes highlighted), then
+press **Add to case** in the bottom-right of the modal. The recording is
+appended to the selected case and queued for archiving alongside the
+recordings already attached to it.
 
 ## Configuration
 
