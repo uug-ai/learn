@@ -28,7 +28,7 @@ Kerberos Vaults can be chained and configured in forwarding mode. This configura
       "header": "VAULT TARGET", "title": "Vault", "subtitle": "Cloud Storage",
       "badges": ["aws", "gcp", "azure"] },
     { "id": "hub", "kind": "hub", "x":  40, "y": 110, "w": 240, "h": 130,
-      "header": "HUB", "title": "Kerberos Hub", "subtitle": "Monitor and analyse" },
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse" },
     { "id": "edge-vault", "kind": "vault", "x": 460, "y": 320, "w": 240, "h": 150,
       "header": "VAULT SOURCE", "title": "Vault", "subtitle": "Edge Storage",
       "badges": ["minio", "ceph"] },

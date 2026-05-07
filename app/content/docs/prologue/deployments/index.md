@@ -33,46 +33,47 @@ We will discuss some of the most common setups we have seen, however this doesn'
 {{< rete caption="The Kerberos.io solution stack" alt="The Kerberos.io solution stack" height="540" >}}
 {
   "groups": [
-    { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 640, "h": 760 },
-    { "id": "edge",  "label": "Edge",  "x": 740, "y": 20, "w": 700, "h": 760 }
+    { "id": "capture",     "label": "Camera processing",  "x":    0, "y": 20, "w": 460, "h": 760 },
+    { "id": "persistence", "label": "Persistence",        "x":  560, "y": 20, "w": 320, "h": 760 },
+    { "id": "analyse",     "label": "Analyse and monitor","x":  980, "y": 20, "w": 320, "h": 760 }
   ],
   "nodes": [
-    { "id": "hub", "kind": "hub", "x":  40, "y": 165, "w": 240, "h": 130,
-      "header": "HUB", "title": "Kerberos Hub", "subtitle": "Monitor and analyse" },
-    { "id": "vault", "kind": "vault", "x":  40, "y": 485, "w": 240, "h": 150,
-      "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage",
-      "badges": ["aws", "gcp", "azure"] },
-    { "id": "agent-1", "kind": "agent", "x": 360, "y":  80, "w": 240, "h": 130,
+    { "id": "cam-1", "kind": "camera", "x":  40, "y":  80, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x":  40, "y": 250, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "cam-3", "kind": "camera", "x":  40, "y": 420, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
+    { "id": "cam-4", "kind": "camera", "x":  40, "y": 590, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" },
+    { "id": "agent-1", "kind": "agent", "x": 240, "y":  80, "w": 200, "h": 130,
       "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
-    { "id": "agent-2", "kind": "agent", "x": 360, "y": 250, "w": 240, "h": 130,
+    { "id": "agent-2", "kind": "agent", "x": 240, "y": 250, "w": 200, "h": 130,
       "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
-    { "id": "agent-3", "kind": "agent", "x": 360, "y": 420, "w": 240, "h": 130,
+    { "id": "agent-3", "kind": "agent", "x": 240, "y": 420, "w": 200, "h": 130,
       "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
-    { "id": "agent-4", "kind": "agent", "x": 360, "y": 590, "w": 240, "h": 130,
+    { "id": "agent-4", "kind": "agent", "x": 240, "y": 590, "w": 200, "h": 130,
       "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" },
-    { "id": "edge-vault", "kind": "vault", "x": 780, "y": 305, "w": 240, "h": 150,
+    { "id": "edge-vault", "kind": "vault", "x": 600, "y": 235, "w": 240, "h": 150,
       "header": "VAULT", "title": "Vault", "subtitle": "Edge Storage",
       "badges": ["minio", "ceph"] },
-    { "id": "cam-1", "kind": "camera", "x": 1200, "y":  80, "w": 180, "h": 130,
-      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
-    { "id": "cam-2", "kind": "camera", "x": 1200, "y": 250, "w": 180, "h": 130,
-      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
-    { "id": "cam-3", "kind": "camera", "x": 1200, "y": 420, "w": 180, "h": 130,
-      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
-    { "id": "cam-4", "kind": "camera", "x": 1200, "y": 590, "w": 180, "h": 130,
-      "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" }
+    { "id": "cloud-vault", "kind": "vault", "x": 600, "y": 415, "w": 240, "h": 150,
+      "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage",
+      "badges": ["aws", "gcp", "azure"] },
+    { "id": "hub", "kind": "hub", "x": 1020, "y": 325, "w": 240, "h": 130,
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse" }
   ],
   "connections": [
-    { "from": "vault", "to": "hub", "fromSide": "top", "toSide": "bottom" },
-    { "from": "edge-vault", "to": "vault", "fromSide": "left", "toSide": "right", "kind": "thick", "label": "Forwarding" },
-    { "from": "agent-1", "to": "edge-vault", "fromSide": "left", "toSide": "right" },
-    { "from": "agent-2", "to": "edge-vault", "fromSide": "left", "toSide": "right" },
-    { "from": "agent-3", "to": "edge-vault", "fromSide": "left", "toSide": "right" },
-    { "from": "agent-4", "to": "edge-vault", "fromSide": "left", "toSide": "right" },
-    { "from": "cam-1", "to": "agent-1", "fromSide": "left", "toSide": "right" },
-    { "from": "cam-2", "to": "agent-2", "fromSide": "left", "toSide": "right" },
-    { "from": "cam-3", "to": "agent-3", "fromSide": "left", "toSide": "right" },
-    { "from": "cam-4", "to": "agent-4", "fromSide": "left", "toSide": "right" }
+    { "from": "cam-1", "to": "agent-1", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-2", "to": "agent-2", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-3", "to": "agent-3", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-4", "to": "agent-4", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-1", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-2", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-3", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-4", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
+    { "from": "edge-vault", "to": "cloud-vault", "fromSide": "bottom", "toSide": "top", "kind": "thick", "label": "Forwarding" },
+    { "from": "cloud-vault", "to": "hub", "fromSide": "right", "toSide": "left" }
   ]
 }
 {{< /rete >}}
@@ -179,7 +180,7 @@ The huge benefit of this approach is that your [Kerberos Agents](/agent/first-th
   ],
   "nodes": [
     { "id": "hub", "kind": "hub", "x":  60, "y": 165, "w": 240, "h": 130,
-      "header": "HUB", "title": "Kerberos Hub", "subtitle": "Monitor and analyse" },
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse" },
     { "id": "cloud-vault", "kind": "vault", "x":  60, "y": 485, "w": 240, "h": 150,
       "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage",
       "badges": ["aws", "gcp", "azure"] },
@@ -232,7 +233,7 @@ With this setup we are moving from a Hybrid setup to a complete Cloud approach. 
   ],
   "nodes": [
     { "id": "hub", "kind": "hub", "x":  60, "y": 165, "w": 240, "h": 130,
-      "header": "HUB", "title": "Kerberos Hub", "subtitle": "Monitor and analyse" },
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse" },
     { "id": "cloud-vault", "kind": "vault", "x":  60, "y": 485, "w": 240, "h": 150,
       "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage",
       "badges": ["aws", "gcp", "azure"] },
@@ -287,7 +288,7 @@ As described above you might mix a Hybrid and Cloud setup, in the end you decide
   ],
   "nodes": [
     { "id": "hub", "kind": "hub", "x":  40, "y": 325, "w": 240, "h": 130,
-      "header": "HUB", "title": "Kerberos Hub", "subtitle": "Monitor and analyse" },
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse" },
     { "id": "cloud-vault", "kind": "vault", "x": 460, "y": 315, "w": 240, "h": 150,
       "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage",
       "badges": ["aws", "gcp", "azure"] },
@@ -341,7 +342,7 @@ If you need more and better redundancy then the Chained setup might be of intere
       "header": "VAULT TARGET", "title": "Vault", "subtitle": "Cloud Storage",
       "badges": ["aws", "gcp", "azure"] },
     { "id": "hub", "kind": "hub", "x":  40, "y": 110, "w": 240, "h": 130,
-      "header": "HUB", "title": "Kerberos Hub", "subtitle": "Monitor and analyse" },
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse" },
     { "id": "edge-vault", "kind": "vault", "x": 460, "y": 320, "w": 240, "h": 150,
       "header": "VAULT SOURCE", "title": "Vault", "subtitle": "Edge Storage",
       "badges": ["minio", "ceph"] },
