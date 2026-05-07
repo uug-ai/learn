@@ -253,21 +253,25 @@ test.describe('Hub — media documentation screenshots', () => {
 
     // The breadcrumb "Create case" button is the one rendered in the page
     // header (see media.component.html — `<Breadcrumb> ... <ButtonField
-    // text="Create case" ...></Breadcrumb>`). The modal at the top of the
-    // file also contains a button with the same label, but it lives inside
-    // a hidden `<Modal>` until we open it, so we scope the locator to the
-    // breadcrumb element to avoid matching the hidden one first.
+    // text="Create case" ...></Breadcrumb>`, which the breadcrumb component
+    // template wraps in a `<header>` — exposed as the `banner` ARIA role).
+    // The modal at the top of the file also contains a button with the same
+    // label, but it lives inside a hidden `<Modal>` until we open it, so we
+    // scope the locator to the page banner to avoid matching the hidden one.
     const createCaseButton = page
-      .locator('breadcrumb, Breadcrumb')
-      .first()
-      .locator('buttonfield button, button')
-      .filter({ hasText: /^create case$/i })
+      .getByRole('banner')
+      .getByRole('button', { name: /^create case$/i })
       .first();
 
     await createCaseButton.waitFor({ state: 'visible', timeout: 15_000 });
 
-    const enabled = await createCaseButton
-      .isEnabled({ timeout: 15_000 })
+    // The button stays disabled until `mediaScopeTotal` is populated by the
+    // /media/total-count call (see isCreateCaseButtonDisabled in
+    // media.component.ts). Poll for the enabled state instead of taking a
+    // single instantaneous snapshot.
+    const enabled = await expect(createCaseButton)
+      .toBeEnabled({ timeout: 30_000 })
+      .then(() => true)
       .catch(() => false);
 
     if (!enabled) {

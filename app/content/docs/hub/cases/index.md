@@ -94,14 +94,37 @@ configured below.
 There are also two other entry points to the same modal:
 
 - From the **Recordings** page header, the **Create case** button creates a
-  case from the currently active filters (useful to attach multiple
-  recordings at once). Pick a date, narrow down to a device or site, and
-  drag the timeline to the time window of interest — every recording that
-  matches the active filters will be pre-attached to the new case.
+  case from the currently active filters — see *Creating a case in bulk
+  from the Recordings page* below.
 - From the **Watchlist**, every notification row exposes an **Add Case**
   action that pre-fills the modal with the notification's recording.
 
+### Creating a case in bulk from the Recordings page
+
+The single-recording flow above is convenient when you already know which
+recording you want to archive. When the event of interest covers a longer
+time window — or when you want to archive every recording from a given
+device on a specific day — the **Recordings** page lets you create a case
+in bulk from the active filters.
+
+1. Open **Recordings** in the sidebar.
+2. Pick a **date** in the date picker.
+3. Optionally narrow down by **device** or **site** in the filter bar.
+4. Drag the **timeline** at the bottom to the time window you want to
+   archive (the *from* and *to* selection updates the URL — for example
+   `/media?date=2026-05-07&from=1262&to=2574&devices=camera2`).
+5. Click the **Create case** button in the page header (next to *Clear
+   filter* and *Refresh*).
+
+The same *New case* modal opens, with every recording matching the active
+filters pre-attached on the **Media** tab. Fill in the case details as
+usual and confirm with **New case** in the bottom-right.
+
 {{< figure src="hub-media-create-case-bulk.png" alt="The Create case modal opened from the Recordings page header with a date, device and time range pre-applied via the page filters." caption="The Create case modal opened from the Recordings page header. Every recording matching the active filters (date, device, time range) is attached to the new case in one go." class="stretch">}}
+
+> **Note:** To keep cases manageable, the **Create case** button is
+> disabled when more than 1000 recordings match the current filters.
+> Refine the date, device or time range before retrying.
 
 ### Creating a case from the context overlay
 
