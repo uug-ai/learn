@@ -83,13 +83,35 @@ html.dark .rete-group__label,
 
 .rete-connection {
     fill: none;
-    stroke: #555f8e;
+    stroke: #c9ccd6;
     stroke-width: 4;
     stroke-linecap: round;
+    /* Flowing-liquid effect: a dashed stroke whose offset animates so the
+       dashes appear to drift from `from` to `to`. */
+    stroke-dasharray: 10 10;
+    animation: rete-flow 1.2s linear infinite;
 }
 
-.rete-connection--thick { stroke-width: 24; opacity: 0.85; stroke-linecap: butt; }
+@keyframes rete-flow {
+    to { stroke-dashoffset: -20; }
+}
+
+.rete-connection--thick {
+    stroke-width: 24;
+    opacity: 0.85;
+    stroke-linecap: butt;
+    stroke: #555f8e;
+    /* Bigger gap so the moving highlight reads at thick width. */
+    stroke-dasharray: 40 24;
+    animation-duration: 2.4s;
+}
 .rete-connection--dashed { stroke-dasharray: 6 6; }
+
+/* Labelled edges read better as a static solid line so the label stays legible. */
+.rete-connection--labelled {
+    stroke-dasharray: none;
+    animation: none;
+}
 
 /* Inline label drawn on top of a connection's bezier midpoint. */
 .rete-connection__label {
@@ -105,8 +127,7 @@ html.dark .rete-group__label,
 }
 
 /* Nodes. The card is a soft-shadowed white panel; the header is a coloured
-   "pill" badge that floats above the card's top edge (à la Figma component
-   labels). The badge uses the per-kind colour variable. */
+   bar that sits flush across the full top edge of the card. */
 .rete-node {
     box-sizing: border-box;
     background: #ffffff;
@@ -114,12 +135,11 @@ html.dark .rete-group__label,
     box-shadow:
         0 1px 2px rgba(0, 0, 0, 0.06),
         0 8px 24px rgba(0, 0, 0, 0.08);
-    /* Allow the floating header pill to overflow the top edge. */
-    overflow: visible;
+    overflow: hidden;
     cursor: grab;
-    /* Reserve room above the card content for the half-overlapping pill. */
-    padding-top: 18px;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .rete-node:active { cursor: grabbing; }
@@ -138,36 +158,33 @@ html.dark .rete-node,
 .rete-node {
     --rete-node-color: #6b7280; /* default: neutral grey */
 }
-.rete-node--vault   { --rete-node-color: #2563eb; } /* blue   */
-.rete-node--hub     { --rete-node-color: #7c3aed; } /* purple */
-.rete-node--agent   { --rete-node-color: #16a34a; } /* green  */
-.rete-node--factory { --rete-node-color: #16a34a; } /* green  */
+.rete-node--vault   { --rete-node-color: #555f8e; } /* indigo */
+.rete-node--hub     { --rete-node-color: #84559f; } /* purple */
+.rete-node--agent   { --rete-node-color: #4a796b; } /* teal   */
+.rete-node--factory { --rete-node-color: #4a796b; } /* teal   */
 
 .rete-node__header {
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 6px 18px;
+    padding: 8px 14px;
     background: var(--rete-node-color);
     color: #ffffff;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+    text-align: center;
+    /* Square the bottom corners; top corners follow the card's radius (12 - 1 inset). */
+    border-radius: 11px 11px 0 0;
     white-space: nowrap;
 }
 
 .rete-node__body {
-    padding: 18px 20px 20px;
+    padding: 18px 20px 28px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    height: 100%;
+    flex: 1;
     box-sizing: border-box;
 }
 
@@ -186,6 +203,23 @@ html.dark .rete-node,
 
 html.dark .rete-node__subtitle,
 .dark .rete-node__subtitle { color: #b5b5b5; }
+
+/* Brand badges (storage providers, etc.) shown beneath the subtitle. */
+.rete-node__badges {
+    margin-top: -2px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    line-height: 1;
+}
+.rete-node__badge {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    display: block;
+}
 
 /* Selected state. */
 .rete-node[data-selected="true"] {

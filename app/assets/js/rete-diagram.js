@@ -58,6 +58,22 @@ function createNodeEl(n) {
         sub.textContent = n.subtitle;
         body.appendChild(sub);
     }
+    if (Array.isArray(n.badges) && n.badges.length) {
+        const badges = document.createElement('div');
+        badges.className = 'rete-node__badges';
+        n.badges.forEach(b => {
+            const slug = (typeof b === 'string') ? b : b.slug;
+            const label = (typeof b === 'string') ? b : (b.label || b.slug);
+            const img = document.createElement('img');
+            img.className = 'rete-node__badge';
+            img.alt = label;
+            img.title = label;
+            img.loading = 'lazy';
+            img.src = `/icons/brands/${slug}.svg`;
+            badges.appendChild(img);
+        });
+        body.appendChild(badges);
+    }
     el.appendChild(body);
     return el;
 }
@@ -80,9 +96,27 @@ function createGroupEl(g) {
     return el;
 }
 
-function bezierPath(x1, y1, x2, y2) {
-    const dx = Math.max(40, Math.abs(x2 - x1) * 0.4);
-    return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+function bezierPath(x1, y1, x2, y2, fromSide, toSide) {
+    // Vertical sides (top/bottom) get vertical control offsets so the curve
+    // flows straight along the y axis instead of sideways-S'ing.
+    const fromVertical = fromSide === 'top' || fromSide === 'bottom';
+    const toVertical   = toSide   === 'top' || toSide   === 'bottom';
+    let c1x, c1y, c2x, c2y;
+    if (fromVertical) {
+        const dy = Math.max(40, Math.abs(y2 - y1) * 0.4) * (fromSide === 'top' ? -1 : 1);
+        c1x = x1; c1y = y1 + dy;
+    } else {
+        const dx = Math.max(40, Math.abs(x2 - x1) * 0.4) * (fromSide === 'left' ? -1 : 1);
+        c1x = x1 + dx; c1y = y1;
+    }
+    if (toVertical) {
+        const dy = Math.max(40, Math.abs(y2 - y1) * 0.4) * (toSide === 'top' ? -1 : 1);
+        c2x = x2; c2y = y2 + dy;
+    } else {
+        const dx = Math.max(40, Math.abs(x2 - x1) * 0.4) * (toSide === 'left' ? -1 : 1);
+        c2x = x2 + dx; c2y = y2;
+    }
+    return `M ${x1} ${y1} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x2} ${y2}`;
 }
 
 function anchorPoint(node, side) {
@@ -209,24 +243,32 @@ function init(container) {
             const from = nodeById.get(c.from);
             const to   = nodeById.get(c.to);
             if (!from || !to) return;
-            const a = anchorPoint(from, c.fromSide || 'right');
-            const b = anchorPoint(to,   c.toSide   || 'left');
+            const fromSide = c.fromSide || 'right';
+            const toSide   = c.toSide   || 'left';
+            const a = anchorPoint(from, fromSide);
+            const b = anchorPoint(to,   toSide);
             const path = document.createElementNS(SVG_NS, 'path');
-            path.setAttribute('d', bezierPath(a.x, a.y, b.x, b.y));
-            path.setAttribute('class', `rete-connection rete-connection--${c.kind || 'default'}`);
+            path.setAttribute('d', bezierPath(a.x, a.y, b.x, b.y, fromSide, toSide));
+            const classes = ['rete-connection', `rete-connection--${c.kind || 'default'}`];
+            if (c.label) classes.push('rete-connection--labelled');
+            path.setAttribute('class', classes.join(' '));
             svg.appendChild(path);
 
             if (c.label) {
-                // Midpoint of the cubic bezier (t=0.5 with our symmetric control points).
-                const dx = Math.max(40, Math.abs(b.x - a.x) * 0.4);
-                const mx = 0.125 * a.x + 0.375 * (a.x + dx) + 0.375 * (b.x - dx) + 0.125 * b.x;
-                const my = 0.125 * a.y + 0.375 * a.y         + 0.375 * b.y         + 0.125 * b.y;
+                // Midpoint = straight average of endpoints (good enough for label placement).
+                const mx = (a.x + b.x) / 2;
+                const my = (a.y + b.y) / 2;
+                let angle = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+                // Keep text upright: never read upside-down.
+                if (angle > 90)  angle -= 180;
+                if (angle < -90) angle += 180;
                 const text = document.createElementNS(SVG_NS, 'text');
                 text.setAttribute('x', mx);
                 text.setAttribute('y', my);
                 text.setAttribute('class', 'rete-connection__label');
                 text.setAttribute('text-anchor', 'middle');
                 text.setAttribute('dominant-baseline', 'middle');
+                text.setAttribute('transform', `rotate(${angle} ${mx} ${my})`);
                 text.textContent = c.label;
                 svg.appendChild(text);
             }
@@ -291,8 +333,10 @@ function init(container) {
         container.style.cursor = '';
     });
 
-    // --- Zoom: wheel, anchored at cursor.
+    // --- Zoom: wheel, anchored at cursor. Only active in fullscreen so the
+    // page can still scroll normally when reading the docs.
     container.addEventListener('wheel', e => {
+        if (!isFullscreen()) return;
         e.preventDefault();
         const rect = container.getBoundingClientRect();
         const cx = e.clientX - rect.left;
@@ -386,4 +430,23 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bootstrap);
 } else {
     bootstrap();
+}
+
+// Hextra (and other Hugo themes) sometimes swap page content via client-side
+// navigation, which doesn't re-execute the module. Watch for new diagram
+// elements being inserted into the DOM and bootstrap them on the fly.
+if (typeof MutationObserver !== 'undefined') {
+    const mo = new MutationObserver(muts => {
+        for (const m of muts) {
+            for (const node of m.addedNodes) {
+                if (!(node instanceof HTMLElement)) continue;
+                if (node.matches?.('.rete-diagram:not(.rete-diagram--ready)') ||
+                    node.querySelector?.('.rete-diagram:not(.rete-diagram--ready)')) {
+                    bootstrap();
+                    return;
+                }
+            }
+        }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
 }

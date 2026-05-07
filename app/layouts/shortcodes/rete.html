@@ -27,7 +27,8 @@
     <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
   {{- end }}
   {{- with resources.Get "js/rete-diagram.js" -}}
-    <script type="module" src="{{ .RelPermalink }}"></script>
+    {{- $js := . | fingerprint -}}
+    <script type="module" src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script>
   {{- end }}
 {{- end }}
 

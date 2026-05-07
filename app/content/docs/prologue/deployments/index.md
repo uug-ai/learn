@@ -96,29 +96,31 @@ If you need more and better redundancy then the Chained setup might be of intere
 {{< rete caption="Kerberos Vault chaining" alt="Kerberos Vault chaining" height="520" >}}
 {
   "groups": [
-    { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 320, "h": 460 },
-    { "id": "edge",  "label": "Edge",  "x": 420, "y": 20, "w": 720, "h": 460 }
+    { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 320, "h": 540 },
+    { "id": "edge",  "label": "Edge",  "x": 420, "y": 20, "w": 720, "h": 540 }
   ],
   "nodes": [
-    { "id": "cloud-vault", "kind": "vault", "x":  40, "y": 200, "w": 240, "h": 110,
-      "header": "VAULT TARGET", "title": "Cloud Vault", "subtitle": "Forwarding sink" },
-    { "id": "edge-vault", "kind": "vault", "x": 460, "y": 200, "w": 240, "h": 110,
-      "header": "VAULT SOURCE", "title": "Edge Vault", "subtitle": "On-prem recordings" },
-    { "id": "agent-1", "kind": "agent", "x": 860, "y":  80, "w": 260, "h": 70,
-      "header": "AGENT", "title": "Edge Agent 1" },
-    { "id": "agent-2", "kind": "agent", "x": 860, "y": 180, "w": 260, "h": 70,
-      "header": "AGENT", "title": "Edge Agent 2" },
-    { "id": "agent-3", "kind": "agent", "x": 860, "y": 280, "w": 260, "h": 70,
-      "header": "AGENT", "title": "Edge Agent 3" },
-    { "id": "agent-4", "kind": "agent", "x": 860, "y": 380, "w": 260, "h": 70,
-      "header": "AGENT", "title": "Edge Agent 4" }
+    { "id": "cloud-vault", "kind": "vault", "x":  40, "y": 320, "w": 240, "h": 150,
+      "header": "VAULT TARGET", "title": "Vault", "subtitle": "Cloud Storage",
+      "badges": ["aws", "gcp", "azure"] },
+    { "id": "hub", "kind": "hub", "x":  40, "y": 110, "w": 240, "h": 130,
+      "header": "HUB", "title": "Kerberos Hub", "subtitle": "Monitor and analyse" },
+    { "id": "edge-vault", "kind": "vault", "x": 460, "y": 320, "w": 240, "h": 150,
+      "header": "VAULT SOURCE", "title": "Vault", "subtitle": "Edge Storage",
+      "badges": ["minio", "ceph"] },
+    { "id": "agent-1", "kind": "agent", "x": 860, "y":  60, "w": 260, "h": 130,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
+    { "id": "agent-2", "kind": "agent", "x": 860, "y": 235, "w": 260, "h": 130,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
+    { "id": "agent-3", "kind": "agent", "x": 860, "y": 410, "w": 260, "h": 130,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" }
   ],
   "connections": [
+    { "from": "cloud-vault", "to": "hub", "fromSide": "top", "toSide": "bottom" },
     { "from": "edge-vault", "to": "cloud-vault", "fromSide": "left", "toSide": "right", "kind": "thick", "label": "Forwarding" },
     { "from": "agent-1", "to": "edge-vault", "fromSide": "left", "toSide": "right" },
     { "from": "agent-2", "to": "edge-vault", "fromSide": "left", "toSide": "right" },
-    { "from": "agent-3", "to": "edge-vault", "fromSide": "left", "toSide": "right" },
-    { "from": "agent-4", "to": "edge-vault", "fromSide": "left", "toSide": "right" }
+    { "from": "agent-3", "to": "edge-vault", "fromSide": "left", "toSide": "right" }
   ]
 }
 {{< /rete >}}
