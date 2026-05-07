@@ -1,0 +1,33 @@
+import { Page } from '@playwright/test';
+
+/**
+ * Hides UI chrome that should not appear in documentation screenshots, such
+ * as the non-production environment banner that Hub renders at the top of
+ * every page (see home.component.html / login.component.html in
+ * hub-frontend: `<div class="environment {{config.environment}}">`).
+ *
+ * Safe to call multiple times — the injected style block is idempotent and
+ * survives client-side navigation because it's added to the document head.
+ *
+ * Uses `page.evaluate` rather than `page.addStyleTag` because the latter
+ * waits for the page's load state, which can hang indefinitely on Hub pages
+ * that keep long-poll connections open.
+ */
+export async function hideEnvironmentBar(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const id = '__docs-screenshot-style';
+    if (document.getElementById(id)) return;
+    const style = document.createElement('style');
+    style.id = id;
+    style.textContent = `.environment { display: none !important; }`;
+    document.head.appendChild(style);
+  });
+}
+
+/**
+ * Convenience wrapper that hides every "screenshot-noisy" element in one
+ * call. Add new selectors here when more chrome needs to be filtered.
+ */
+export async function prepareForScreenshot(page: Page): Promise<void> {
+  await hideEnvironmentBar(page);
+}
