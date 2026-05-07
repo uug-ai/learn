@@ -36,7 +36,37 @@ We will discuss some of the most common setups we have seen, however this doesn'
 
 If you are starting with a basic deployment - for example for your home - then you probably prefer to have it rather simple. In this case you can host one or more [Kerberos Agents](/agent/first-things-first) on a compute of choice, in the network you desire.
 
-{{< figure src="deployment-basic.svg" alt="The basic deployment" caption="The basic deployment" class="stretch">}}
+{{< rete caption="Basic setup: cameras connected directly to Kerberos Agents at the edge" alt="Basic Kerberos setup" height="540" >}}
+{
+  "groups": [
+    { "id": "edge", "label": "Edge", "x": 0, "y": 20, "w": 880, "h": 760 }
+  ],
+  "nodes": [
+    { "id": "cam-1", "kind": "camera", "x":  40, "y":  80, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x":  40, "y": 250, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "cam-3", "kind": "camera", "x":  40, "y": 420, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
+    { "id": "cam-4", "kind": "camera", "x":  40, "y": 590, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" },
+    { "id": "agent-1", "kind": "agent", "x": 580, "y":  80, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
+    { "id": "agent-2", "kind": "agent", "x": 580, "y": 250, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
+    { "id": "agent-3", "kind": "agent", "x": 580, "y": 420, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
+    { "id": "agent-4", "kind": "agent", "x": 580, "y": 590, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" }
+  ],
+  "connections": [
+    { "from": "cam-1", "to": "agent-1", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-2", "to": "agent-2", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-3", "to": "agent-3", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-4", "to": "agent-4", "fromSide": "right", "toSide": "left" }
+  ]
+}
+{{< /rete >}}
 
 In a home setup you'll probably rely on [`docker`](https://github.com/kerberos-io/agent/tree/master/deployments/docker#1-running-a-single-container) or [`a binary`](https://github.com/kerberos-io/agent/tree/master/deployments/snap) instead of [`kubernetes`](https://github.com/kerberos-io/agent/tree/master/deployments/kubernetes), mainly because of simplicity. However nothing is stopping you utilise Kubernetes for your local deployment.
 
@@ -45,7 +75,44 @@ In a home setup you'll probably rely on [`docker`](https://github.com/kerberos-i
 [Kerberos Agents](/agent/first-things-first) store recordings on the host system. You might want to have a more elegant and centralised storage setup. Run [Kerberos Vault](/vault/first-things-first/) next to your
 [Kerberos Agents](/agent/first-things-first) and connect to an edge or cloud storage system such as S3, Minio, etc.
 
-{{< figure src="deployment-extended.svg" alt="The home-setup deployment" caption="The home-setup deployment" class="stretch">}}
+{{< rete caption="Extended setup: a Kerberos Vault at the edge centralises storage for the agents" alt="Extended Kerberos setup" height="540" >}}
+{
+  "groups": [
+    { "id": "edge", "label": "Edge", "x": 0, "y": 20, "w": 1200, "h": 760 }
+  ],
+  "nodes": [
+    { "id": "cam-1", "kind": "camera", "x":  40, "y":  80, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x":  40, "y": 250, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "cam-3", "kind": "camera", "x":  40, "y": 420, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
+    { "id": "cam-4", "kind": "camera", "x":  40, "y": 590, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" },
+    { "id": "agent-1", "kind": "agent", "x": 460, "y":  80, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
+    { "id": "agent-2", "kind": "agent", "x": 460, "y": 250, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
+    { "id": "agent-3", "kind": "agent", "x": 460, "y": 420, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
+    { "id": "agent-4", "kind": "agent", "x": 460, "y": 590, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" },
+    { "id": "edge-vault", "kind": "vault", "x": 920, "y": 305, "w": 240, "h": 150,
+      "header": "VAULT", "title": "Vault", "subtitle": "Cloud / Edge Storage",
+      "badges": ["minio", "ceph", "aws", "gcp", "azure"] }
+  ],
+  "connections": [
+    { "from": "cam-1", "to": "agent-1", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-2", "to": "agent-2", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-3", "to": "agent-3", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-4", "to": "agent-4", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-1", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-2", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-3", "to": "edge-vault", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-4", "to": "edge-vault", "fromSide": "right", "toSide": "left" }
+  ]
+}
+{{< /rete >}}
 
 Similar to the basic installation, Kerberos Vault can be installed through [`docker`](https://github.com/kerberos-io/vault/tree/master/docker) and [`kubernetes`](https://github.com/kerberos-io/vault/tree/master/kubernetes). In this setup, [Kerberos Agents](/agent/first-things-first) are installed on a compute at the edge, next to a [Kerberos Vault](/vault/first-things-first/).
 
@@ -57,9 +124,50 @@ When leveraging [Kubernetes](https://github.com/kerberos-io/vault/tree/master/ku
 
 One of the most common setups is a hybrid setup, where you install the majority of the components in a managed cloud or your own private cloud.
 
-{{< figure src="deployment-hybrid.svg" alt="The hybrid deployment" caption="The hybrid deployment" class="stretch">}}
-
 The huge benefit of this approach is that your [Kerberos Agents](/agent/first-things-first) are installed next to the camera infrastructure, and ideally in the same network. This will bring latency and data transfer to a minimum.
+
+{{< rete caption="Hybrid setup: Kerberos Agents at the edge connect to a Kerberos Vault and Kerberos Hub running in the cloud" alt="Hybrid Kerberos setup" height="540" >}}
+{
+  "groups": [
+    { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 360, "h": 760 },
+    { "id": "edge",  "label": "Edge",  "x": 460, "y": 20, "w": 940, "h": 760 }
+  ],
+  "nodes": [
+    { "id": "hub", "kind": "hub", "x":  60, "y": 165, "w": 240, "h": 130,
+      "header": "HUB", "title": "Kerberos Hub", "subtitle": "Monitor and analyse" },
+    { "id": "cloud-vault", "kind": "vault", "x":  60, "y": 485, "w": 240, "h": 150,
+      "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage",
+      "badges": ["aws", "gcp", "azure"] },
+    { "id": "cam-1", "kind": "camera", "x":  980, "y":  80, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x":  980, "y": 250, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "cam-3", "kind": "camera", "x":  980, "y": 420, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
+    { "id": "cam-4", "kind": "camera", "x":  980, "y": 590, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" },
+    { "id": "agent-1", "kind": "agent", "x": 500, "y":  80, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
+    { "id": "agent-2", "kind": "agent", "x": 500, "y": 250, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
+    { "id": "agent-3", "kind": "agent", "x": 500, "y": 420, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
+    { "id": "agent-4", "kind": "agent", "x": 500, "y": 590, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" }
+  ],
+  "connections": [
+    { "from": "cloud-vault", "to": "hub", "fromSide": "top", "toSide": "bottom" },
+    { "from": "cam-1", "to": "agent-1", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-2", "to": "agent-2", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-3", "to": "agent-3", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-4", "to": "agent-4", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-1", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-2", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-3", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-4", "to": "cloud-vault", "fromSide": "left", "toSide": "right" }
+  ]
+}
+{{< /rete >}}
 
 The [Kerberos Vault](/vault/first-things-first/) is installed in the cloud together with some scalable cloud storage. The [Kerberos Hub](/hub/first-things-first/) is installed in the same or other cloud as the [Kerberos Vault](/vault/first-things-first/).
 

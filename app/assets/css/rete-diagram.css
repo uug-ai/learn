@@ -162,6 +162,7 @@ html.dark .rete-node,
 .rete-node--hub     { --rete-node-color: #84559f; } /* purple */
 .rete-node--agent   { --rete-node-color: #4a796b; } /* teal   */
 .rete-node--factory { --rete-node-color: #4a796b; } /* teal   */
+.rete-node--camera  { --rete-node-color: #374151; } /* slate  */
 
 .rete-node__header {
     padding: 8px 14px;
@@ -215,8 +216,8 @@ html.dark .rete-node__subtitle,
     line-height: 1;
 }
 .rete-node__badge {
-    width: 20px;
-    height: 20px;
+    width: 28px;
+    height: 28px;
     object-fit: contain;
     display: block;
 }
