@@ -190,9 +190,7 @@ function init(container) {
     const ICON_COLLAPSE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/></svg>';
     fsBtn.innerHTML = ICON_EXPAND;
     toolbar.appendChild(fsBtn);
-    // Fullscreen disabled: keep the toolbar element for layout consistency but
-    // don't attach it to the DOM. (Remove this guard to re-enable.)
-    // container.appendChild(toolbar);
+    container.appendChild(toolbar);
 
     // Build groups.
     (config.groups || []).forEach(g => groupLayer.appendChild(createGroupEl(g)));
@@ -415,11 +413,10 @@ function init(container) {
         setFullscreen(!isFullscreen());
     });
     // Double-click on the canvas background (not on a node) toggles fullscreen.
-    // Disabled along with the toolbar button.
-    // container.addEventListener('dblclick', e => {
-    //     if (e.target.closest('.rete-node, .rete-toolbar')) return;
-    //     setFullscreen(!isFullscreen());
-    // });
+    container.addEventListener('dblclick', e => {
+        if (e.target.closest('.rete-node, .rete-toolbar')) return;
+        setFullscreen(!isFullscreen());
+    });
     window.addEventListener('keydown', e => {
         if (e.key === 'Escape' && isFullscreen()) setFullscreen(false);
     });

@@ -47,7 +47,7 @@ Kerberos Vaults can be chained and configured in forwarding mode. This configura
     { "from": "agent-3", "to": "edge-vault", "fromSide": "left", "toSide": "right" }
   ]
 }
-{{< /rete >}}
+{{< /rete >}}f
 
 Forwarding can be configured in two modes: continuous forwarding and on-demand recording.
 

@@ -30,7 +30,52 @@ Starting something new is not easy, there is always a steep learning curve. Whil
 
 We will discuss some of the most common setups we have seen, however this doesn't mean that your setup will not work if it's not shown as identical in the sections below.
 
-{{< figure src="overview.svg" alt="The Kerberos.io solution stack" caption="The Kerberos.io solution stack" class="stretch">}}
+{{< rete caption="The Kerberos.io solution stack" alt="The Kerberos.io solution stack" height="540" >}}
+{
+  "groups": [
+    { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 640, "h": 760 },
+    { "id": "edge",  "label": "Edge",  "x": 740, "y": 20, "w": 700, "h": 760 }
+  ],
+  "nodes": [
+    { "id": "hub", "kind": "hub", "x":  40, "y": 165, "w": 240, "h": 130,
+      "header": "HUB", "title": "Kerberos Hub", "subtitle": "Monitor and analyse" },
+    { "id": "vault", "kind": "vault", "x":  40, "y": 485, "w": 240, "h": 150,
+      "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage",
+      "badges": ["aws", "gcp", "azure"] },
+    { "id": "agent-1", "kind": "agent", "x": 360, "y":  80, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
+    { "id": "agent-2", "kind": "agent", "x": 360, "y": 250, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
+    { "id": "agent-3", "kind": "agent", "x": 360, "y": 420, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
+    { "id": "agent-4", "kind": "agent", "x": 360, "y": 590, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" },
+    { "id": "edge-vault", "kind": "vault", "x": 780, "y": 305, "w": 240, "h": 150,
+      "header": "VAULT", "title": "Vault", "subtitle": "Edge Storage",
+      "badges": ["minio", "ceph"] },
+    { "id": "cam-1", "kind": "camera", "x": 1200, "y":  80, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x": 1200, "y": 250, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "cam-3", "kind": "camera", "x": 1200, "y": 420, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
+    { "id": "cam-4", "kind": "camera", "x": 1200, "y": 590, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" }
+  ],
+  "connections": [
+    { "from": "vault", "to": "hub", "fromSide": "top", "toSide": "bottom" },
+    { "from": "edge-vault", "to": "vault", "fromSide": "left", "toSide": "right", "kind": "thick", "label": "Forwarding" },
+    { "from": "agent-1", "to": "edge-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-2", "to": "edge-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-3", "to": "edge-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-4", "to": "edge-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-1", "to": "agent-1", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-2", "to": "agent-2", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-3", "to": "agent-3", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-4", "to": "agent-4", "fromSide": "left", "toSide": "right" }
+  ]
+}
+{{< /rete >}}
 
 ## Basic setup
 
@@ -179,7 +224,48 @@ Another benefit is low latency and bandwidth consumption, as we have compute run
 
 With this setup we are moving from a Hybrid setup to a complete Cloud approach. As described before, it might be a challenge to host hardware at the edge, as you or your customers don't want to invest in additional hardware. Therefore it might be an option to move your [Kerberos Agents](/agent/first-things-first) to the cloud, and leverage a secure connection between the cameras at the edge, and the [Kerberos Agents](/agent/first-things-first) in the cloud.
 
-{{< figure src="deployment-cloud.svg" alt="The cloud deployment" caption="The cloud deployment" class="stretch">}}
+{{< rete caption="Cloud setup: only the cameras stay at the edge, every other component runs in the cloud over a secure VPN" alt="Cloud Kerberos setup" height="540" >}}
+{
+  "groups": [
+    { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 940, "h": 760 },
+    { "id": "edge",  "label": "Edge",  "x": 1040, "y": 20, "w": 280, "h": 760 }
+  ],
+  "nodes": [
+    { "id": "hub", "kind": "hub", "x":  60, "y": 165, "w": 240, "h": 130,
+      "header": "HUB", "title": "Kerberos Hub", "subtitle": "Monitor and analyse" },
+    { "id": "cloud-vault", "kind": "vault", "x":  60, "y": 485, "w": 240, "h": 150,
+      "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage",
+      "badges": ["aws", "gcp", "azure"] },
+    { "id": "agent-1", "kind": "agent", "x": 580, "y":  80, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
+    { "id": "agent-2", "kind": "agent", "x": 580, "y": 250, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
+    { "id": "agent-3", "kind": "agent", "x": 580, "y": 420, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
+    { "id": "agent-4", "kind": "agent", "x": 580, "y": 590, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" },
+    { "id": "cam-1", "kind": "camera", "x": 1080, "y":  80, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x": 1080, "y": 250, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "cam-3", "kind": "camera", "x": 1080, "y": 420, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
+    { "id": "cam-4", "kind": "camera", "x": 1080, "y": 590, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" }
+  ],
+  "connections": [
+    { "from": "cloud-vault", "to": "hub", "fromSide": "top", "toSide": "bottom" },
+    { "from": "agent-1", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-2", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-3", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-4", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-1", "to": "agent-1", "fromSide": "left", "toSide": "right", "kind": "thick", "label": "VPN" },
+    { "from": "cam-2", "to": "agent-2", "fromSide": "left", "toSide": "right", "kind": "thick", "label": "VPN" },
+    { "from": "cam-3", "to": "agent-3", "fromSide": "left", "toSide": "right", "kind": "thick", "label": "VPN" },
+    { "from": "cam-4", "to": "agent-4", "fromSide": "left", "toSide": "right", "kind": "thick", "label": "VPN" }
+  ]
+}
+{{< /rete >}}
 
 The main advantage is here, is that you'll avoid any extra hardware costs on site. On the otherhand you'll need a secure connection, which might already be available, to setup a remote connection between the camera streams at the edge and the [Kerberos Agents](/agent/first-things-first) in the cloud.
 
@@ -191,7 +277,50 @@ A noticable disadvantage is that a continuous stream of data is send over the ne
 
 As described above you might mix a Hybrid and Cloud setup, in the end you decide where to host your [Kerberos Agents](/agent/first-things-first). Within the SAAS setup, you'll utilise our [Kerberos Hub SAAS](/hub/first-things-first/) edition, and connect your [Kerberos Agents](/agent/first-things-first) and [Kerberos Vault](/vault/first-things-first/).
 
-{{< figure src="deployment-saas.svg" alt="The SAAS deployment" caption="The SAAS deployment" class="stretch">}}
+{{< rete caption="SAAS setup: Kerberos Hub is operated by us, while you keep ownership of the cameras, agents and vault" alt="SAAS Kerberos setup" height="540" >}}
+{
+  "groups": [
+    { "id": "saas",        "label": "SAAS (managed)", "x":    0, "y":  20, "w": 320, "h": 760 },
+    { "id": "cloud-vault-grp", "label": "Cloud",      "x":  420, "y":  20, "w": 320, "h": 760 },
+    { "id": "cloud-edge",  "label": "Cloud",          "x":  840, "y":  20, "w": 700, "h": 370 },
+    { "id": "edge",        "label": "Edge",           "x":  840, "y": 410, "w": 700, "h": 370 }
+  ],
+  "nodes": [
+    { "id": "hub", "kind": "hub", "x":  40, "y": 325, "w": 240, "h": 130,
+      "header": "HUB", "title": "Kerberos Hub", "subtitle": "Monitor and analyse" },
+    { "id": "cloud-vault", "kind": "vault", "x": 460, "y": 315, "w": 240, "h": 150,
+      "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage",
+      "badges": ["aws", "gcp", "azure"] },
+    { "id": "agent-1", "kind": "agent", "x": 880, "y":  80, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
+    { "id": "agent-2", "kind": "agent", "x": 880, "y": 230, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
+    { "id": "agent-3", "kind": "agent", "x": 880, "y": 470, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
+    { "id": "agent-4", "kind": "agent", "x": 880, "y": 620, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" },
+    { "id": "cam-1", "kind": "camera", "x": 1300, "y":  80, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x": 1300, "y": 230, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "cam-3", "kind": "camera", "x": 1300, "y": 470, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
+    { "id": "cam-4", "kind": "camera", "x": 1300, "y": 620, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" }
+  ],
+  "connections": [
+    { "from": "cloud-vault", "to": "hub", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-1", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-2", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-3", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-4", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-1", "to": "agent-1", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-2", "to": "agent-2", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-3", "to": "agent-3", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-4", "to": "agent-4", "fromSide": "left", "toSide": "right" }
+  ]
+}
+{{< /rete >}}
 
 The main advantage of this setup is that you have full control over your [Kerberos Agents](/agent/first-things-first) and [Kerberos Vault](/vault/first-things-first/), but consult the Kerberos.io team for visualizing your video landscape through [our Kerberos Hub SAAS](/hub/first-things-first/) edition.
 
