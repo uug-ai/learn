@@ -251,11 +251,16 @@ test.describe('Hub — media documentation screenshots', () => {
       page.locator('mediagrid, media-grid, MediaGrid').first(),
     ).toBeVisible({ timeout: 30_000 });
 
-    // The breadcrumb "Create case" button is the first ButtonField with that
-    // label on the page (the others live inside the modal that we're about
-    // to open).
+    // The breadcrumb "Create case" button is the one rendered in the page
+    // header (see media.component.html — `<Breadcrumb> ... <ButtonField
+    // text="Create case" ...></Breadcrumb>`). The modal at the top of the
+    // file also contains a button with the same label, but it lives inside
+    // a hidden `<Modal>` until we open it, so we scope the locator to the
+    // breadcrumb element to avoid matching the hidden one first.
     const createCaseButton = page
-      .locator('Breadcrumb buttonfield button, breadcrumb buttonfield button, buttonfield button')
+      .locator('breadcrumb, Breadcrumb')
+      .first()
+      .locator('buttonfield button, button')
       .filter({ hasText: /^create case$/i })
       .first();
 
