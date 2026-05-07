@@ -25,7 +25,7 @@ html.dark .rete-diagram,
     color: #ededed;
 }
 
-.rete-diagram > div {
+.rete-diagram > .rete-viewport {
     width: 100%;
     height: 100%;
 }
@@ -152,4 +152,69 @@ html.dark .rete-node__subtitle,
 .rete-node[data-selected="true"] {
     outline: 2px solid #555f8e;
     outline-offset: 2px;
+}
+
+/* Toolbar (fullscreen button, top-right). */
+.rete-toolbar {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 5;
+    display: flex;
+    gap: 4px;
+}
+
+.rete-toolbar__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #262424;
+    cursor: pointer;
+    transition: background 120ms ease, color 120ms ease;
+}
+
+.rete-toolbar__btn:hover {
+    background: #ffffff;
+    color: #555f8e;
+}
+
+.rete-toolbar__btn:focus-visible {
+    outline: 2px solid #555f8e;
+    outline-offset: 1px;
+}
+
+html.dark .rete-toolbar__btn,
+.dark .rete-toolbar__btn {
+    background: rgba(40, 40, 40, 0.9);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #ededed;
+}
+
+html.dark .rete-toolbar__btn:hover,
+.dark .rete-toolbar__btn:hover {
+    background: #2a2a2a;
+    color: #ffffff;
+}
+
+/* Window-level fullscreen: pin the diagram to fill the browser viewport
+   without invoking the native OS Fullscreen API. */
+.rete-diagram--pseudo-fullscreen {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    z-index: 9999;
+    border-radius: 0;
+}
+
+/* Prevent the page underneath from scrolling while fullscreen is active. */
+body.rete-diagram-fs-lock {
+    overflow: hidden;
 }

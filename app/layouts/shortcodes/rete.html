@@ -19,9 +19,16 @@
 {{- $alt := .Get "alt" | default $caption -}}
 {{- $height := .Get "height" -}}
 
-{{- with resources.Get "css/rete-diagram.css" -}}
-  {{- $css := . | minify | fingerprint -}}
-  <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
+{{- /* Emit the CSS + module loader only once per page. */ -}}
+{{- if not (.Page.Store.Get "reteAssetsEmitted") -}}
+  {{- .Page.Store.Set "reteAssetsEmitted" true -}}
+  {{- with resources.Get "css/rete-diagram.css" -}}
+    {{- $css := . | minify | fingerprint -}}
+    <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
+  {{- end }}
+  {{- with resources.Get "js/rete-diagram.js" -}}
+    <script type="module" src="{{ .RelPermalink }}"></script>
+  {{- end }}
 {{- end }}
 
 <figure class="rete-diagram-figure">
@@ -35,7 +42,3 @@
   ></div>
   {{ with $caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}
 </figure>
-
-{{- with resources.Get "js/rete-diagram.js" -}}
-  <script type="module" src="{{ .RelPermalink }}"></script>
-{{- end -}}

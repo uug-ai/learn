@@ -1,103 +1,103 @@
 /*
- * Rete-powered architecture diagram renderer.
+ * Architecture diagram renderer.
  *
- * Each `<div class="rete-diagram" data-rete-config="...">` element on the page
- * is hydrated into a draggable / pan- and zoom-able node graph using rete.js v2
- * (data model + area plugin) and a small custom DOM/SVG renderer.
+ * Originally prototyped on rete.js, but we use none of rete's graph features
+ * (no engine, no validated connections, no sockets) — just positioned cards
+ * with bezier connectors. Pulling rete + a render plugin in via esm.sh
+ * triggered `instanceof Scope` mismatches and empty node DOM. Replaced with a
+ * ~200 LOC vanilla implementation: no external runtime deps, no import map.
  *
- * Config schema (JSON, embedded in `data-rete-config`):
+ * Each `<div class="rete-diagram" data-rete-config="...">` element is hydrated
+ * with a draggable / pan- and zoom-able canvas built from the JSON config:
+ *
  *   {
- *     "groups": [ { "id": "edge", "label": "Edge", "x": 0, "y": 0, "w": 320, "h": 460 } ],
- *     "nodes":  [ { "id": "src", "label": "VAULT SOURCE", "kind": "source",
- *                    "x": 540, "y": 110, "w": 252, "h": 120,
- *                    "header": "VAULT SOURCE", "title": "Forwarder" } ],
- *     "connections": [ { "from": "src", "to": "sink1" } ]
+ *     "groups":      [ { "id": "edge", "label": "Edge", "x": 0, "y": 0, "w": 320, "h": 460 } ],
+ *     "nodes":       [ { "id": "src",  "label": "...", "kind": "source",
+ *                         "x": 540, "y": 110, "w": 252, "h": 120,
+ *                         "header": "VAULT SOURCE", "title": "Forwarder",
+ *                         "subtitle": "..." } ],
+ *     "connections": [ { "from": "src", "to": "sink1",
+ *                         "fromSide": "right", "toSide": "left",
+ *                         "kind": "thick" } ]
  *   }
  *
- * The renderer is intentionally minimal: it leans on rete's NodeEditor /
- * ClassicPreset for the data model and the AreaPlugin for the canvas
- * (pan, zoom, node dragging) but draws nodes and connections with hand-rolled
- * DOM + SVG rather than pulling in the React/Vue render plugins. This keeps
- * the bundle small (~25 kB gz) and avoids a framework dependency in the docs
- * site.
+ * The class name is kept as `.rete-diagram` for backward compatibility with
+ * the existing CSS and shortcode.
  */
 
-import { NodeEditor, ClassicPreset } from 'https://esm.sh/rete@2.0.5';
-import { AreaPlugin, AreaExtensions } from 'https://esm.sh/rete-area-plugin@2.1.5';
+const SVG_NS = 'http://www.w3.org/2000/svg';
 
-class DiagramNode extends ClassicPreset.Node {
-    constructor(data) {
-        super(data.label || data.id);
-        this.data = data;
-        this.width = data.w || 220;
-        this.height = data.h || 120;
-    }
-}
-
-function renderNodeDom(node) {
+function createNodeEl(n) {
     const el = document.createElement('div');
-    el.className = `rete-node rete-node--${node.data.kind || 'default'}`;
-    el.style.width = node.width + 'px';
-    el.style.height = node.height + 'px';
+    el.className = `rete-node rete-node--${n.kind || 'default'}`;
+    el.style.position = 'absolute';
+    el.style.left = '0';
+    el.style.top = '0';
+    el.style.width = (n.w || 220) + 'px';
+    el.style.height = (n.h || 120) + 'px';
+    el.style.transform = `translate(${n.x}px, ${n.y}px)`;
+    el.dataset.nodeId = n.id;
 
-    if (node.data.header) {
+    if (n.header) {
         const header = document.createElement('div');
         header.className = 'rete-node__header';
-        header.textContent = node.data.header;
+        header.textContent = n.header;
         el.appendChild(header);
     }
-
     const body = document.createElement('div');
     body.className = 'rete-node__body';
-
-    if (node.data.title) {
+    if (n.title) {
         const title = document.createElement('div');
         title.className = 'rete-node__title';
-        title.textContent = node.data.title;
+        title.textContent = n.title;
         body.appendChild(title);
     }
-    if (node.data.subtitle) {
+    if (n.subtitle) {
         const sub = document.createElement('div');
         sub.className = 'rete-node__subtitle';
-        sub.textContent = node.data.subtitle;
+        sub.textContent = n.subtitle;
         body.appendChild(sub);
     }
     el.appendChild(body);
     return el;
 }
 
-function renderGroupDom(group) {
+function createGroupEl(g) {
     const el = document.createElement('div');
     el.className = 'rete-group';
-    el.style.width = group.w + 'px';
-    el.style.height = group.h + 'px';
-    if (group.label) {
+    el.style.position = 'absolute';
+    el.style.left = '0';
+    el.style.top = '0';
+    el.style.width = g.w + 'px';
+    el.style.height = g.h + 'px';
+    el.style.transform = `translate(${g.x}px, ${g.y}px)`;
+    if (g.label) {
         const label = document.createElement('div');
         label.className = 'rete-group__label';
-        label.textContent = group.label;
+        label.textContent = g.label;
         el.appendChild(label);
     }
     return el;
 }
 
-function ensureSvgLayer(container) {
-    let svg = container.querySelector('svg.rete-connections');
-    if (svg) return svg;
-    svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('class', 'rete-connections');
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    // Place the SVG inside the area's content holder so it pans/zooms with nodes.
-    const holder = container.querySelector('.rete-area, [data-area]') || container;
-    holder.insertBefore(svg, holder.firstChild);
-    return svg;
-}
-
-function buildPath(x1, y1, x2, y2) {
+function bezierPath(x1, y1, x2, y2) {
     const dx = Math.max(40, Math.abs(x2 - x1) * 0.4);
     return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
 }
 
-async function init(container) {
+function anchorPoint(node, side) {
+    const w = node.w || 220;
+    const h = node.h || 120;
+    switch (side) {
+        case 'left':   return { x: node.x,         y: node.y + h / 2 };
+        case 'right':  return { x: node.x + w,     y: node.y + h / 2 };
+        case 'top':    return { x: node.x + w / 2, y: node.y };
+        case 'bottom': return { x: node.x + w / 2, y: node.y + h };
+        default:       return { x: node.x + w / 2, y: node.y + h / 2 };
+    }
+}
+
+function init(container) {
     let config;
     try {
         config = JSON.parse(container.dataset.reteConfig);
@@ -105,127 +105,239 @@ async function init(container) {
         console.error('[rete-diagram] invalid config', err, container);
         return;
     }
-
     container.classList.add('rete-diagram--ready');
+    container.innerHTML = '';
 
-    const editor = new NodeEditor();
-    const area = new AreaPlugin(container);
+    // Layered structure (all transformed together by the viewport):
+    //   viewport
+    //     ├─ groups     (background rectangles, non-interactive)
+    //     ├─ svg        (connection paths)
+    //     └─ nodes      (draggable cards on top)
+    const viewport = document.createElement('div');
+    viewport.className = 'rete-viewport';
+    viewport.style.position = 'absolute';
+    viewport.style.left = '0';
+    viewport.style.top = '0';
+    viewport.style.transformOrigin = '0 0';
+    container.appendChild(viewport);
 
-    AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {
-        accumulating: AreaExtensions.accumulateOnCtrl()
-    });
-
-    editor.use(area);
-
-    // Locate the area's content holder so we can inject groups + connections SVG
-    // beneath the node layer.
-    const holder = container.querySelector('div'); // area plugin creates a wrapping div
     const groupLayer = document.createElement('div');
     groupLayer.className = 'rete-group-layer';
-    holder.insertBefore(groupLayer, holder.firstChild);
+    groupLayer.style.position = 'absolute';
+    groupLayer.style.inset = '0';
+    groupLayer.style.pointerEvents = 'none';
+    viewport.appendChild(groupLayer);
 
-    // Render group rectangles (purely decorative, not part of the rete graph).
-    (config.groups || []).forEach(g => {
-        const el = renderGroupDom(g);
-        el.style.transform = `translate(${g.x}px, ${g.y}px)`;
-        el.dataset.groupId = g.id;
-        groupLayer.appendChild(el);
-    });
-
-    // Connections SVG layer (under the node layer, above the group layer).
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('class', 'rete-connections');
-    holder.insertBefore(svg, groupLayer.nextSibling);
+    svg.style.position = 'absolute';
+    svg.style.left = '0';
+    svg.style.top = '0';
+    svg.style.overflow = 'visible';
+    svg.style.pointerEvents = 'none';
+    viewport.appendChild(svg);
 
-    // Custom DOM rendering hook: replace the empty node element the area plugin
-    // creates with our own card markup.
-    area.addPipe(ctx => {
-        if (ctx.type === 'rendernode') {
-            const view = area.nodeViews.get(ctx.data.node.id);
-            if (view && view.element && !view.element.dataset.reteRendered) {
-                view.element.innerHTML = '';
-                view.element.appendChild(renderNodeDom(ctx.data.node));
-                view.element.dataset.reteRendered = '1';
-            }
-        }
-        if (ctx.type === 'nodetranslated' || ctx.type === 'noderesized' || ctx.type === 'rendered') {
-            redrawConnections();
-        }
-        return ctx;
+    const nodeLayer = document.createElement('div');
+    nodeLayer.className = 'rete-node-layer';
+    nodeLayer.style.position = 'absolute';
+    nodeLayer.style.inset = '0';
+    viewport.appendChild(nodeLayer);
+
+    // Toolbar (fullscreen toggle). Sits above the viewport, fixed in container
+    // coords so it stays put when panning/zooming.
+    const toolbar = document.createElement('div');
+    toolbar.className = 'rete-toolbar';
+    const fsBtn = document.createElement('button');
+    fsBtn.type = 'button';
+    fsBtn.className = 'rete-toolbar__btn';
+    fsBtn.setAttribute('aria-label', 'Toggle fullscreen');
+    fsBtn.title = 'Toggle fullscreen';
+    const ICON_EXPAND  = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>';
+    const ICON_COLLAPSE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/></svg>';
+    fsBtn.innerHTML = ICON_EXPAND;
+    toolbar.appendChild(fsBtn);
+    container.appendChild(toolbar);
+
+    // Build groups.
+    (config.groups || []).forEach(g => groupLayer.appendChild(createGroupEl(g)));
+
+    // Build nodes; remember each node's element so we can update its transform.
+    const nodes = (config.nodes || []).map(n => ({ ...n }));
+    const nodeEls = new Map();
+    nodes.forEach(n => {
+        const el = createNodeEl(n);
+        nodeLayer.appendChild(el);
+        nodeEls.set(n.id, el);
     });
+    const nodeById = new Map(nodes.map(n => [n.id, n]));
 
-    // Add nodes from config.
-    const nodeMap = new Map();
-    for (const n of config.nodes || []) {
-        const node = new DiagramNode(n);
-        nodeMap.set(n.id, node);
-        await editor.addNode(node);
-        await area.translate(node.id, { x: n.x, y: n.y });
-    }
-
-    // Helper: derive screen-space (canvas-space, pre-transform) anchor points
-    // for a node based on its current translation + dimensions.
-    function anchor(nodeId, side) {
-        const node = nodeMap.get(nodeId);
-        const view = area.nodeViews.get(nodeId);
-        if (!node || !view) return null;
-        const { x, y } = view.position;
-        const w = node.width;
-        const h = node.height;
-        switch (side) {
-            case 'left':   return { x: x,         y: y + h / 2 };
-            case 'right':  return { x: x + w,     y: y + h / 2 };
-            case 'top':    return { x: x + w / 2, y: y };
-            case 'bottom': return { x: x + w / 2, y: y + h };
-            default:       return { x: x + w / 2, y: y + h / 2 };
-        }
-    }
-
-    function redrawConnections() {
-        // Compute bounding box across all groups + nodes so the SVG covers the canvas.
+    function redraw() {
         let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
         (config.groups || []).forEach(g => {
             minX = Math.min(minX, g.x); minY = Math.min(minY, g.y);
             maxX = Math.max(maxX, g.x + g.w); maxY = Math.max(maxY, g.y + g.h);
         });
-        nodeMap.forEach((node, id) => {
-            const v = area.nodeViews.get(id);
-            if (!v) return;
-            minX = Math.min(minX, v.position.x);
-            minY = Math.min(minY, v.position.y);
-            maxX = Math.max(maxX, v.position.x + node.width);
-            maxY = Math.max(maxY, v.position.y + node.height);
+        nodes.forEach(n => {
+            minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
+            maxX = Math.max(maxX, n.x + (n.w || 220));
+            maxY = Math.max(maxY, n.y + (n.h || 120));
         });
         if (!isFinite(minX)) return;
+        const pad = 40;
+        svg.setAttribute('viewBox',
+            `${minX - pad} ${minY - pad} ${maxX - minX + pad * 2} ${maxY - minY + pad * 2}`);
+        svg.style.left   = (minX - pad) + 'px';
+        svg.style.top    = (minY - pad) + 'px';
+        svg.style.width  = (maxX - minX + pad * 2) + 'px';
+        svg.style.height = (maxY - minY + pad * 2) + 'px';
 
-        svg.setAttribute('viewBox', `${minX - 20} ${minY - 20} ${maxX - minX + 40} ${maxY - minY + 40}`);
-        svg.style.width  = (maxX - minX + 40) + 'px';
-        svg.style.height = (maxY - minY + 40) + 'px';
-        svg.style.transform = `translate(${minX - 20}px, ${minY - 20}px)`;
-
-        // Rebuild paths.
         svg.innerHTML = '';
         (config.connections || []).forEach(c => {
-            const a = anchor(c.from, c.fromSide || 'right');
-            const b = anchor(c.to,   c.toSide   || 'left');
-            if (!a || !b) return;
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.setAttribute('d', buildPath(a.x, a.y, b.x, b.y));
+            const from = nodeById.get(c.from);
+            const to   = nodeById.get(c.to);
+            if (!from || !to) return;
+            const a = anchorPoint(from, c.fromSide || 'right');
+            const b = anchorPoint(to,   c.toSide   || 'left');
+            const path = document.createElementNS(SVG_NS, 'path');
+            path.setAttribute('d', bezierPath(a.x, a.y, b.x, b.y));
             path.setAttribute('class', `rete-connection rete-connection--${c.kind || 'default'}`);
             svg.appendChild(path);
         });
     }
 
-    // Initial layout pass.
-    await AreaExtensions.zoomAt(area, editor.getNodes());
-    redrawConnections();
+    // Pan + zoom state (applied as a single transform on the viewport).
+    let scale = 1, tx = 0, ty = 0;
+    function applyViewport() {
+        viewport.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+    }
+
+    // Center initial viewport so the content fits within the container.
+    function fit() {
+        const rect = container.getBoundingClientRect();
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        (config.groups || []).forEach(g => {
+            minX = Math.min(minX, g.x); minY = Math.min(minY, g.y);
+            maxX = Math.max(maxX, g.x + g.w); maxY = Math.max(maxY, g.y + g.h);
+        });
+        nodes.forEach(n => {
+            minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
+            maxX = Math.max(maxX, n.x + (n.w || 220));
+            maxY = Math.max(maxY, n.y + (n.h || 120));
+        });
+        if (!isFinite(minX) || rect.width === 0 || rect.height === 0) {
+            applyViewport();
+            return;
+        }
+        const cw = maxX - minX, ch = maxY - minY;
+        const margin = 40;
+        scale = Math.min(
+            (rect.width - margin * 2) / cw,
+            (rect.height - margin * 2) / ch,
+            1.2
+        );
+        if (!isFinite(scale) || scale <= 0) scale = 1;
+        tx = (rect.width  - cw * scale) / 2 - minX * scale;
+        ty = (rect.height - ch * scale) / 2 - minY * scale;
+        applyViewport();
+    }
+
+    // --- Pan: drag on empty container background.
+    let panning = false, panStartX = 0, panStartY = 0, panStartTx = 0, panStartTy = 0;
+    container.addEventListener('mousedown', e => {
+        if (e.target.closest('.rete-node')) return; // node drag handles itself
+        panning = true;
+        panStartX = e.clientX; panStartY = e.clientY;
+        panStartTx = tx; panStartTy = ty;
+        container.style.cursor = 'grabbing';
+        e.preventDefault();
+    });
+    window.addEventListener('mousemove', e => {
+        if (!panning) return;
+        tx = panStartTx + (e.clientX - panStartX);
+        ty = panStartTy + (e.clientY - panStartY);
+        applyViewport();
+    });
+    window.addEventListener('mouseup', () => {
+        if (!panning) return;
+        panning = false;
+        container.style.cursor = '';
+    });
+
+    // --- Zoom: wheel, anchored at cursor.
+    container.addEventListener('wheel', e => {
+        e.preventDefault();
+        const rect = container.getBoundingClientRect();
+        const cx = e.clientX - rect.left;
+        const cy = e.clientY - rect.top;
+        const factor = Math.exp(-e.deltaY * 0.0015);
+        const next = Math.max(0.2, Math.min(4, scale * factor));
+        // Keep the point under the cursor stationary in canvas space.
+        tx = cx - (cx - tx) * (next / scale);
+        ty = cy - (cy - ty) * (next / scale);
+        scale = next;
+        applyViewport();
+    }, { passive: false });
+
+    // --- Per-node drag (translates the node within the viewport's coordinate
+    // space; divide screen delta by scale to compensate for zoom).
+    nodes.forEach(n => {
+        const el = nodeEls.get(n.id);
+        let dragging = false, sx = 0, sy = 0, ox = 0, oy = 0;
+        el.addEventListener('mousedown', e => {
+            dragging = true;
+            sx = e.clientX; sy = e.clientY;
+            ox = n.x; oy = n.y;
+            el.classList.add('is-dragging');
+            e.stopPropagation(); // don't trigger pan
+            e.preventDefault();
+        });
+        window.addEventListener('mousemove', e => {
+            if (!dragging) return;
+            n.x = ox + (e.clientX - sx) / scale;
+            n.y = oy + (e.clientY - sy) / scale;
+            el.style.transform = `translate(${n.x}px, ${n.y}px)`;
+            redraw();
+        });
+        window.addEventListener('mouseup', () => {
+            if (!dragging) return;
+            dragging = false;
+            el.classList.remove('is-dragging');
+        });
+    });
+
+    redraw();
+    // Defer fit until after layout settles (container may have 0 width on first paint).
+    requestAnimationFrame(fit);
+    window.addEventListener('resize', fit);
+
+    // --- Fullscreen toggle (window-level only). We deliberately don't use
+    // the native Fullscreen API: it takes over the whole OS screen and breaks
+    // out of the docs reading flow. Instead we toggle a class that pins the
+    // container to fill the browser viewport.
+    function isFullscreen() {
+        return container.classList.contains('rete-diagram--pseudo-fullscreen');
+    }
+    function syncFsIcon() {
+        fsBtn.innerHTML = isFullscreen() ? ICON_COLLAPSE : ICON_EXPAND;
+        fsBtn.title = isFullscreen() ? 'Exit fullscreen' : 'Toggle fullscreen';
+    }
+    function setFullscreen(on) {
+        container.classList.toggle('rete-diagram--pseudo-fullscreen', on);
+        document.body.classList.toggle('rete-diagram-fs-lock', on);
+        // Two RAFs: one to apply the new size, one to measure + refit.
+        requestAnimationFrame(() => requestAnimationFrame(() => { fit(); syncFsIcon(); }));
+    }
+    fsBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        setFullscreen(!isFullscreen());
+    });
+    window.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && isFullscreen()) setFullscreen(false);
+    });
 }
 
 function bootstrap() {
-    document.querySelectorAll('.rete-diagram:not(.rete-diagram--ready)').forEach(el => {
-        // Defer to next frame so layout is settled before measuring.
-        requestAnimationFrame(() => init(el));
-    });
+    document.querySelectorAll('.rete-diagram:not(.rete-diagram--ready)').forEach(init);
 }
 
 if (document.readyState === 'loading') {
