@@ -171,6 +171,19 @@ function init(container) {
     });
     const nodeById = new Map(nodes.map(n => [n.id, n]));
 
+    // Assign each node to the group that contains it at init time. Drag is
+    // then clamped to that group's bounds so a node can't escape its group.
+    const groups = config.groups || [];
+    function findGroupFor(n) {
+        const w = n.w || 220, h = n.h || 120;
+        const cx = n.x + w / 2, cy = n.y + h / 2;
+        return groups.find(g =>
+            cx >= g.x && cx <= g.x + g.w &&
+            cy >= g.y && cy <= g.y + g.h
+        ) || null;
+    }
+    nodes.forEach(n => { n._group = findGroupFor(n); });
+
     function redraw() {
         let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
         (config.groups || []).forEach(g => {
@@ -202,6 +215,21 @@ function init(container) {
             path.setAttribute('d', bezierPath(a.x, a.y, b.x, b.y));
             path.setAttribute('class', `rete-connection rete-connection--${c.kind || 'default'}`);
             svg.appendChild(path);
+
+            if (c.label) {
+                // Midpoint of the cubic bezier (t=0.5 with our symmetric control points).
+                const dx = Math.max(40, Math.abs(b.x - a.x) * 0.4);
+                const mx = 0.125 * a.x + 0.375 * (a.x + dx) + 0.375 * (b.x - dx) + 0.125 * b.x;
+                const my = 0.125 * a.y + 0.375 * a.y         + 0.375 * b.y         + 0.125 * b.y;
+                const text = document.createElementNS(SVG_NS, 'text');
+                text.setAttribute('x', mx);
+                text.setAttribute('y', my);
+                text.setAttribute('class', 'rete-connection__label');
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dominant-baseline', 'middle');
+                text.textContent = c.label;
+                svg.appendChild(text);
+            }
         });
     }
 
@@ -293,8 +321,17 @@ function init(container) {
         });
         window.addEventListener('mousemove', e => {
             if (!dragging) return;
-            n.x = ox + (e.clientX - sx) / scale;
-            n.y = oy + (e.clientY - sy) / scale;
+            let nx = ox + (e.clientX - sx) / scale;
+            let ny = oy + (e.clientY - sy) / scale;
+            // Clamp to group bounds if the node belongs to one.
+            const g = n._group;
+            if (g) {
+                const w = n.w || 220, h = n.h || 120;
+                nx = Math.max(g.x, Math.min(nx, g.x + g.w - w));
+                ny = Math.max(g.y, Math.min(ny, g.y + g.h - h));
+            }
+            n.x = nx;
+            n.y = ny;
             el.style.transform = `translate(${n.x}px, ${n.y}px)`;
             redraw();
         });
@@ -329,6 +366,11 @@ function init(container) {
     }
     fsBtn.addEventListener('click', e => {
         e.stopPropagation();
+        setFullscreen(!isFullscreen());
+    });
+    // Double-click on the canvas background (not on a node) toggles fullscreen.
+    container.addEventListener('dblclick', e => {
+        if (e.target.closest('.rete-node, .rete-toolbar')) return;
         setFullscreen(!isFullscreen());
     });
     window.addEventListener('keydown', e => {
