@@ -60,7 +60,28 @@ Thanks to this modular approach, each part of the Kerberos.io stack can be scale
 
 At the foundation of every Kerberos.io deployment sits one or more [Agents](/agent/first-things-first/). Agents can be installed [in a variety of ways](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent) and run on the compute of your choice — virtual machine, bare metal, Kubernetes cluster or otherwise — connected to the camera streams you control.
 
-{{< figure src="agent-explanation.svg" alt="An Agent consists of both a backend and a frontend." caption="An Agent consists of both a backend and a frontend." class="stretch">}}
+{{< rete caption="An Agent consists of both a backend and a frontend." alt="An Agent consists of both a backend and a frontend." height="380" >}}
+{
+  "groups": [
+    { "id": "agent", "label": "Agent", "x": 300, "y": 20, "w": 420, "h": 340 }
+  ],
+  "nodes": [
+    { "id": "user", "kind": "default", "x":  40, "y": 145, "w": 200, "h": 110,
+      "header": "USER", "title": "Browser", "subtitle": "Web UI" },
+    { "id": "frontend", "kind": "agent", "x": 340, "y":  70, "w": 340, "h": 110,
+      "header": "AGENT", "title": "Frontend", "subtitle": "User interface" },
+    { "id": "backend", "kind": "agent", "x": 340, "y": 210, "w": 340, "h": 110,
+      "header": "AGENT", "title": "Backend", "subtitle": "API & video processing" },
+    { "id": "camera", "kind": "camera", "x": 780, "y": 145, "w": 200, "h": 110,
+      "header": "CAMERA", "title": "Camera", "subtitle": "RTSP://" }
+  ],
+  "connections": [
+    { "from": "user", "to": "frontend", "fromSide": "right", "toSide": "left" },
+    { "from": "frontend", "to": "backend", "fromSide": "bottom", "toSide": "top" },
+    { "from": "camera", "to": "backend", "fromSide": "left", "toSide": "right" }
+  ]
+}
+{{< /rete >}}
 
 Each Agent is responsible for a single camera and has two roles: it serves as a user interface (frontend) and as an API server (backend). The backend processes the video stream, applies computer vision techniques, records footage and triggers configured actions such as webhooks. The frontend allows users to review recordings and adjust the Agent's configuration.
 

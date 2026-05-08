@@ -13,10 +13,10 @@ weight: 104
 toc: true
 ---
 
-We want to provide every human being on this planet with a free-of-charge solution, a video platform, to protect its families, friends, homes, or anything it cares for, in the form of Open Source; MIT license.
+We want to provide every person on this planet with a free, Open Source video platform — released under the MIT license — to help protect their families, friends, homes and anything else they care about.
 
-We develop our solutions in such a way, that it’s using the latest technologies and best-practices, to create a seamless, never-seen and delicious user experience in the space of video management, video analytics and video surveillance.
+We build our solutions using the latest technologies and best practices to deliver a seamless, modern and delightful user experience across video management, video analytics and video surveillance.
 
-Our mission is to reach far beyond the traditional video platforms we experiencing nowadays. We have a strong focus to simplify the process of scaling, going from a simple home deployment to a large scale production deployment with thousands of cameras.
+Our mission reaches far beyond the traditional video platforms available today. We focus on simplifying the path from a single-camera home setup to a large-scale production deployment running thousands of cameras.
 
-While moving on, and leveraging our skills to scale, we are experimenting and implementing video analysis that are linked to optimise specific use case: people tracking, license plate recognition, people counting, etc. These concepts will/are be integrated in the various components of the Kerberos.io portfolio.
+As we grow, we continue to experiment with and integrate video analytics tailored to specific use cases — such as people tracking, license plate recognition and people counting. These capabilities are progressively rolled out across the components of the Kerberos.io portfolio.
