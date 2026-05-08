@@ -1,0 +1,45 @@
+{{- /*
+  rete shortcode — embed an interactive architecture diagram backed by rete.js.
+
+  Usage:
+    {{< rete caption="Vault chaining" >}}
+    {
+      "groups":      [ ... ],
+      "nodes":       [ ... ],
+      "connections": [ ... ]
+    }
+    {{< /rete >}}
+
+  See assets/js/rete-diagram.js for the full config schema.
+*/ -}}
+
+{{- $config := trim .Inner " \n\r\t" -}}
+{{- $id := printf "rete-%s" (substr (md5 $config) 0 8) -}}
+{{- $caption := .Get "caption" -}}
+{{- $alt := .Get "alt" | default $caption -}}
+{{- $height := .Get "height" -}}
+
+{{- /* Emit the CSS + module loader only once per page. */ -}}
+{{- if not (.Page.Store.Get "reteAssetsEmitted") -}}
+  {{- .Page.Store.Set "reteAssetsEmitted" true -}}
+  {{- with resources.Get "css/rete-diagram.css" -}}
+    {{- $css := . | minify | fingerprint -}}
+    <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
+  {{- end }}
+  {{- with resources.Get "js/rete-diagram.js" -}}
+    {{- $js := . | fingerprint -}}
+    <script type="module" src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script>
+  {{- end }}
+{{- end }}
+
+<figure class="rete-diagram-figure">
+  <div
+    id="{{ $id }}"
+    class="rete-diagram"
+    role="img"
+    aria-label="{{ $alt }}"
+    {{ with $height }}style="height: {{ . }}px"{{ end }}
+    data-rete-config='{{ $config | safeHTMLAttr }}'
+  ></div>
+  {{ with $caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}
+</figure>

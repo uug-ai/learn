@@ -17,7 +17,37 @@ Multiple Kerberos Vaults can be installed in your video landscape. You may have 
 
 Kerberos Vaults can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by requesting a forward from Kerberos Hub or building your own forwarding application code.
 
-{{< figure src="deployment-chaining.svg" alt="Synchronise recordings between multiple Kerberos Vault" caption="Synchronise recordings between multiple Kerberos Vault" class="stretch">}}
+{{< rete caption="Synchronise recordings between multiple Kerberos Vault" alt="Synchronise recordings between multiple Kerberos Vault" height="520" >}}
+{
+  "groups": [
+    { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 320, "h": 540 },
+    { "id": "edge",  "label": "Edge",  "x": 420, "y": 20, "w": 720, "h": 540 }
+  ],
+  "nodes": [
+    { "id": "cloud-vault", "kind": "vault", "x":  40, "y": 320, "w": 240, "h": 150,
+      "header": "VAULT TARGET", "title": "Vault", "subtitle": "Cloud Storage",
+      "badges": ["aws", "gcp", "azure", "kubernetes"] },
+    { "id": "hub", "kind": "hub", "x":  40, "y": 110, "w": 240, "h": 150,
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse", "badges": ["kubernetes"] },
+    { "id": "edge-vault", "kind": "vault", "x": 460, "y": 320, "w": 240, "h": 150,
+      "header": "VAULT SOURCE", "title": "Vault", "subtitle": "Edge Storage",
+      "badges": ["minio", "ceph", "kubernetes"] },
+    { "id": "agent-1", "kind": "agent", "x": 860, "y":  60, "w": 260, "h": 150,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-2", "kind": "agent", "x": 860, "y": 235, "w": 260, "h": 150,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-3", "kind": "agent", "x": 860, "y": 410, "w": 260, "h": 150,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] }
+  ],
+  "connections": [
+    { "from": "cloud-vault", "to": "hub", "fromSide": "top", "toSide": "bottom" },
+    { "from": "edge-vault", "to": "cloud-vault", "fromSide": "left", "toSide": "right", "kind": "thick", "label": "Forwarding" },
+    { "from": "agent-1", "to": "edge-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-2", "to": "edge-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-3", "to": "edge-vault", "fromSide": "left", "toSide": "right" }
+  ]
+}
+{{< /rete >}}f
 
 Forwarding can be configured in two modes: continuous forwarding and on-demand recording.
 

@@ -1,0 +1,303 @@
+/* Rete-powered architecture diagrams. */
+
+.rete-diagram {
+    position: relative;
+    width: 100%;
+    height: 520px;
+    margin: 1.5rem 0;
+    overflow: hidden;
+    border-radius: 6px;
+    background:
+        radial-gradient(circle at 1px 1px, rgba(120, 120, 120, 0.18) 1px, transparent 0) 0 0 / 24px 24px,
+        var(--rete-bg, #fafafa);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #262424;
+    user-select: none;
+}
+
+html.dark .rete-diagram,
+.dark .rete-diagram {
+    background:
+        radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.08) 1px, transparent 0) 0 0 / 24px 24px,
+        #1a1a1a;
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #ededed;
+}
+
+.rete-diagram > .rete-viewport {
+    width: 100%;
+    height: 100%;
+}
+
+/* Group rectangles (decorative containers behind nodes). */
+.rete-group-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.rete-group {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 2px solid #d1d1d1;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.5);
+    box-sizing: border-box;
+}
+
+html.dark .rete-group,
+.dark .rete-group {
+    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.rete-group__label {
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: var(--rete-bg, #fafafa);
+    color: #6d6666;
+}
+
+html.dark .rete-group__label,
+.dark .rete-group__label {
+    background: #1a1a1a;
+    color: #b5b5b5;
+}
+
+/* Connections SVG. */
+.rete-connections {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.rete-connection {
+    fill: none;
+    stroke: #c9ccd6;
+    stroke-width: 4;
+    stroke-linecap: round;
+    /* Flowing-liquid effect: a dashed stroke whose offset animates so the
+       dashes appear to drift from `from` to `to`. */
+    stroke-dasharray: 10 10;
+    animation: rete-flow 1.2s linear infinite;
+}
+
+@keyframes rete-flow {
+    to { stroke-dashoffset: -20; }
+}
+
+.rete-connection--thick {
+    stroke-width: 24;
+    opacity: 0.85;
+    stroke-linecap: butt;
+    stroke: #555f8e;
+    /* Bigger gap so the moving highlight reads at thick width. */
+    stroke-dasharray: 40 24;
+    animation-duration: 2.4s;
+}
+.rete-connection--dashed { stroke-dasharray: 6 6; }
+
+/* Labelled edges read better as a static solid line so the label stays legible. */
+.rete-connection--labelled {
+    stroke-dasharray: none;
+    animation: none;
+}
+
+/* Inline label drawn on top of a connection's bezier midpoint. */
+.rete-connection__label {
+    fill: #ffffff;
+    stroke: none;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    paint-order: stroke;
+    pointer-events: none;
+}
+
+/* Nodes. The card is a soft-shadowed white panel; the header is a coloured
+   bar that sits flush across the full top edge of the card. */
+.rete-node {
+    box-sizing: border-box;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.06),
+        0 8px 24px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    cursor: grab;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.rete-node:active { cursor: grabbing; }
+
+html.dark .rete-node,
+.dark .rete-node {
+    background: #2a2a2a;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.3),
+        0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Node kinds. Each kind sets a single `--rete-node-color` variable that drives
+   the header pill and the selection outline; add new kinds by appending one
+   line below. */
+.rete-node {
+    --rete-node-color: #6b7280; /* default: neutral grey */
+}
+.rete-node--vault   { --rete-node-color: #555f8e; } /* indigo */
+.rete-node--storage { --rete-node-color: #6b7280; } /* gray   */
+.rete-node--hub     { --rete-node-color: #84559f; } /* purple */
+.rete-node--agent   { --rete-node-color: #4a796b; } /* teal   */
+.rete-node--factory { --rete-node-color: #4a796b; } /* teal   */
+.rete-node--camera  { --rete-node-color: #374151; } /* slate  */
+
+.rete-node__header {
+    padding: 8px 14px;
+    background: var(--rete-node-color);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    /* Square the bottom corners; top corners follow the card's radius (12 - 1 inset). */
+    border-radius: 11px 11px 0 0;
+    white-space: nowrap;
+}
+
+.rete-node__body {
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex: 1;
+    box-sizing: border-box;
+}
+
+/* When the body contains a badges row, give it a touch more bottom padding so
+   the icons don't visually crowd the card edge. */
+.rete-node__body:has(.rete-node__badges) {
+    padding-bottom: 32px;
+}
+
+.rete-node__title {
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.01em;
+    color: inherit;
+    line-height: 1.2;
+}
+
+.rete-node__subtitle {
+    margin-top: 0;
+    font-size: 13px;
+    color: #6d6666;
+    line-height: 1.2;
+}
+
+html.dark .rete-node__subtitle,
+.dark .rete-node__subtitle { color: #b5b5b5; }
+
+/* Brand badges (storage providers, etc.) shown beneath the subtitle. */
+.rete-node__badges {
+    margin-top: 0;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    line-height: 1;
+}
+.rete-node__badge {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    display: block;
+}
+
+/* Selected state. */
+.rete-node[data-selected="true"] {
+    outline: 2px solid var(--rete-node-color);
+    outline-offset: 2px;
+}
+
+/* Toolbar (fullscreen button, top-right). */
+.rete-toolbar {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 5;
+    display: flex;
+    gap: 4px;
+}
+
+.rete-toolbar__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #262424;
+    cursor: pointer;
+    transition: background 120ms ease, color 120ms ease;
+}
+
+.rete-toolbar__btn:hover {
+    background: #ffffff;
+    color: #555f8e;
+}
+
+.rete-toolbar__btn:focus-visible {
+    outline: 2px solid #555f8e;
+    outline-offset: 1px;
+}
+
+html.dark .rete-toolbar__btn,
+.dark .rete-toolbar__btn {
+    background: rgba(40, 40, 40, 0.9);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #ededed;
+}
+
+html.dark .rete-toolbar__btn:hover,
+.dark .rete-toolbar__btn:hover {
+    background: #2a2a2a;
+    color: #ffffff;
+}
+
+/* Window-level fullscreen: pin the diagram to fill the browser viewport
+   without invoking the native OS Fullscreen API. */
+.rete-diagram--pseudo-fullscreen {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    z-index: 9999;
+    border-radius: 0;
+}
+
+/* Prevent the page underneath from scrolling while fullscreen is active. */
+body.rete-diagram-fs-lock {
+    overflow: hidden;
+}
