@@ -87,7 +87,20 @@ Each Agent is responsible for a single camera and has two roles: it serves as a 
 
 An Agent is shipped as a single container that bundles all required dependencies and libraries. One container is deployed per camera.
 
-{{< figure src="introduction-kerberos-io.svg" alt="An Agent monitoring a single camera stream." caption="An Agent monitoring a single camera stream." class="stretch">}}
+{{< rete caption="An Agent monitoring a single camera stream." alt="An Agent monitoring a single camera stream." height="280" >}}
+{
+  "groups": [],
+  "nodes": [
+    { "id": "camera", "kind": "camera", "x":  40, "y":  60, "w": 200, "h": 150,
+      "header": "CAMERA", "title": "Camera", "subtitle": "RTSP://" },
+    { "id": "agent", "kind": "agent", "x": 360, "y":  60, "w": 240, "h": 150,
+      "header": "AGENT", "title": "Agent", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] }
+  ],
+  "connections": [
+    { "from": "camera", "to": "agent", "fromSide": "right", "toSide": "left" }
+  ]
+}
+{{< /rete >}}
 
 This design provides full isolation: if one Agent fails, no other Agent or camera is affected. It also makes the system straightforward to scale.
 
@@ -95,7 +108,35 @@ This design provides full isolation: if one Agent fails, no other Agent or camer
 
 Starting with a handful of Agents is straightforward, and scaling out is just as simple. The [different deployment models](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent) we document let you grow your Kerberos.io setup at your own pace.
 
-{{< figure src="scaling-out.svg" alt="Scaling out Agents is straightforward." caption="Scaling out Agents is straightforward." class="stretch">}}
+{{< rete caption="Scaling out Agents is straightforward." alt="Scaling out Agents is straightforward." height="720" >}}
+{
+  "groups": [],
+  "nodes": [
+    { "id": "cam-1", "kind": "camera", "x":  40, "y":  40, "w": 200, "h": 130,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x":  40, "y": 200, "w": 200, "h": 130,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "cam-3", "kind": "camera", "x":  40, "y": 360, "w": 200, "h": 130,
+      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
+    { "id": "cam-4", "kind": "camera", "x":  40, "y": 520, "w": 200, "h": 130,
+      "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" },
+    { "id": "agent-1", "kind": "agent", "x": 380, "y":  40, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
+    { "id": "agent-2", "kind": "agent", "x": 380, "y": 200, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
+    { "id": "agent-3", "kind": "agent", "x": 380, "y": 360, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
+    { "id": "agent-4", "kind": "agent", "x": 380, "y": 520, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" }
+  ],
+  "connections": [
+    { "from": "cam-1", "to": "agent-1", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-2", "to": "agent-2", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-3", "to": "agent-3", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-4", "to": "agent-4", "fromSide": "right", "toSide": "left" }
+  ]
+}
+{{< /rete >}}
 
 [Selecting the right deployment](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent) depends on your scenario. There is no single best option — your choice should reflect your preferences and operational experience. A few examples:
 
@@ -113,7 +154,39 @@ Agents are responsible for storing recordings and triggering events. By default,
 
 For most setups — and especially as your video landscape grows — it is more convenient to rely on a central, scalable storage system such as Ceph, MinIO, or cloud object storage like S3. This is where Vault comes in.
 
-{{< figure src="agents-to-vault.svg" alt="Bring your own storage using Vault" caption="Bring your own storage using Vault" class="stretch">}}
+{{< rete caption="Bring your own storage using Vault" alt="Bring your own storage using Vault" height="540" >}}
+{
+  "groups": [],
+  "nodes": [
+    { "id": "cam-1", "kind": "camera", "x":  40, "y":  40, "w": 200, "h": 130,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x":  40, "y": 200, "w": 200, "h": 130,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "cam-3", "kind": "camera", "x":  40, "y": 360, "w": 200, "h": 130,
+      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
+    { "id": "agent-1", "kind": "agent", "x": 320, "y":  40, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
+    { "id": "agent-2", "kind": "agent", "x": 320, "y": 200, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
+    { "id": "agent-3", "kind": "agent", "x": 320, "y": 360, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
+    { "id": "vault", "kind": "vault", "x": 660, "y": 120, "w": 240, "h": 130,
+      "header": "VAULT", "title": "Vault", "subtitle": "Storage interface" },
+    { "id": "object-storage", "kind": "storage", "x": 660, "y": 280, "w": 240, "h": 150,
+      "header": "OBJECT STORAGE", "title": "Object Storage", "subtitle": "Cloud / Edge",
+      "badges": ["minio", "ceph", "aws", "gcp", "azure"] }
+  ],
+  "connections": [
+    { "from": "cam-1", "to": "agent-1", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-2", "to": "agent-2", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-3", "to": "agent-3", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-1", "to": "vault", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-2", "to": "vault", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-3", "to": "vault", "fromSide": "right", "toSide": "left" },
+    { "from": "vault", "to": "object-storage", "fromSide": "bottom", "toSide": "top" }
+  ]
+}
+{{< /rete >}}
 
 [Vault](/vault/first-things-first/) acts as an interface between your Agents and your storage system. It receives recordings from the Agents and persists them to the storage backend you have configured. Decoupling Agents from storage through Vault means you can swap the underlying storage system at any time, without reconfiguring every Agent.
 
@@ -125,7 +198,48 @@ Scaling [Agents](/agent/first-things-first/) and pairing them with a flexible, s
 
 The real value emerges when that data is turned into insights for stakeholders, governed properly, and combined with live information.
 
-{{< figure src="introduction-hub.svg" alt="Vault connected to Hub." caption="Vault connected to Hub." class="stretch">}}
+{{< rete caption="Vault connected to Hub." alt="Vault connected to Hub." height="540" >}}
+{
+  "groups": [
+    { "id": "cloud",      "label": "Cloud", "x":    0, "y":  20, "w": 740, "h": 760 },
+    { "id": "cloud-edge", "label": "Cloud", "x":  840, "y":  20, "w": 700, "h": 370 },
+    { "id": "edge",       "label": "Edge",  "x":  840, "y": 410, "w": 700, "h": 370 }
+  ],
+  "nodes": [
+    { "id": "hub", "kind": "hub", "x":  40, "y": 325, "w": 240, "h": 130,
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse" },
+    { "id": "cloud-vault", "kind": "vault", "x": 460, "y": 325, "w": 240, "h": 130,
+      "header": "VAULT", "title": "Vault", "subtitle": "Cloud Storage" },
+    { "id": "agent-1", "kind": "agent", "x": 880, "y":  80, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream" },
+    { "id": "agent-2", "kind": "agent", "x": 880, "y": 230, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream" },
+    { "id": "agent-3", "kind": "agent", "x": 880, "y": 470, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream" },
+    { "id": "agent-4", "kind": "agent", "x": 880, "y": 620, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 4", "subtitle": "Process stream" },
+    { "id": "cam-1", "kind": "camera", "x": 1300, "y":  80, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x": 1300, "y": 230, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "cam-3", "kind": "camera", "x": 1300, "y": 470, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
+    { "id": "cam-4", "kind": "camera", "x": 1300, "y": 620, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 4", "subtitle": "RTSP://" }
+  ],
+  "connections": [
+    { "from": "cloud-vault", "to": "hub", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-1", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-2", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-3", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "agent-4", "to": "cloud-vault", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-1", "to": "agent-1", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-2", "to": "agent-2", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-3", "to": "agent-3", "fromSide": "left", "toSide": "right" },
+    { "from": "cam-4", "to": "agent-4", "fromSide": "left", "toSide": "right" }
+  ]
+}
+{{< /rete >}}
 
 [Hub](/hub/first-things-first/) is our answer. It is a highly scalable platform that connects stakeholders to sites and groups of cameras, and provides all the capabilities you would expect: live streaming, object detection, fine-grained access control, alerts and more.
 
