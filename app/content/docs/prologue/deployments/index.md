@@ -46,12 +46,12 @@ We will discuss some of the most common setups we have seen, however this doesn'
       "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
     { "id": "agent-2", "kind": "agent", "x": 240, "y": 280, "w": 200, "h": 150,
       "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
-    { "id": "vault", "kind": "vault", "x": 600, "y":  80, "w": 240, "h": 150,
+    { "id": "vault", "kind": "vault", "x": 600, "y":  70, "w": 240, "h": 150,
       "header": "VAULT", "title": "Vault", "subtitle": "Storage interface", "badges": ["kubernetes"] },
-    { "id": "object-storage", "kind": "storage", "x": 600, "y": 290, "w": 240, "h": 150,
+    { "id": "object-storage", "kind": "storage", "x": 600, "y": 280, "w": 240, "h": 150,
       "header": "OBJECT STORAGE", "title": "Object Storage", "subtitle": "Cloud / Edge",
       "badges": ["minio", "ceph", "aws", "gcp", "azure"] },
-    { "id": "hub", "kind": "hub", "x": 1020, "y": 185, "w": 240, "h": 150,
+    { "id": "hub", "kind": "hub", "x": 1020, "y": 175, "w": 240, "h": 150,
       "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse", "badges": ["kubernetes"] }
   ],
   "connections": [

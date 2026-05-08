@@ -19,7 +19,40 @@ As described at the [introduction page](/) and [mission statement](/prologue/mis
 
 As shown below there are 3 critical steps in setting up a video management solution: camera processing, persisting of recordings and analysing. Instead of building a single solution, which many other vendors have build, which covers those 3 functions, we have divided and concur each role and responsibility in a stand-alone solution: [Kerberos Agents](/agent/first-things-first/), [Kerberos Factory](/factory/first-things-first/), [Kerberos Vault](/vault/first-things-first/) and [Kerberos Hub](/hub/first-things-first/).
 
-{{< figure src="overview.svg" alt="The Kerberos.io solution stack" caption="The Kerberos.io solution stack" class="stretch">}}
+{{< rete caption="The Kerberos.io solution stack" alt="The Kerberos.io solution stack" height="540" >}}
+{
+  "groups": [
+    { "id": "capture",     "label": "Camera processing",  "x":    0, "y": 20, "w": 460, "h": 460 },
+    { "id": "persistence", "label": "Persistence",        "x":  560, "y": 20, "w": 320, "h": 460 },
+    { "id": "analyse",     "label": "Analyse and monitor","x":  980, "y": 20, "w": 320, "h": 460 }
+  ],
+  "nodes": [
+    { "id": "cam-1", "kind": "camera", "x":  40, "y":  80, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x":  40, "y": 290, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "agent-1", "kind": "agent", "x": 240, "y":  70, "w": 200, "h": 150,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent-2", "kind": "agent", "x": 240, "y": 280, "w": 200, "h": 150,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream", "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "vault", "kind": "vault", "x": 600, "y":  70, "w": 240, "h": 150,
+      "header": "VAULT", "title": "Vault", "subtitle": "Storage interface", "badges": ["kubernetes"] },
+    { "id": "object-storage", "kind": "storage", "x": 600, "y": 280, "w": 240, "h": 150,
+      "header": "OBJECT STORAGE", "title": "Object Storage", "subtitle": "Cloud / Edge",
+      "badges": ["minio", "ceph", "aws", "gcp", "azure"] },
+    { "id": "hub", "kind": "hub", "x": 1020, "y": 175, "w": 240, "h": 150,
+      "header": "HUB", "title": "Hub", "subtitle": "Monitor and analyse", "badges": ["kubernetes"] }
+  ],
+  "connections": [
+    { "from": "cam-1", "to": "agent-1", "fromSide": "right", "toSide": "left" },
+    { "from": "cam-2", "to": "agent-2", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-1", "to": "vault", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-2", "to": "vault", "fromSide": "right", "toSide": "left" },
+    { "from": "vault", "to": "object-storage", "fromSide": "bottom", "toSide": "top" },
+    { "from": "vault", "to": "hub", "fromSide": "right", "toSide": "left" }
+  ]
+}
+{{< /rete >}}
 
 Due to this approach the Kerberos.io solution stack can be scaled and deployed independently. This means you can deploy specific parts on-premise and other parts on a cloud provider, or the other way arround. Next to that it also allows you to only install what you need: start small and grow over time when your business requires it.
 
