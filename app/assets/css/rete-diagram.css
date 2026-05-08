@@ -159,7 +159,7 @@ html.dark .rete-node,
     --rete-node-color: #6b7280; /* default: neutral grey */
 }
 .rete-node--vault   { --rete-node-color: #555f8e; } /* indigo */
-.rete-node--storage { --rete-node-color: #6b7a99; } /* steel  */
+.rete-node--storage { --rete-node-color: #6b7280; } /* gray   */
 .rete-node--hub     { --rete-node-color: #84559f; } /* purple */
 .rete-node--agent   { --rete-node-color: #4a796b; } /* teal   */
 .rete-node--factory { --rete-node-color: #4a796b; } /* teal   */
