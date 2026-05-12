@@ -241,6 +241,7 @@ class Designer {
         switch (action) {
             case 'connect': this.toggleConnectMode(btn); break;
             case 'fit':     this.fit(); break;
+            case 'fullscreen': this.toggleFullscreen(); break;
             case 'clear':
                 if (state.nodes.length || state.groups.length) {
                     if (!confirm('Remove all nodes, groups and connections?')) return;
@@ -262,6 +263,19 @@ class Designer {
         this.toast(state.mode === 'connect'
             ? 'Connect mode: click an anchor on the source, then on the target.'
             : 'Select mode.');
+    }
+
+    toggleFullscreen() {
+        const on = !this.root.classList.contains('is-fullscreen');
+        this.root.classList.toggle('is-fullscreen', on);
+        document.body.classList.toggle('designer-fs-lock', on);
+        const btn = this.root.querySelector('.designer__btn[data-action="fullscreen"]');
+        if (btn) {
+            btn.setAttribute('aria-pressed', String(on));
+            btn.title = on ? 'Exit fullscreen' : 'Toggle fullscreen';
+        }
+        // Two RAFs: one for layout to apply the new size, one to refit.
+        requestAnimationFrame(() => requestAnimationFrame(() => this.fit()));
     }
 
     // ----------------------------------------------------------- CRUD ops
@@ -839,6 +853,8 @@ class Designer {
                 if (state.mode === 'connect') {
                     const btn = this.root.querySelector('.designer__btn[data-action="connect"]');
                     this.toggleConnectMode(btn);
+                } else if (this.root.classList.contains('is-fullscreen')) {
+                    this.toggleFullscreen();
                 } else if (state.selection) {
                     this.select(null);
                 }

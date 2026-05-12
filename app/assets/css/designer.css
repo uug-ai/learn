@@ -1,9 +1,27 @@
 /* Designer page styles. Built on top of rete-diagram.css so the canvas itself
    reuses the same node visuals as the embedded diagrams. */
 
+/* Full-width page wrapper: bypass hextra's max-page-width to use the entire
+   viewport, leaving only a small gutter on the sides. */
+.designer-page {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.designer-page__main {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    padding: 1rem 1.5rem 2rem;
+}
+
+@media (min-width: 768px) {
+    .designer-page__main { padding: 1rem 2rem 2rem; }
+}
+
 .designer {
     display: grid;
-    grid-template-columns: 220px 1fr 280px;
+    grid-template-columns: 220px 1fr 300px;
     gap: 16px;
     margin: 1rem 0 2rem;
     font-family: 'Inter', system-ui, sans-serif;
@@ -231,6 +249,51 @@ html.dark .designer__btn:hover,
 
 .designer__canvas.designer__canvas--connecting {
     cursor: crosshair;
+}
+
+/* --- Fullscreen mode ---------------------------------------------------- */
+
+/* Toggle icons: collapse only shown while in fullscreen. */
+.designer__icon-collapse { display: none; }
+.designer.is-fullscreen .designer__icon-expand { display: none; }
+.designer.is-fullscreen .designer__icon-collapse { display: inline-block; }
+
+.designer.is-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    margin: 0;
+    padding: 12px;
+    background: var(--rete-bg, #fafafa);
+    grid-template-rows: 1fr;
+    overflow: hidden;
+}
+
+html.dark .designer.is-fullscreen,
+.dark .designer.is-fullscreen {
+    background: #1a1a1a;
+}
+
+.designer.is-fullscreen .designer__palette,
+.designer.is-fullscreen .designer__inspector {
+    min-height: 0;
+    height: 100%;
+    overflow: auto;
+}
+
+.designer.is-fullscreen .designer__canvas-wrap {
+    height: 100%;
+    min-height: 0;
+}
+
+.designer.is-fullscreen .designer__canvas {
+    flex: 1;
+    min-height: 0;
+}
+
+/* Prevent page underneath scrolling while fullscreen is active. */
+body.designer-fs-lock {
+    overflow: hidden;
 }
 
 .designer__source {
