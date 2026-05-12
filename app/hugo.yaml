@@ -36,6 +36,9 @@ menu:
     - name: Support
       pageRef: /support
       weight: 6
+    - name: Designer
+      pageRef: /designer
+      weight: 6.5
     - name: Search
       weight: 7
       params:
