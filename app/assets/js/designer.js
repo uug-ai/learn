@@ -52,13 +52,12 @@ const state = {
     connections: [],
     nextId: 1,
     selection: null, // { type: 'node'|'group'|'connection', id }
-    mode: 'select',  // 'select' | 'connect'
     pending: null,   // { nodeId, side } for in-progress connection
 };
 
-// Undo/redo: snapshots of the data-bearing parts of `state`. `selection`,
-// `mode`, and `pending` are intentionally excluded so undoing doesn't move
-// focus around or toggle modes.
+// Undo/redo: snapshots of the data-bearing parts of `state`. `selection`
+// and `pending` are intentionally excluded so undoing doesn't move focus
+// around or cancel in-progress interactions.
 const history = {
     past: [],
     future: [],
@@ -403,7 +402,6 @@ class Designer {
 
     handleAction(action, btn) {
         switch (action) {
-            case 'connect': this.toggleConnectMode(btn); break;
             case 'fit':     this.fit(); break;
             case 'fullscreen': this.toggleFullscreen(); break;
             case 'undo':    this.undo(); break;
@@ -462,17 +460,6 @@ class Designer {
         const redoBtn = this.root.querySelector('.designer__btn[data-action="redo"]');
         if (undoBtn) undoBtn.disabled = history.past.length === 0;
         if (redoBtn) redoBtn.disabled = history.future.length === 0;
-    }
-
-    toggleConnectMode(btn) {
-        state.mode = state.mode === 'connect' ? 'select' : 'connect';
-        state.pending = null;
-        if (btn) btn.setAttribute('aria-pressed', String(state.mode === 'connect'));
-        this.canvas.classList.toggle('designer__canvas--connecting', state.mode === 'connect');
-        this.renderAnchors();
-        this.toast(state.mode === 'connect'
-            ? 'Connect mode: click an anchor on the source, then on the target.'
-            : 'Select mode.');
     }
 
     toggleFullscreen() {
@@ -651,20 +638,21 @@ class Designer {
 
     renderAnchors() {
         this.anchorLayer.innerHTML = '';
-        if (state.mode !== 'connect') return;
+        this.anchorLayer.classList.toggle('is-connecting', !!state.pending);
         state.nodes.forEach(n => {
             ['top', 'right', 'bottom', 'left'].forEach(side => {
                 const p = anchorPoint(n, side);
                 const dot = document.createElement('button');
                 dot.type = 'button';
                 dot.className = 'designer__anchor';
+                dot.dataset.nodeId = n.id;
                 if (state.pending && state.pending.nodeId === n.id && state.pending.side === side) {
                     dot.classList.add('designer__anchor--pending');
                 }
                 dot.style.left = p.x + 'px';
                 dot.style.top  = p.y + 'px';
-                dot.title = `${n.id} · ${side}`;
-                dot.addEventListener('mousedown', e => { e.stopPropagation(); });
+                dot.title = `Connect from ${n.id} · ${side}`;
+                dot.addEventListener('mousedown', e => { e.stopPropagation(); e.preventDefault(); });
                 dot.addEventListener('click', e => {
                     e.stopPropagation();
                     this.handleAnchorClick(n.id, side);
@@ -1169,7 +1157,6 @@ ${css}
         let dragging = false, sx = 0, sy = 0, ox = 0, oy = 0, moved = false, snapped = false;
         let altUsed = false;
         el.addEventListener('mousedown', e => {
-            if (state.mode === 'connect') return;
             dragging = true; moved = false; snapped = false; altUsed = false;
             sx = e.clientX; sy = e.clientY; ox = n.x; oy = n.y;
             el.classList.add('is-dragging');
@@ -1198,7 +1185,7 @@ ${css}
             }
             el.style.transform = `translate(${n.x}px, ${n.y}px)`;
             this.renderConnections();
-            if (state.mode === 'connect') this.renderAnchors();
+            this.renderAnchors();
         });
         window.addEventListener('mouseup', () => {
             if (!dragging) return;
@@ -1243,7 +1230,6 @@ ${css}
         let dragging = false, sx = 0, sy = 0, ox = 0, oy = 0, moved = false, snapped = false;
         let childOffsets = [];
         el.addEventListener('mousedown', e => {
-            if (state.mode === 'connect') return;
             // Resize handles handle their own mousedown.
             if (e.target.classList.contains('designer__resize')) return;
             // Only drag when the click is on the group's own surface, not on a child node.
@@ -1308,7 +1294,6 @@ ${css}
             el.style.height = g.h + 'px';
         };
         handle.addEventListener('mousedown', e => {
-            if (state.mode === 'connect') return;
             dragging = true; snapped = false;
             sx = e.clientX; sy = e.clientY;
             ox = g.x; oy = g.y; ow = g.w; oh = g.h;
@@ -1375,9 +1360,9 @@ ${css}
                     this.deleteSelection();
                 }
             } else if (e.key === 'Escape') {
-                if (state.mode === 'connect') {
-                    const btn = this.root.querySelector('.designer__btn[data-action="connect"]');
-                    this.toggleConnectMode(btn);
+                if (state.pending) {
+                    state.pending = null;
+                    this.renderAnchors();
                 } else if (this.root.classList.contains('is-fullscreen')) {
                     this.toggleFullscreen();
                 } else if (state.selection) {

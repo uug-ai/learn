@@ -249,10 +249,6 @@ html.dark .designer__btn:hover,
     margin: 0;
 }
 
-.designer__canvas.designer__canvas--connecting {
-    cursor: crosshair;
-}
-
 /* --- Fullscreen mode ---------------------------------------------------- */
 
 /* Toggle icons: collapse only shown while in fullscreen. */
@@ -423,13 +419,15 @@ html.dark .designer__field textarea,
     color: #ffffff;
 }
 
-/* --- Anchor handles drawn on top of each node when in connect mode. --- */
+/* --- Anchor handles drawn on top of each node for click-to-connect. ---
+   Subtle by default; emphasised when the dot is hovered or when a
+   connection is in progress. */
 .designer__anchor {
     position: absolute;
-    width: 12px;
-    height: 12px;
-    margin-left: -6px;
-    margin-top: -6px;
+    width: 10px;
+    height: 10px;
+    margin-left: -5px;
+    margin-top: -5px;
     border-radius: 50%;
     background: #555f8e;
     border: 2px solid #ffffff;
@@ -437,13 +435,22 @@ html.dark .designer__field textarea,
     z-index: 4;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
     pointer-events: auto;
-    transition: transform 100ms ease;
+    opacity: 0.35;
+    transition: opacity 100ms ease, transform 100ms ease;
 }
 
-.designer__anchor:hover { transform: scale(1.4); }
+.designer__anchor:hover {
+    opacity: 1;
+    transform: scale(1.5);
+}
+
+/* While drawing a connection, make every dot fully visible so the target
+   is easy to find. */
+.designer__anchor-layer.is-connecting .designer__anchor { opacity: 1; }
 
 .designer__anchor--pending {
     background: #f59e0b;
+    opacity: 1;
 }
 
 /* Selection. */
