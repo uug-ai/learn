@@ -12,19 +12,32 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 // --- Building-block catalogue. Each entry maps to a `kind` understood by the
 // rete-diagram styling (see rete-diagram.css for the colour palette). ----
 
-const PALETTE = [
-    { kind: 'camera',  header: 'CAMERA',  title: 'Camera',  subtitle: 'RTSP://',          w: 200, h: 130 },
-    { kind: 'agent',   header: 'AGENT',   title: 'Agent',   subtitle: 'Process stream',    w: 220, h: 140,
-      badges: ['docker', 'linux', 'raspberrypi', 'kubernetes'] },
-    { kind: 'vault',   header: 'VAULT',   title: 'Vault',   subtitle: 'Storage interface', w: 240, h: 150,
-      badges: ['kubernetes'] },
-    { kind: 'storage', header: 'OBJECT STORAGE', title: 'Object Storage', subtitle: 'Cloud / Edge',
-      w: 240, h: 150, badges: ['minio', 'ceph', 'aws', 'gcp', 'azure'] },
-    { kind: 'hub',     header: 'HUB',     title: 'Hub',     subtitle: 'Monitor and analyse', w: 240, h: 150,
-      badges: ['kubernetes'] },
-    { kind: 'factory', header: 'FACTORY', title: 'Factory', subtitle: 'Orchestrate',       w: 240, h: 150 },
-    { kind: 'default', header: 'NODE',    title: 'Node',    subtitle: '',                  w: 200, h: 120 },
+const PALETTE_SECTIONS = [
+    {
+        title: 'General',
+        items: [
+            { kind: 'camera',  header: 'CAMERA',         title: 'Camera',         subtitle: 'RTSP://',     w: 200, h: 130 },
+            { kind: 'storage', header: 'OBJECT STORAGE', title: 'Object Storage', subtitle: 'Cloud / Edge', w: 240, h: 150,
+              badges: ['minio', 'ceph', 'aws', 'gcp', 'azure'] },
+            { kind: 'default', header: 'NODE',           title: 'Node',           subtitle: '',            w: 200, h: 120 },
+        ],
+    },
+    {
+        title: 'Applications',
+        items: [
+            { kind: 'agent',   header: 'AGENT',   title: 'Agent',   subtitle: 'Process stream',     w: 220, h: 140,
+              badges: ['docker', 'linux', 'raspberrypi', 'kubernetes'] },
+            { kind: 'vault',   header: 'VAULT',   title: 'Vault',   subtitle: 'Storage interface',  w: 240, h: 150,
+              badges: ['kubernetes'] },
+            { kind: 'hub',     header: 'HUB',     title: 'Hub',     subtitle: 'Monitor and analyse', w: 240, h: 150,
+              badges: ['kubernetes'] },
+            { kind: 'factory', header: 'FACTORY', title: 'Factory', subtitle: 'Orchestrate',        w: 240, h: 150 },
+        ],
+    },
 ];
+
+// Flat list kept for any consumers that just want the full catalogue.
+const PALETTE = PALETTE_SECTIONS.flatMap(s => s.items);
 
 const KIND_LABELS = {
     camera: 'Camera', agent: 'Agent', vault: 'Vault', storage: 'Object Storage',
@@ -341,16 +354,22 @@ class Designer {
     // ------------------------------------------------------------------ UI
 
     buildPalette() {
-        PALETTE.forEach(spec => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'designer__palette-item';
-            btn.innerHTML = `
-                <span class="designer__palette-swatch rete-node--${spec.kind}"></span>
-                <span class="designer__palette-label">${KIND_LABELS[spec.kind] || spec.kind}</span>
-            `;
-            btn.addEventListener('click', () => this.addNodeFromSpec(spec));
-            this.paletteEl.appendChild(btn);
+        PALETTE_SECTIONS.forEach(section => {
+            const heading = document.createElement('h3');
+            heading.className = 'designer__palette-title';
+            heading.textContent = section.title;
+            this.paletteEl.appendChild(heading);
+            section.items.forEach(spec => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'designer__palette-item';
+                btn.innerHTML = `
+                    <span class="designer__palette-swatch rete-node--${spec.kind}"></span>
+                    <span class="designer__palette-label">${KIND_LABELS[spec.kind] || spec.kind}</span>
+                `;
+                btn.addEventListener('click', () => this.addNodeFromSpec(spec));
+                this.paletteEl.appendChild(btn);
+            });
         });
         this.root.querySelector('[data-add-group]')
             ?.addEventListener('click', () => this.addGroup());

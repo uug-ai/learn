@@ -9,15 +9,14 @@
 {{- end }}
 
 <div class="designer-page">
-  <main class="designer-page__main hextra-max-navbar-width">
+  <main class="designer-page__main">
     {{ if .Title }}<h1 class="hx:mt-2 hx:text-4xl hx:font-bold hx:tracking-tight hx:text-slate-900 hx:dark:text-slate-100">{{ .Title }}</h1>{{ end }}
     <div class="content hx:mt-2 hx:mb-4">{{ .Content }}</div>
 
     <div id="designer" class="designer">
         <aside class="designer__palette" aria-label="Building blocks">
-          <h3 class="designer__palette-title">Building blocks</h3>
           <div class="designer__palette-list" data-palette>
-            <!-- Palette items rendered by designer.js -->
+            <!-- Sections + items rendered by designer.js -->
           </div>
           <h3 class="designer__palette-title">Containers</h3>
           <div class="designer__palette-list">

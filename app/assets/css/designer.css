@@ -10,14 +10,15 @@
 
 .designer-page__main {
     width: 100%;
+    max-width: 1200px;
     box-sizing: border-box;
     margin-left: auto;
     margin-right: auto;
-    padding: 1rem 1.5rem 2rem;
+    padding: 1rem 20px 2rem;
 }
 
 @media (min-width: 768px) {
-    .designer-page__main { padding: 1rem 2rem 2rem; }
+    .designer-page__main { padding: 1rem 20px 2rem; }
 }
 
 .designer {
