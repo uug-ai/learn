@@ -43,12 +43,68 @@ const state = {
     pending: null,   // { nodeId, side } for in-progress connection
 };
 
+// Undo/redo: snapshots of the data-bearing parts of `state`. `selection`,
+// `mode`, and `pending` are intentionally excluded so undoing doesn't move
+// focus around or toggle modes.
+const history = {
+    past: [],
+    future: [],
+    limit: 100,
+};
+
+function snapshotState() {
+    return JSON.stringify({
+        groups: state.groups,
+        nodes: state.nodes,
+        connections: state.connections,
+        nextId: state.nextId,
+    });
+}
+
+function restoreSnapshot(snap) {
+    const data = JSON.parse(snap);
+    state.groups = data.groups;
+    state.nodes = data.nodes;
+    state.connections = data.connections;
+    state.nextId = data.nextId;
+    // Drop selection if it points to something that no longer exists.
+    if (state.selection) {
+        const { type, id } = state.selection;
+        if (type === 'node' && !state.nodes.find(n => n.id === id)) state.selection = null;
+        else if (type === 'group' && !state.groups.find(g => g.id === id)) state.selection = null;
+        else if (type === 'connection' && !state.connections[id]) state.selection = null;
+    }
+    state.pending = null;
+}
+
 function makeId(prefix) {
     return `${prefix}-${state.nextId++}`;
 }
 
 function nodeById(id) { return state.nodes.find(n => n.id === id); }
 function groupById(id) { return state.groups.find(g => g.id === id); }
+
+// Returns the first group whose rectangle fully contains the node's bounding
+// box, or `null` if the node is free. Used to auto-couple on drop.
+function containingGroup(n) {
+    const w = n.w || 220, h = n.h || 120;
+    return state.groups.find(g =>
+        n.x >= g.x && n.y >= g.y &&
+        n.x + w <= g.x + g.w &&
+        n.y + h <= g.y + g.h
+    ) || null;
+}
+
+// Clamp a node's (x, y) so its rectangle stays inside the given group.
+function clampToGroup(n, g) {
+    const w = n.w || 220, h = n.h || 120;
+    const maxX = g.x + g.w - w;
+    const maxY = g.y + g.h - h;
+    return {
+        x: Math.max(g.x, Math.min(maxX, n.x)),
+        y: Math.max(g.y, Math.min(maxY, n.y)),
+    };
+}
 
 // --- Geometry helpers (mirrors rete-diagram.js) ---------------------------
 
@@ -89,6 +145,7 @@ function bezierPath(x1, y1, x2, y2, fromSide, toSide) {
 function buildNodeEl(n) {
     const el = document.createElement('div');
     el.className = `rete-node rete-node--${n.kind || 'default'}`;
+    if (n.groupId) el.classList.add('rete-node--coupled');
     el.style.position = 'absolute';
     el.style.left = '0';
     el.style.top = '0';
@@ -96,6 +153,7 @@ function buildNodeEl(n) {
     el.style.height = (n.h || 120) + 'px';
     el.style.transform = `translate(${n.x}px, ${n.y}px)`;
     el.dataset.nodeId = n.id;
+    if (n.groupId) el.dataset.groupId = n.groupId;
 
     if (n.header) {
         const header = document.createElement('div');
@@ -151,6 +209,13 @@ function buildGroupEl(g) {
         label.textContent = g.label;
         el.appendChild(label);
     }
+    // Resize handles — only visible while the group is selected (CSS).
+    ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].forEach(dir => {
+        const h = document.createElement('div');
+        h.className = `designer__resize designer__resize--${dir}`;
+        h.dataset.dir = dir;
+        el.appendChild(h);
+    });
     return el;
 }
 
@@ -209,8 +274,68 @@ class Designer {
         this.bindToolbar();
         this.bindCanvasInput();
         this.bindKeyboard();
-        this.seedExample();
+        this.bindAltHint();
+        if (!this.loadFromUrl()) {
+            this.seedExample();
+        }
         this.render();
+        // Run an initial fit on the next frame so the canvas has measured
+        // dimensions when called via URL with a large diagram.
+        requestAnimationFrame(() => this.fit());
+    }
+
+    // Try to populate state from the URL fragment, e.g.
+    //   /designer/#diagram=<base64-of-json>
+    // Returns true on success.
+    loadFromUrl() {
+        const hash = (window.location.hash || '').replace(/^#/, '');
+        if (!hash) return false;
+        const params = new URLSearchParams(hash);
+        const encoded = params.get('diagram');
+        if (!encoded) return false;
+        try {
+            // Accept both standard and URL-safe base64.
+            const b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+            const json = decodeURIComponent(escape(atob(b64)));
+            this.loadConfig(JSON.parse(json));
+            return true;
+        } catch (err) {
+            console.warn('Designer: failed to decode #diagram from URL', err);
+            return false;
+        }
+    }
+
+    // Replace the current state with a parsed rete config (same schema as
+    // the {{< rete >}} shortcode body).
+    loadConfig(cfg) {
+        if (!cfg || typeof cfg !== 'object') return;
+        state.groups = Array.isArray(cfg.groups) ? cfg.groups.map(g => ({ ...g })) : [];
+        state.nodes = Array.isArray(cfg.nodes) ? cfg.nodes.map(n => ({ ...n })) : [];
+        state.connections = Array.isArray(cfg.connections)
+            ? cfg.connections.map(c => ({ ...c })) : [];
+        state.selection = null;
+        state.pending = null;
+        // Re-derive nextId from existing IDs so newly added nodes don't clash.
+        let max = 0;
+        const collect = arr => arr.forEach(o => {
+            const m = String(o.id || '').match(/-(\d+)$/);
+            if (m) max = Math.max(max, parseInt(m[1], 10));
+        });
+        collect(state.nodes); collect(state.groups);
+        state.nextId = max + 1;
+        history.past.length = 0;
+        history.future.length = 0;
+    }
+
+    // Reflect the Alt-key state on the root so CSS can show the “detach”
+    // affordance and so the toolbar hint becomes visible.
+    bindAltHint() {
+        const update = (down) => {
+            this.root.classList.toggle('is-alt', !!down);
+        };
+        window.addEventListener('keydown', e => { if (e.key === 'Alt') update(true); });
+        window.addEventListener('keyup',   e => { if (e.key === 'Alt') update(false); });
+        window.addEventListener('blur',    () => update(false));
     }
 
     // ------------------------------------------------------------------ UI
@@ -235,6 +360,26 @@ class Designer {
         this.root.querySelectorAll('.designer__btn[data-action]').forEach(btn => {
             btn.addEventListener('click', () => this.handleAction(btn.dataset.action, btn));
         });
+        const inspectorToggle = this.root.querySelector('[data-action="toggle-inspector"]');
+        if (inspectorToggle) {
+            inspectorToggle.addEventListener('click', () => this.toggleInspector());
+        }
+    }
+
+    toggleInspector(force) {
+        const collapsed = typeof force === 'boolean'
+            ? force
+            : !this.root.classList.contains('is-inspector-collapsed');
+        this.root.classList.toggle('is-inspector-collapsed', collapsed);
+        const btn = this.root.querySelector('[data-action="toggle-inspector"]');
+        if (btn) {
+            btn.setAttribute('aria-expanded', String(!collapsed));
+            btn.title = collapsed ? 'Expand properties panel' : 'Collapse properties panel';
+            const label = btn.querySelector('.designer__inspector-toggle-label');
+            if (label) label.textContent = collapsed ? 'Expand' : 'Collapse';
+        }
+        // Re-fit so the canvas uses the freed space.
+        requestAnimationFrame(() => requestAnimationFrame(() => this.fit()));
     }
 
     handleAction(action, btn) {
@@ -242,16 +387,62 @@ class Designer {
             case 'connect': this.toggleConnectMode(btn); break;
             case 'fit':     this.fit(); break;
             case 'fullscreen': this.toggleFullscreen(); break;
+            case 'undo':    this.undo(); break;
+            case 'redo':    this.redo(); break;
             case 'clear':
                 if (state.nodes.length || state.groups.length) {
                     if (!confirm('Remove all nodes, groups and connections?')) return;
                 }
+                this.pushHistory();
                 state.groups = []; state.nodes = []; state.connections = [];
                 state.selection = null;
                 this.render();
                 break;
             case 'copy':    this.copyShortcode(); break;
+            case 'export':  this.exportPng(); break;
         }
+    }
+
+    // -------------------------------------------------------- Undo / Redo
+
+    pushHistory() {
+        const snap = snapshotState();
+        if (history.past.length && history.past[history.past.length - 1] === snap) return;
+        history.past.push(snap);
+        if (history.past.length > history.limit) history.past.shift();
+        history.future.length = 0;
+        this.updateHistoryButtons();
+    }
+
+    undo() {
+        if (!history.past.length) return;
+        const current = snapshotState();
+        const snap = history.past.pop();
+        if (snap === current && history.past.length) {
+            history.future.push(current);
+            return this.undo();
+        }
+        history.future.push(current);
+        restoreSnapshot(snap);
+        this.render();
+        this.updateHistoryButtons();
+    }
+
+    redo() {
+        if (!history.future.length) return;
+        const current = snapshotState();
+        const snap = history.future.pop();
+        history.past.push(current);
+        restoreSnapshot(snap);
+        this.render();
+        this.updateHistoryButtons();
+    }
+
+    updateHistoryButtons() {
+        const undoBtn = this.root.querySelector('.designer__btn[data-action="undo"]');
+        const redoBtn = this.root.querySelector('.designer__btn[data-action="redo"]');
+        if (undoBtn) undoBtn.disabled = history.past.length === 0;
+        if (redoBtn) redoBtn.disabled = history.future.length === 0;
     }
 
     toggleConnectMode(btn) {
@@ -281,6 +472,7 @@ class Designer {
     // ----------------------------------------------------------- CRUD ops
 
     addNodeFromSpec(spec) {
+        this.pushHistory();
         const id = makeId(spec.kind || 'node');
         // Drop new nodes near the centre of the visible canvas (compensating
         // for the current pan/zoom transform).
@@ -305,6 +497,7 @@ class Designer {
     }
 
     addGroup() {
+        this.pushHistory();
         const id = makeId('group');
         const rect = this.canvas.getBoundingClientRect();
         const cx = (rect.width  / 2 - this.tx) / this.scale;
@@ -321,12 +514,15 @@ class Designer {
 
     deleteSelection() {
         if (!state.selection) return;
+        this.pushHistory();
         const { type, id } = state.selection;
         if (type === 'node') {
             state.nodes = state.nodes.filter(n => n.id !== id);
             state.connections = state.connections.filter(c => c.from !== id && c.to !== id);
         } else if (type === 'group') {
             state.groups = state.groups.filter(g => g.id !== id);
+            // Detach any nodes that were children of this group.
+            state.nodes.forEach(n => { if (n.groupId === id) n.groupId = null; });
         } else if (type === 'connection') {
             state.connections.splice(id, 1); // id is index for connections
         }
@@ -471,6 +667,7 @@ class Designer {
             this.renderAnchors();
             return;
         }
+        this.pushHistory();
         state.connections.push({
             from: state.pending.nodeId,
             to: nodeId,
@@ -506,6 +703,13 @@ class Designer {
     renderNodeInspector(n) {
         if (!n) return;
         const kinds = ['camera', 'agent', 'vault', 'storage', 'hub', 'factory', 'default'];
+        const otherGroups = state.groups;
+        const parent = n.groupId ? groupById(n.groupId) : null;
+        const parentLabel = parent ? (parent.label || parent.id) : '—';
+        const groupOptions = ['<option value="">(none)</option>']
+            .concat(otherGroups.map(g =>
+                `<option value="${escapeHtml(g.id)}"${g.id === n.groupId ? ' selected' : ''}>${escapeHtml(g.label || g.id)}</option>`
+            )).join('');
         this.inspector.innerHTML = `
             <div class="designer__field">
                 <label>Kind</label>
@@ -543,6 +747,11 @@ class Designer {
             <div class="designer__field">
                 <label>ID</label>
                 <input type="text" data-field="id" value="${escapeHtml(n.id)}">
+            </div>
+            <div class="designer__field">
+                <label>Parent group <span class="designer__field-hint">(hold Alt while dragging to detach)</span></label>
+                <select data-field="groupId">${groupOptions}</select>
+                <p class="designer__field-meta">Currently: <strong>${escapeHtml(parentLabel)}</strong></p>
             </div>
             <button type="button" class="designer__danger" data-delete>Delete node</button>
         `;
@@ -612,6 +821,9 @@ class Designer {
 
     bindInspector(target, type) {
         this.inspector.querySelectorAll('[data-field]').forEach(input => {
+            // Snapshot once when the user starts editing this field, so a
+            // continuous edit collapses into a single undo step.
+            input.addEventListener('focus', () => this.pushHistory());
             input.addEventListener('input', () => {
                 const field = input.dataset.field;
                 let value = input.value;
@@ -619,6 +831,18 @@ class Designer {
                     value = Math.max(40, parseInt(value, 10) || 0);
                 } else if (field === 'badges') {
                     value = value.split(',').map(s => s.trim()).filter(Boolean);
+                } else if (field === 'groupId') {
+                    value = value || null;
+                    target.groupId = value;
+                    if (value && type === 'node') {
+                        const g = groupById(value);
+                        if (g) {
+                            const c = clampToGroup(target, g);
+                            target.x = c.x; target.y = c.y;
+                        }
+                    }
+                    this.render();
+                    return;
                 } else if (field === 'id') {
                     value = value.trim().replace(/\s+/g, '-');
                     if (!value) return;
@@ -654,6 +878,7 @@ class Designer {
                 };
                 if (n.subtitle) out.subtitle = n.subtitle;
                 if (n.badges && n.badges.length) out.badges = n.badges;
+                if (n.groupId) out.groupId = n.groupId;
                 return out;
             }),
             connections: state.connections.map(c => {
@@ -689,6 +914,153 @@ class Designer {
             catch { this.toast('Copy failed — select the preview manually.'); }
             ta.remove();
         }
+    }
+
+    // Render the current diagram to a PNG and trigger a download. Uses
+    // SVG <foreignObject> to embed a clone of the rendered HTML so node
+    // styling matches what is on screen. External <img> badges are inlined
+    // as data URIs so the resulting canvas is not tainted.
+    async exportPng() {
+        if (!state.nodes.length && !state.groups.length) {
+            this.toast('Nothing to export — add some nodes first.');
+            return;
+        }
+        this.toast('Exporting PNG…');
+        try {
+            const blob = await this.renderPngBlob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `architecture-${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            this.toast('Exported diagram as PNG.');
+        } catch (err) {
+            console.error('Designer: PNG export failed', err);
+            this.toast('Export failed — see console for details.');
+        }
+    }
+
+    async renderPngBlob() {
+        // Compute bounding box of all geometry, plus padding.
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        state.groups.forEach(g => {
+            minX = Math.min(minX, g.x); minY = Math.min(minY, g.y);
+            maxX = Math.max(maxX, g.x + g.w); maxY = Math.max(maxY, g.y + g.h);
+        });
+        state.nodes.forEach(n => {
+            const w = n.w || 220, h = n.h || 120;
+            minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
+            maxX = Math.max(maxX, n.x + w); maxY = Math.max(maxY, n.y + h);
+        });
+        if (!isFinite(minX)) { minX = 0; minY = 0; maxX = 800; maxY = 600; }
+        const pad = 40;
+        const ox = minX - pad, oy = minY - pad;
+        const w = (maxX - minX) + pad * 2;
+        const h = (maxY - minY) + pad * 2;
+        const scale = 2; // 2x for crisp output
+
+        // Clone the live viewport (groups + nodes) so styling matches.
+        const viewportClone = this.viewport.cloneNode(true);
+        // Strip designer-only chrome and the live connections <svg> from the
+        // clone (we re-render connections as native SVG paths below, and
+        // nesting an <svg> inside <foreignObject> often breaks the export).
+        viewportClone.querySelectorAll(
+            '.designer__resize, .designer__anchor, .designer__anchor-layer, svg.rete-connections'
+        ).forEach(el => el.remove());
+        viewportClone.querySelectorAll('.is-selected, .is-dragging').forEach(el => {
+            el.classList.remove('is-selected');
+            el.classList.remove('is-dragging');
+        });
+        // Reset the viewport transform so coordinates are absolute.
+        viewportClone.style.transform = 'none';
+
+        // Inline external <img> badges as data URIs (otherwise the canvas
+        // becomes tainted and toBlob throws SecurityError).
+        await Promise.all(Array.from(viewportClone.querySelectorAll('img')).map(async img => {
+            try {
+                const data = await fetchAsDataUri(img.src);
+                if (data) img.src = data;
+            } catch { /* leave as-is, may be skipped on render */ }
+        }));
+
+        // Inline page CSS so the foreignObject content renders correctly
+        // when the SVG is loaded as a standalone image.
+        const css = await collectStylesheets();
+        // Inline all loaded webfonts as @font-face rules with data: URIs so
+        // the standalone SVG can render text in the right typeface.
+        const fontCss = await collectFontFaces();
+        if (!fontCss) {
+            console.warn('Designer: no @font-face rules were inlined; exported PNG will use fallback fonts.');
+        } else {
+            console.debug('Designer: inlined font CSS length =', fontCss.length, 'chars');
+        }
+
+        // Re-render connections at absolute coordinates for the export.
+        const connectionsSvg = state.connections.map(c => {
+            const from = nodeById(c.from), to = nodeById(c.to);
+            if (!from || !to) return '';
+            const fs = c.fromSide || 'right', ts = c.toSide || 'left';
+            const a = anchorPoint(from, fs);
+            const b = anchorPoint(to, ts);
+            const d = bezierPath(a.x, a.y, b.x, b.y, fs, ts);
+            const cls = `rete-connection rete-connection--${c.kind || 'default'}${c.label ? ' rete-connection--labelled' : ''}`;
+            const path = `<path class="${cls}" d="${d}"></path>`;
+            if (!c.label) return path;
+            const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+            let angle = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+            if (angle > 90) angle -= 180; if (angle < -90) angle += 180;
+            return path +
+                `<text class="rete-connection__label" x="${mx}" y="${my}" text-anchor="middle" transform="rotate(${angle} ${mx} ${my})">${escapeXml(c.label)}</text>`;
+        }).join('');
+
+        const serializer = new XMLSerializer();
+        const innerHtml = serializer.serializeToString(viewportClone);
+
+        const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+     width="${w * scale}" height="${h * scale}" viewBox="${ox} ${oy} ${w} ${h}">
+  <defs><style type="text/css"><![CDATA[
+${fontCss}
+${css}
+  ]]></style></defs>
+  <rect x="${ox}" y="${oy}" width="${w}" height="${h}" fill="#fafafa"/>
+  <g class="rete-connections-export">${connectionsSvg}</g>
+  <foreignObject x="${ox}" y="${oy}" width="${w}" height="${h}">
+    <xhtml:div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;width:${w}px;height:${h}px;">
+      <xhtml:div xmlns="http://www.w3.org/1999/xhtml" style="position:absolute;left:${-ox}px;top:${-oy}px;">
+        ${innerHtml}
+      </xhtml:div>
+    </xhtml:div>
+  </foreignObject>
+</svg>`;
+
+        // Use a data URL rather than a blob URL: Chromium occasionally
+        // refuses to rasterise <foreignObject> from blob: URLs.
+        const svgBase64 = btoa(unescape(encodeURIComponent(svg)));
+        const url = `data:image/svg+xml;base64,${svgBase64}`;
+        let img;
+        try {
+            img = await loadImage(url);
+        } catch (err) {
+            console.warn('Designer: PNG export SVG (paste into a new tab to inspect):', svg);
+            // Surface a more informative error: the failure is usually due
+            // to invalid CSS or a cross-origin resource referenced from CSS.
+            const e = new Error('SVG image failed to load (likely invalid embedded CSS or cross-origin reference). The full SVG was logged to the console.');
+            e.cause = err;
+            throw e;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w * scale;
+        canvas.height = h * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fafafa';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        return await new Promise((resolve, reject) =>
+            canvas.toBlob(b => b ? resolve(b) : reject(new Error('toBlob returned null')), 'image/png'));
     }
 
     toast(msg) {
@@ -775,10 +1147,11 @@ class Designer {
     }
 
     attachNodeHandlers(n, el) {
-        let dragging = false, sx = 0, sy = 0, ox = 0, oy = 0, moved = false;
+        let dragging = false, sx = 0, sy = 0, ox = 0, oy = 0, moved = false, snapped = false;
+        let altUsed = false;
         el.addEventListener('mousedown', e => {
             if (state.mode === 'connect') return;
-            dragging = true; moved = false;
+            dragging = true; moved = false; snapped = false; altUsed = false;
             sx = e.clientX; sy = e.clientY; ox = n.x; oy = n.y;
             el.classList.add('is-dragging');
             e.stopPropagation();
@@ -788,9 +1161,22 @@ class Designer {
             if (!dragging) return;
             const dx = (e.clientX - sx) / this.scale;
             const dy = (e.clientY - sy) / this.scale;
-            if (Math.abs(dx) + Math.abs(dy) > 2) moved = true;
+            if (Math.abs(dx) + Math.abs(dy) > 2 && !moved) {
+                moved = true;
+                if (!snapped) { this.pushHistory(); snapped = true; }
+            }
             n.x = Math.round(ox + dx);
             n.y = Math.round(oy + dy);
+            // Constrain to parent group unless the user is holding Alt to
+            // “decouple” the node mid-drag.
+            if (e.altKey) altUsed = true;
+            if (n.groupId && !e.altKey) {
+                const g = groupById(n.groupId);
+                if (g) {
+                    const c = clampToGroup(n, g);
+                    n.x = c.x; n.y = c.y;
+                }
+            }
             el.style.transform = `translate(${n.x}px, ${n.y}px)`;
             this.renderConnections();
             if (state.mode === 'connect') this.renderAnchors();
@@ -801,20 +1187,61 @@ class Designer {
             el.classList.remove('is-dragging');
             if (!moved) {
                 this.select({ type: 'node', id: n.id });
-            } else {
-                this.renderSource();
+                return;
             }
+            // Resolve coupling on drop.
+            if (n.groupId) {
+                const g = groupById(n.groupId);
+                if (g) {
+                    const inside = containingGroup(n);
+                    if (altUsed && inside?.id !== g.id) {
+                        // Dragged out of its parent while Alt-held → detach.
+                        n.groupId = inside ? inside.id : null;
+                    } else if (!inside) {
+                        // Safety net (shouldn't happen because of clamp).
+                        const c = clampToGroup(n, g);
+                        n.x = c.x; n.y = c.y;
+                    }
+                } else {
+                    n.groupId = null;
+                }
+            } else {
+                // Free node — auto-couple if dropped fully inside a group.
+                const inside = containingGroup(n);
+                if (inside) n.groupId = inside.id;
+            }
+            // Re-render so inspector / coupling outline updates.
+            this.render();
         });
     }
 
     attachGroupHandlers(g, el) {
-        let dragging = false, sx = 0, sy = 0, ox = 0, oy = 0, moved = false;
+        // Resize handles take precedence over drag.
+        el.querySelectorAll('.designer__resize').forEach(h => {
+            this.attachResizeHandle(g, el, h, h.dataset.dir);
+        });
+
+        let dragging = false, sx = 0, sy = 0, ox = 0, oy = 0, moved = false, snapped = false;
+        let childOffsets = [];
         el.addEventListener('mousedown', e => {
             if (state.mode === 'connect') return;
+            // Resize handles handle their own mousedown.
+            if (e.target.classList.contains('designer__resize')) return;
             // Only drag when the click is on the group's own surface, not on a child node.
             if (e.target !== el && !e.target.classList.contains('rete-group__label')) return;
-            dragging = true; moved = false;
+            dragging = true; moved = false; snapped = false;
             sx = e.clientX; sy = e.clientY; ox = g.x; oy = g.y;
+            // Capture positions of every node that should move with the
+            // group: explicitly coupled children plus any free node whose
+            // rectangle is fully inside the group at drag start.
+            childOffsets = state.nodes
+                .filter(n => n.groupId === g.id || (
+                    !n.groupId &&
+                    n.x >= g.x && n.y >= g.y &&
+                    n.x + (n.w || 220) <= g.x + g.w &&
+                    n.y + (n.h || 120) <= g.y + g.h
+                ))
+                .map(n => ({ node: n, ox: n.x, oy: n.y }));
             e.stopPropagation();
             e.preventDefault();
         });
@@ -822,10 +1249,19 @@ class Designer {
             if (!dragging) return;
             const dx = (e.clientX - sx) / this.scale;
             const dy = (e.clientY - sy) / this.scale;
-            if (Math.abs(dx) + Math.abs(dy) > 2) moved = true;
+            if (Math.abs(dx) + Math.abs(dy) > 2 && !moved) {
+                moved = true;
+                if (!snapped) { this.pushHistory(); snapped = true; }
+            }
             g.x = Math.round(ox + dx);
             g.y = Math.round(oy + dy);
             el.style.transform = `translate(${g.x}px, ${g.y}px)`;
+            childOffsets.forEach(({ node, ox: nox, oy: noy }) => {
+                node.x = Math.round(nox + dx);
+                node.y = Math.round(noy + dy);
+                const childEl = this.nodeEls.get(node.id);
+                if (childEl) childEl.style.transform = `translate(${node.x}px, ${node.y}px)`;
+            });
             this.renderConnections();
         });
         window.addEventListener('mouseup', () => {
@@ -839,11 +1275,81 @@ class Designer {
         });
     }
 
+    // Drag a single resize handle on a group. `dir` is one of
+    // nw, n, ne, e, se, s, sw, w.
+    attachResizeHandle(g, el, handle, dir) {
+        const MIN_W = 80, MIN_H = 60;
+        let dragging = false;
+        let sx = 0, sy = 0;
+        let ox = 0, oy = 0, ow = 0, oh = 0;
+        let snapped = false;
+        const setEl = () => {
+            el.style.transform = `translate(${g.x}px, ${g.y}px)`;
+            el.style.width  = g.w + 'px';
+            el.style.height = g.h + 'px';
+        };
+        handle.addEventListener('mousedown', e => {
+            if (state.mode === 'connect') return;
+            dragging = true; snapped = false;
+            sx = e.clientX; sy = e.clientY;
+            ox = g.x; oy = g.y; ow = g.w; oh = g.h;
+            this.select({ type: 'group', id: g.id });
+            e.stopPropagation();
+            e.preventDefault();
+        });
+        window.addEventListener('mousemove', e => {
+            if (!dragging) return;
+            if (!snapped) { this.pushHistory(); snapped = true; }
+            const dx = (e.clientX - sx) / this.scale;
+            const dy = (e.clientY - sy) / this.scale;
+            let nx = ox, ny = oy, nw = ow, nh = oh;
+            if (dir.includes('e')) nw = Math.max(MIN_W, ow + dx);
+            if (dir.includes('s')) nh = Math.max(MIN_H, oh + dy);
+            if (dir.includes('w')) {
+                nw = Math.max(MIN_W, ow - dx);
+                nx = ox + (ow - nw);
+            }
+            if (dir.includes('n')) {
+                nh = Math.max(MIN_H, oh - dy);
+                ny = oy + (oh - nh);
+            }
+            g.x = Math.round(nx); g.y = Math.round(ny);
+            g.w = Math.round(nw); g.h = Math.round(nh);
+            setEl();
+            // Re-clamp coupled children so they stay inside the new bounds.
+            state.nodes.forEach(n => {
+                if (n.groupId !== g.id) return;
+                const c = clampToGroup(n, g);
+                n.x = c.x; n.y = c.y;
+                const childEl = this.nodeEls.get(n.id);
+                if (childEl) childEl.style.transform = `translate(${n.x}px, ${n.y}px)`;
+            });
+            this.renderConnections();
+        });
+        window.addEventListener('mouseup', () => {
+            if (!dragging) return;
+            dragging = false;
+            this.renderSource();
+            this.renderInspector();
+        });
+    }
+
     bindKeyboard() {
         window.addEventListener('keydown', e => {
             // Ignore typing inside the inspector / palette inputs.
             const tag = (e.target.tagName || '').toLowerCase();
             if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+            const mod = e.ctrlKey || e.metaKey;
+            if (mod && (e.key === 'z' || e.key === 'Z')) {
+                e.preventDefault();
+                if (e.shiftKey) this.redo(); else this.undo();
+                return;
+            }
+            if (mod && (e.key === 'y' || e.key === 'Y')) {
+                e.preventDefault();
+                this.redo();
+                return;
+            }
             if (e.key === 'Delete' || e.key === 'Backspace') {
                 if (state.selection) {
                     e.preventDefault();
@@ -890,6 +1396,150 @@ function escapeHtml(s) {
     return String(s)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function escapeXml(s) {
+    return String(s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+
+// Load a same-origin (or CORS-enabled) URL and return a `data:` URI for it.
+// Used during PNG export to inline <img> badges so the canvas isn't tainted.
+async function fetchAsDataUri(url) {
+    const res = await fetch(url, { mode: 'cors' });
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return await new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(r.result);
+        r.onerror = reject;
+        r.readAsDataURL(blob);
+    });
+}
+
+// Collect all same-origin stylesheet rules into a single CSS string. External
+// or cross-origin stylesheets (which raise SecurityError on cssRules) are
+// skipped. Used so the SVG export carries the styles needed to render the
+// nodes inside <foreignObject>.
+async function collectStylesheets() {
+    const parts = [];
+    for (const sheet of Array.from(document.styleSheets)) {
+        try {
+            const rules = sheet.cssRules;
+            if (!rules) continue;
+            for (const rule of Array.from(rules)) {
+                const text = rule.cssText;
+                // CSS containing a literal `]]>` would terminate the CDATA
+                // block we emit it inside; defensively split it apart.
+                parts.push(text.replace(/]]>/g, ']]]]><![CDATA[>'));
+            }
+        } catch { /* cross-origin: skip */ }
+    }
+    return parts.join('\n');
+}
+
+function loadImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+    });
+}
+
+// Walk all CSS rules in same-origin stylesheets, find every @font-face rule,
+// fetch its `src: url(...)` resource, and emit a new @font-face rule with the
+// font binary inlined as a base64 data URI. This lets a standalone SVG render
+// text in the same typeface as the live page (otherwise the font is missing
+// in the SVG image context and falls back to a system default).
+//
+// To stay fast: only collect families actually referenced by the document
+// and only the Latin subset — everything else is wasted bandwidth for our
+// English-only diagram text.
+const FONT_FAMILIES_OF_INTEREST = ['inter', 'outfit'];
+
+function isLatinSubset(unicodeRange) {
+    if (!unicodeRange) return true; // no range = covers everything = keep it
+    // Heuristic: Google Fonts marks the Latin subset with U+0000-00FF.
+    return /U\+0000-00FF|U\+0020-00FF|U\+0000-007F|U\+0020-007F/i.test(unicodeRange);
+}
+
+async function collectFontFaces() {
+    const candidates = []; // { family, weight, style, url, fmt }
+    const pushCandidate = (family, weight, style, src, baseHref, unicodeRange) => {
+        if (!family || !src) return;
+        const fam = family.replace(/['"]/g, '').trim().toLowerCase();
+        if (!FONT_FAMILIES_OF_INTEREST.some(f => fam.includes(f))) return;
+        if (!isLatinSubset(unicodeRange)) return;
+        const m = src.match(/url\(\s*(['"]?)([^'")]+)\1\s*\)(?:\s*format\(\s*(['"]?)([^'")]+)\3\s*\))?/);
+        if (!m) return;
+        const url = new URL(m[2], baseHref || document.baseURI).href;
+        candidates.push({ family: family.trim(), weight, style, url, fmt: m[4] });
+    };
+
+    // 1. Same-origin sheets: walk parsed cssRules.
+    for (const sheet of Array.from(document.styleSheets)) {
+        let cssRules;
+        try { cssRules = sheet.cssRules; } catch { cssRules = null; }
+        if (cssRules) {
+            for (const rule of Array.from(cssRules)) {
+                if (rule.type !== 5) continue; // CSSRule.FONT_FACE_RULE
+                pushCandidate(
+                    rule.style.getPropertyValue('font-family'),
+                    rule.style.getPropertyValue('font-weight') || 'normal',
+                    rule.style.getPropertyValue('font-style')  || 'normal',
+                    rule.style.getPropertyValue('src'),
+                    sheet.href,
+                    rule.style.getPropertyValue('unicode-range'),
+                );
+            }
+            continue;
+        }
+        // 2. Cross-origin sheets (e.g. Google Fonts): fetch the CSS text and
+        //    regex out @font-face blocks. Google serves these with permissive
+        //    CORS so this works in browsers.
+        if (!sheet.href) continue;
+        let cssText;
+        try {
+            const res = await fetch(sheet.href);
+            if (!res.ok) continue;
+            cssText = await res.text();
+        } catch { continue; }
+        const faceRe = /@font-face\s*\{([^}]+)\}/g;
+        let m;
+        while ((m = faceRe.exec(cssText))) {
+            const body = m[1];
+            const get = re => { const x = body.match(re); return x ? x[1].trim() : ''; };
+            pushCandidate(
+                get(/font-family\s*:\s*([^;]+);/i),
+                get(/font-weight\s*:\s*([^;]+);/i) || 'normal',
+                get(/font-style\s*:\s*([^;]+);/i)  || 'normal',
+                get(/src\s*:\s*([^;]+);/i),
+                sheet.href,
+                get(/unicode-range\s*:\s*([^;]+);/i),
+            );
+        }
+    }
+
+    // De-dupe and fetch all binaries in parallel.
+    const seen = new Set();
+    const unique = candidates.filter(c => {
+        const k = `${c.family}|${c.weight}|${c.style}|${c.url}`;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+    });
+    const results = await Promise.all(unique.map(async c => {
+        try {
+            const dataUri = await fetchAsDataUri(c.url);
+            if (!dataUri) return null;
+            const formatPart = c.fmt ? ` format('${c.fmt}')` : '';
+            return `@font-face { font-family: ${c.family}; font-style: ${c.style}; ` +
+                `font-weight: ${c.weight}; src: url('${dataUri}')${formatPart}; }`;
+        } catch { return null; }
+    }));
+    return results.filter(Boolean).join('\n');
 }
 
 function bootstrap() {

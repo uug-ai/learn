@@ -1,8 +1,8 @@
 /* Designer page styles. Built on top of rete-diagram.css so the canvas itself
    reuses the same node visuals as the embedded diagrams. */
 
-/* Full-width page wrapper: bypass hextra's max-page-width to use the entire
-   viewport, leaving only a small gutter on the sides. */
+/* Page wrapper: respect hextra's max-page-width so the designer aligns with
+   the navigation bar instead of stretching across the full viewport. */
 .designer-page {
     width: 100%;
     box-sizing: border-box;
@@ -10,8 +10,9 @@
 
 .designer-page__main {
     width: 100%;
-    max-width: none;
     box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
     padding: 1rem 1.5rem 2rem;
 }
 
@@ -493,3 +494,176 @@ html.dark .designer__field textarea,
     opacity: 1;
     transform: translate(-50%, 0);
 }
+
+/* --- Group coupling --------------------------------------------------- */
+
+/* Subtle dashed accent on nodes that are coupled to a group. The accent
+   becomes more prominent when the user holds Alt to indicate they can
+   detach. */
+.rete-node.rete-node--coupled {
+    box-shadow: 0 0 0 1px rgba(85, 95, 142, 0.35) inset;
+}
+
+.designer.is-alt .rete-node.rete-node--coupled {
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.7) inset;
+    cursor: alias;
+}
+
+/* Toolbar "Hold Alt" hint: only visible while Alt is pressed. */
+.designer__alt-hint {
+    display: none;
+    font: 500 11px/1 'Inter', system-ui, sans-serif;
+    color: #f59e0b;
+    padding: 0 8px;
+}
+
+.designer.is-alt .designer__alt-hint { display: inline-flex; align-items: center; gap: 4px; }
+
+.designer__alt-hint kbd {
+    font: inherit;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid rgba(245, 158, 11, 0.5);
+    background: rgba(245, 158, 11, 0.1);
+}
+
+/* Inspector helper text for the parent-group field. */
+.designer__field-hint {
+    font-weight: 400;
+    font-size: 10px;
+    color: #6d6666;
+    margin-left: 4px;
+}
+
+html.dark .designer__field-hint,
+.dark .designer__field-hint { color: #b5b5b5; }
+
+.designer__field-meta {
+    margin: 4px 0 0;
+    font-size: 11px;
+    color: #6d6666;
+}
+
+html.dark .designer__field-meta,
+.dark .designer__field-meta { color: #b5b5b5; }
+
+/* --- Inspector collapse ----------------------------------------------- */
+
+.designer__inspector-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.designer__inspector-header .designer__inspector-title { margin: 0; }
+
+.designer__inspector-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 6px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    background: #fafafa;
+    color: #6d6666;
+    font: 600 11px/1 'Inter', system-ui, sans-serif;
+    cursor: pointer;
+    transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.designer__inspector-toggle:hover {
+    background: #ffffff;
+    color: #555f8e;
+    border-color: #555f8e;
+}
+
+html.dark .designer__inspector-toggle,
+.dark  .designer__inspector-toggle {
+    background: #262626;
+    color: #b5b5b5;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+html.dark .designer__inspector-toggle:hover,
+.dark  .designer__inspector-toggle:hover {
+    background: #2a2a2a;
+    color: #ffffff;
+}
+
+/* Chevron icons: only the relevant one is visible per state. */
+.designer__icon-chevron-expand { display: none; }
+.designer.is-inspector-collapsed .designer__icon-chevron-collapse { display: none; }
+.designer.is-inspector-collapsed .designer__icon-chevron-expand   { display: inline-block; }
+
+/* Collapsed state: shrink the right column to a slim handle and hide the
+   inspector body so the canvas takes over the freed space. */
+.designer.is-inspector-collapsed { grid-template-columns: 220px 1fr 36px; }
+
+@media (max-width: 1100px) {
+    /* On medium screens the inspector spans the full width — collapse just
+       hides its body so the canvas gets the vertical space back. */
+    .designer.is-inspector-collapsed { grid-template-columns: 180px 1fr; }
+}
+
+.designer.is-inspector-collapsed .designer__inspector {
+    padding: 8px 4px;
+    min-height: 0;
+    align-self: start;
+    overflow: hidden;
+}
+
+.designer.is-inspector-collapsed .designer__inspector-header {
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+}
+
+.designer.is-inspector-collapsed .designer__inspector-title {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 10px;
+}
+
+.designer.is-inspector-collapsed .designer__inspector-toggle-label { display: none; }
+
+.designer.is-inspector-collapsed .designer__inspector-body { display: none; }
+
+/* When fullscreen + collapsed, keep the slim column. */
+.designer.is-fullscreen.is-inspector-collapsed { grid-template-columns: 220px 1fr 36px; }
+
+/* --- Group resize handles -------------------------------------------- */
+
+.designer__resize {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #555f8e;
+    border: 1px solid #ffffff;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 100ms ease;
+    z-index: 4;
+}
+
+/* Show handles on hover and when the group is selected. */
+.designer .rete-group:hover .designer__resize,
+.designer .rete-group.is-selected .designer__resize {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Corners. */
+.designer__resize--nw { top: -5px; left: -5px;  cursor: nwse-resize; }
+.designer__resize--ne { top: -5px; right: -5px; cursor: nesw-resize; }
+.designer__resize--sw { bottom: -5px; left: -5px;  cursor: nesw-resize; }
+.designer__resize--se { bottom: -5px; right: -5px; cursor: nwse-resize; }
+
+/* Side midpoints. */
+.designer__resize--n { top: -5px;    left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+.designer__resize--s { bottom: -5px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+.designer__resize--w { left: -5px;   top: 50%;  transform: translateY(-50%); cursor: ew-resize; }
+.designer__resize--e { right: -5px;  top: 50%;  transform: translateY(-50%); cursor: ew-resize; }

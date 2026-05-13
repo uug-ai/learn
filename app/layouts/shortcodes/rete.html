@@ -18,6 +18,10 @@
 {{- $caption := .Get "caption" -}}
 {{- $alt := .Get "alt" | default $caption -}}
 {{- $height := .Get "height" -}}
+{{- /* Build a designer URL pre-loaded with this diagram. The config is
+   base64-encoded into the URL fragment so it doesn't hit the server and
+   can hold larger payloads than a query string typically allows. */ -}}
+{{- $designerHref := printf "/designer/#diagram=%s" ($config | base64Encode) -}}
 
 {{- /* Emit the CSS + module loader only once per page. */ -}}
 {{- if not (.Page.Store.Get "reteAssetsEmitted") -}}
@@ -33,6 +37,10 @@
 {{- end }}
 
 <figure class="rete-diagram-figure">
+  <a class="rete-diagram-edit" href="{{ $designerHref | safeURL }}" title="Open this diagram in the architecture designer">
+    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>
+    <span>Edit</span>
+  </a>
   <div
     id="{{ $id }}"
     class="rete-diagram"
