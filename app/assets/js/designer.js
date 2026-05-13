@@ -356,15 +356,21 @@ class Designer {
         PALETTE_SECTIONS.forEach(section => {
             const heading = document.createElement('h3');
             heading.className = 'designer__palette-title';
+            heading.dataset.section = section.title;
             heading.textContent = section.title;
             this.paletteEl.appendChild(heading);
             section.items.forEach(spec => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'designer__palette-item';
+                const label = KIND_LABELS[spec.kind] || spec.kind;
+                btn.dataset.search = [
+                    label, spec.kind, spec.header, spec.title, spec.subtitle,
+                    ...(spec.badges || []),
+                ].filter(Boolean).join(' ').toLowerCase();
                 btn.innerHTML = `
                     <span class="designer__palette-swatch rete-node--${spec.kind}"></span>
-                    <span class="designer__palette-label">${KIND_LABELS[spec.kind] || spec.kind}</span>
+                    <span class="designer__palette-label">${label}</span>
                 `;
                 btn.addEventListener('click', () => this.addNodeFromSpec(spec));
                 this.paletteEl.appendChild(btn);
@@ -372,6 +378,32 @@ class Designer {
         });
         this.root.querySelector('[data-add-group]')
             ?.addEventListener('click', () => this.addGroup());
+
+        const search = this.root.querySelector('[data-palette-search]');
+        if (search) {
+            search.addEventListener('input', () => this.filterPalette(search.value));
+        }
+    }
+
+    filterPalette(query) {
+        const q = (query || '').trim().toLowerCase();
+        const items = this.paletteEl.querySelectorAll('.designer__palette-item');
+        const visible = new Set();
+        items.forEach(btn => {
+            const match = !q || (btn.dataset.search || '').includes(q);
+            btn.hidden = !match;
+            if (match) {
+                // Track which section this item belongs to (preceding heading).
+                let prev = btn.previousElementSibling;
+                while (prev && !prev.classList.contains('designer__palette-title')) {
+                    prev = prev.previousElementSibling;
+                }
+                if (prev) visible.add(prev);
+            }
+        });
+        this.paletteEl.querySelectorAll('.designer__palette-title').forEach(h => {
+            h.hidden = q !== '' && !visible.has(h);
+        });
     }
 
     bindToolbar() {
