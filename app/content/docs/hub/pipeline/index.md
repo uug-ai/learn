@@ -13,7 +13,7 @@ weight: 304
 toc: true
 ---
  
-Hub leverages a pipeline of microservices to execute specific tasks. Each time a recording is uploaded to Kerberos Vault, it will forward an event to Hub, which on its turn will activate a pipeline consisting of a series of  microservices.
+Hub processes every recording through a pipeline of small, focused microservices. As soon as a camera triggers an Agent, the resulting recording is pushed to Vault, an event lands on the message broker and Hub picks it up — kicking off a chain of services that enrich, classify and alert on that single event.
 
 {{< rete caption="Pipelines to scale the processing." alt="Pipelines to scale the processing." height="500" >}}
 {
@@ -83,93 +83,98 @@ Hub leverages a pipeline of microservices to execute specific tasks. Each time a
 }
 {{< /rete >}}
 
-Each microservice in the Hub pipeline will be responsible for a specific action or process. The pipeline acts as an event mesh, that sends messages from one microservice to the other in an asynchronous matter. Important to note is that it is possible to customize the pipeline and bring you own microservices inside the pipeline; using the programming languages you prefer.
+Each microservice in the Hub pipeline owns a single responsibility. Together they form an event mesh that passes messages from one service to the next asynchronously, so any step can scale, fail or be replaced independently. The pipeline is also open: you can drop in your own microservices, written in whatever language fits the job, and slot them in next to the built-in ones.
 
 # How it works
 
-Each time a recording is being uploaded to Kerberos Vault, and event is sent to Hub, and a pipeline is started for that specific recording; and thus event. The pipeline will start sending messages towards to the different microservices in sequence and/or in parallel, depending on how the microservices and pipeline is configured. Once the pipeline is executed, and all related microservices are finished, the pipeline is done, and it will go in idle mode until the next event is received.
+When Vault stores a new recording, it publishes an event to the broker. Hub consumes that event and starts a pipeline run for it. From there messages flow through the services either sequentially (Monitor → Sequence → Analysis → Throttler → Notification) or in parallel (everything fanning out from Analysis), depending on the configuration. Once every service involved in the run has acknowledged its message, the pipeline goes idle until the next event arrives.
 
-The distribution of messages is done through a Kafka broker and the concept of Kafka topics. Each microservice consume messages of its own Kafka topic. As soon as a microservice receives a message on its topic, it knows it has to do something, and execute the action he is responsible for. By having Kafka and the concept of topics we have a loosely coupled event architecture that we can easily extend with additional function and features (microservices).
+Message distribution is handled by a message broker — Kafka, AMQP/RabbitMQ, or any other supported broker — using queues (or topics, depending on the broker). Each service consumes from its own queue, does its work, and hands off to the next stage. This loose coupling is what makes the pipeline easy to extend: adding a new capability is just a matter of adding a new consumer on a new queue.
 
-The different kafka topics and microservices we have in place are.
+It's worth calling out explicitly: the microservices never talk to each other directly. All hand-offs go through the message broker, which routes messages from one service to the next. The only runtime dependencies a service has are the broker (to receive and forward messages) and the MongoDB database (to read and write event metadata). There is no service-to-service HTTP, no shared in-process state, and no hard ordering between services beyond what the orchestrator dictates — which is exactly what makes individual services trivial to scale, restart or replace without affecting the rest of the pipeline.
+
+The default queues and the services that consume them are:
 
 - Orchestrator - `kcloud-event-queue`
 - Monitoring - `kcloud-monitor-queue`
 - Sequencer - `kcloud-sequence-queue`
 - Analyser - `kcloud-analysis-queue`
-- Thumbnail - `kcloud-thumbnail-queue`
-- Sprite - `kcloud-sprite-queue`
-- Dominant color - `kcloud-dominantcolor-queue`
+- Thumbnail - `kcloud-thumby-queue.fifo`
+- Sprite - `kcloud-sprite-queue.fifo`
+- Dominant color - `kcloud-dominantcolor-queue.fifo`
+- Classification - `kcloud-classify-queue.fifo`
 - Throttler - `kcloud-throttler-queue`
 - Notification - `kcloud-notification-queue`
 
-## Orchestrator 
+## Orchestrator
 
 > kcloud-event-queue
 
-A pipeline starts with the first microservice being executed, that is the event microservice, listening to the `kcloud-event-queue` topic. The event microservice is the dispatcher service that forwards messages back and forth. It reads the to be processed microservices, and forwards the message to the next microservice, so it can be consumed. Once the microservice is completed it will send the message back to the event microservice.
+The orchestrator is the entry point of every pipeline run. It listens on `kcloud-event-queue`, reads which services need to run for the incoming event, and dispatches the message to the next service in line. Each service hands its result back to the orchestrator, which then forwards the message to the following stage. In effect, the orchestrator is the conductor: it knows the order, keeps state, and decides what runs next.
 
 ## Monitoring
 
 > kcloud-monitor-queue
 
-The first microservice in the pipeline is the monitoring microservice, this will verify a couple of things and store some metadata. It will keep track of
+The monitoring service is the first stage of the pipeline. It validates the incoming event and records the operational metadata Hub needs to keep track of an account's usage, such as:
 
-- the MB of data being stored,
-- the latest event for each Kerberos Agent,
-- if an account has to be disabled due to reaching its upload limit
-- etc.
+- the volume of data being stored,
+- the most recent event for each Agent,
+- whether an account should be disabled because it has reached its upload limit,
+- and other usage metrics surfaced in the Hub UI.
 
-The monitoring microservice is like the name said, a monitoring step in the entire pipeline, it will keep track of some analytics that are useful to be shown in the Hub application.
+In short: it is the bookkeeping step that powers the analytics and quotas users see in the application.
 
 ## Sequencer
 
 > kcloud-sequence-queue
 
-This is where the magic happens. The sequencer is responsible for grouping recordings that belong to a close time window, it makes it possible to handle individual events as group of events, so that it can be more easily queried.
+The sequencer groups recordings that fall within a short time window so that a burst of related events can be treated as a single logical event. This makes downstream querying, alerting and UI rendering dramatically easier.
 
-The sequencer microservice is build in such a way that it can group events, even if they are delayed, or the connection from the Kerberos Agent was interrupted for some time. The sequencer will be able to recover and properly sequence in whatever situation.
+It is built to be resilient: even if recordings arrive late or an Agent's connection was briefly interrupted, the sequencer can still reconstruct the correct ordering and grouping after the fact.
 
 ## Analyser
 
 > kcloud-analysis-queue
 
-As recordings are sequenced the analyser will take care of some post-processing. Additional computations and algorithms are being executed in parallel on the uploaded recordings such as:
-
-- Dominant color
-- thumbnail,
-- machine learning and object tracking, etc.
-
-Once the analyser is hit, it will send out several messages in parallel to the different microservices to compute the previously mentioned requests. As soon as results come in, asynchronously, the analysis step is completed, and the next microservice is triggered.
+Once recordings are sequenced, the analyser orchestrates the post-processing stage. It fans out the event in parallel to the enrichment services — thumbnail, sprite, dominant color, classification, counting, and any custom services you've added. Each of those services runs independently and reports back asynchronously. As soon as the analysis stage as a whole completes, the pipeline continues to the next sequential step.
 
 ## Thumbnail
 
-> kcloud-thumbnail-queue
+> kcloud-thumby-queue.fifo
 
-The thumbnail microservice generates a poster image for each recording. It extracts a representative frame from the uploaded video and stores it as a still image, so the Hub UI can display a quick preview without loading the full recording. This makes browsing through large numbers of events much faster and gives operators an at-a-glance view of what each event looks like.
+The thumbnail service generates a poster image for each recording by extracting a representative frame from the video. The Hub UI uses these thumbnails to render fast, scannable previews so operators can browse large numbers of events without having to load any video.
 
 ## Sprite
 
-> kcloud-sprite-queue
+> kcloud-sprite-queue.fifo
 
-The sprite microservice produces a video timelapse — a single image strip composed of frames sampled at regular intervals across the recording. This sprite is used to power the scrubbing preview in the Hub player, allowing users to hover the timeline and instantly see what is happening at any point in the recording without having to seek through the underlying video.
+The sprite service builds a video timelapse — a single image strip composed of frames sampled at regular intervals across the recording. The Hub player uses this sprite to power its hover-to-scrub preview, so users can see what is happening at any point in the timeline without seeking through the underlying video.
 
 ## Dominant color
 
-> kcloud-dominantcolor-queue
+> kcloud-dominantcolor-queue.fifo
 
-The dominant color microservice analyses the recording and computes the most prevalent colors in the scene. The resulting palette is stored alongside the event metadata and used in the Hub UI to colour-code recordings, group them visually, and provide an additional dimension to filter and search on.
+The dominant color service computes the most prevalent colors in a recording and stores the resulting palette alongside the event metadata. Hub uses these palettes to colour-code recordings, group them visually, and add another dimension to filter and search on.
+
+## Classification
+
+> kcloud-classify-queue.fifo
+
+The classification service runs object detection on the recording and tags the event with the objects it identifies — people, vehicles, animals, and so on. These tags drive a lot of the downstream behaviour in Hub: filtering events, grouping recordings, and triggering alerts.
+
+The classifier is open source ([github.com/uug-ai/hub-pipeline-classifier](https://github.com/uug-ai/hub-pipeline-classifier)) and explicitly designed to be extended. Because every service in the pipeline is just a queue consumer, you can fork the classifier — or write a new service from scratch in any language — point it at its own queue, and have the orchestrator route messages to it. That gives you a clean place to plug in custom application logic or your own machine-learning model and write the results back as event metadata, without touching anything else in the pipeline.
 
 ## Throttler
 
 > kcloud-throttler-queue
 
-Messages that reach the throttler microservice will go in a throttling function, that controls the number of events going out. The reason of throttling is to limit the number of message being sent to the next microservice. Easy said, it is a way to limit and protect it against a huge amount of incoming data.
+The throttler limits how many events flow through to the next stage. When a sudden burst of recordings happens — for example a long motion event producing dozens of clips — you usually don't want a notification for every single one of them. The throttler collapses that traffic so downstream services receive a controlled stream instead of being flooded.
 
-Let's say you have a lot of recordings being generated at once, this would result in a lot of messages being generated. When this happens you do not want to send notifications or other actions for every single message, you rather have a single message for all of them. This is what the throttler is for.
+In practice, this means the notification stage gets a single coherent message for a burst of activity rather than one per recording.
 
 ## Notification
 
 > kcloud-notification-queue
 
-After the throttler has been executed, it's time to send out alerts and notifications which you have setup. Depending on your alert settings, the notification microservice will send out a specific notification to your selected channels.
+The notification service is the final stage of the pipeline. Based on the alert rules configured for the account, it dispatches notifications to the channels you've enabled — email, webhook, Slack, MQTT, and so on — for events that survived the throttler.
