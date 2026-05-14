@@ -203,10 +203,16 @@ html.dark .rete-node,
     box-sizing: border-box;
 }
 
-/* When the body contains a badges row, give it a touch more bottom padding so
-   the icons don't visually crowd the card edge. */
+/* When the body contains a badges row, top-anchor the content and give it
+   real bottom breathing room. With the default `justify-content: center`
+   the padding only acts as a minimum, so cards with badges (factory,
+   vault, …) end up with their badges flush to the edge whenever the card
+   is short. */
 .rete-node__body:has(.rete-node__badges) {
-    padding-bottom: 32px;
+    justify-content: flex-start;
+    padding-top: 14px;
+    padding-bottom: 18px;
+    gap: 8px;
 }
 
 .rete-node__title {

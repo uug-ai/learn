@@ -673,6 +673,12 @@ class Designer {
         if (sel && this.root.classList.contains('is-inspector-collapsed')) {
             this.toggleInspector(false);
         }
+        // Selection changed — blur any focused inspector input so the
+        // renderInspector early-return (focus guard) doesn't keep showing
+        // the previous selection's properties.
+        if (this.inspector.contains(document.activeElement)) {
+            document.activeElement.blur();
+        }
         this.renderInspector();
         this.renderSelection();
     }

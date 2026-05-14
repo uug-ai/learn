@@ -19,25 +19,37 @@ You can run Kerberos Factory wherever you can run a Kubernetes cluster, so it ca
 
 When running a managed Kubernetes cluster, such as [GKE](https://cloud.google.com/kubernetes-engine), [EKS](https://aws.amazon.com/eks/) or  or [AKS](https://azure.microsoft.com/en-us/products/kubernetes-service/), you will have a wide range of superpowers such as a `LoadBalancer` service, automatic `Volume` creation, etc. The latter is something what is missing in an self-hosted deployment, where you will have to prepare the volumes yourself and install an edge load balancer like `MetalLB`.
 
-{{< rete caption="Kerberos Factory can be installed everywhere your Kubernetes cluster can be installed." alt="Kerberos Factory can be installed everywhere your Kubernetes cluster can be installed." height="540" >}}
+{{< rete caption="Kerberos Factory can be installed everywhere your Kubernetes cluster can be installed." alt="Kerberos Factory can be installed everywhere your Kubernetes cluster can be installed." height="680" >}}
 {
   "groups": [
-    { "id": "edge",  "label": "Edge Kubernetes",    "x":   0, "y": 20, "w": 460, "h": 460 },
-    { "id": "cloud", "label": "Managed Kubernetes", "x": 560, "y": 20, "w": 460, "h": 460 }
+    { "id": "edge",  "label": "Edge Kubernetes",    "x":   0, "y": 20, "w": 460, "h": 660 },
+    { "id": "cloud", "label": "Managed Kubernetes", "x": 560, "y": 20, "w": 460, "h": 660 }
   ],
   "nodes": [
-    { "id": "edge-factory", "kind": "factory", "x":  40, "y":  80, "w": 240, "h": 130,
+    { "id": "edge-factory", "kind": "factory", "x":  110, "y":  80, "w": 240, "h": 130,
       "header": "FACTORY", "title": "Factory", "subtitle": "Self-hosted", "badges": ["kubernetes"] },
-    { "id": "edge-agent",   "kind": "agent",   "x":  40, "y": 290, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent", "subtitle": "Provisioned at edge", "badges": ["kubernetes"] },
-    { "id": "cloud-factory","kind": "factory", "x": 600, "y":  80, "w": 240, "h": 130,
+    { "id": "edge-agent-1", "kind": "agent",   "x":  110, "y": 250, "w": 240, "h": 110,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Provisioned at edge" },
+    { "id": "edge-agent-2", "kind": "agent",   "x":  110, "y": 390, "w": 240, "h": 110,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Provisioned at edge" },
+    { "id": "edge-agent-3", "kind": "agent",   "x":  110, "y": 530, "w": 240, "h": 110,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Provisioned at edge" },
+    { "id": "cloud-factory","kind": "factory", "x": 670, "y":  80, "w": 240, "h": 130,
       "header": "FACTORY", "title": "Factory", "subtitle": "Managed cloud",  "badges": ["kubernetes"] },
-    { "id": "cloud-agent",  "kind": "agent",   "x": 600, "y": 290, "w": 240, "h": 130,
-      "header": "AGENT", "title": "Agent", "subtitle": "Provisioned in cloud", "badges": ["kubernetes"] }
+    { "id": "cloud-agent-1","kind": "agent",   "x": 670, "y": 250, "w": 240, "h": 110,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Provisioned in cloud" },
+    { "id": "cloud-agent-2","kind": "agent",   "x": 670, "y": 390, "w": 240, "h": 110,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Provisioned in cloud" },
+    { "id": "cloud-agent-3","kind": "agent",   "x": 670, "y": 530, "w": 240, "h": 110,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Provisioned in cloud" }
   ],
   "connections": [
-    { "from": "edge-factory",  "to": "edge-agent",  "fromSide": "bottom", "toSide": "top", "label": "provisions" },
-    { "from": "cloud-factory", "to": "cloud-agent", "fromSide": "bottom", "toSide": "top", "label": "provisions" }
+    { "from": "edge-factory",  "to": "edge-agent-1",  "fromSide": "bottom", "toSide": "top", "label": "provisions" },
+    { "from": "edge-factory",  "to": "edge-agent-2",  "fromSide": "bottom", "toSide": "top" },
+    { "from": "edge-factory",  "to": "edge-agent-3",  "fromSide": "bottom", "toSide": "top" },
+    { "from": "cloud-factory", "to": "cloud-agent-1", "fromSide": "bottom", "toSide": "top", "label": "provisions" },
+    { "from": "cloud-factory", "to": "cloud-agent-2", "fromSide": "bottom", "toSide": "top" },
+    { "from": "cloud-factory", "to": "cloud-agent-3", "fromSide": "bottom", "toSide": "top" }
   ]
 }
 {{< /rete >}}
