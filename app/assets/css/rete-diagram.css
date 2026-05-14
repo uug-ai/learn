@@ -301,3 +301,54 @@ html.dark .rete-toolbar__btn:hover,
 body.rete-diagram-fs-lock {
     overflow: hidden;
 }
+
+/* --- Edit-in-designer affordance ------------------------------------- */
+
+.rete-diagram-figure {
+    position: relative;
+}
+
+.rete-diagram-edit {
+    position: absolute;
+    top: 12px;       /* aligns with the 32px fullscreen button */
+    right: 52px;     /* sit just left of the fullscreen toolbar */
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 32px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: rgba(255, 255, 255, 0.92);
+    color: #555f8e;
+    font: 600 11px/1 'Inter', system-ui, sans-serif;
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 120ms ease, background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.rete-diagram-figure:hover .rete-diagram-edit,
+.rete-diagram-edit:focus-visible {
+    opacity: 1;
+}
+
+.rete-diagram-edit:hover {
+    background: #555f8e;
+    color: #ffffff;
+    border-color: #555f8e;
+}
+
+html.dark .rete-diagram-edit,
+.dark .rete-diagram-edit {
+    background: rgba(31, 31, 31, 0.92);
+    color: #b5b5ff;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+html.dark .rete-diagram-edit:hover,
+.dark .rete-diagram-edit:hover {
+    background: #555f8e;
+    color: #ffffff;
+}

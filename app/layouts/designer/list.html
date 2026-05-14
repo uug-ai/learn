@@ -1,0 +1,113 @@
+{{ define "main" }}
+{{- with resources.Get "css/rete-diagram.css" -}}
+  {{- $css := . | minify | fingerprint -}}
+  <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
+{{- end }}
+{{- with resources.Get "css/designer.css" -}}
+  {{- $css := . | minify | fingerprint -}}
+  <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
+{{- end }}
+
+<div class="designer-page">
+  <main class="designer-page__main">
+    {{ if .Title }}<h1 class="hx:mt-2 hx:text-4xl hx:font-bold hx:tracking-tight hx:text-slate-900 hx:dark:text-slate-100">{{ .Title }}</h1>{{ end }}
+    <div class="content hx:mt-2 hx:mb-4">{{ .Content }}</div>
+
+    <div id="designer" class="designer">
+        <aside class="designer__palette" aria-label="Building blocks">
+          <div class="designer__palette-search">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="search" data-palette-search placeholder="Search blocks…" aria-label="Search building blocks">
+          </div>
+          <div class="designer__palette-list" data-palette>
+            <!-- Sections + items rendered by designer.js -->
+          </div>
+          <h3 class="designer__palette-title">Containers</h3>
+          <div class="designer__palette-list">
+            <button type="button" class="designer__palette-item" data-add-group>
+              <span class="designer__palette-swatch designer__palette-swatch--group"></span>
+              <span class="designer__palette-label">Group</span>
+            </button>
+          </div>
+          <h3 class="designer__palette-title">Tips</h3>
+          <ul class="designer__hints">
+            <li>Click a block to add it to the canvas.</li>
+            <li>Drag nodes; pan the canvas by dragging empty space.</li>
+            <li>Click a node to edit it on the right.</li>
+            <li>Drop a node inside a group to attach it; hold <kbd>Alt</kbd> while dragging to detach.</li>
+            <li>Hover a node and click one of its dots, then click a dot on another node to connect them.</li>
+            <li>Hit <kbd>Delete</kbd> to remove the selection.</li>
+          </ul>
+        </aside>
+
+        <div class="designer__canvas-wrap">
+          <div class="designer__toolbar">
+            <button type="button" class="designer__btn" data-action="undo" title="Undo (Ctrl+Z)" disabled>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>
+              Undo
+            </button>
+            <button type="button" class="designer__btn" data-action="redo" title="Redo (Ctrl+Shift+Z)" disabled>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 15-6.7L21 13"/></svg>
+              Redo
+            </button>
+            <button type="button" class="designer__btn" data-action="fit" title="Fit the diagram to the canvas">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
+              Fit
+            </button>
+            <button type="button" class="designer__btn" data-action="clear" title="Remove every node and connection">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              Clear
+            </button>
+            <div class="designer__toolbar-spacer"></div>
+            <span class="designer__alt-hint" aria-hidden="true">Hold <kbd>Alt</kbd> to detach from group</span>
+            <button type="button" class="designer__btn" data-action="fullscreen" title="Toggle fullscreen">
+              <svg class="designer__icon-expand" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
+              <svg class="designer__icon-collapse" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/></svg>
+              <span class="designer__btn-label">Fullscreen</span>
+            </button>
+            <button type="button" class="designer__btn designer__btn--primary" data-action="copy" title="Copy the rete shortcode contents to the clipboard">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+            <button type="button" class="designer__btn" data-action="export" title="Export the diagram as a PNG image">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              PNG
+            </button>
+          </div>
+
+          <div id="designer-canvas" class="rete-diagram designer__canvas" role="application" aria-label="Architecture canvas"></div>
+
+          <details class="designer__source">
+            <summary>Preview shortcode</summary>
+<pre><code id="designer-source">Loading…</code></pre>
+          </details>
+        </div>
+
+        <aside class="designer__inspector" aria-label="Properties">
+          <div class="designer__inspector-header">
+            <h3 class="designer__inspector-title">Properties</h3>
+            <button type="button" class="designer__inspector-toggle"
+                    data-action="toggle-inspector"
+                    aria-controls="designer-inspector"
+                    aria-expanded="true"
+                    title="Collapse properties panel">
+              <svg class="designer__icon-chevron-collapse" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg class="designer__icon-chevron-expand"   viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+              <span class="designer__inspector-toggle-label">Collapse</span>
+            </button>
+          </div>
+          <div id="designer-inspector" class="designer__inspector-body">
+            <p class="designer__inspector-empty">Select a node or group to edit its properties.</p>
+          </div>
+        </aside>
+      </div>
+
+      <div id="designer-toast" class="designer__toast" role="status" aria-live="polite"></div>
+  </main>
+</div>
+
+{{- with resources.Get "js/designer.js" -}}
+  {{- $js := . | fingerprint -}}
+  <script type="module" src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script>
+{{- end }}
+{{- end }}

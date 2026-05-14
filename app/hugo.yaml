@@ -21,21 +21,34 @@ menu:
     - name: Documentation
       pageRef: /docs
       weight: 1
-    - name: Knowledge base
+    - identifier: knowledge-base
+      name: Knowledge base
       pageRef: /knowledge-base
       weight: 2
     - name: Tutorials
       pageRef: /tutorials
-      weight: 3
+      parent: knowledge-base
+      weight: 1
+      params:
+        description: Step-by-step walkthroughs to get hands-on with our products.
     - name: Guides
       pageRef: /guides
-      weight: 4
+      parent: knowledge-base
+      weight: 2
+      params:
+        description: In-depth how-tos for common tasks and workflows.
     - name: Blog
       pageRef: /blog
-      weight: 5
+      parent: knowledge-base
+      weight: 3
+      params:
+        description: Latest news, announcements and deep-dives from the team.
     - name: Support
       pageRef: /support
       weight: 6
+    - name: Designer
+      pageRef: /designer
+      weight: 6.5
     - name: Search
       weight: 7
       params:
