@@ -291,6 +291,9 @@ class Designer {
             this.seedExample();
         }
         this.render();
+        // Start with the properties panel collapsed; selecting something
+        // will open it.
+        this.toggleInspector(true);
         // Run an initial fit on the next frame so the canvas has measured
         // dimensions when called via URL with a large diagram.
         requestAnimationFrame(() => this.fit());
@@ -410,10 +413,47 @@ class Designer {
         this.root.querySelectorAll('.designer__btn[data-action]').forEach(btn => {
             btn.addEventListener('click', () => this.handleAction(btn.dataset.action, btn));
         });
+        this.root.querySelectorAll('.designer__menu-item[data-action]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.handleAction(btn.dataset.action, btn);
+                this.closeMenus();
+            });
+        });
+        this.root.querySelectorAll('[data-menu-toggle]').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.stopPropagation();
+                const menu = btn.closest('[data-menu]');
+                const list = menu?.querySelector('.designer__menu-list');
+                if (!list) return;
+                const open = !list.hidden;
+                this.closeMenus();
+                if (!open) {
+                    list.hidden = false;
+                    btn.setAttribute('aria-expanded', 'true');
+                    menu.classList.add('is-open');
+                }
+            });
+        });
+        document.addEventListener('click', e => {
+            if (!e.target.closest('[data-menu]')) this.closeMenus();
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') this.closeMenus();
+        });
         const inspectorToggle = this.root.querySelector('[data-action="toggle-inspector"]');
         if (inspectorToggle) {
             inspectorToggle.addEventListener('click', () => this.toggleInspector());
         }
+    }
+
+    closeMenus() {
+        this.root.querySelectorAll('[data-menu]').forEach(menu => {
+            menu.classList.remove('is-open');
+            const list = menu.querySelector('.designer__menu-list');
+            if (list) list.hidden = true;
+            const toggle = menu.querySelector('[data-menu-toggle]');
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
     }
 
     toggleInspector(force) {
@@ -447,7 +487,10 @@ class Designer {
                 state.selection = null;
                 this.render();
                 break;
-            case 'copy':    this.copyShortcode(); break;
+            case 'copy':           this.copyShortcode(); break;
+            case 'copy-shortcode': this.copyShortcode(); break;
+            case 'copy-json':      this.copyJson(); break;
+            case 'copy-url':       this.copyShareUrl(); break;
             case 'export':  this.exportPng(); break;
         }
     }
@@ -570,6 +613,9 @@ class Designer {
 
     select(sel) {
         state.selection = sel;
+        if (sel && this.root.classList.contains('is-inspector-collapsed')) {
+            this.toggleInspector(false);
+        }
         this.renderInspector();
         this.renderSelection();
     }
@@ -634,19 +680,33 @@ class Designer {
             const toSide   = c.toSide   || 'left';
             const a = anchorPoint(from, fromSide);
             const b = anchorPoint(to,   toSide);
+            const d = bezierPath(a.x, a.y, b.x, b.y, fromSide, toSide);
+
+            // Invisible thick hit-area so clicks land reliably even on the
+            // gaps of the flowing dashed stroke.
+            const hit = document.createElementNS(SVG_NS, 'path');
+            hit.setAttribute('d', d);
+            hit.setAttribute('class', 'rete-connection-hit');
+            hit.setAttribute('fill', 'none');
+            hit.setAttribute('stroke', 'transparent');
+            hit.setAttribute('stroke-width', '20');
+            hit.style.pointerEvents = 'stroke';
+            hit.style.cursor = 'pointer';
+            hit.addEventListener('click', e => {
+                e.stopPropagation();
+                this.select({ type: 'connection', id: idx });
+            });
+            this.svg.appendChild(hit);
+
             const path = document.createElementNS(SVG_NS, 'path');
-            path.setAttribute('d', bezierPath(a.x, a.y, b.x, b.y, fromSide, toSide));
+            path.setAttribute('d', d);
             const classes = ['rete-connection', `rete-connection--${c.kind || 'default'}`];
             if (c.label) classes.push('rete-connection--labelled');
             if (state.selection?.type === 'connection' && state.selection.id === idx) {
                 classes.push('is-selected');
             }
             path.setAttribute('class', classes.join(' '));
-            path.style.pointerEvents = 'stroke';
-            path.addEventListener('click', e => {
-                e.stopPropagation();
-                this.select({ type: 'connection', id: idx });
-            });
+            path.style.pointerEvents = 'none';
             this.svg.appendChild(path);
 
             if (c.label) {
@@ -929,18 +989,64 @@ class Designer {
                 return out;
             }),
         };
+        this.lastConfig = cfg;
         this.lastShortcode =
             '{{< rete caption="My diagram" >}}\n' +
             JSON.stringify(cfg, null, 2) + '\n' +
             '{{< /rete >}}';
         if (this.sourceEl) this.sourceEl.textContent = this.lastShortcode;
+        this.persistToUrl(cfg);
+    }
+
+    // Mirror the current diagram into the URL fragment so an accidental
+    // refresh restores the same state. Debounced to avoid spamming the
+    // history API while dragging.
+    persistToUrl(cfg) {
+        clearTimeout(this._persistTimer);
+        this._persistTimer = setTimeout(() => {
+            try {
+                const empty = !cfg.nodes.length && !cfg.groups.length && !cfg.connections.length;
+                const base = window.location.pathname + window.location.search;
+                if (empty) {
+                    history.replaceState(null, '', base);
+                    return;
+                }
+                const json = JSON.stringify(cfg);
+                const b64 = btoa(unescape(encodeURIComponent(json)));
+                history.replaceState(null, '', `${base}#diagram=${b64}`);
+            } catch (err) {
+                // Non-fatal — just skip persistence for this tick.
+            }
+        }, 150);
     }
 
     async copyShortcode() {
-        const text = this.lastShortcode || '';
+        await this.copyText(this.lastShortcode || '', 'Copied shortcode to clipboard.');
+    }
+
+    async copyJson() {
+        const json = JSON.stringify(this.lastConfig || {}, null, 2);
+        await this.copyText(json, 'Copied JSON to clipboard.');
+    }
+
+    async copyShareUrl() {
+        const json = JSON.stringify(this.lastConfig || {});
+        let b64;
+        try {
+            b64 = btoa(unescape(encodeURIComponent(json)));
+        } catch {
+            this.toast('Could not encode the diagram for sharing.');
+            return;
+        }
+        const base = `${window.location.origin}${window.location.pathname}`;
+        const url = `${base}#diagram=${b64}`;
+        await this.copyText(url, 'Copied share URL to clipboard.');
+    }
+
+    async copyText(text, successMsg) {
         try {
             await navigator.clipboard.writeText(text);
-            this.toast('Copied shortcode to clipboard.');
+            this.toast(successMsg);
         } catch (err) {
             // Fallback for browsers without clipboard API.
             const ta = document.createElement('textarea');
@@ -949,7 +1055,7 @@ class Designer {
             ta.style.opacity = '0';
             document.body.appendChild(ta);
             ta.select();
-            try { document.execCommand('copy'); this.toast('Copied shortcode to clipboard.'); }
+            try { document.execCommand('copy'); this.toast(successMsg); }
             catch { this.toast('Copy failed — select the preview manually.'); }
             ta.remove();
         }
@@ -1146,7 +1252,7 @@ ${css}
         // Pan + click-to-deselect.
         let panning = false, sx = 0, sy = 0, otx = 0, oty = 0, moved = false;
         this.canvas.addEventListener('mousedown', e => {
-            if (e.target.closest('.rete-node, .rete-group, .designer__anchor, .rete-connection')) return;
+            if (e.target.closest('.rete-node, .rete-group, .designer__anchor, .rete-connection, .rete-connection-hit')) return;
             panning = true; moved = false;
             sx = e.clientX; sy = e.clientY; otx = this.tx; oty = this.ty;
             this.canvas.style.cursor = 'grabbing';

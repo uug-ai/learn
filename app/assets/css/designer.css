@@ -273,6 +273,92 @@ html.dark .designer__toolbar,
     border-color: #555f8e;
 }
 
+/* --- Toolbar dropdown menu (e.g. Copy → shortcode/JSON/URL) ---------- */
+.designer__menu {
+    position: relative;
+    display: inline-flex;
+}
+
+.designer__menu-toggle {
+    gap: 4px;
+}
+
+.designer__menu-chevron {
+    transition: transform 100ms ease;
+    opacity: 0.85;
+}
+
+.designer__menu.is-open .designer__menu-chevron {
+    transform: rotate(180deg);
+}
+
+.designer__menu-list {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 30;
+    margin: 0;
+    padding: 6px;
+    min-width: 260px;
+    list-style: none;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 12px 28px rgba(20, 11, 59, 0.14);
+}
+
+html.dark .designer__menu-list,
+.dark .designer__menu-list {
+    background: #1f1f1f;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+.designer__menu-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+}
+
+.designer__menu-item:hover,
+.designer__menu-item:focus-visible {
+    background: rgba(85, 95, 142, 0.1);
+    outline: none;
+}
+
+.designer__menu-item-title {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.designer__menu-item-desc {
+    font-size: 11.5px;
+    color: #6d6666;
+    line-height: 1.35;
+}
+
+html.dark .designer__menu-item-desc,
+.dark .designer__menu-item-desc { color: #a8a8a8; }
+
+.designer__menu-item code {
+    font-size: 11px;
+    padding: 0 4px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+html.dark .designer__menu-item code,
+.dark .designer__menu-item code { background: rgba(255, 255, 255, 0.1); }
+
 html.dark .designer__btn,
 .dark .designer__btn {
     background: #262626;

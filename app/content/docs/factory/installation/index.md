@@ -19,7 +19,28 @@ You can run Kerberos Factory wherever you can run a Kubernetes cluster, so it ca
 
 When running a managed Kubernetes cluster, such as [GKE](https://cloud.google.com/kubernetes-engine), [EKS](https://aws.amazon.com/eks/) or  or [AKS](https://azure.microsoft.com/en-us/products/kubernetes-service/), you will have a wide range of superpowers such as a `LoadBalancer` service, automatic `Volume` creation, etc. The latter is something what is missing in an self-hosted deployment, where you will have to prepare the volumes yourself and install an edge load balancer like `MetalLB`.
 
-{{< figure src="factory-edge-cloud.svg" alt="Kerberos Factory can be installed everywhere your Kubernetes cluster can be installed." caption="Kerberos Factory can be installed everywhere your Kubernetes cluster can be installed." class="stretch">}}
+{{< rete caption="Kerberos Factory can be installed everywhere your Kubernetes cluster can be installed." alt="Kerberos Factory can be installed everywhere your Kubernetes cluster can be installed." height="540" >}}
+{
+  "groups": [
+    { "id": "edge",  "label": "Edge Kubernetes",    "x":   0, "y": 20, "w": 460, "h": 460 },
+    { "id": "cloud", "label": "Managed Kubernetes", "x": 560, "y": 20, "w": 460, "h": 460 }
+  ],
+  "nodes": [
+    { "id": "edge-factory", "kind": "factory", "x":  40, "y":  80, "w": 240, "h": 130,
+      "header": "FACTORY", "title": "Factory", "subtitle": "Self-hosted", "badges": ["kubernetes"] },
+    { "id": "edge-agent",   "kind": "agent",   "x":  40, "y": 290, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent", "subtitle": "Provisioned at edge", "badges": ["kubernetes"] },
+    { "id": "cloud-factory","kind": "factory", "x": 600, "y":  80, "w": 240, "h": 130,
+      "header": "FACTORY", "title": "Factory", "subtitle": "Managed cloud",  "badges": ["kubernetes"] },
+    { "id": "cloud-agent",  "kind": "agent",   "x": 600, "y": 290, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent", "subtitle": "Provisioned in cloud", "badges": ["kubernetes"] }
+  ],
+  "connections": [
+    { "from": "edge-factory",  "to": "edge-agent",  "fromSide": "bottom", "toSide": "top", "label": "provisions" },
+    { "from": "cloud-factory", "to": "cloud-agent", "fromSide": "bottom", "toSide": "top", "label": "provisions" }
+  ]
+}
+{{< /rete >}}
 
 ## Managed Kubernetes
 
@@ -27,7 +48,33 @@ Installing Kerberos Factory in a managed Kubernetes cluster (Azure, GCP, AWS) is
 
 > Install Kerberos Factory in a managed Kubernetes cluster by [following this step-by-step installation guide](https://github.com/kerberos-io/factory/tree/master/kubernetes#b-managed-kubernetes-1).
 
-{{< figure src="factory-cloud.svg" alt="Kerberos Factory managed cluster" caption="Kerberos Factory managed cluster" class="stretch">}}
+{{< rete caption="Kerberos Factory managed cluster" alt="Kerberos Factory managed cluster" height="540" >}}
+{
+  "groups": [
+    { "id": "cloud", "label": "Managed Kubernetes (GKE / EKS / AKS)", "x": 0, "y": 20, "w": 1180, "h": 460 }
+  ],
+  "nodes": [
+    { "id": "factory", "kind": "factory", "x":  40, "y":  80, "w": 240, "h": 150,
+      "header": "FACTORY", "title": "Factory", "subtitle": "Orchestrates agents", "badges": ["kubernetes"] },
+    { "id": "agent-1", "kind": "agent",   "x": 360, "y":  80, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream", "badges": ["kubernetes"] },
+    { "id": "agent-2", "kind": "agent",   "x": 360, "y": 240, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream", "badges": ["kubernetes"] },
+    { "id": "vault",   "kind": "vault",   "x": 680, "y":  80, "w": 240, "h": 150,
+      "header": "VAULT", "title": "Vault", "subtitle": "Storage interface", "badges": ["kubernetes"] },
+    { "id": "object-storage", "kind": "storage", "x": 680, "y": 280, "w": 240, "h": 150,
+      "header": "OBJECT STORAGE", "title": "Object Storage", "subtitle": "Cloud volumes",
+      "badges": ["aws", "gcp", "azure"] }
+  ],
+  "connections": [
+    { "from": "factory", "to": "agent-1", "fromSide": "right", "toSide": "left", "label": "provisions" },
+    { "from": "factory", "to": "agent-2", "fromSide": "right", "toSide": "left", "label": "provisions" },
+    { "from": "agent-1", "to": "vault",   "fromSide": "right", "toSide": "left" },
+    { "from": "agent-2", "to": "vault",   "fromSide": "right", "toSide": "left" },
+    { "from": "vault",   "to": "object-storage", "fromSide": "bottom", "toSide": "top" }
+  ]
+}
+{{< /rete >}}
 
 ## Self-hosted Kubernetes
 
@@ -37,4 +84,43 @@ In contradiction to the Kubernetes Service Provider, there will be more work req
 
 > Install Kerberos Factory on a private cloud or at the edge by [following this step-by-step installation guide](https://github.com/kerberos-io/factory/tree/master/kubernetes#a-self-hosted-kubernetes-1).
 
-{{< figure src="factory-edge.svg" alt="Kerberos Factory self-hosted cluster" caption="Kerberos Factory self-hosted cluster" class="stretch">}}
+{{< rete caption="Kerberos Factory self-hosted cluster" alt="Kerberos Factory self-hosted cluster" height="540" >}}
+{
+  "groups": [
+    { "id": "edge", "label": "Self-hosted Kubernetes (edge / private cloud)", "x": 0, "y": 20, "w": 1320, "h": 520 }
+  ],
+  "nodes": [
+    { "id": "cam-1", "kind": "camera", "x":  40, "y":  80, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x":  40, "y": 250, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "cam-3", "kind": "camera", "x":  40, "y": 420, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" },
+    { "id": "factory", "kind": "factory", "x": 280, "y":  80, "w": 240, "h": 150,
+      "header": "FACTORY", "title": "Factory", "subtitle": "Orchestrates agents", "badges": ["kubernetes"] },
+    { "id": "agent-1", "kind": "agent",   "x": 580, "y":  80, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Process stream", "badges": ["kubernetes"] },
+    { "id": "agent-2", "kind": "agent",   "x": 580, "y": 250, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Process stream", "badges": ["kubernetes"] },
+    { "id": "agent-3", "kind": "agent",   "x": 580, "y": 420, "w": 240, "h": 130,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Process stream", "badges": ["kubernetes"] },
+    { "id": "vault",   "kind": "vault",   "x": 880, "y": 165, "w": 240, "h": 150,
+      "header": "VAULT", "title": "Vault", "subtitle": "Storage interface", "badges": ["kubernetes"] },
+    { "id": "object-storage", "kind": "storage", "x": 880, "y": 365, "w": 240, "h": 150,
+      "header": "OBJECT STORAGE", "title": "Object Storage", "subtitle": "MinIO / Ceph",
+      "badges": ["minio", "ceph"] }
+  ],
+  "connections": [
+    { "from": "cam-1",   "to": "agent-1",   "fromSide": "right", "toSide": "left" },
+    { "from": "cam-2",   "to": "agent-2",   "fromSide": "right", "toSide": "left" },
+    { "from": "cam-3",   "to": "agent-3",   "fromSide": "right", "toSide": "left" },
+    { "from": "factory", "to": "agent-1",   "fromSide": "right", "toSide": "left", "label": "provisions" },
+    { "from": "factory", "to": "agent-2",   "fromSide": "right", "toSide": "left", "label": "provisions" },
+    { "from": "factory", "to": "agent-3",   "fromSide": "right", "toSide": "left", "label": "provisions" },
+    { "from": "agent-1", "to": "vault",     "fromSide": "right", "toSide": "left" },
+    { "from": "agent-2", "to": "vault",     "fromSide": "right", "toSide": "left" },
+    { "from": "agent-3", "to": "vault",     "fromSide": "right", "toSide": "left" },
+    { "from": "vault",   "to": "object-storage", "fromSide": "bottom", "toSide": "top" }
+  ]
+}
+{{< /rete >}}

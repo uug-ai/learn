@@ -65,10 +65,33 @@
               <svg class="designer__icon-collapse" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/></svg>
               <span class="designer__btn-label">Fullscreen</span>
             </button>
-            <button type="button" class="designer__btn designer__btn--primary" data-action="copy" title="Copy the rete shortcode contents to the clipboard">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              Copy
-            </button>
+            <div class="designer__menu" data-menu>
+              <button type="button" class="designer__btn designer__btn--primary designer__menu-toggle" data-menu-toggle aria-haspopup="menu" aria-expanded="false" title="Copy options">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+                <svg class="designer__menu-chevron" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <ul class="designer__menu-list" role="menu" hidden>
+                <li role="none">
+                  <button type="button" role="menuitem" class="designer__menu-item" data-action="copy-shortcode">
+                    <span class="designer__menu-item-title">Copy shortcode</span>
+                    <span class="designer__menu-item-desc">Paste into a Hugo page as <code>{{ "{{< rete >}}" }}</code>.</span>
+                  </button>
+                </li>
+                <li role="none">
+                  <button type="button" role="menuitem" class="designer__menu-item" data-action="copy-json">
+                    <span class="designer__menu-item-title">Copy JSON</span>
+                    <span class="designer__menu-item-desc">Just the diagram config.</span>
+                  </button>
+                </li>
+                <li role="none">
+                  <button type="button" role="menuitem" class="designer__menu-item" data-action="copy-url">
+                    <span class="designer__menu-item-title">Copy share URL</span>
+                    <span class="designer__menu-item-desc">Link to this designer pre-loaded with the diagram.</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
             <button type="button" class="designer__btn" data-action="export" title="Export the diagram as a PNG image">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               PNG
