@@ -177,6 +177,10 @@ html.dark .rete-node,
 .rete-node--pipeline-dominantcolor { --rete-node-color: #be185d; }
 .rete-node--pipeline-thumbnail     { --rete-node-color: #be185d; }
 .rete-node--pipeline-export        { --rete-node-color: #be185d; }
+.rete-node--pipeline-counting      { --rete-node-color: #be185d; }
+.rete-node--pipeline-licenseplate  { --rete-node-color: #be185d; }
+.rete-node--pipeline-nohelmet      { --rete-node-color: #be185d; }
+.rete-node--pipeline-llm           { --rete-node-color: #be185d; }
 
 .rete-node__header {
     padding: 8px 14px;
@@ -192,6 +196,28 @@ html.dark .rete-node,
     white-space: nowrap;
 }
 
+/* Step indicator (numbered badge) shown in the top-right corner of a node so
+   the reader can follow the orchestration order without crowding the edges
+   with numeric labels. */
+.rete-node__step {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 11px;
+    background: #ffffff;
+    color: var(--rete-node-color);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 22px;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    z-index: 2;
+}
+
 .rete-node__body {
     padding: 18px 20px;
     display: flex;
@@ -203,16 +229,11 @@ html.dark .rete-node,
     box-sizing: border-box;
 }
 
-/* When the body contains a badges row, top-anchor the content and give it
-   real bottom breathing room. With the default `justify-content: center`
-   the padding only acts as a minimum, so cards with badges (factory,
-   vault, …) end up with their badges flush to the edge whenever the card
-   is short. */
+/* When the body contains a badges row, give it a touch more bottom padding so
+   the icons don't visually crowd the card edge. */
 .rete-node__body:has(.rete-node__badges) {
-    justify-content: flex-start;
-    padding-top: 14px;
-    padding-bottom: 18px;
-    gap: 8px;
+    padding-bottom: 24px;
+    gap: 6px;
 }
 
 .rete-node__title {

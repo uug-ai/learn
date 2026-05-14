@@ -55,6 +55,10 @@ const PALETTE_SECTIONS = [
             { kind: 'pipeline-dominantcolor', header: 'PIPELINE', title: 'Dominant color', subtitle: 'hub-pipeline-dominantcolor', w: 240, h: 130 },
             { kind: 'pipeline-thumbnail',     header: 'PIPELINE', title: 'Thumbnail',      subtitle: 'hub-pipeline-thumbnail',     w: 240, h: 130 },
             { kind: 'pipeline-export',        header: 'PIPELINE', title: 'Export',         subtitle: 'hub-pipeline-export',        w: 240, h: 130 },
+            { kind: 'pipeline-counting',      header: 'PIPELINE', title: 'Counting',       subtitle: 'hub-pipeline-counting',      w: 240, h: 130 },
+            { kind: 'pipeline-licenseplate',  header: 'PIPELINE', title: 'License plate',  subtitle: 'hub-pipeline-licenseplate',  w: 240, h: 130 },
+            { kind: 'pipeline-nohelmet',      header: 'PIPELINE', title: 'No helmet',      subtitle: 'hub-pipeline-nohelmet',      w: 240, h: 130 },
+            { kind: 'pipeline-llm',           header: 'PIPELINE', title: 'LLM',            subtitle: 'hub-pipeline-llm',           w: 240, h: 130 },
         ],
     },
 ];
@@ -76,6 +80,10 @@ const KIND_LABELS = {
     'pipeline-dominantcolor': 'Dominant color',
     'pipeline-thumbnail':     'Thumbnail',
     'pipeline-export':        'Export',
+    'pipeline-counting':      'Counting',
+    'pipeline-licenseplate':  'License plate',
+    'pipeline-nohelmet':      'No helmet',
+    'pipeline-llm':           'LLM',
     default: 'Generic node',
 };
 
@@ -1468,6 +1476,10 @@ ${css}
             'pipeline-dominantcolor': '#be185d',
             'pipeline-thumbnail':     '#be185d',
             'pipeline-export':        '#be185d',
+            'pipeline-counting':      '#be185d',
+            'pipeline-licenseplate':  '#be185d',
+            'pipeline-nohelmet':      '#be185d',
+            'pipeline-llm':           '#be185d',
             default: '#6b7280',
         };
         // Build content.
