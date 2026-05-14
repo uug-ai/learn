@@ -291,6 +291,8 @@ class Designer {
         });
         this.viewport.appendChild(this.anchorLayer);
 
+        this.buildMinimap();
+
         // Pan/zoom transform.
         this.scale = 1; this.tx = 80; this.ty = 80;
         this.applyViewport();
@@ -678,6 +680,7 @@ class Designer {
         this.renderSelection();
         this.renderInspector();
         this.renderSource();
+        this.renderMinimap();
     }
 
     renderConnections() {
@@ -819,6 +822,9 @@ class Designer {
     }
 
     renderInspector() {
+        // Don't blow away the panel while the user is typing in one of its
+        // inputs — re-rendering would steal focus on every keystroke.
+        if (this.inspector.contains(document.activeElement)) return;
         const sel = state.selection;
         if (!sel) {
             this.inspector.innerHTML = '<p class="designer__inspector-empty">Select a node or group to edit its properties.</p>';
@@ -1035,6 +1041,7 @@ class Designer {
         this._sourceRaf = requestAnimationFrame(() => {
             this._sourceRaf = 0;
             this.renderSource();
+            this.renderMinimap();
         });
     }
 
@@ -1313,6 +1320,141 @@ ${css}
 
     applyViewport() {
         this.viewport.style.transform = `translate(${this.tx}px, ${this.ty}px) scale(${this.scale})`;
+        this.renderMinimap();
+    }
+
+    // ---- Minimap --------------------------------------------------------
+    buildMinimap() {
+        const map = document.createElement('div');
+        map.className = 'designer__minimap';
+        map.title = 'Minimap — click or drag to pan';
+        const svg = document.createElementNS(SVG_NS, 'svg');
+        svg.setAttribute('class', 'designer__minimap-svg');
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        map.appendChild(svg);
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'designer__minimap-toggle';
+        toggle.title = 'Hide minimap';
+        toggle.textContent = '\u2013';
+        toggle.addEventListener('click', e => {
+            e.stopPropagation();
+            const collapsed = map.classList.toggle('is-collapsed');
+            toggle.textContent = collapsed ? '\u25A1' : '\u2013';
+            toggle.title = collapsed ? 'Show minimap' : 'Hide minimap';
+            if (!collapsed) this.renderMinimap();
+        });
+        map.appendChild(toggle);
+        this.canvas.appendChild(map);
+        this.minimap = map;
+        this.minimapSvg = svg;
+        this.bindMinimapInput();
+    }
+
+    bindMinimapInput() {
+        const map = this.minimap;
+        // Click/drag on the minimap pans the main viewport so the chosen
+        // canvas point lands at the centre of the visible area.
+        const panTo = (clientX, clientY) => {
+            if (!this._minimapBounds) return;
+            const { minX, minY, w, h } = this._minimapBounds;
+            const rect = map.getBoundingClientRect();
+            const fx = (clientX - rect.left) / rect.width;
+            const fy = (clientY - rect.top)  / rect.height;
+            const cx = minX + fx * w;
+            const cy = minY + fy * h;
+            const canvasRect = this.canvas.getBoundingClientRect();
+            this.tx = canvasRect.width  / 2 - cx * this.scale;
+            this.ty = canvasRect.height / 2 - cy * this.scale;
+            this.applyViewport();
+        };
+        let dragging = false;
+        map.addEventListener('mousedown', e => {
+            if (map.classList.contains('is-collapsed')) {
+                map.classList.remove('is-collapsed');
+                map.querySelector('.designer__minimap-toggle').textContent = '\u2013';
+                this.renderMinimap();
+                e.stopPropagation();
+                return;
+            }
+            if (e.target.classList.contains('designer__minimap-toggle')) return;
+            dragging = true;
+            panTo(e.clientX, e.clientY);
+            e.stopPropagation();
+            e.preventDefault();
+        });
+        window.addEventListener('mousemove', e => {
+            if (!dragging) return;
+            panTo(e.clientX, e.clientY);
+        });
+        window.addEventListener('mouseup', () => { dragging = false; });
+    }
+
+    renderMinimap() {
+        if (!this.minimapSvg || this.minimap.classList.contains('is-collapsed')) return;
+        // World bounds: union of all geometry plus the current viewport so
+        // the visible area is always represented even when empty.
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        state.groups.forEach(g => {
+            minX = Math.min(minX, g.x); minY = Math.min(minY, g.y);
+            maxX = Math.max(maxX, g.x + g.w); maxY = Math.max(maxY, g.y + g.h);
+        });
+        state.nodes.forEach(n => {
+            minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
+            maxX = Math.max(maxX, n.x + (n.w || 220));
+            maxY = Math.max(maxY, n.y + (n.h || 120));
+        });
+        // Include the current viewport rect in world coordinates.
+        const cRect = this.canvas.getBoundingClientRect();
+        const vx = -this.tx / this.scale;
+        const vy = -this.ty / this.scale;
+        const vw = cRect.width / this.scale;
+        const vh = cRect.height / this.scale;
+        if (!isFinite(minX)) { minX = vx; minY = vy; maxX = vx + vw; maxY = vy + vh; }
+        minX = Math.min(minX, vx);
+        minY = Math.min(minY, vy);
+        maxX = Math.max(maxX, vx + vw);
+        maxY = Math.max(maxY, vy + vh);
+        // Add a margin so things don't kiss the edge.
+        const pad = 60;
+        minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+        const w = maxX - minX, h = maxY - minY;
+        this._minimapBounds = { minX, minY, w, h };
+        const svg = this.minimapSvg;
+        svg.setAttribute('viewBox', `${minX} ${minY} ${w} ${h}`);
+        // Per-kind header colors that mirror --rete-node-color in CSS.
+        const KIND_COLOR = {
+            vault: '#555f8e', storage: '#6b7280', hub: '#84559f',
+            agent: '#4a796b', factory: '#4a796b', camera: '#374151',
+            amqp: '#b45309', turn: '#1d4ed8', mqtt: '#0f766e',
+            default: '#6b7280',
+        };
+        // Build content.
+        let html = '';
+        state.groups.forEach(g => {
+            html += `<rect class="designer__minimap-group" x="${g.x}" y="${g.y}" width="${g.w}" height="${g.h}" rx="6"/>`;
+            if (g.label) {
+                html += `<text class="designer__minimap-group-label" x="${g.x + 8}" y="${g.y + 16}">${escapeXml(g.label)}</text>`;
+            }
+        });
+        state.nodes.forEach(n => {
+            const nw = n.w || 220, nh = n.h || 120;
+            const headerH = Math.max(14, Math.min(nh * 0.28, 28));
+            const color = KIND_COLOR[n.kind] || KIND_COLOR.default;
+            // Body card.
+            html += `<rect class="designer__minimap-node-body" x="${n.x}" y="${n.y}" width="${nw}" height="${nh}" rx="6"/>`;
+            // Colored header pill (top portion only, with rounded top corners
+            // — the bottom corners stay flat against the body).
+            html += `<path class="designer__minimap-node-header" fill="${color}" d="${roundedTopPath(n.x, n.y, nw, headerH, 6)}"/>`;
+            // Title text inside the body.
+            const title = n.title || n.header || '';
+            if (title) {
+                const ty = n.y + headerH + Math.max(14, (nh - headerH) / 2 + 4);
+                html += `<text class="designer__minimap-node-title" x="${n.x + nw / 2}" y="${ty}" text-anchor="middle">${escapeXml(title)}</text>`;
+            }
+        });
+        html += `<rect class="designer__minimap-viewport" x="${vx}" y="${vy}" width="${vw}" height="${vh}" rx="3"/>`;
+        svg.innerHTML = html;
     }
 
     fit() {
@@ -1696,6 +1838,20 @@ function escapeXml(s) {
     return String(s)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+
+// Build an SVG path describing a rectangle with only its top corners rounded.
+// Used by the minimap to draw the colored header pill on each miniature node.
+function roundedTopPath(x, y, w, h, r) {
+    const rr = Math.max(0, Math.min(r, w / 2, h));
+    return `M${x + rr} ${y}` +
+           `H${x + w - rr}` +
+           `Q${x + w} ${y} ${x + w} ${y + rr}` +
+           `V${y + h}` +
+           `H${x}` +
+           `V${y + rr}` +
+           `Q${x} ${y} ${x + rr} ${y}` +
+           `Z`;
 }
 
 // Load a same-origin (or CORS-enabled) URL and return a `data:` URI for it.
