@@ -34,6 +34,14 @@ const PALETTE_SECTIONS = [
             { kind: 'factory', header: 'FACTORY', title: 'Factory', subtitle: 'Orchestrate',        w: 240, h: 150 },
         ],
     },
+    {
+        title: 'Dependencies',
+        items: [
+            { kind: 'amqp', header: 'AMQP', title: 'AMQP', subtitle: 'Message broker',     w: 220, h: 130 },
+            { kind: 'turn', header: 'TURN', title: 'TURN', subtitle: 'WebRTC relay',        w: 220, h: 130 },
+            { kind: 'mqtt', header: 'MQTT', title: 'MQTT', subtitle: 'Pub/sub broker',      w: 220, h: 130 },
+        ],
+    },
 ];
 
 // Flat list kept for any consumers that just want the full catalogue.
@@ -41,7 +49,9 @@ const PALETTE = PALETTE_SECTIONS.flatMap(s => s.items);
 
 const KIND_LABELS = {
     camera: 'Camera', agent: 'Agent', vault: 'Vault', storage: 'Object Storage',
-    hub: 'Hub', factory: 'Factory', default: 'Generic node',
+    hub: 'Hub', factory: 'Factory',
+    amqp: 'AMQP', turn: 'TURN', mqtt: 'MQTT',
+    default: 'Generic node',
 };
 
 // Grid step (in canvas units) used to align nodes/groups during drag and
