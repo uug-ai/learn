@@ -1332,6 +1332,34 @@ ${css}
     }
 
     bindCanvasInput() {
+        // Group-edge hit zone: if the user clicks within ~12 canvas-units of
+        // a group's perimeter, prefer selecting the group even when a child
+        // node sits on top. Runs in the capture phase so it intercepts the
+        // node's own mousedown handler.
+        this.viewport.addEventListener('mousedown', e => {
+            if (e.button !== 0) return;
+            if (e.target.closest('.designer__resize, .designer__anchor, .rete-connection, .rete-connection-hit, .rete-group__label')) return;
+            // Convert client coords to canvas-units.
+            const rect = this.canvas.getBoundingClientRect();
+            const cx = (e.clientX - rect.left - this.tx) / this.scale;
+            const cy = (e.clientY - rect.top  - this.ty) / this.scale;
+            const EDGE = 12;
+            const matches = state.groups.filter(g => {
+                const inOuter = cx >= g.x - EDGE && cx <= g.x + g.w + EDGE &&
+                                cy >= g.y - EDGE && cy <= g.y + g.h + EDGE;
+                if (!inOuter) return false;
+                const inInner = cx > g.x + EDGE && cx < g.x + g.w - EDGE &&
+                                cy > g.y + EDGE && cy < g.y + g.h - EDGE;
+                return !inInner; // only the rim counts
+            });
+            if (!matches.length) return;
+            // Smallest matching group wins (most specific).
+            matches.sort((a, b) => (a.w * a.h) - (b.w * b.h));
+            this.select({ type: 'group', id: matches[0].id });
+            e.stopPropagation();
+            e.preventDefault();
+        }, true);
+
         // Pan + click-to-deselect.
         let panning = false, sx = 0, sy = 0, otx = 0, oty = 0, moved = false;
         this.canvas.addEventListener('mousedown', e => {
