@@ -167,6 +167,16 @@ html.dark .rete-node,
 .rete-node--amqp    { --rete-node-color: #b45309; } /* amber  */
 .rete-node--turn    { --rete-node-color: #1d4ed8; } /* blue   */
 .rete-node--mqtt    { --rete-node-color: #0f766e; } /* cyan   */
+.rete-node--pipeline-monitor       { --rete-node-color: #be185d; } /* pink   */
+.rete-node--pipeline-sequence      { --rete-node-color: #be185d; }
+.rete-node--pipeline-analysis      { --rete-node-color: #be185d; }
+.rete-node--pipeline-classifier    { --rete-node-color: #be185d; }
+.rete-node--pipeline-threshold     { --rete-node-color: #be185d; }
+.rete-node--pipeline-notification  { --rete-node-color: #be185d; }
+.rete-node--pipeline-sprite        { --rete-node-color: #be185d; }
+.rete-node--pipeline-dominantcolor { --rete-node-color: #be185d; }
+.rete-node--pipeline-thumbnail     { --rete-node-color: #be185d; }
+.rete-node--pipeline-export        { --rete-node-color: #be185d; }
 
 .rete-node__header {
     padding: 8px 14px;

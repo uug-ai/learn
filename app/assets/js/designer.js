@@ -42,6 +42,21 @@ const PALETTE_SECTIONS = [
             { kind: 'mqtt', header: 'MQTT', title: 'MQTT', subtitle: 'Pub/sub broker',      w: 220, h: 130 },
         ],
     },
+    {
+        title: 'Services',
+        items: [
+            { kind: 'pipeline-monitor',       header: 'PIPELINE', title: 'Monitor',        subtitle: 'hub-pipeline-monitor',       w: 240, h: 130 },
+            { kind: 'pipeline-sequence',      header: 'PIPELINE', title: 'Sequence',       subtitle: 'hub-pipeline-sequence',      w: 240, h: 130 },
+            { kind: 'pipeline-analysis',      header: 'PIPELINE', title: 'Analysis',       subtitle: 'hub-pipeline-analysis',      w: 240, h: 130 },
+            { kind: 'pipeline-classifier',    header: 'PIPELINE', title: 'Classifier',     subtitle: 'hub-pipeline-classifier',    w: 240, h: 130 },
+            { kind: 'pipeline-threshold',     header: 'PIPELINE', title: 'Threshold',      subtitle: 'hub-pipeline-threshold',     w: 240, h: 130 },
+            { kind: 'pipeline-notification',  header: 'PIPELINE', title: 'Notification',   subtitle: 'hub-pipeline-notification',  w: 240, h: 130 },
+            { kind: 'pipeline-sprite',        header: 'PIPELINE', title: 'Sprite',         subtitle: 'hub-pipeline-sprite',        w: 240, h: 130 },
+            { kind: 'pipeline-dominantcolor', header: 'PIPELINE', title: 'Dominant color', subtitle: 'hub-pipeline-dominantcolor', w: 240, h: 130 },
+            { kind: 'pipeline-thumbnail',     header: 'PIPELINE', title: 'Thumbnail',      subtitle: 'hub-pipeline-thumbnail',     w: 240, h: 130 },
+            { kind: 'pipeline-export',        header: 'PIPELINE', title: 'Export',         subtitle: 'hub-pipeline-export',        w: 240, h: 130 },
+        ],
+    },
 ];
 
 // Flat list kept for any consumers that just want the full catalogue.
@@ -51,6 +66,16 @@ const KIND_LABELS = {
     camera: 'Camera', agent: 'Agent', vault: 'Vault', storage: 'Object Storage',
     hub: 'Hub', factory: 'Factory',
     amqp: 'AMQP', turn: 'TURN', mqtt: 'MQTT',
+    'pipeline-monitor':       'Monitor',
+    'pipeline-sequence':      'Sequence',
+    'pipeline-analysis':      'Analysis',
+    'pipeline-classifier':    'Classifier',
+    'pipeline-threshold':     'Threshold',
+    'pipeline-notification':  'Notification',
+    'pipeline-sprite':        'Sprite',
+    'pipeline-dominantcolor': 'Dominant color',
+    'pipeline-thumbnail':     'Thumbnail',
+    'pipeline-export':        'Export',
     default: 'Generic node',
 };
 
@@ -1427,6 +1452,16 @@ ${css}
             vault: '#555f8e', storage: '#6b7280', hub: '#84559f',
             agent: '#4a796b', factory: '#4a796b', camera: '#374151',
             amqp: '#b45309', turn: '#1d4ed8', mqtt: '#0f766e',
+            'pipeline-monitor':       '#be185d',
+            'pipeline-sequence':      '#be185d',
+            'pipeline-analysis':      '#be185d',
+            'pipeline-classifier':    '#be185d',
+            'pipeline-threshold':     '#be185d',
+            'pipeline-notification':  '#be185d',
+            'pipeline-sprite':        '#be185d',
+            'pipeline-dominantcolor': '#be185d',
+            'pipeline-thumbnail':     '#be185d',
+            'pipeline-export':        '#be185d',
             default: '#6b7280',
         };
         // Build content.

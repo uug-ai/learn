@@ -209,6 +209,47 @@ html.dark .designer__hints kbd,
     border-color: rgba(255, 255, 255, 0.15);
 }
 
+/* Tips: collapsed by default, revealed on hover or focus.
+   Uses a <details> so it remains keyboard accessible. */
+.designer__tips {
+    margin-top: 14px;
+}
+
+.designer__tips-summary {
+    list-style: none;
+    cursor: help;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.designer__tips-summary::-webkit-details-marker { display: none; }
+
+.designer__tips-summary::after {
+    content: '\25BE'; /* small down triangle */
+    font-size: 10px;
+    opacity: 0.6;
+    transition: transform 120ms ease;
+}
+
+.designer__tips[open] .designer__tips-summary::after,
+.designer__tips:hover .designer__tips-summary::after,
+.designer__tips:focus-within .designer__tips-summary::after {
+    transform: rotate(180deg);
+}
+
+.designer__tips .designer__hints {
+    display: none;
+    margin-top: 8px;
+}
+
+.designer__tips[open] .designer__hints,
+.designer__tips:hover .designer__hints,
+.designer__tips:focus-within .designer__hints {
+    display: block;
+}
+
 /* --- Canvas + toolbar (centre). --- */
 .designer__canvas-wrap {
     display: flex;
