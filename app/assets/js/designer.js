@@ -300,17 +300,26 @@ class Designer {
     }
 
     // Try to populate state from the URL fragment, e.g.
-    //   /designer/#diagram=<base64-of-json>
+    //   /designer/#diagram=<base64-of-json>&fullscreen=1
     // Returns true on success.
     loadFromUrl() {
         const hash = (window.location.hash || '').replace(/^#/, '');
         if (!hash) return false;
         const params = new URLSearchParams(hash);
         const encoded = params.get('diagram');
+        if (params.get('fullscreen') === '1' || params.get('fs') === '1') {
+            // Defer until after the initial render/fit so the layout is sized.
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                if (!this.root.classList.contains('is-fullscreen')) this.toggleFullscreen();
+            }));
+        }
         if (!encoded) return false;
         try {
             // Accept both standard and URL-safe base64.
-            const b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+            let b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+            // Re-pad if URL-safe encoding stripped trailing '=' chars.
+            const pad = b64.length % 4;
+            if (pad) b64 += '='.repeat(4 - pad);
             const json = decodeURIComponent(escape(atob(b64)));
             this.loadConfig(JSON.parse(json));
             return true;
@@ -546,6 +555,11 @@ class Designer {
             btn.setAttribute('aria-pressed', String(on));
             btn.title = on ? 'Exit fullscreen' : 'Toggle fullscreen';
         }
+        // Reflect fullscreen state in the URL so a refresh keeps it.
+        // Route through _writePersist so the diagram param keeps its
+        // URL-safe (un-percent-encoded) form and we don't duplicate logic.
+        if (this.lastConfig) this._pendingCfg = this.lastConfig;
+        this._writePersist();
         // Two RAFs: one for layout to apply the new size, one to refit.
         requestAnimationFrame(() => requestAnimationFrame(() => this.fit()));
     }
@@ -998,26 +1012,82 @@ class Designer {
         this.persistToUrl(cfg);
     }
 
+    // Throttle live URL updates during drag/resize to one per animation
+    // frame so we don't thrash history.replaceState on every mousemove.
+    scheduleSource() {
+        if (this._sourceRaf) return;
+        this._sourceRaf = requestAnimationFrame(() => {
+            this._sourceRaf = 0;
+            this.renderSource();
+        });
+    }
+
     // Mirror the current diagram into the URL fragment so an accidental
-    // refresh restores the same state. Debounced to avoid spamming the
-    // history API while dragging.
+    // refresh restores the same state. Throttled because browsers (Chrome
+    // in particular) rate-limit history.replaceState — around 100 calls
+    // per 30s — so writing on every mousemove silently drops updates.
     persistToUrl(cfg) {
+        this._pendingCfg = cfg;
+        const now = Date.now();
+        const since = now - (this._lastPersistAt || 0);
+        if (since >= 250) {
+            this._writePersist();
+            return;
+        }
+        if (this._persistTimer) return;
+        this._persistTimer = setTimeout(() => this._writePersist(), 250 - since);
+        if (!this._unloadHooked) {
+            this._unloadHooked = true;
+            const flush = () => this._writePersist();
+            window.addEventListener('beforeunload', flush);
+            window.addEventListener('pagehide', flush);
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') this._writePersist();
+            });
+        }
+    }
+
+    _writePersist() {
         clearTimeout(this._persistTimer);
-        this._persistTimer = setTimeout(() => {
-            try {
+        this._persistTimer = 0;
+        this._lastPersistAt = Date.now();
+        const cfg = this._pendingCfg;
+        try {
+            const existing = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
+            existing.delete('diagram');
+            existing.delete('fullscreen');
+            existing.delete('fs');
+            if (cfg) {
                 const empty = !cfg.nodes.length && !cfg.groups.length && !cfg.connections.length;
-                const base = window.location.pathname + window.location.search;
-                if (empty) {
-                    history.replaceState(null, '', base);
-                    return;
+                if (!empty) {
+                    const json = JSON.stringify(cfg);
+                    const b64 = btoa(unescape(encodeURIComponent(json)));
+                    // URL-safe base64 so the value isn't percent-encoded.
+                    const safe = b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                    existing.set('diagram', safe);
                 }
-                const json = JSON.stringify(cfg);
-                const b64 = btoa(unescape(encodeURIComponent(json)));
-                history.replaceState(null, '', `${base}#diagram=${b64}`);
-            } catch (err) {
-                // Non-fatal — just skip persistence for this tick.
             }
-        }, 150);
+            // Always reflect the current fullscreen state.
+            if (this.root && this.root.classList.contains('is-fullscreen')) {
+                existing.set('fullscreen', '1');
+            }
+            // Build the hash manually so the diagram value stays un-encoded.
+            const parts = [];
+            existing.forEach((v, k) => {
+                if (k === 'diagram') parts.push(`diagram=${v}`);
+                else parts.push(`${encodeURIComponent(k)}=${encodeURIComponent(v)}`);
+            });
+            const hash = parts.join('&');
+            const base = window.location.pathname + window.location.search;
+            try {
+                history.replaceState(null, '', hash ? `${base}#${hash}` : base);
+            } catch (e) {
+                // Fallback if replaceState is throttled/unavailable.
+                window.location.hash = hash;
+            }
+        } catch (err) {
+            console.warn('Designer: persistToUrl failed', err);
+        }
     }
 
     async copyShortcode() {
@@ -1039,7 +1109,14 @@ class Designer {
             return;
         }
         const base = `${window.location.origin}${window.location.pathname}`;
-        const url = `${base}#diagram=${b64}`;
+        const params = new URLSearchParams();
+        params.set('diagram', b64);
+        // If the user is currently in fullscreen, the link will reopen in
+        // fullscreen too.
+        if (this.root.classList.contains('is-fullscreen')) {
+            params.set('fullscreen', '1');
+        }
+        const url = `${base}#${params.toString()}`;
         await this.copyText(url, 'Copied share URL to clipboard.');
     }
 
@@ -1324,6 +1401,7 @@ ${css}
             el.style.transform = `translate(${n.x}px, ${n.y}px)`;
             this.renderConnections();
             this.renderAnchors();
+            this.scheduleSource();
         });
         window.addEventListener('mouseup', () => {
             if (!dragging) return;
@@ -1406,6 +1484,7 @@ ${css}
                 if (childEl) childEl.style.transform = `translate(${node.x}px, ${node.y}px)`;
             });
             this.renderConnections();
+            this.scheduleSource();
         });
         window.addEventListener('mouseup', () => {
             if (!dragging) return;
@@ -1467,6 +1546,7 @@ ${css}
                 if (childEl) childEl.style.transform = `translate(${n.x}px, ${n.y}px)`;
             });
             this.renderConnections();
+            this.scheduleSource();
         });
         window.addEventListener('mouseup', () => {
             if (!dragging) return;
