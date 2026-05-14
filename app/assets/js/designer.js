@@ -44,6 +44,12 @@ const KIND_LABELS = {
     hub: 'Hub', factory: 'Factory', default: 'Generic node',
 };
 
+// Grid step (in canvas units) used to align nodes/groups during drag and
+// resize. Holding Shift while dragging temporarily disables snapping for
+// freeform placement.
+const GRID = 20;
+const snap = (v) => Math.round(v / GRID) * GRID;
+
 // --- State ----------------------------------------------------------------
 
 const state = {
@@ -1386,8 +1392,14 @@ ${css}
                 moved = true;
                 if (!snapped) { this.pushHistory(); snapped = true; }
             }
-            n.x = Math.round(ox + dx);
-            n.y = Math.round(oy + dy);
+            // Snap to grid for clean alignment; Shift disables snapping.
+            if (e.shiftKey) {
+                n.x = Math.round(ox + dx);
+                n.y = Math.round(oy + dy);
+            } else {
+                n.x = snap(ox + dx);
+                n.y = snap(oy + dy);
+            }
             // Constrain to parent group unless the user is holding Alt to
             // “decouple” the node mid-drag.
             if (e.altKey) altUsed = true;
@@ -1474,12 +1486,19 @@ ${css}
                 moved = true;
                 if (!snapped) { this.pushHistory(); snapped = true; }
             }
-            g.x = Math.round(ox + dx);
-            g.y = Math.round(oy + dy);
+            // Snap the group origin to the grid; children move by the same
+            // snapped delta so their relative offsets are preserved.
+            const useSnap = !e.shiftKey;
+            const nx = useSnap ? snap(ox + dx) : Math.round(ox + dx);
+            const ny = useSnap ? snap(oy + dy) : Math.round(oy + dy);
+            const sdx = nx - ox;
+            const sdy = ny - oy;
+            g.x = nx;
+            g.y = ny;
             el.style.transform = `translate(${g.x}px, ${g.y}px)`;
             childOffsets.forEach(({ node, ox: nox, oy: noy }) => {
-                node.x = Math.round(nox + dx);
-                node.y = Math.round(noy + dy);
+                node.x = Math.round(nox + sdx);
+                node.y = Math.round(noy + sdy);
                 const childEl = this.nodeEls.get(node.id);
                 if (childEl) childEl.style.transform = `translate(${node.x}px, ${node.y}px)`;
             });
@@ -1533,6 +1552,21 @@ ${css}
             if (dir.includes('n')) {
                 nh = Math.max(MIN_H, oh - dy);
                 ny = oy + (oh - nh);
+            }
+            // Snap to grid for clean alignment; Shift disables snapping.
+            if (!e.shiftKey) {
+                if (dir.includes('e')) nw = Math.max(MIN_W, snap(nw));
+                if (dir.includes('s')) nh = Math.max(MIN_H, snap(nh));
+                if (dir.includes('w')) {
+                    const snappedX = snap(nx);
+                    nw = Math.max(MIN_W, ow + (ox - snappedX));
+                    nx = snappedX;
+                }
+                if (dir.includes('n')) {
+                    const snappedY = snap(ny);
+                    nh = Math.max(MIN_H, oh + (oy - snappedY));
+                    ny = snappedY;
+                }
             }
             g.x = Math.round(nx); g.y = Math.round(ny);
             g.w = Math.round(nw); g.h = Math.round(nh);
