@@ -50,15 +50,15 @@ Hub processes every recording through a pipeline of small, focused microservices
       "header": "PIPE SERVICE", "title": "Sprite",         "subtitle": "Video timelapse" },
     { "id": "classifier",  "kind": "pipeline-classifier",    "x":  710, "y": 480, "w": 200, "h": 130,
       "header": "PIPE SERVICE", "title": "Classification", "subtitle": "Object detection" },
-    { "id": "counting",    "kind": "pipeline-counting",      "x":  930, "y": 480, "w": 200, "h": 130,
-      "header": "PIPE SERVICE", "title": "Counting",       "subtitle": "Object counting" },
 
     { "id": "licenseplate", "kind": "pipeline-licenseplate", "x":  270, "y": 660, "w": 200, "h": 130,
       "header": "PIPE SERVICE", "title": "License plate", "subtitle": "OCR processing" },
     { "id": "nohelmet",     "kind": "pipeline-nohelmet",     "x":  490, "y": 660, "w": 200, "h": 130,
       "header": "PIPE SERVICE", "title": "No helmet",     "subtitle": "Safety detection" },
     { "id": "llm",          "kind": "pipeline-llm",          "x":  710, "y": 660, "w": 200, "h": 130,
-      "header": "PIPE SERVICE", "title": "LLM",           "subtitle": "Large language model" }
+      "header": "PIPE SERVICE", "title": "LLM",           "subtitle": "Large language model" },
+    { "id": "counting",    "kind": "pipeline-counting",      "x":  930, "y": 660, "w": 200, "h": 130,
+      "header": "PIPE SERVICE", "title": "Counting",       "subtitle": "Object counting" }
   ],
   "connections": [
     { "from": "camera",   "to": "agent",    "fromSide": "left",  "toSide": "right" },
@@ -75,8 +75,8 @@ Hub processes every recording through a pipeline of small, focused microservices
     { "from": "analysis",  "to": "thumbnail",  "fromSide": "bottom", "toSide": "top" },
     { "from": "analysis",  "to": "dominant",   "fromSide": "bottom", "toSide": "top" },
     { "from": "analysis",  "to": "classifier", "fromSide": "bottom", "toSide": "top" },
-    { "from": "analysis",  "to": "counting",   "fromSide": "bottom", "toSide": "top" },
 
+    { "from": "classifier", "to": "counting", "fromSide": "bottom", "toSide": "top", "kind": "dashed" },
     { "from": "classifier", "to": "nohelmet", "fromSide": "bottom", "toSide": "top", "kind": "dashed" },
     { "from": "classifier", "to": "llm",      "fromSide": "bottom", "toSide": "top", "kind": "dashed" }
   ]
