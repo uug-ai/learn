@@ -24,6 +24,8 @@ The default Hub pipeline is intentionally opinionated: a recording arrives from 
 - A retail store only needs people detection during opening hours.
 - A logistics site wants license-plate recognition on the parking camera, but a no-helmet model on the warehouse camera.
 - A control room wants high-frequency anomaly detection on a few critical cameras, and a low-frequency throttle on the rest to keep costs down.
+- A reception desk wants to chain models: first run person detection on the camera, and only when a person is found, pass those frames to face recognition — saving the heavier model from running on empty scenes.
+- A parking lot wants to detect vehicles first, and only forward those frames to the license-plate reader — avoiding wasted OCR runs on empty asphalt.
 
 Workflows expose the building blocks of the pipeline as a small, visual graph so a non-developer can express exactly that — per camera, per time window, per use-case.
 
