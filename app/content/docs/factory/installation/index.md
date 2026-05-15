@@ -19,7 +19,40 @@ You can run Kerberos Factory wherever you can run a Kubernetes cluster, so it ca
 
 When running a managed Kubernetes cluster, such as [GKE](https://cloud.google.com/kubernetes-engine), [EKS](https://aws.amazon.com/eks/) or  or [AKS](https://azure.microsoft.com/en-us/products/kubernetes-service/), you will have a wide range of superpowers such as a `LoadBalancer` service, automatic `Volume` creation, etc. The latter is something what is missing in an self-hosted deployment, where you will have to prepare the volumes yourself and install an edge load balancer like `MetalLB`.
 
-{{< figure src="factory-edge-cloud.svg" alt="Kerberos Factory can be installed everywhere your Kubernetes cluster can be installed." caption="Kerberos Factory can be installed everywhere your Kubernetes cluster can be installed." class="stretch">}}
+{{< rete caption="Kerberos Factory can be installed everywhere your Kubernetes cluster can be installed." alt="Kerberos Factory can be installed everywhere your Kubernetes cluster can be installed." height="780" >}}
+{
+  "groups": [
+    { "id": "edge",  "label": "Edge Kubernetes",    "x":   0, "y": 20, "w": 460, "h": 760 },
+    { "id": "cloud", "label": "Managed Kubernetes", "x": 560, "y": 20, "w": 460, "h": 760 }
+  ],
+  "nodes": [
+    { "id": "edge-factory", "kind": "factory", "x":  110, "y":  80, "w": 240, "h": 160,
+      "header": "FACTORY", "title": "Factory", "subtitle": "Self-hosted", "badges": ["kubernetes"] },
+    { "id": "edge-agent-1", "kind": "agent",   "x":  110, "y": 280, "w": 240, "h": 110,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Provisioned at edge" },
+    { "id": "edge-agent-2", "kind": "agent",   "x":  110, "y": 420, "w": 240, "h": 110,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Provisioned at edge" },
+    { "id": "edge-agent-3", "kind": "agent",   "x":  110, "y": 560, "w": 240, "h": 110,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Provisioned at edge" },
+    { "id": "cloud-factory","kind": "factory", "x": 670, "y":  80, "w": 240, "h": 160,
+      "header": "FACTORY", "title": "Factory", "subtitle": "Managed cloud",  "badges": ["kubernetes"] },
+    { "id": "cloud-agent-1","kind": "agent",   "x": 670, "y": 280, "w": 240, "h": 110,
+      "header": "AGENT", "title": "Agent 1", "subtitle": "Provisioned in cloud" },
+    { "id": "cloud-agent-2","kind": "agent",   "x": 670, "y": 420, "w": 240, "h": 110,
+      "header": "AGENT", "title": "Agent 2", "subtitle": "Provisioned in cloud" },
+    { "id": "cloud-agent-3","kind": "agent",   "x": 670, "y": 560, "w": 240, "h": 110,
+      "header": "AGENT", "title": "Agent 3", "subtitle": "Provisioned in cloud" }
+  ],
+  "connections": [
+    { "from": "edge-factory",  "to": "edge-agent-1",  "fromSide": "bottom", "toSide": "top", "label": "provisions" },
+    { "from": "edge-factory",  "to": "edge-agent-2",  "fromSide": "bottom", "toSide": "top" },
+    { "from": "edge-factory",  "to": "edge-agent-3",  "fromSide": "bottom", "toSide": "top" },
+    { "from": "cloud-factory", "to": "cloud-agent-1", "fromSide": "bottom", "toSide": "top", "label": "provisions" },
+    { "from": "cloud-factory", "to": "cloud-agent-2", "fromSide": "bottom", "toSide": "top" },
+    { "from": "cloud-factory", "to": "cloud-agent-3", "fromSide": "bottom", "toSide": "top" }
+  ]
+}
+{{< /rete >}}
 
 ## Managed Kubernetes
 
@@ -27,7 +60,38 @@ Installing Kerberos Factory in a managed Kubernetes cluster (Azure, GCP, AWS) is
 
 > Install Kerberos Factory in a managed Kubernetes cluster by [following this step-by-step installation guide](https://github.com/kerberos-io/factory/tree/master/kubernetes#b-managed-kubernetes-1).
 
-{{< figure src="factory-cloud.svg" alt="Kerberos Factory managed cluster" caption="Kerberos Factory managed cluster" class="stretch">}}
+{{< rete caption="Kerberos Factory managed cluster" alt="Kerberos Factory managed cluster" height="540" >}}
+{
+  "groups": [
+    { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 460, "h": 680 },
+    { "id": "edge",  "label": "Edge",  "x": 560, "y": 20, "w": 360, "h": 680 }
+  ],
+  "nodes": [
+    { "id": "factory", "kind": "factory", "x":  110, "y":  80, "w": 240, "h": 160,
+      "header": "AS A SERVICE", "title": "Factory", "subtitle": "Scale agents", "badges": ["kubernetes"] },
+    { "id": "agent-1", "kind": "agent", "x":  110, "y": 280, "w": 240, "h": 110,
+      "header": "RECORD", "title": "Agent 1", "subtitle": "Process stream" },
+    { "id": "agent-2", "kind": "agent", "x":  110, "y": 410, "w": 240, "h": 110,
+      "header": "RECORD", "title": "Agent 2", "subtitle": "Process stream" },
+    { "id": "agent-3", "kind": "agent", "x":  110, "y": 540, "w": 240, "h": 110,
+      "header": "RECORD", "title": "Agent 3", "subtitle": "Process stream" },
+    { "id": "cam-1", "kind": "camera", "x": 620, "y": 280, "w": 240, "h": 110,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x": 620, "y": 410, "w": 240, "h": 110,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "cam-3", "kind": "camera", "x": 620, "y": 540, "w": 240, "h": 110,
+      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" }
+  ],
+  "connections": [
+    { "from": "factory", "to": "agent-1", "fromSide": "bottom", "toSide": "top", "label": "provisions" },
+    { "from": "factory", "to": "agent-2", "fromSide": "bottom", "toSide": "top" },
+    { "from": "factory", "to": "agent-3", "fromSide": "bottom", "toSide": "top" },
+    { "from": "agent-1", "to": "cam-1", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-2", "to": "cam-2", "fromSide": "right", "toSide": "left" },
+    { "from": "agent-3", "to": "cam-3", "fromSide": "right", "toSide": "left" }
+  ]
+}
+{{< /rete >}}
 
 ## Self-hosted Kubernetes
 
@@ -37,4 +101,46 @@ In contradiction to the Kubernetes Service Provider, there will be more work req
 
 > Install Kerberos Factory on a private cloud or at the edge by [following this step-by-step installation guide](https://github.com/kerberos-io/factory/tree/master/kubernetes#a-self-hosted-kubernetes-1).
 
-{{< figure src="factory-edge.svg" alt="Kerberos Factory self-hosted cluster" caption="Kerberos Factory self-hosted cluster" class="stretch">}}
+{{< rete caption="Kerberos Factory self-hosted cluster" alt="Kerberos Factory self-hosted cluster" height="780" >}}
+{
+  "groups": [
+    { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 460, "h": 760 },
+    { "id": "edge",  "label": "Edge",  "x": 560, "y": 20, "w": 820, "h": 760 }
+  ],
+  "nodes": [
+    { "id": "cloud-factory", "kind": "factory", "x":  110, "y":  80, "w": 240, "h": 160,
+      "header": "PRIVATE CLOUD", "title": "Factory", "subtitle": "Scale agents", "badges": ["kubernetes"] },
+    { "id": "cloud-agent-1", "kind": "agent", "x":  110, "y": 280, "w": 240, "h": 110,
+      "header": "RECORD", "title": "Agent 1", "subtitle": "Process stream" },
+    { "id": "cloud-agent-2", "kind": "agent", "x":  110, "y": 410, "w": 240, "h": 110,
+      "header": "RECORD", "title": "Agent 2", "subtitle": "Process stream" },
+    { "id": "cloud-agent-3", "kind": "agent", "x":  110, "y": 540, "w": 240, "h": 110,
+      "header": "RECORD", "title": "Agent 3", "subtitle": "Process stream" },
+    { "id": "edge-factory", "kind": "factory", "x":  670, "y":  80, "w": 240, "h": 160,
+      "header": "SELF-HOSTED", "title": "Factory", "subtitle": "Scale agents", "badges": ["kubernetes"] },
+    { "id": "edge-agent-1", "kind": "agent", "x":  670, "y": 280, "w": 240, "h": 110,
+      "header": "RECORD", "title": "Agent 1", "subtitle": "Process stream" },
+    { "id": "edge-agent-2", "kind": "agent", "x":  670, "y": 410, "w": 240, "h": 110,
+      "header": "RECORD", "title": "Agent 2", "subtitle": "Process stream" },
+    { "id": "edge-agent-3", "kind": "agent", "x":  670, "y": 540, "w": 240, "h": 110,
+      "header": "RECORD", "title": "Agent 3", "subtitle": "Process stream" },
+    { "id": "cam-1", "kind": "camera", "x": 1120, "y": 280, "w": 240, "h": 110,
+      "header": "CAMERA", "title": "Camera 1", "subtitle": "RTSP://" },
+    { "id": "cam-2", "kind": "camera", "x": 1120, "y": 410, "w": 240, "h": 110,
+      "header": "CAMERA", "title": "Camera 2", "subtitle": "RTSP://" },
+    { "id": "cam-3", "kind": "camera", "x": 1120, "y": 540, "w": 240, "h": 110,
+      "header": "CAMERA", "title": "Camera 3", "subtitle": "RTSP://" }
+  ],
+  "connections": [
+    { "from": "cloud-factory", "to": "cloud-agent-1", "fromSide": "bottom", "toSide": "top", "label": "provisions" },
+    { "from": "cloud-factory", "to": "cloud-agent-2", "fromSide": "bottom", "toSide": "top" },
+    { "from": "cloud-factory", "to": "cloud-agent-3", "fromSide": "bottom", "toSide": "top" },
+    { "from": "edge-factory", "to": "edge-agent-1", "fromSide": "bottom", "toSide": "top", "label": "provisions" },
+    { "from": "edge-factory", "to": "edge-agent-2", "fromSide": "bottom", "toSide": "top" },
+    { "from": "edge-factory", "to": "edge-agent-3", "fromSide": "bottom", "toSide": "top" },
+    { "from": "edge-agent-1", "to": "cam-1", "fromSide": "right", "toSide": "left" },
+    { "from": "edge-agent-2", "to": "cam-2", "fromSide": "right", "toSide": "left" },
+    { "from": "edge-agent-3", "to": "cam-3", "fromSide": "right", "toSide": "left" }
+  ]
+}
+{{< /rete >}}

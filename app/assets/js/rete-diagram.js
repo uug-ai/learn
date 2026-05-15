@@ -44,6 +44,12 @@ function createNodeEl(n) {
         header.textContent = n.header;
         el.appendChild(header);
     }
+    if (n.step !== undefined && n.step !== null && n.step !== '') {
+        const step = document.createElement('div');
+        step.className = 'rete-node__step';
+        step.textContent = n.step;
+        el.appendChild(step);
+    }
     const body = document.createElement('div');
     body.className = 'rete-node__body';
     if (n.title) {

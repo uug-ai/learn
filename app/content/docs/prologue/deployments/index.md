@@ -260,7 +260,7 @@ With this setup we are moving from a Hybrid setup to a complete Cloud approach. 
   ]
 }
 {{< /rete >}}
-
+ 
 The main advantage is here, is that you'll avoid any extra hardware costs on site. On the otherhand you'll need a secure connection, which might already be available, to setup a remote connection between the camera streams at the edge and the [Kerberos Agents](/agent/first-things-first) in the cloud.
 
 A noticable disadvantage is that a continuous stream of data is send over the network for each camera stream. Which might become more expensive than buying the additional hardware at the edge. Build up a usecase, of what setup makes sense for which customer.

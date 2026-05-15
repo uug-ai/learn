@@ -209,6 +209,47 @@ html.dark .designer__hints kbd,
     border-color: rgba(255, 255, 255, 0.15);
 }
 
+/* Tips: collapsed by default, revealed on hover or focus.
+   Uses a <details> so it remains keyboard accessible. */
+.designer__tips {
+    margin-top: 14px;
+}
+
+.designer__tips-summary {
+    list-style: none;
+    cursor: help;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.designer__tips-summary::-webkit-details-marker { display: none; }
+
+.designer__tips-summary::after {
+    content: '\25BE'; /* small down triangle */
+    font-size: 10px;
+    opacity: 0.6;
+    transition: transform 120ms ease;
+}
+
+.designer__tips[open] .designer__tips-summary::after,
+.designer__tips:hover .designer__tips-summary::after,
+.designer__tips:focus-within .designer__tips-summary::after {
+    transform: rotate(180deg);
+}
+
+.designer__tips .designer__hints {
+    display: none;
+    margin-top: 8px;
+}
+
+.designer__tips[open] .designer__hints,
+.designer__tips:hover .designer__hints,
+.designer__tips:focus-within .designer__hints {
+    display: block;
+}
+
 /* --- Canvas + toolbar (centre). --- */
 .designer__canvas-wrap {
     display: flex;
@@ -273,6 +314,92 @@ html.dark .designer__toolbar,
     border-color: #555f8e;
 }
 
+/* --- Toolbar dropdown menu (e.g. Copy → shortcode/JSON/URL) ---------- */
+.designer__menu {
+    position: relative;
+    display: inline-flex;
+}
+
+.designer__menu-toggle {
+    gap: 4px;
+}
+
+.designer__menu-chevron {
+    transition: transform 100ms ease;
+    opacity: 0.85;
+}
+
+.designer__menu.is-open .designer__menu-chevron {
+    transform: rotate(180deg);
+}
+
+.designer__menu-list {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 30;
+    margin: 0;
+    padding: 6px;
+    min-width: 260px;
+    list-style: none;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 12px 28px rgba(20, 11, 59, 0.14);
+}
+
+html.dark .designer__menu-list,
+.dark .designer__menu-list {
+    background: #1f1f1f;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+.designer__menu-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+}
+
+.designer__menu-item:hover,
+.designer__menu-item:focus-visible {
+    background: rgba(85, 95, 142, 0.1);
+    outline: none;
+}
+
+.designer__menu-item-title {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.designer__menu-item-desc {
+    font-size: 11.5px;
+    color: #6d6666;
+    line-height: 1.35;
+}
+
+html.dark .designer__menu-item-desc,
+.dark .designer__menu-item-desc { color: #a8a8a8; }
+
+.designer__menu-item code {
+    font-size: 11px;
+    padding: 0 4px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+html.dark .designer__menu-item code,
+.dark .designer__menu-item code { background: rgba(255, 255, 255, 0.1); }
+
 html.dark .designer__btn,
 .dark .designer__btn {
     background: #262626;
@@ -290,6 +417,124 @@ html.dark .designer__btn:hover,
     flex: 1;
     min-height: 600px;
     margin: 0;
+}
+
+/* --- Minimap ------------------------------------------------------------ */
+.designer__minimap {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 200px;
+    height: 140px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    z-index: 6;
+    cursor: pointer;
+    backdrop-filter: blur(2px);
+}
+
+html.dark .designer__minimap,
+.dark .designer__minimap {
+    background: rgba(30, 30, 30, 0.9);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.designer__minimap-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.designer__minimap-group {
+    fill: rgba(85, 95, 142, 0.06);
+    stroke: rgba(85, 95, 142, 0.45);
+    stroke-width: 1;
+    stroke-dasharray: 4 3;
+    vector-effect: non-scaling-stroke;
+}
+
+.designer__minimap-group-label {
+    fill: rgba(85, 95, 142, 0.7);
+    font: 600 10px 'Inter', system-ui, sans-serif;
+    paint-order: stroke;
+    stroke: rgba(255, 255, 255, 0.85);
+    stroke-width: 2;
+}
+
+html.dark .designer__minimap-group-label,
+.dark .designer__minimap-group-label {
+    fill: rgba(180, 190, 230, 0.85);
+    stroke: rgba(0, 0, 0, 0.6);
+}
+
+.designer__minimap-node-body {
+    fill: #ffffff;
+    stroke: rgba(0, 0, 0, 0.18);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+}
+
+html.dark .designer__minimap-node-body,
+.dark .designer__minimap-node-body {
+    fill: #2a2a2a;
+    stroke: rgba(255, 255, 255, 0.18);
+}
+
+.designer__minimap-node-header {
+    /* fill set inline per kind */
+    stroke: none;
+}
+
+.designer__minimap-node-title {
+    fill: #262424;
+    font: 600 10px 'Inter', system-ui, sans-serif;
+}
+
+html.dark .designer__minimap-node-title,
+.dark .designer__minimap-node-title {
+    fill: #ededed;
+}
+
+.designer__minimap-viewport {
+    fill: rgba(245, 158, 11, 0.18);
+    stroke: rgba(245, 158, 11, 0.9);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+}
+
+.designer__minimap-toggle {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 18px;
+    height: 18px;
+    border: none;
+    background: transparent;
+    color: inherit;
+    opacity: 0.55;
+    cursor: pointer;
+    font: 600 12px/1 'Inter', system-ui, sans-serif;
+    padding: 0;
+}
+
+.designer__minimap-toggle:hover { opacity: 1; }
+
+.designer__minimap.is-collapsed {
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+}
+
+.designer__minimap.is-collapsed .designer__minimap-svg { display: none; }
+.designer__minimap.is-collapsed .designer__minimap-toggle {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.85;
 }
 
 /* --- Fullscreen mode ---------------------------------------------------- */

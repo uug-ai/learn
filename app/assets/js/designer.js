@@ -34,6 +34,33 @@ const PALETTE_SECTIONS = [
             { kind: 'factory', header: 'FACTORY', title: 'Factory', subtitle: 'Orchestrate',        w: 240, h: 150 },
         ],
     },
+    {
+        title: 'Dependencies',
+        items: [
+            { kind: 'amqp', header: 'AMQP', title: 'AMQP', subtitle: 'Message broker',     w: 220, h: 130 },
+            { kind: 'turn', header: 'TURN', title: 'TURN', subtitle: 'WebRTC relay',        w: 220, h: 130 },
+            { kind: 'mqtt', header: 'MQTT', title: 'MQTT', subtitle: 'Pub/sub broker',      w: 220, h: 130 },
+        ],
+    },
+    {
+        title: 'Services',
+        items: [
+            { kind: 'pipeline-monitor',       header: 'PIPELINE', title: 'Monitor',        subtitle: 'hub-pipeline-monitor',       w: 240, h: 130 },
+            { kind: 'pipeline-sequence',      header: 'PIPELINE', title: 'Sequence',       subtitle: 'hub-pipeline-sequence',      w: 240, h: 130 },
+            { kind: 'pipeline-analysis',      header: 'PIPELINE', title: 'Analysis',       subtitle: 'hub-pipeline-analysis',      w: 240, h: 130 },
+            { kind: 'pipeline-classifier',    header: 'PIPELINE', title: 'Classifier',     subtitle: 'hub-pipeline-classifier',    w: 240, h: 130 },
+            { kind: 'pipeline-threshold',     header: 'PIPELINE', title: 'Threshold',      subtitle: 'hub-pipeline-threshold',     w: 240, h: 130 },
+            { kind: 'pipeline-notification',  header: 'PIPELINE', title: 'Notification',   subtitle: 'hub-pipeline-notification',  w: 240, h: 130 },
+            { kind: 'pipeline-sprite',        header: 'PIPELINE', title: 'Sprite',         subtitle: 'hub-pipeline-sprite',        w: 240, h: 130 },
+            { kind: 'pipeline-dominantcolor', header: 'PIPELINE', title: 'Dominant color', subtitle: 'hub-pipeline-dominantcolor', w: 240, h: 130 },
+            { kind: 'pipeline-thumbnail',     header: 'PIPELINE', title: 'Thumbnail',      subtitle: 'hub-pipeline-thumbnail',     w: 240, h: 130 },
+            { kind: 'pipeline-export',        header: 'PIPELINE', title: 'Export',         subtitle: 'hub-pipeline-export',        w: 240, h: 130 },
+            { kind: 'pipeline-counting',      header: 'PIPELINE', title: 'Counting',       subtitle: 'hub-pipeline-counting',      w: 240, h: 130 },
+            { kind: 'pipeline-licenseplate',  header: 'PIPELINE', title: 'License plate',  subtitle: 'hub-pipeline-licenseplate',  w: 240, h: 130 },
+            { kind: 'pipeline-nohelmet',      header: 'PIPELINE', title: 'No helmet',      subtitle: 'hub-pipeline-nohelmet',      w: 240, h: 130 },
+            { kind: 'pipeline-llm',           header: 'PIPELINE', title: 'LLM',            subtitle: 'hub-pipeline-llm',           w: 240, h: 130 },
+        ],
+    },
 ];
 
 // Flat list kept for any consumers that just want the full catalogue.
@@ -41,8 +68,30 @@ const PALETTE = PALETTE_SECTIONS.flatMap(s => s.items);
 
 const KIND_LABELS = {
     camera: 'Camera', agent: 'Agent', vault: 'Vault', storage: 'Object Storage',
-    hub: 'Hub', factory: 'Factory', default: 'Generic node',
+    hub: 'Hub', factory: 'Factory',
+    amqp: 'AMQP', turn: 'TURN', mqtt: 'MQTT',
+    'pipeline-monitor':       'Monitor',
+    'pipeline-sequence':      'Sequence',
+    'pipeline-analysis':      'Analysis',
+    'pipeline-classifier':    'Classifier',
+    'pipeline-threshold':     'Threshold',
+    'pipeline-notification':  'Notification',
+    'pipeline-sprite':        'Sprite',
+    'pipeline-dominantcolor': 'Dominant color',
+    'pipeline-thumbnail':     'Thumbnail',
+    'pipeline-export':        'Export',
+    'pipeline-counting':      'Counting',
+    'pipeline-licenseplate':  'License plate',
+    'pipeline-nohelmet':      'No helmet',
+    'pipeline-llm':           'LLM',
+    default: 'Generic node',
 };
+
+// Grid step (in canvas units) used to align nodes/groups during drag and
+// resize. Holding Shift while dragging temporarily disables snapping for
+// freeform placement.
+const GRID = 20;
+const snap = (v) => Math.round(v / GRID) * GRID;
 
 // --- State ----------------------------------------------------------------
 
@@ -275,6 +324,8 @@ class Designer {
         });
         this.viewport.appendChild(this.anchorLayer);
 
+        this.buildMinimap();
+
         // Pan/zoom transform.
         this.scale = 1; this.tx = 80; this.ty = 80;
         this.applyViewport();
@@ -291,23 +342,35 @@ class Designer {
             this.seedExample();
         }
         this.render();
+        // Start with the properties panel collapsed; selecting something
+        // will open it.
+        this.toggleInspector(true);
         // Run an initial fit on the next frame so the canvas has measured
         // dimensions when called via URL with a large diagram.
         requestAnimationFrame(() => this.fit());
     }
 
     // Try to populate state from the URL fragment, e.g.
-    //   /designer/#diagram=<base64-of-json>
+    //   /designer/#diagram=<base64-of-json>&fullscreen=1
     // Returns true on success.
     loadFromUrl() {
         const hash = (window.location.hash || '').replace(/^#/, '');
         if (!hash) return false;
         const params = new URLSearchParams(hash);
         const encoded = params.get('diagram');
+        if (params.get('fullscreen') === '1' || params.get('fs') === '1') {
+            // Defer until after the initial render/fit so the layout is sized.
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                if (!this.root.classList.contains('is-fullscreen')) this.toggleFullscreen();
+            }));
+        }
         if (!encoded) return false;
         try {
             // Accept both standard and URL-safe base64.
-            const b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+            let b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+            // Re-pad if URL-safe encoding stripped trailing '=' chars.
+            const pad = b64.length % 4;
+            if (pad) b64 += '='.repeat(4 - pad);
             const json = decodeURIComponent(escape(atob(b64)));
             this.loadConfig(JSON.parse(json));
             return true;
@@ -410,10 +473,47 @@ class Designer {
         this.root.querySelectorAll('.designer__btn[data-action]').forEach(btn => {
             btn.addEventListener('click', () => this.handleAction(btn.dataset.action, btn));
         });
+        this.root.querySelectorAll('.designer__menu-item[data-action]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.handleAction(btn.dataset.action, btn);
+                this.closeMenus();
+            });
+        });
+        this.root.querySelectorAll('[data-menu-toggle]').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.stopPropagation();
+                const menu = btn.closest('[data-menu]');
+                const list = menu?.querySelector('.designer__menu-list');
+                if (!list) return;
+                const open = !list.hidden;
+                this.closeMenus();
+                if (!open) {
+                    list.hidden = false;
+                    btn.setAttribute('aria-expanded', 'true');
+                    menu.classList.add('is-open');
+                }
+            });
+        });
+        document.addEventListener('click', e => {
+            if (!e.target.closest('[data-menu]')) this.closeMenus();
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') this.closeMenus();
+        });
         const inspectorToggle = this.root.querySelector('[data-action="toggle-inspector"]');
         if (inspectorToggle) {
             inspectorToggle.addEventListener('click', () => this.toggleInspector());
         }
+    }
+
+    closeMenus() {
+        this.root.querySelectorAll('[data-menu]').forEach(menu => {
+            menu.classList.remove('is-open');
+            const list = menu.querySelector('.designer__menu-list');
+            if (list) list.hidden = true;
+            const toggle = menu.querySelector('[data-menu-toggle]');
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        });
     }
 
     toggleInspector(force) {
@@ -447,7 +547,10 @@ class Designer {
                 state.selection = null;
                 this.render();
                 break;
-            case 'copy':    this.copyShortcode(); break;
+            case 'copy':           this.copyShortcode(); break;
+            case 'copy-shortcode': this.copyShortcode(); break;
+            case 'copy-json':      this.copyJson(); break;
+            case 'copy-url':       this.copyShareUrl(); break;
             case 'export':  this.exportPng(); break;
         }
     }
@@ -503,6 +606,11 @@ class Designer {
             btn.setAttribute('aria-pressed', String(on));
             btn.title = on ? 'Exit fullscreen' : 'Toggle fullscreen';
         }
+        // Reflect fullscreen state in the URL so a refresh keeps it.
+        // Route through _writePersist so the diagram param keeps its
+        // URL-safe (un-percent-encoded) form and we don't duplicate logic.
+        if (this.lastConfig) this._pendingCfg = this.lastConfig;
+        this._writePersist();
         // Two RAFs: one for layout to apply the new size, one to refit.
         requestAnimationFrame(() => requestAnimationFrame(() => this.fit()));
     }
@@ -570,6 +678,15 @@ class Designer {
 
     select(sel) {
         state.selection = sel;
+        if (sel && this.root.classList.contains('is-inspector-collapsed')) {
+            this.toggleInspector(false);
+        }
+        // Selection changed — blur any focused inspector input so the
+        // renderInspector early-return (focus guard) doesn't keep showing
+        // the previous selection's properties.
+        if (this.inspector.contains(document.activeElement)) {
+            document.activeElement.blur();
+        }
         this.renderInspector();
         this.renderSelection();
     }
@@ -602,6 +719,7 @@ class Designer {
         this.renderSelection();
         this.renderInspector();
         this.renderSource();
+        this.renderMinimap();
     }
 
     renderConnections() {
@@ -634,19 +752,33 @@ class Designer {
             const toSide   = c.toSide   || 'left';
             const a = anchorPoint(from, fromSide);
             const b = anchorPoint(to,   toSide);
+            const d = bezierPath(a.x, a.y, b.x, b.y, fromSide, toSide);
+
+            // Invisible thick hit-area so clicks land reliably even on the
+            // gaps of the flowing dashed stroke.
+            const hit = document.createElementNS(SVG_NS, 'path');
+            hit.setAttribute('d', d);
+            hit.setAttribute('class', 'rete-connection-hit');
+            hit.setAttribute('fill', 'none');
+            hit.setAttribute('stroke', 'transparent');
+            hit.setAttribute('stroke-width', '20');
+            hit.style.pointerEvents = 'stroke';
+            hit.style.cursor = 'pointer';
+            hit.addEventListener('click', e => {
+                e.stopPropagation();
+                this.select({ type: 'connection', id: idx });
+            });
+            this.svg.appendChild(hit);
+
             const path = document.createElementNS(SVG_NS, 'path');
-            path.setAttribute('d', bezierPath(a.x, a.y, b.x, b.y, fromSide, toSide));
+            path.setAttribute('d', d);
             const classes = ['rete-connection', `rete-connection--${c.kind || 'default'}`];
             if (c.label) classes.push('rete-connection--labelled');
             if (state.selection?.type === 'connection' && state.selection.id === idx) {
                 classes.push('is-selected');
             }
             path.setAttribute('class', classes.join(' '));
-            path.style.pointerEvents = 'stroke';
-            path.addEventListener('click', e => {
-                e.stopPropagation();
-                this.select({ type: 'connection', id: idx });
-            });
+            path.style.pointerEvents = 'none';
             this.svg.appendChild(path);
 
             if (c.label) {
@@ -729,6 +861,9 @@ class Designer {
     }
 
     renderInspector() {
+        // Don't blow away the panel while the user is typing in one of its
+        // inputs — re-rendering would steal focus on every keystroke.
+        if (this.inspector.contains(document.activeElement)) return;
         const sel = state.selection;
         if (!sel) {
             this.inspector.innerHTML = '<p class="designer__inspector-empty">Select a node or group to edit its properties.</p>';
@@ -929,18 +1064,128 @@ class Designer {
                 return out;
             }),
         };
+        this.lastConfig = cfg;
         this.lastShortcode =
             '{{< rete caption="My diagram" >}}\n' +
             JSON.stringify(cfg, null, 2) + '\n' +
             '{{< /rete >}}';
         if (this.sourceEl) this.sourceEl.textContent = this.lastShortcode;
+        this.persistToUrl(cfg);
+    }
+
+    // Throttle live URL updates during drag/resize to one per animation
+    // frame so we don't thrash history.replaceState on every mousemove.
+    scheduleSource() {
+        if (this._sourceRaf) return;
+        this._sourceRaf = requestAnimationFrame(() => {
+            this._sourceRaf = 0;
+            this.renderSource();
+            this.renderMinimap();
+        });
+    }
+
+    // Mirror the current diagram into the URL fragment so an accidental
+    // refresh restores the same state. Throttled because browsers (Chrome
+    // in particular) rate-limit history.replaceState — around 100 calls
+    // per 30s — so writing on every mousemove silently drops updates.
+    persistToUrl(cfg) {
+        this._pendingCfg = cfg;
+        const now = Date.now();
+        const since = now - (this._lastPersistAt || 0);
+        if (since >= 250) {
+            this._writePersist();
+            return;
+        }
+        if (this._persistTimer) return;
+        this._persistTimer = setTimeout(() => this._writePersist(), 250 - since);
+        if (!this._unloadHooked) {
+            this._unloadHooked = true;
+            const flush = () => this._writePersist();
+            window.addEventListener('beforeunload', flush);
+            window.addEventListener('pagehide', flush);
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') this._writePersist();
+            });
+        }
+    }
+
+    _writePersist() {
+        clearTimeout(this._persistTimer);
+        this._persistTimer = 0;
+        this._lastPersistAt = Date.now();
+        const cfg = this._pendingCfg;
+        try {
+            const existing = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
+            existing.delete('diagram');
+            existing.delete('fullscreen');
+            existing.delete('fs');
+            if (cfg) {
+                const empty = !cfg.nodes.length && !cfg.groups.length && !cfg.connections.length;
+                if (!empty) {
+                    const json = JSON.stringify(cfg);
+                    const b64 = btoa(unescape(encodeURIComponent(json)));
+                    // URL-safe base64 so the value isn't percent-encoded.
+                    const safe = b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                    existing.set('diagram', safe);
+                }
+            }
+            // Always reflect the current fullscreen state.
+            if (this.root && this.root.classList.contains('is-fullscreen')) {
+                existing.set('fullscreen', '1');
+            }
+            // Build the hash manually so the diagram value stays un-encoded.
+            const parts = [];
+            existing.forEach((v, k) => {
+                if (k === 'diagram') parts.push(`diagram=${v}`);
+                else parts.push(`${encodeURIComponent(k)}=${encodeURIComponent(v)}`);
+            });
+            const hash = parts.join('&');
+            const base = window.location.pathname + window.location.search;
+            try {
+                history.replaceState(null, '', hash ? `${base}#${hash}` : base);
+            } catch (e) {
+                // Fallback if replaceState is throttled/unavailable.
+                window.location.hash = hash;
+            }
+        } catch (err) {
+            console.warn('Designer: persistToUrl failed', err);
+        }
     }
 
     async copyShortcode() {
-        const text = this.lastShortcode || '';
+        await this.copyText(this.lastShortcode || '', 'Copied shortcode to clipboard.');
+    }
+
+    async copyJson() {
+        const json = JSON.stringify(this.lastConfig || {}, null, 2);
+        await this.copyText(json, 'Copied JSON to clipboard.');
+    }
+
+    async copyShareUrl() {
+        const json = JSON.stringify(this.lastConfig || {});
+        let b64;
+        try {
+            b64 = btoa(unescape(encodeURIComponent(json)));
+        } catch {
+            this.toast('Could not encode the diagram for sharing.');
+            return;
+        }
+        const base = `${window.location.origin}${window.location.pathname}`;
+        const params = new URLSearchParams();
+        params.set('diagram', b64);
+        // If the user is currently in fullscreen, the link will reopen in
+        // fullscreen too.
+        if (this.root.classList.contains('is-fullscreen')) {
+            params.set('fullscreen', '1');
+        }
+        const url = `${base}#${params.toString()}`;
+        await this.copyText(url, 'Copied share URL to clipboard.');
+    }
+
+    async copyText(text, successMsg) {
         try {
             await navigator.clipboard.writeText(text);
-            this.toast('Copied shortcode to clipboard.');
+            this.toast(successMsg);
         } catch (err) {
             // Fallback for browsers without clipboard API.
             const ta = document.createElement('textarea');
@@ -949,7 +1194,7 @@ class Designer {
             ta.style.opacity = '0';
             document.body.appendChild(ta);
             ta.select();
-            try { document.execCommand('copy'); this.toast('Copied shortcode to clipboard.'); }
+            try { document.execCommand('copy'); this.toast(successMsg); }
             catch { this.toast('Copy failed — select the preview manually.'); }
             ta.remove();
         }
@@ -1114,6 +1359,155 @@ ${css}
 
     applyViewport() {
         this.viewport.style.transform = `translate(${this.tx}px, ${this.ty}px) scale(${this.scale})`;
+        this.renderMinimap();
+    }
+
+    // ---- Minimap --------------------------------------------------------
+    buildMinimap() {
+        const map = document.createElement('div');
+        map.className = 'designer__minimap';
+        map.title = 'Minimap — click or drag to pan';
+        const svg = document.createElementNS(SVG_NS, 'svg');
+        svg.setAttribute('class', 'designer__minimap-svg');
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        map.appendChild(svg);
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'designer__minimap-toggle';
+        toggle.title = 'Hide minimap';
+        toggle.textContent = '\u2013';
+        toggle.addEventListener('click', e => {
+            e.stopPropagation();
+            const collapsed = map.classList.toggle('is-collapsed');
+            toggle.textContent = collapsed ? '\u25A1' : '\u2013';
+            toggle.title = collapsed ? 'Show minimap' : 'Hide minimap';
+            if (!collapsed) this.renderMinimap();
+        });
+        map.appendChild(toggle);
+        this.canvas.appendChild(map);
+        this.minimap = map;
+        this.minimapSvg = svg;
+        this.bindMinimapInput();
+    }
+
+    bindMinimapInput() {
+        const map = this.minimap;
+        // Click/drag on the minimap pans the main viewport so the chosen
+        // canvas point lands at the centre of the visible area.
+        const panTo = (clientX, clientY) => {
+            if (!this._minimapBounds) return;
+            const { minX, minY, w, h } = this._minimapBounds;
+            const rect = map.getBoundingClientRect();
+            const fx = (clientX - rect.left) / rect.width;
+            const fy = (clientY - rect.top)  / rect.height;
+            const cx = minX + fx * w;
+            const cy = minY + fy * h;
+            const canvasRect = this.canvas.getBoundingClientRect();
+            this.tx = canvasRect.width  / 2 - cx * this.scale;
+            this.ty = canvasRect.height / 2 - cy * this.scale;
+            this.applyViewport();
+        };
+        let dragging = false;
+        map.addEventListener('mousedown', e => {
+            if (map.classList.contains('is-collapsed')) {
+                map.classList.remove('is-collapsed');
+                map.querySelector('.designer__minimap-toggle').textContent = '\u2013';
+                this.renderMinimap();
+                e.stopPropagation();
+                return;
+            }
+            if (e.target.classList.contains('designer__minimap-toggle')) return;
+            dragging = true;
+            panTo(e.clientX, e.clientY);
+            e.stopPropagation();
+            e.preventDefault();
+        });
+        window.addEventListener('mousemove', e => {
+            if (!dragging) return;
+            panTo(e.clientX, e.clientY);
+        });
+        window.addEventListener('mouseup', () => { dragging = false; });
+    }
+
+    renderMinimap() {
+        if (!this.minimapSvg || this.minimap.classList.contains('is-collapsed')) return;
+        // World bounds: union of all geometry plus the current viewport so
+        // the visible area is always represented even when empty.
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        state.groups.forEach(g => {
+            minX = Math.min(minX, g.x); minY = Math.min(minY, g.y);
+            maxX = Math.max(maxX, g.x + g.w); maxY = Math.max(maxY, g.y + g.h);
+        });
+        state.nodes.forEach(n => {
+            minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
+            maxX = Math.max(maxX, n.x + (n.w || 220));
+            maxY = Math.max(maxY, n.y + (n.h || 120));
+        });
+        // Include the current viewport rect in world coordinates.
+        const cRect = this.canvas.getBoundingClientRect();
+        const vx = -this.tx / this.scale;
+        const vy = -this.ty / this.scale;
+        const vw = cRect.width / this.scale;
+        const vh = cRect.height / this.scale;
+        if (!isFinite(minX)) { minX = vx; minY = vy; maxX = vx + vw; maxY = vy + vh; }
+        minX = Math.min(minX, vx);
+        minY = Math.min(minY, vy);
+        maxX = Math.max(maxX, vx + vw);
+        maxY = Math.max(maxY, vy + vh);
+        // Add a margin so things don't kiss the edge.
+        const pad = 60;
+        minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+        const w = maxX - minX, h = maxY - minY;
+        this._minimapBounds = { minX, minY, w, h };
+        const svg = this.minimapSvg;
+        svg.setAttribute('viewBox', `${minX} ${minY} ${w} ${h}`);
+        // Per-kind header colors that mirror --rete-node-color in CSS.
+        const KIND_COLOR = {
+            vault: '#555f8e', storage: '#6b7280', hub: '#84559f',
+            agent: '#4a796b', factory: '#4a796b', camera: '#374151',
+            amqp: '#b45309', turn: '#1d4ed8', mqtt: '#0f766e',
+            'pipeline-monitor':       '#be185d',
+            'pipeline-sequence':      '#be185d',
+            'pipeline-analysis':      '#be185d',
+            'pipeline-classifier':    '#be185d',
+            'pipeline-threshold':     '#be185d',
+            'pipeline-notification':  '#be185d',
+            'pipeline-sprite':        '#be185d',
+            'pipeline-dominantcolor': '#be185d',
+            'pipeline-thumbnail':     '#be185d',
+            'pipeline-export':        '#be185d',
+            'pipeline-counting':      '#be185d',
+            'pipeline-licenseplate':  '#be185d',
+            'pipeline-nohelmet':      '#be185d',
+            'pipeline-llm':           '#be185d',
+            default: '#6b7280',
+        };
+        // Build content.
+        let html = '';
+        state.groups.forEach(g => {
+            html += `<rect class="designer__minimap-group" x="${g.x}" y="${g.y}" width="${g.w}" height="${g.h}" rx="6"/>`;
+            if (g.label) {
+                html += `<text class="designer__minimap-group-label" x="${g.x + 8}" y="${g.y + 16}">${escapeXml(g.label)}</text>`;
+            }
+        });
+        state.nodes.forEach(n => {
+            const nw = n.w || 220, nh = n.h || 120;
+            const headerH = Math.max(14, Math.min(nh * 0.28, 28));
+            const color = KIND_COLOR[n.kind] || KIND_COLOR.default;
+            // Body card.
+            html += `<rect class="designer__minimap-node-body" x="${n.x}" y="${n.y}" width="${nw}" height="${nh}" rx="6"/>`;
+            // Colored header pill (top portion only, with rounded top corners
+            // — the bottom corners stay flat against the body).
+            html += `<path class="designer__minimap-node-header" fill="${color}" d="${roundedTopPath(n.x, n.y, nw, headerH, 6)}"/>`;
+            // Title text inside the body.
+            const title = n.title || n.header || '';
+            if (title) {
+                const ty = n.y + headerH + Math.max(14, (nh - headerH) / 2 + 4);
+                html += `<text class="designer__minimap-node-title" x="${n.x + nw / 2}" y="${ty}" text-anchor="middle">${escapeXml(title)}</text>`;
+            }
+        });
+        html += `<rect class="designer__minimap-viewport" x="${vx}" y="${vy}" width="${vw}" height="${vh}" rx="3"/>`;
+        svg.innerHTML = html;
     }
 
     fit() {
@@ -1143,10 +1537,38 @@ ${css}
     }
 
     bindCanvasInput() {
+        // Group-edge hit zone: if the user clicks within ~12 canvas-units of
+        // a group's perimeter, prefer selecting the group even when a child
+        // node sits on top. Runs in the capture phase so it intercepts the
+        // node's own mousedown handler.
+        this.viewport.addEventListener('mousedown', e => {
+            if (e.button !== 0) return;
+            if (e.target.closest('.designer__resize, .designer__anchor, .rete-connection, .rete-connection-hit, .rete-group__label')) return;
+            // Convert client coords to canvas-units.
+            const rect = this.canvas.getBoundingClientRect();
+            const cx = (e.clientX - rect.left - this.tx) / this.scale;
+            const cy = (e.clientY - rect.top  - this.ty) / this.scale;
+            const EDGE = 12;
+            const matches = state.groups.filter(g => {
+                const inOuter = cx >= g.x - EDGE && cx <= g.x + g.w + EDGE &&
+                                cy >= g.y - EDGE && cy <= g.y + g.h + EDGE;
+                if (!inOuter) return false;
+                const inInner = cx > g.x + EDGE && cx < g.x + g.w - EDGE &&
+                                cy > g.y + EDGE && cy < g.y + g.h - EDGE;
+                return !inInner; // only the rim counts
+            });
+            if (!matches.length) return;
+            // Smallest matching group wins (most specific).
+            matches.sort((a, b) => (a.w * a.h) - (b.w * b.h));
+            this.select({ type: 'group', id: matches[0].id });
+            e.stopPropagation();
+            e.preventDefault();
+        }, true);
+
         // Pan + click-to-deselect.
         let panning = false, sx = 0, sy = 0, otx = 0, oty = 0, moved = false;
         this.canvas.addEventListener('mousedown', e => {
-            if (e.target.closest('.rete-node, .rete-group, .designer__anchor, .rete-connection')) return;
+            if (e.target.closest('.rete-node, .rete-group, .designer__anchor, .rete-connection, .rete-connection-hit')) return;
             panning = true; moved = false;
             sx = e.clientX; sy = e.clientY; otx = this.tx; oty = this.ty;
             this.canvas.style.cursor = 'grabbing';
@@ -1203,8 +1625,14 @@ ${css}
                 moved = true;
                 if (!snapped) { this.pushHistory(); snapped = true; }
             }
-            n.x = Math.round(ox + dx);
-            n.y = Math.round(oy + dy);
+            // Snap to grid for clean alignment; Shift disables snapping.
+            if (e.shiftKey) {
+                n.x = Math.round(ox + dx);
+                n.y = Math.round(oy + dy);
+            } else {
+                n.x = snap(ox + dx);
+                n.y = snap(oy + dy);
+            }
             // Constrain to parent group unless the user is holding Alt to
             // “decouple” the node mid-drag.
             if (e.altKey) altUsed = true;
@@ -1218,6 +1646,7 @@ ${css}
             el.style.transform = `translate(${n.x}px, ${n.y}px)`;
             this.renderConnections();
             this.renderAnchors();
+            this.scheduleSource();
         });
         window.addEventListener('mouseup', () => {
             if (!dragging) return;
@@ -1290,16 +1719,24 @@ ${css}
                 moved = true;
                 if (!snapped) { this.pushHistory(); snapped = true; }
             }
-            g.x = Math.round(ox + dx);
-            g.y = Math.round(oy + dy);
+            // Snap the group origin to the grid; children move by the same
+            // snapped delta so their relative offsets are preserved.
+            const useSnap = !e.shiftKey;
+            const nx = useSnap ? snap(ox + dx) : Math.round(ox + dx);
+            const ny = useSnap ? snap(oy + dy) : Math.round(oy + dy);
+            const sdx = nx - ox;
+            const sdy = ny - oy;
+            g.x = nx;
+            g.y = ny;
             el.style.transform = `translate(${g.x}px, ${g.y}px)`;
             childOffsets.forEach(({ node, ox: nox, oy: noy }) => {
-                node.x = Math.round(nox + dx);
-                node.y = Math.round(noy + dy);
+                node.x = Math.round(nox + sdx);
+                node.y = Math.round(noy + sdy);
                 const childEl = this.nodeEls.get(node.id);
                 if (childEl) childEl.style.transform = `translate(${node.x}px, ${node.y}px)`;
             });
             this.renderConnections();
+            this.scheduleSource();
         });
         window.addEventListener('mouseup', () => {
             if (!dragging) return;
@@ -1349,6 +1786,21 @@ ${css}
                 nh = Math.max(MIN_H, oh - dy);
                 ny = oy + (oh - nh);
             }
+            // Snap to grid for clean alignment; Shift disables snapping.
+            if (!e.shiftKey) {
+                if (dir.includes('e')) nw = Math.max(MIN_W, snap(nw));
+                if (dir.includes('s')) nh = Math.max(MIN_H, snap(nh));
+                if (dir.includes('w')) {
+                    const snappedX = snap(nx);
+                    nw = Math.max(MIN_W, ow + (ox - snappedX));
+                    nx = snappedX;
+                }
+                if (dir.includes('n')) {
+                    const snappedY = snap(ny);
+                    nh = Math.max(MIN_H, oh + (oy - snappedY));
+                    ny = snappedY;
+                }
+            }
             g.x = Math.round(nx); g.y = Math.round(ny);
             g.w = Math.round(nw); g.h = Math.round(nh);
             setEl();
@@ -1361,6 +1813,7 @@ ${css}
                 if (childEl) childEl.style.transform = `translate(${n.x}px, ${n.y}px)`;
             });
             this.renderConnections();
+            this.scheduleSource();
         });
         window.addEventListener('mouseup', () => {
             if (!dragging) return;
@@ -1438,6 +1891,20 @@ function escapeXml(s) {
     return String(s)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+
+// Build an SVG path describing a rectangle with only its top corners rounded.
+// Used by the minimap to draw the colored header pill on each miniature node.
+function roundedTopPath(x, y, w, h, r) {
+    const rr = Math.max(0, Math.min(r, w / 2, h));
+    return `M${x + rr} ${y}` +
+           `H${x + w - rr}` +
+           `Q${x + w} ${y} ${x + w} ${y + rr}` +
+           `V${y + h}` +
+           `H${x}` +
+           `V${y + rr}` +
+           `Q${x} ${y} ${x + rr} ${y}` +
+           `Z`;
 }
 
 // Load a same-origin (or CORS-enabled) URL and return a `data:` URI for it.
