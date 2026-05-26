@@ -66,8 +66,8 @@ A filter bar sits above the list and lets you narrow the cases down:
 - **Assignees** — only show cases assigned to the selected users.
 - **Labels** — only show cases tagged with at least one of the selected
   labels. Clicking a label on an expanded case applies the same filter.
-- **Status** — switch between *Open*, *Approved* and *Rejected* (the
-  default is *Open*).
+- **Status** — switch between *All*, *Open*, *Approved* and *Rejected*
+  (the default is *Open*).
 
 The **Refresh** button in the page header reloads the list with the
 current filters applied.
@@ -98,12 +98,17 @@ The modal has two tabs — **Details** and **Media** — and the following field
 
 **Settings**
 
-- **Retention date** *(optional)* — overrides the default retention period
-  inherited from the Vault archive account for the recordings attached to
-  this case. Leave it empty to keep the account-level retention; pick a date
-  in the future to extend or shorten how long the archived copies are kept.
-  Useful when a single case needs to be preserved longer than your default
-  archive policy (for example for an ongoing legal hold).
+- **Retention date** *(optional)* — picks the date at which the case itself
+  is automatically cleaned up from Hub. When left empty, Hub falls back to
+  the default retention window (365 days from creation, configurable on the
+  hub-api with the `DEFAULT_TASK_RETENTION_DAYS` env var). Picking a date
+  here explicitly overrides that default — useful when a case needs to be
+  preserved longer (for example for an ongoing legal hold) or, on the
+  contrary, can be removed earlier than the account default.
+
+  This field controls only the Hub-side case lifetime. The retention of
+  the underlying archived recordings is governed separately by the Vault
+  archive account (see *Configuration* below).
 - **Notify assignees** — when enabled, the assignees you select below receive
   a notification as soon as the case is created.
 - **Keep this case private** — restricts visibility of the case to its
@@ -166,7 +171,7 @@ usual and confirm with **New case** in the bottom-right.
 {{< figure src="hub-media-create-case-bulk.png" alt="The Create case modal opened from the Recordings page header with a date, device and time range pre-applied via the page filters." caption="The Create case modal opened from the Recordings page header. Every recording matching the active filters (date, device, time range) is attached to the new case in one go." class="stretch">}}
 
 > **Note:** To keep cases manageable, the **Create case** button is
-> disabled when more than 1000 recordings match the current filters.
+> disabled when 1000 or more recordings match the current filters.
 > Refine the date, device or time range before retrying.
 
 ### Creating a case from the context overlay
@@ -241,7 +246,7 @@ The details column has two tabs at the top:
   row loads it in the player, and the *Autoplay next* toggle continues to
   the next recording when the current one ends. The three-dots menu on
   each row exposes per-recording actions:
-  - **Open detail** — opens the recording's full detail page.
+  - **Open media detail** — opens the recording's full detail page.
   - **Edit video** — opens the face redaction editor on that recording
     (see the [face redaction documentation]({{< ref "/docs/hub/pipeline" >}})
     for details).
@@ -267,11 +272,16 @@ The lower part of the details column gathers the case metadata:
 - **Visibility** — switches the case between *Public* (visible to all users
   in the account) and *Private* (visible to its assignees only). Same
   permission rules as the assignees.
-- **Retention** — shows the expiry date of the case. The date is computed
-  from the retention period of the Vault archive account, or from the
-  custom **Retention date** picked when the case was created. *No expiry
-  set* is displayed when the case (and therefore its archived recordings)
-  has no expiration date.
+- **Retention** — shows when the case will be automatically removed from
+  Hub. The date is either the custom **Retention date** picked when the
+  case was created, or — when none was provided — a default expiry
+  computed from `DEFAULT_TASK_RETENTION_DAYS` (365 days from creation by
+  default). *No expiry set* is displayed when the default has been
+  disabled (`DEFAULT_TASK_RETENTION_DAYS=0`) and no custom date was
+  picked, in which case the case is kept indefinitely. Note that this
+  expiry only controls the Hub-side cleanup of the case — the underlying
+  archived recordings follow the retention configured on the Vault
+  archive account.
 
 ### Comments
 
@@ -359,17 +369,21 @@ To create a new share:
 
 1. Enter the **email address** of the person you want to give access to.
 2. Pick an **expiry** for the link — *1 hour*, *24 hours* or *7 days*.
-3. Click **Send invite**. Hub generates a unique link, emails it to the
-   recipient and adds the entry to the *Existing shares* list below.
+3. Click **Send invite**. Hub generates a unique share link
+   (`/share/<token>`) and a one-time **verification code**, and emails
+   both to the recipient. After clicking the link, the recipient must
+   enter that code to open the case. The new share is added to the
+   *Existing shares* list below.
 
 The *Existing shares* section lists every active invitation with the
 recipient's email and the expiry date. Clicking the trash icon on a row
-revokes that share immediately — the link can no longer be used to open
-the case.
+revokes that share immediately — the link and verification code can no
+longer be used to open the case.
 
 > **Note:** Shared links only grant access to the case itself (recordings,
 > attachments, description). They do not give the recipient access to the
-> rest of your Hub account.
+> rest of your Hub account, and they require both the link and the
+> verification code from the invite email to open the case.
 
 ## Configuration
 

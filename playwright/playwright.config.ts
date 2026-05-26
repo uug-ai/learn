@@ -2,6 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
+// Load .env.local first (developer overrides, gitignored), then fall back to
+// the committed .env defaults. dotenv does not overwrite existing variables,
+// so values already present from the first call win.
+dotenv.config({ path: path.resolve(__dirname, '.env.local') });
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const baseURL = process.env.HUB_BASE_URL || 'http://localhost:4200';
