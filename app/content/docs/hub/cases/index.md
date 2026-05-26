@@ -61,6 +61,12 @@ The modal has two tabs — **Details** and **Media** — and the following field
 
 **Settings**
 
+- **Retention date** *(optional)* — overrides the default retention period
+  inherited from the Vault archive account for the recordings attached to
+  this case. Leave it empty to keep the account-level retention; pick a date
+  in the future to extend or shorten how long the archived copies are kept.
+  Useful when a single case needs to be preserved longer than your default
+  archive policy (for example for an ongoing legal hold).
 - **Notify assignees** — when enabled, the assignees you select below receive
   a notification as soon as the case is created.
 - **Keep this case private** — restricts visibility of the case to its
@@ -169,6 +175,73 @@ Click a case in the list to select it (the row becomes highlighted), then
 press **Add to case** in the bottom-right of the modal. The recording is
 appended to the selected case and queued for archiving alongside the
 recordings already attached to it.
+
+## Working with an open case
+
+Selecting a row in the cases overview expands the case in place. The
+expanded view is split in two columns: the **video column** on the left
+plays the recordings attached to the case, and the **details column** on
+the right groups the metadata, comments and additional files.
+
+### Playlist and attachments
+
+The details column has two tabs at the top:
+
+- **Playlist** — lists every recording attached to the case. Selecting a
+  row loads it in the player, and the *Autoplay next* toggle continues to
+  the next recording when the current one ends. The three-dots menu on each
+  row exposes per-recording actions (open the recording detail, edit the
+  video with face redaction, …).
+- **Attachments** — additional files attached to the case (PDF reports,
+  photos, witness statements, exported clips, …). Files can be added by
+  clicking the **Upload** button or by **dragging them onto the panel**.
+  Once uploaded, every attachment can be renamed or deleted from the row's
+  inline actions.
+
+{{< figure src="hub-cases-attachments.png" alt="The Attachments tab of an open case with the drag-and-drop upload area and a list of attached files." caption="The Attachments tab lets you add supporting files to a case via drag-and-drop or the upload button." class="stretch">}}
+
+### Details, labels, assignees and retention
+
+The lower part of the details column gathers the case metadata:
+
+- **Description** — the reporter (the user who created the case) can edit
+  the description in place by clicking the pencil icon next to their name.
+- **Labels** — labels can be added or removed using the pencil icon next to
+  the labels row. Clicking a label filters the cases overview on it.
+- **Assignees** — the list of users responsible for following up. The
+  *notify assignees* toggle and the pencil icon are only shown to users
+  allowed to manage the case (see *Permissions* below).
+- **Visibility** — switches the case between *Public* (visible to all users
+  in the account) and *Private* (visible to its assignees only). Same
+  permission rules as the assignees.
+- **Retention** — shows the expiry date of the case. The date is computed
+  from the retention period of the Vault archive account, or from the
+  custom **Retention date** picked when the case was created. *No expiry
+  set* is displayed when the case (and therefore its archived recordings)
+  has no expiration date.
+
+### Comments
+
+The **Comments** tab on the right of the *Details* tab keeps a chronological
+log of the discussion around the case. Every assignee — and every user with
+access to the case — can post a comment from the input at the bottom of the
+tab.
+
+### Permissions
+
+Some controls on the expanded case are only available to specific users.
+These checks mirror the same rules applied by the API:
+
+- **Manage membership** — toggling the *visibility*, editing the
+  *assignees* list and changing the *notify assignees* flag is restricted
+  to the case's **reporter**, account **admins** and the account **owner**.
+- **Delete the case** — the **Delete** button at the bottom of the open
+  case is only shown to the case's **reporter**, account **admins** and the
+  account **owner**.
+
+Other users keep read-only access to the same information: they can play
+the recordings, browse the attachments, read the description and post
+comments, but cannot change the case's membership or delete it.
 
 ## Configuration
 

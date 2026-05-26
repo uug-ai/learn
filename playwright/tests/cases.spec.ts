@@ -7,8 +7,14 @@ import { capture } from './utils/screenshots';
  * `learn/app/content/docs/hub/cases/index.md` documentation page.
  *
  * Captured files (overwritten on each run):
- *   - hub-cases-list.png        — the /cases overview page
- *   - hub-cases-create.png      — the "Create case" modal opened from /watchlist
+ *   - hub-cases-list.png         — the /cases overview page
+ *   - hub-cases-opened.png       — an expanded case showing the playlist tab,
+ *                                  description, labels, assignees, visibility
+ *                                  and the new retention row.
+ *   - hub-cases-attachments.png  — the Attachments tab of an open case
+ *                                  showing the drag-and-drop upload area
+ *                                  and the list of attached files.
+ *   - hub-cases-create.png       — the "Create case" modal opened from /watchlist
  *   - hub-cases-created.png     — the success confirmation after creating a case
  */
 test.describe('Hub — cases documentation screenshots', () => {
@@ -76,6 +82,76 @@ test.describe('Hub — cases documentation screenshots', () => {
     await firstCase.scrollIntoViewIfNeeded().catch(() => undefined);
 
     await capture(page, 'hub-cases-opened.png');
+  });
+
+  test('captures the Attachments tab of an opened case', async ({ page }) => {
+    await page.goto('/cases');
+    await expect(page.locator('text=Cases').first()).toBeVisible();
+
+    // Locate and expand the first case in the list (same flow as the
+    // "opened case" test above).
+    const firstCase = page.locator('tasks-line .task-item').first();
+    const hasCase = await firstCase
+      .waitFor({ state: 'visible', timeout: 15_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!hasCase) {
+      test.info().annotations.push({
+        type: 'skip-no-case',
+        description:
+          'No cases available to open — skipping the attachments-tab screenshot.',
+      });
+      return;
+    }
+
+    const header = firstCase.locator('> .header').first();
+    await header.scrollIntoViewIfNeeded().catch(() => undefined);
+    await header.click({ force: true });
+
+    await firstCase
+      .locator('.body')
+      .first()
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .catch(() => {
+        /* still capture whatever is visible */
+      });
+
+    // Switch to the Attachments tab. See tasks-line.component.html:
+    // `<button class="case-detail-tab" ... (click)="setPlaylistTab('attachments')">`.
+    const attachmentsTab = firstCase
+      .locator('.case-detail-tab')
+      .filter({ hasText: /attachments/i })
+      .first();
+
+    const hasAttachmentsTab = await attachmentsTab
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!hasAttachmentsTab) {
+      test.info().annotations.push({
+        type: 'skip-no-tab',
+        description:
+          'Attachments tab is not present on this build — skipping screenshot.',
+      });
+      return;
+    }
+
+    await attachmentsTab.click();
+
+    // Wait for the attachments-panel to render before capturing.
+    await firstCase
+      .locator('attachments-panel')
+      .first()
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .catch(() => {
+        /* still capture whatever is visible */
+      });
+
+    await firstCase.scrollIntoViewIfNeeded().catch(() => undefined);
+
+    await capture(page, 'hub-cases-attachments.png');
   });
 
   test('captures the create-case flow from the watchlist', async ({ page }) => {
