@@ -7,8 +7,21 @@ import { capture } from './utils/screenshots';
  * `learn/app/content/docs/hub/cases/index.md` documentation page.
  *
  * Captured files (overwritten on each run):
- *   - hub-cases-list.png        — the /cases overview page
- *   - hub-cases-create.png      — the "Create case" modal opened from /watchlist
+ *   - hub-cases-list.png         — the /cases overview page
+ *   - hub-cases-opened.png       — an expanded case showing the playlist tab,
+ *                                  description, labels, assignees, visibility
+ *                                  and the new retention row.
+ *   - hub-cases-attachments.png  — the Attachments tab of an open case
+ *                                  showing the drag-and-drop upload area
+ *                                  and the list of attached files.
+ *   - hub-cases-filter.png       — the cases overview filter bar expanded
+ *                                  with the Sites, Devices, Assignees,
+ *                                  Labels and Status filters visible.
+ *   - hub-cases-detail.png       — the dedicated /cases/<id> detail page
+ *                                  with the Actions menu open.
+ *   - hub-cases-share.png        — the Share case modal opened from the
+ *                                  Actions menu of the case detail page.
+ *   - hub-cases-create.png       — the "Create case" modal opened from /watchlist
  *   - hub-cases-created.png     — the success confirmation after creating a case
  */
 test.describe('Hub — cases documentation screenshots', () => {
@@ -76,6 +89,76 @@ test.describe('Hub — cases documentation screenshots', () => {
     await firstCase.scrollIntoViewIfNeeded().catch(() => undefined);
 
     await capture(page, 'hub-cases-opened.png');
+  });
+
+  test('captures the Attachments tab of an opened case', async ({ page }) => {
+    await page.goto('/cases');
+    await expect(page.locator('text=Cases').first()).toBeVisible();
+
+    // Locate and expand the first case in the list (same flow as the
+    // "opened case" test above).
+    const firstCase = page.locator('tasks-line .task-item').first();
+    const hasCase = await firstCase
+      .waitFor({ state: 'visible', timeout: 15_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!hasCase) {
+      test.info().annotations.push({
+        type: 'skip-no-case',
+        description:
+          'No cases available to open — skipping the attachments-tab screenshot.',
+      });
+      return;
+    }
+
+    const header = firstCase.locator('> .header').first();
+    await header.scrollIntoViewIfNeeded().catch(() => undefined);
+    await header.click({ force: true });
+
+    await firstCase
+      .locator('.body')
+      .first()
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .catch(() => {
+        /* still capture whatever is visible */
+      });
+
+    // Switch to the Attachments tab. See tasks-line.component.html:
+    // `<button class="case-detail-tab" ... (click)="setPlaylistTab('attachments')">`.
+    const attachmentsTab = firstCase
+      .locator('.case-detail-tab')
+      .filter({ hasText: /attachments/i })
+      .first();
+
+    const hasAttachmentsTab = await attachmentsTab
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!hasAttachmentsTab) {
+      test.info().annotations.push({
+        type: 'skip-no-tab',
+        description:
+          'Attachments tab is not present on this build — skipping screenshot.',
+      });
+      return;
+    }
+
+    await attachmentsTab.click();
+
+    // Wait for the attachments-panel to render before capturing.
+    await firstCase
+      .locator('attachments-panel')
+      .first()
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .catch(() => {
+        /* still capture whatever is visible */
+      });
+
+    await firstCase.scrollIntoViewIfNeeded().catch(() => undefined);
+
+    await capture(page, 'hub-cases-attachments.png');
   });
 
   test('captures the create-case flow from the watchlist', async ({ page }) => {
@@ -167,5 +250,186 @@ test.describe('Hub — cases documentation screenshots', () => {
         /* still capture whatever is on screen */
       });
     await capture(page, 'hub-cases-created.png');
+  });
+
+  test('captures the cases overview filter bar', async ({ page }) => {
+    await page.goto('/cases');
+    await expect(page.locator('text=Cases').first()).toBeVisible();
+
+    // The filter bar is rendered by <tasks-filter> (see
+    // tasks.component.html). The default collapsed state shows just the
+    // search field + a "Show filters" toggle; we expand it so every
+    // multi-select is visible in the screenshot.
+    const filterHost = page.locator('tasks-filter').first();
+    await filterHost.waitFor({ state: 'visible', timeout: 15_000 });
+
+    const showFiltersToggle = filterHost
+      .locator('.toggle-filters')
+      .filter({ hasText: /show filters|filters/i })
+      .first();
+    const isCollapsed = await showFiltersToggle
+      .isVisible({ timeout: 1_000 })
+      .catch(() => false);
+    if (isCollapsed) {
+      await showFiltersToggle.click().catch(() => undefined);
+    }
+
+    // Make sure the multi-select chips are rendered before screenshotting.
+    await filterHost
+      .locator('multiselect, MultiSelect')
+      .first()
+      .waitFor({ state: 'visible', timeout: 5_000 })
+      .catch(() => undefined);
+
+    await capture(page, 'hub-cases-filter.png');
+  });
+
+  test('captures the case detail page with the Actions menu open', async ({
+    page,
+  }) => {
+    // Open the first case in the overview and read its id from the URL of
+    // the "Open detail" button so we can navigate to /cases/<id>.
+    await page.goto('/cases');
+    await expect(page.locator('text=Cases').first()).toBeVisible();
+
+    const firstCase = page.locator('tasks-line .task-item').first();
+    const hasCase = await firstCase
+      .waitFor({ state: 'visible', timeout: 15_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!hasCase) {
+      test.info().annotations.push({
+        type: 'skip-no-case',
+        description:
+          'No cases available — skipping the case detail page screenshot.',
+      });
+      return;
+    }
+
+    // Expand the row so the "Open detail" link (a router link to
+    // /cases/<id>) becomes part of the DOM, then read its href.
+    await firstCase.locator('> .header').click({ force: true });
+    const openDetailLink = firstCase
+      .locator('a[href^="/cases/"]')
+      .first();
+    const href = await openDetailLink
+      .getAttribute('href', { timeout: 10_000 })
+      .catch(() => null);
+
+    if (!href) {
+      test.info().annotations.push({
+        type: 'skip-no-detail-link',
+        description:
+          'Could not resolve a /cases/<id> link from the expanded row.',
+      });
+      return;
+    }
+
+    await page.goto(href);
+
+    // Wait for the breadcrumb on the dedicated case detail page.
+    await expect(
+      page.locator('.case-detail, .media-detail').first(),
+    ).toBeVisible({ timeout: 20_000 });
+
+    // Open the Actions menu in the top-right of the page header (see
+    // case-detail.component.html: `.media-detail-actions` with a
+    // <ButtonField text="Actions">).
+    const actionsButton = page
+      .locator('.media-detail-actions buttonfield button, .media-detail-actions button')
+      .filter({ hasText: /actions/i })
+      .first();
+    await actionsButton.waitFor({ state: 'visible', timeout: 15_000 });
+    await actionsButton.click();
+
+    const actionsMenu = page.locator('.media-detail-actions__menu').first();
+    await expect(actionsMenu).toBeVisible();
+
+    await capture(page, 'hub-cases-detail.png');
+  });
+
+  test('captures the Share case modal from the case detail page', async ({
+    page,
+  }) => {
+    // Same prelude as the detail-page test — open the first case in the
+    // overview and navigate to its dedicated detail page.
+    await page.goto('/cases');
+    await expect(page.locator('text=Cases').first()).toBeVisible();
+
+    const firstCase = page.locator('tasks-line .task-item').first();
+    const hasCase = await firstCase
+      .waitFor({ state: 'visible', timeout: 15_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!hasCase) {
+      test.info().annotations.push({
+        type: 'skip-no-case',
+        description:
+          'No cases available — skipping the Share case modal screenshot.',
+      });
+      return;
+    }
+
+    await firstCase.locator('> .header').click({ force: true });
+    const openDetailLink = firstCase.locator('a[href^="/cases/"]').first();
+    const href = await openDetailLink
+      .getAttribute('href', { timeout: 10_000 })
+      .catch(() => null);
+    if (!href) {
+      test.info().annotations.push({
+        type: 'skip-no-detail-link',
+        description:
+          'Could not resolve a /cases/<id> link from the expanded row.',
+      });
+      return;
+    }
+
+    await page.goto(href);
+    await expect(
+      page.locator('.case-detail, .media-detail').first(),
+    ).toBeVisible({ timeout: 20_000 });
+
+    // Open the Actions menu and click the "Share case" entry.
+    const actionsButton = page
+      .locator('.media-detail-actions buttonfield button, .media-detail-actions button')
+      .filter({ hasText: /actions/i })
+      .first();
+    await actionsButton.waitFor({ state: 'visible', timeout: 15_000 });
+    await actionsButton.click();
+
+    const shareItem = page
+      .locator('.media-detail-actions__menu buttonfield button, .media-detail-actions__menu button')
+      .filter({ hasText: /share case/i })
+      .first();
+    const canShare = await shareItem
+      .waitFor({ state: 'visible', timeout: 5_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!canShare) {
+      test.info().annotations.push({
+        type: 'skip-no-share',
+        description:
+          'Share case action not available — skipping screenshot.',
+      });
+      return;
+    }
+    await shareItem.click();
+
+    // The share modal is declared in case-detail.component.html as
+    // <Modal class="share-modal">. Same hidden-host caveat as the other
+    // modal captures — target the visible `.bg.open` overlay.
+    const shareModalHost = page
+      .locator('modal.share-modal, modal[class*="share-modal"]')
+      .first();
+    const overlay = shareModalHost.locator('.bg.open').first();
+    await expect(overlay).toBeVisible({ timeout: 10_000 });
+
+    // Give the existing-shares list a moment to load before screenshotting.
+    await page.waitForTimeout(800);
+
+    await capture(page, 'hub-cases-share.png');
   });
 });
