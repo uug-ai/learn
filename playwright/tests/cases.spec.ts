@@ -170,13 +170,14 @@ test.describe('Hub — cases documentation screenshots', () => {
     await expect(page.locator('text=Watchlist').first()).toBeVisible();
 
     // Wait for at least one notification row.
-    const firstRow = page.locator('watch-line .task-item').first();
-    const hasRow = await firstRow
+    const rows = page.locator('watch-line .task-item');
+    const hasAny = await rows
+      .first()
       .waitFor({ state: 'visible', timeout: 15_000 })
       .then(() => true)
       .catch(() => false);
 
-    if (!hasRow) {
+    if (!hasAny) {
       test.info().annotations.push({
         type: 'skip-create',
         description:
@@ -185,24 +186,48 @@ test.describe('Hub — cases documentation screenshots', () => {
       return;
     }
 
-    // Expand the row so the action bar (with "Add Case") becomes visible.
-    await firstRow.locator('.header').click();
-
-    const addCaseButton = firstRow
-      .locator('button-field, button')
-      .filter({ hasText: /^add case$/i })
+    // The "Add Case" button is only rendered when notification.task_created
+    // is false, and only inside the expanded body (*ngIf="open"). Iterate
+    // rows, expanding each, until we find one that still allows adding a
+    // case. Previous rows are collapsed again to avoid stacking modals.
+    const total = Math.min(await rows.count(), 15);
+    let row = rows.first();
+    let addCaseButton = row
+      .locator('button-field, buttonfield, ButtonField, button')
+      .filter({ hasText: /add case/i })
       .first();
+    let canAddCase = false;
 
-    const canAddCase = await addCaseButton
-      .waitFor({ state: 'visible', timeout: 5_000 })
-      .then(() => true)
-      .catch(() => false);
+    for (let i = 0; i < total; i += 1) {
+      row = rows.nth(i);
+      await row.scrollIntoViewIfNeeded().catch(() => {});
+      await row.locator('.header').first().click({ force: true });
+
+      addCaseButton = row
+        .locator('button-field, buttonfield, ButtonField, button')
+        .filter({ hasText: /add case/i })
+        .first();
+
+      canAddCase = await addCaseButton
+        .waitFor({ state: 'visible', timeout: 2_500 })
+        .then(() => true)
+        .catch(() => false);
+
+      if (canAddCase) break;
+
+      // Collapse the row before trying the next one.
+      await row
+        .locator('.header')
+        .first()
+        .click({ force: true })
+        .catch(() => {});
+    }
 
     if (!canAddCase) {
       test.info().annotations.push({
         type: 'skip-create',
         description:
-          'The selected notification already has a case or the "Add Case" action is hidden.',
+          'Every visible notification already has a case — no "Add Case" button to capture.',
       });
       return;
     }
@@ -210,20 +235,24 @@ test.describe('Hub — cases documentation screenshots', () => {
     await addCaseButton.click();
 
     // The Create-case modal lives at the top of watchlist.component.html and
-    // contains an <ExportMedia> component plus left/right action buttons.
-    const modal = page
-      .locator('Modal, modal, .modal')
+    // contains an <ExportMedia> component plus left/right action buttons. The
+    // <modal> host stays display:hidden — target the visible `.bg.open`
+    // overlay instead, same pattern as the share modal capture.
+    const modalHost = page
+      .locator('modal, Modal')
       .filter({ hasText: /create case/i })
       .first();
-    await expect(modal).toBeVisible();
+    const overlay = modalHost.locator('.bg.open').first();
+    await expect(overlay).toBeVisible({ timeout: 15_000 });
+    await page.waitForTimeout(500);
     await capture(page, 'hub-cases-create.png');
 
     // The right-side confirm button is also labelled "Create case". It only
     // becomes enabled once media is selected; the modal pre-filters to the
     // notification's media via [sourceFilter], so it's usually already enabled.
-    const confirmButton = modal
-      .locator('button-field, button')
-      .filter({ hasText: /^create case$/i })
+    const confirmButton = overlay
+      .locator('button-field, buttonfield, ButtonField, button')
+      .filter({ hasText: /create case/i })
       .last();
 
     const enabled = await confirmButton
@@ -307,26 +336,32 @@ test.describe('Hub — cases documentation screenshots', () => {
       return;
     }
 
-    // Expand the row so the "Open detail" link (a router link to
-    // /cases/<id>) becomes part of the DOM, then read its href.
+    // Expand the row so the "Open detail" button (a routerLink to
+    // /cases/<id>) becomes part of the DOM, then click it. ButtonField
+    // renders a <button>, not an <a href>, so we navigate by click.
     await firstCase.locator('> .header').click({ force: true });
-    const openDetailLink = firstCase
-      .locator('a[href^="/cases/"]')
+    const openDetailButton = firstCase
+      .locator('button-field, buttonfield, ButtonField')
+      .filter({ hasText: /open detail/i })
       .first();
-    const href = await openDetailLink
-      .getAttribute('href', { timeout: 10_000 })
-      .catch(() => null);
+    const canOpenDetail = await openDetailButton
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .then(() => true)
+      .catch(() => false);
 
-    if (!href) {
+    if (!canOpenDetail) {
       test.info().annotations.push({
-        type: 'skip-no-detail-link',
+        type: 'skip-no-detail-button',
         description:
-          'Could not resolve a /cases/<id> link from the expanded row.',
+          'Could not find the "Open detail" button in the expanded row.',
       });
       return;
     }
 
-    await page.goto(href);
+    await Promise.all([
+      page.waitForURL(/\/cases\/[^/]+$/, { timeout: 15_000 }),
+      openDetailButton.click(),
+    ]);
 
     // Wait for the breadcrumb on the dedicated case detail page.
     await expect(
@@ -373,20 +408,27 @@ test.describe('Hub — cases documentation screenshots', () => {
     }
 
     await firstCase.locator('> .header').click({ force: true });
-    const openDetailLink = firstCase.locator('a[href^="/cases/"]').first();
-    const href = await openDetailLink
-      .getAttribute('href', { timeout: 10_000 })
-      .catch(() => null);
-    if (!href) {
+    const openDetailButton = firstCase
+      .locator('button-field, buttonfield, ButtonField')
+      .filter({ hasText: /open detail/i })
+      .first();
+    const canOpenDetail = await openDetailButton
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!canOpenDetail) {
       test.info().annotations.push({
-        type: 'skip-no-detail-link',
+        type: 'skip-no-detail-button',
         description:
-          'Could not resolve a /cases/<id> link from the expanded row.',
+          'Could not find the "Open detail" button in the expanded row.',
       });
       return;
     }
 
-    await page.goto(href);
+    await Promise.all([
+      page.waitForURL(/\/cases\/[^/]+$/, { timeout: 15_000 }),
+      openDetailButton.click(),
+    ]);
     await expect(
       page.locator('.case-detail, .media-detail').first(),
     ).toBeVisible({ timeout: 20_000 });
