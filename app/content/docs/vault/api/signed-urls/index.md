@@ -1,5 +1,5 @@
 ---
-title: "REST API"
+title: "Signed URLs"
 description: "How to call the Vault REST API to obtain signed URLs for media, thumbnails, sprites and other generated assets."
 lead: ""
 date: 2026-05-26T00:00:00+00:00
@@ -8,7 +8,7 @@ draft: false
 images: []
 menu:
   vault:
-    parent: "vault"
+    parent: "api"
 weight: 312
 toc: true
 ---
