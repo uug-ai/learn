@@ -235,8 +235,12 @@ The details column has two tabs at the top:
 
 - **Playlist** — lists every recording attached to the case. Selecting a
   row loads it in the player, and the *Autoplay next* toggle continues to
-  the next recording when the current one ends. The three-dots menu on
-  each row exposes per-recording actions:
+  the next recording when the current one ends. Two checkbox columns —
+  **E** (*Include in export*) and **S** (*Include in share*) — let you
+  decide per recording whether it should be part of the next generated
+  export bundle and whether it should be visible to people you share the
+  case with. The header row toggles every recording at once. The
+  three-dots menu on each row exposes per-recording actions:
   - **Open media detail** — opens the recording's full detail page.
   - **Edit video** — opens the face redaction editor on that recording
     (see the [face redaction documentation]({{< ref "/docs/hub/pipeline" >}})
@@ -245,9 +249,16 @@ The details column has two tabs at the top:
   photos, witness statements, exported clips, …). Files can be added by
   clicking the **Upload** button or by **dragging them onto the panel**.
   Once uploaded, every attachment can be renamed or deleted from the row's
-  inline actions.
+  inline actions, and the same **E** / **S** checkboxes as on the playlist
+  let you include or exclude each attachment from the next export bundle
+  and from shared links.
 
 {{< figure src="hub-cases-attachments.png" alt="The Attachments tab of an open case with the drag-and-drop upload area and a list of attached files." caption="The Attachments tab lets you add supporting files to a case via drag-and-drop or the upload button." class="stretch">}}
+
+> **Note:** Cases created before the per-row selection was introduced
+> ("legacy cases") show every **E** and **S** checkbox as checked and
+> disabled. Their export bundle and shared link include every attached
+> item, just like they did before — no migration step is needed.
 
 ### Details, labels, assignees and retention
 
@@ -298,9 +309,21 @@ The bottom of the expanded case exposes an action bar split in two halves:
 **Left side — case-wide actions**
 
 - **Delete** — removes the case (see *Permissions* above).
-- **Download** — once the archiving job has completed, downloads a single
-  compressed archive (`.zip`) containing every recording attached to the
-  case.
+- **Generate export** / **Regenerate export** — queues a background job
+  that bundles every recording and attachment currently flagged
+  *Include in export* (see *Playlist and attachments* above) into a
+  single `.zip` archive. The label and state of the button track the
+  job:
+  - *Generate export* — no bundle has been built yet for this case.
+  - *Generating export… N%* — the worker is running; the button is
+    disabled and shows the percent progress.
+  - *Regenerate export* — a bundle already exists. The button is
+    enabled when the selection has changed since the last build
+    (*stale*) and disabled when the bundle still matches the current
+    selection (*fresh*).
+  - *Retry export* — the last run failed; clicking re-queues the job.
+- **Download** — once a bundle exists, downloads the latest generated
+  `.zip` from storage. Only shown after the first successful export.
 - **Open sequence** — when the case was created from a sequence of
   recordings, jumps to the corresponding entry on the *Recordings* page.
 - **Open detail** — opens the dedicated case detail page (see *Case detail
@@ -324,7 +347,7 @@ in the action bar). It shows the same playlist, attachments, details and
 comments, but in a full-page layout that is better suited to long
 investigations and to sharing the URL with co-workers.
 
-{{< figure src="hub-cases-detail.png" alt="The dedicated case detail page with the Actions menu open in the top-right." caption="The dedicated case detail page. The Actions menu in the top-right gathers every case-wide operation: reopen, approve, reject, open sequence, download, share and delete." class="stretch">}}
+{{< figure src="hub-cases-detail.png" alt="The dedicated case detail page with the Actions menu open in the top-right." caption="The dedicated case detail page. The Actions menu in the top-right gathers every case-wide operation: reopen, approve, reject, open sequence, generate/regenerate export, download, share and delete." class="stretch">}}
 
 The page reuses the *Details* and *Comments* tabs from the inline view and
 adds an **Actions** menu in the top-right of the page header. The menu
@@ -334,12 +357,135 @@ gathers every case-wide operation in one place:
   inline action bar.
 - **Open sequence** — only shown when the case was created from a
   sequence.
-- **Download video** — downloads the compressed archive of the case
-  recordings (only shown once the archive is ready).
+- **Generate export** / **Regenerate export** — same export-bundle
+  trigger as on the inline action bar, with the same *generating /
+  stale / fresh / failed* state machine.
+- **Download video** — downloads the latest generated `.zip` bundle
+  (only shown once an export has been produced).
 - **Share case** — opens the *Share case* modal described below.
 - **Delete** — removes the case. Note that on the detail page **Delete is
   restricted to account admins and the account owner** — the case's
   reporter cannot delete from here, only from the inline action bar.
+
+## Exporting a case
+
+An **export** is a single downloadable `.zip` bundle containing the
+recordings and attachments of a case. Exports are built on demand by the
+**hub-pipeline-export** worker and stored on the Vault archive provider
+configured for the account, so they are available for download as long
+as the case itself exists.
+
+### How an export is built
+
+Triggering an export from the UI doesn't build the bundle synchronously:
+Hub hands the work off to the **hub-pipeline-export** worker through the
+message broker, the worker streams the selected media from Vault into a
+temporary directory, compresses it, and uploads the resulting `.zip`
+back to Vault. The Hub UI tracks progress on the task record and reveals
+the **Download** action once a fresh bundle is available.
+
+{{< rete caption="How a case export is generated and delivered." alt="Architecture of the case export flow: browser to hub-api to RabbitMQ to hub-pipeline-export, with MongoDB for task state and Vault for source media and the resulting .zip bundle." height="500" >}}
+{
+  "groups": [],
+  "nodes": [
+    { "id": "browser",  "kind": "default",         "x":   0, "y":  60, "w": 200, "h": 130,
+      "header": "USER",     "title": "Hub UI",        "subtitle": "Operator browser" },
+    { "id": "hubapi",   "kind": "hub",             "x": 250, "y":  60, "w": 220, "h": 130,
+      "header": "API",      "title": "hub-api",       "subtitle": "REST + job dispatch" },
+    { "id": "rabbit",   "kind": "amqp",            "x": 520, "y":  60, "w": 220, "h": 130,
+      "header": "AMQP",     "title": "RabbitMQ",      "subtitle": "kcloud-export-queue" },
+    { "id": "exporter", "kind": "pipeline-export", "x": 790, "y":  60, "w": 240, "h": 130,
+      "header": "PIPELINE", "title": "Export worker", "subtitle": "hub-pipeline-export" },
+
+    { "id": "mongo",    "kind": "storage",         "x": 360, "y": 320, "w": 220, "h": 130,
+      "header": "DB",       "title": "MongoDB",       "subtitle": "task + case rows" },
+    { "id": "vault",    "kind": "vault",           "x": 790, "y": 320, "w": 240, "h": 130,
+      "header": "STORE",    "title": "Vault",         "subtitle": "Recordings + bundle" }
+  ],
+  "connections": [
+    { "from": "browser",  "to": "hubapi",   "fromSide": "right",  "toSide": "left", "label": "1. Generate" },
+    { "from": "hubapi",   "to": "rabbit",   "fromSide": "right",  "toSide": "left", "label": "2. Enqueue" },
+    { "from": "rabbit",   "to": "exporter", "fromSide": "right",  "toSide": "left", "label": "3. Consume" },
+
+    { "from": "hubapi",   "to": "mongo",    "fromSide": "bottom", "toSide": "top",  "label": "Update status",   "kind": "dashed" },
+    { "from": "exporter", "to": "mongo",    "fromSide": "bottom", "toSide": "top",  "label": "Read / write task", "kind": "dashed" },
+    { "from": "exporter", "to": "vault",    "fromSide": "bottom", "toSide": "top",  "label": "Fetch + upload .zip" }
+  ]
+}
+{{< /rete >}}
+
+The top row is the request path: the browser kicks off a job on
+`hub-api`, which enqueues it on RabbitMQ for the **hub-pipeline-export**
+worker to pick up. The bottom row is the data plane: `hub-api` only
+flips the task status in MongoDB, while the worker reads the current
+*Include in export* selection from MongoDB, streams the matching media
+out of Vault, compresses it locally, uploads the resulting `.zip` back
+to Vault and writes the new `compressed_url` onto the task. The UI then
+polls the task, flips from *Generating…* to *Fresh*, and reveals the
+**Download** action that streams the bundle straight from Vault.
+
+### Curating what goes into the bundle
+
+Before triggering an export, use the **E** (*Include in export*)
+checkboxes in the playlist and attachments panel of the case to decide
+which items end up in the `.zip`:
+
+- **Playlist E column** — each recording attached to the case can be
+  individually included or excluded.
+- **Attachments E column** — each uploaded file can be individually
+  included or excluded.
+- **Header checkbox** — toggles every row of the panel at once, which is
+  handy when you want to start from "all in" or "all out" and then
+  fine-tune.
+
+Toggling any checkbox marks the case's export as *stale* (see *State
+machine* below), which re-enables the **Regenerate export** button so
+the next bundle reflects the new selection.
+
+> **Legacy cases:** cases created before per-row selection was introduced
+> show every **E** checkbox checked and disabled. Their export keeps the
+> previous "include everything" behavior; no migration step is needed.
+
+### Triggering a build
+
+The export can be triggered from two equivalent places:
+
+- The **Generate export** / **Regenerate export** button on the action
+  bar at the bottom of the inline expanded case.
+- The **Generate export** / **Regenerate export** entry in the
+  **Actions** menu on the dedicated case detail page (`/cases/<id>`).
+
+Both push a job to the hub-pipeline-export queue. The worker copies the
+selected recordings from the archive provider, packages them together
+with the selected attachments into a single `.zip`, uploads the bundle
+back to Vault, and updates the case so the **Download** button can serve
+it.
+
+### State machine
+
+The export button label and enabled state track the case's current
+export status:
+
+| State        | Label                       | Enabled | Meaning                                                              |
+|--------------|-----------------------------|:-------:|----------------------------------------------------------------------|
+| *none*       | Generate export             | ✓       | No bundle has ever been built for this case.                         |
+| *generating* | Generating export… *N* %    | ✗       | The worker is running; the percentage is live progress.              |
+| *fresh*      | Regenerate export           | ✗       | A bundle exists and matches the current selection — nothing to do.   |
+| *stale*      | Regenerate export           | ✓       | A bundle exists but the selection changed since the last run.        |
+| *failed*     | Retry export                | ✓       | The last attempt errored; clicking re-queues the job.                |
+
+The state is shared between the inline view, the detail page and the
+status chip on the cases overview row, so a build kicked off from one
+surface is reflected everywhere.
+
+### Downloading the bundle
+
+Once a build has succeeded, both the inline action bar and the
+**Actions** menu show a **Download** entry that streams the latest
+bundle straight from Vault. The button is hidden until the first
+successful build completes. Regenerating an export overwrites the
+previously stored bundle, so the **Download** action always serves the
+freshest version that finished building.
 
 ## Sharing a case
 
@@ -354,7 +500,14 @@ To create a new share:
 
 1. Enter the **email address** of the person you want to give access to.
 2. Pick an **expiry** for the link — *1 hour*, *24 hours* or *7 days*.
-3. Click **Send invite**. Hub generates a unique share link
+3. Use the **Media** and **Attachments** tabs at the top of the modal to
+   curate exactly which recordings and which attachments the recipient
+   will see. The two tabs mirror the *Include in share* (**S**)
+   checkboxes from the playlist and attachments panel, and let you
+   review the selection before sending the invite. A per-share snapshot
+   of the selection is stored on the share itself, so later changes to
+   the case selection do not retroactively affect already-issued links.
+4. Click **Send invite**. Hub generates a unique share link
    (`/share/<token>`) and a one-time **verification code**, and emails
    both to the recipient. After clicking the link, the recipient must
    enter that code to open the case. The new share is added to the
@@ -364,6 +517,12 @@ The *Existing shares* section lists every active invitation with the
 recipient's email and the expiry date. Clicking the trash icon on a row
 revokes that share immediately — the link and verification code can no
 longer be used to open the case.
+
+On the recipient's side, the shared page shows the curated playlist *and*
+an **Attachments** block listing every attachment included in the share,
+each with a one-click download link. The shared link only exposes the
+recordings and attachments included in the share's own selection
+snapshot.
 
 > **Note:** Shared links only grant access to the case itself (recordings,
 > attachments, description). They do not give the recipient access to the
