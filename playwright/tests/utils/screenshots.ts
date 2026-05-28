@@ -3,16 +3,34 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { prepareForScreenshot } from './chrome';
 
-const DEFAULT_DIR = path.resolve(
+/**
+ * Root of the Hub documentation pages — every topic captured by a spec
+ * writes its PNGs into `<HUB_DOCS_ROOT>/<topic>/`.
+ */
+const HUB_DOCS_ROOT = path.resolve(
   __dirname,
-  '../../../app/content/docs/hub/cases',
+  '../../../app/content/docs/hub',
 );
 
-export function screenshotDir(): string {
+/**
+ * Default topic used when a spec does not specify one. Kept for backwards
+ * compatibility with the original cases/media specs which always wrote
+ * into `docs/hub/cases`.
+ */
+const DEFAULT_TOPIC = 'cases';
+
+/**
+ * Resolves the on-disk directory where screenshots for a topic should be
+ * written. Order of precedence:
+ *   1. The `SCREENSHOT_DIR` env var (relative to `learn/playwright/`).
+ *   2. `learn/app/content/docs/hub/<topic>/`.
+ * The directory is created on demand.
+ */
+export function screenshotDir(topic: string = DEFAULT_TOPIC): string {
   const fromEnv = process.env.SCREENSHOT_DIR;
   const dir = fromEnv
     ? path.resolve(__dirname, '..', '..', fromEnv)
-    : DEFAULT_DIR;
+    : path.join(HUB_DOCS_ROOT, topic);
   fs.mkdirSync(dir, { recursive: true });
   return dir;
 }
@@ -25,17 +43,30 @@ export function screenshotDir(): string {
 export const SCREENSHOT_WIDTH = 1450;
 export const SCREENSHOT_HEIGHT = 750;
 
+export interface CaptureOptions {
+  /** Override the default 1450 px viewport width. */
+  width?: number;
+  /** Override the default 750 px viewport height. */
+  height?: number;
+  /**
+   * Documentation topic the screenshot belongs to. Determines the output
+   * subdirectory under `learn/app/content/docs/hub/`. Defaults to `cases`
+   * for backwards compatibility.
+   */
+  topic?: string;
+}
+
 /**
- * Takes a 1400×750 PNG screenshot of the top of the page and writes it
- * (overwriting any existing file) to the screenshot directory. Returns the
- * absolute path on disk.
+ * Takes a 1450×750 PNG screenshot of the top of the page and writes it
+ * (overwriting any existing file) to the topic's screenshot directory.
+ * Returns the absolute path on disk.
  */
 export async function capture(
   page: Page,
   filename: string,
-  options: { width?: number; height?: number } = {},
+  options: CaptureOptions = {},
 ): Promise<string> {
-  const dir = screenshotDir();
+  const dir = screenshotDir(options.topic);
   const target = path.join(dir, filename);
 
   const width = options.width ?? SCREENSHOT_WIDTH;
@@ -64,4 +95,22 @@ export async function capture(
   // eslint-disable-next-line no-console
   console.log(`  📸  saved ${path.relative(process.cwd(), target)}`);
   return target;
+}
+
+/**
+ * Returns a `capture`-shaped function that is bound to a specific
+ * documentation topic. Use this in a spec file to avoid repeating the
+ * `topic` option on every call:
+ *
+ * ```ts
+ * const shoot = captureFor('livestream');
+ * await shoot(page, 'hub-livestream-overview.png');
+ * ```
+ */
+export function captureFor(topic: string) {
+  return (
+    page: Page,
+    filename: string,
+    options: Omit<CaptureOptions, 'topic'> = {},
+  ): Promise<string> => capture(page, filename, { ...options, topic });
 }

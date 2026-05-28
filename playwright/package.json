@@ -9,7 +9,9 @@
     "cases": "playwright test tests/cases.spec.ts",
     "cases:headed": "playwright test tests/cases.spec.ts --headed",
     "media": "playwright test tests/media.spec.ts",
-    "media:headed": "playwright test tests/media.spec.ts --headed"
+    "media:headed": "playwright test tests/media.spec.ts --headed",
+    "livestream": "playwright test tests/livestream.spec.ts",
+    "livestream:headed": "playwright test tests/livestream.spec.ts --headed"
   },
   "devDependencies": {
     "@playwright/test": "^1.47.0",

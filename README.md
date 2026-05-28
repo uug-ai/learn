@@ -162,6 +162,25 @@ docker run -p 8080:80 docs-site
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+### Adding or refreshing a Hub documentation page
+
+The repeatable recipe for adding a new page under `app/content/docs/hub/`
+— or for refreshing an existing one when the Hub frontend changes — is
+documented in [`TEMPLATE.md`](TEMPLATE.md). It covers:
+
+- where to look in the monorepo (`hub-frontend`, `hub-api` and the
+  `hub-pipeline-*` services) for the source of truth behind each
+  feature,
+- the canonical page structure used by the existing pages,
+- how to write a Playwright spec that regenerates every screenshot
+  against a locally-running Hub stack (`hub-api` + `hub-frontend` on
+  `http://localhost:4200`), starting from
+  [`playwright/tests/TEMPLATE.spec.ts.example`](playwright/tests/TEMPLATE.spec.ts.example).
+
+The **Cases** (`docs/hub/cases`) and **Live view** (`docs/hub/livestream`)
+pages are both written against that template and can be used as
+copy/paste references.
+
 ## Resources
 
 - [Hugo Documentation](https://gohugo.io/documentation/)
