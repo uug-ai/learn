@@ -2,7 +2,11 @@
 
 ## v1.3.17
 
-Changes since `v1.3.16`:
+Previous release: `v1.3.16`
+
+Current release: `v1.3.17`
+
+Changes between `v1.3.16` and `v1.3.17`:
 
 - Refreshed the Hub livestream documentation with updated screenshots, clearer wording, and improved styling.
 - Added Playwright coverage for the livestream page, including a diagnostic spec and shared screenshot helpers.
