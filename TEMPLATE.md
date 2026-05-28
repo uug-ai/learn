@@ -17,16 +17,23 @@ It is the meta-template that the `Cases` page (`docs/hub/cases`) and the
    the screenshots almost always pull from several monorepo projects at
    once — pick the right ones for the feature you are documenting (see
    [Where to look in the monorepo](#where-to-look-in-the-monorepo)).
-2. **Write the page.** Add `learn/app/content/docs/hub/<topic>/index.md`
-   following the Hugo frontmatter and section structure described in
-   [Page structure](#page-structure).
-3. **Automate the screenshots.** Add a Playwright spec under
-   `learn/playwright/tests/<topic>.spec.ts` so the PNGs that illustrate
-   the page can be regenerated on demand. Start from
-   `learn/playwright/tests/TEMPLATE.spec.ts.example`.
-4. **Wire the spec into npm scripts** and reference every generated PNG
-   from the Markdown page (see
-   [Generating the screenshots](#generating-the-screenshots)).
+2. **Scaffold the page and spec in one command:**
+
+   ```bash
+   cd learn/playwright
+   npm run new -- <topic> --title="<Title>" --route="/<route>" --heading="<Heading>"
+   ```
+
+   This creates `learn/app/content/docs/hub/<topic>/index.md` (with the
+   recommended section skeleton) and `learn/playwright/tests/<topic>.spec.ts`
+   (generated from `tests/TEMPLATE.spec.ts.example`), and registers the
+   matching `npm run <topic>` / `npm run <topic>:headed` scripts. See
+   [Scaffolding a new page](#scaffolding-a-new-page) for the full option
+   list.
+3. **Fill in the page** following the Hugo frontmatter and section
+   structure described in [Page structure](#page-structure).
+4. **Adapt the spec** so it captures the screenshots referenced by the
+   page (see [Generating the screenshots](#generating-the-screenshots)).
 5. **Review locally** with `hugo server -D` and the headed Playwright run
    before opening a PR.
 
@@ -151,6 +158,94 @@ never collide on disk.
 
 ---
 
+## Scaffolding a new page
+
+The `learn/playwright/scripts/new-hub-page.mjs` helper bootstraps every
+file a new doc page needs in one command, following this template. Run
+it via the npm wrapper so paths resolve correctly:
+
+```bash
+cd learn/playwright
+npm run new -- <topic>
+```
+
+Where `<topic>` is the lowercase, kebab-case slug used both as the
+content folder (`docs/hub/<topic>/`) and the spec filename
+(`tests/<topic>.spec.ts`).
+
+### Options
+
+| Flag                   | Default                            | Purpose                                                                  |
+| ---------------------- | ---------------------------------- | ------------------------------------------------------------------------ |
+| `--title=<text>`       | title-cased `<topic>`              | Frontmatter `title` and the heading the spec waits for.                  |
+| `--description=<text>` | `Documentation for the <Title> page.` | Frontmatter `description` and `lead`.                                    |
+| `--route=<path>`       | `/<topic>`                         | Frontend route the spec navigates to (`page.goto`).                      |
+| `--heading=<text>`     | same as `--title`                  | Text the spec waits for to confirm the page rendered.                    |
+| `--weight=<n>`         | `399`                              | Hugo menu weight — pick a value that slots between existing pages.       |
+| `--force`, `-f`        | off                                | Overwrite the doc page, spec file or npm scripts if they already exist.  |
+
+### What it generates
+
+1. **`learn/app/content/docs/hub/<topic>/index.md`** — Hugo frontmatter,
+   a `figure` reference to `hub-<topic>-overview.png`, and `TODO` markers
+   for every recommended section (Introduction, How it works, Walkthrough,
+   Permissions, Configuration, Troubleshooting).
+2. **`learn/playwright/tests/<topic>.spec.ts`** — a copy of
+   `tests/TEMPLATE.spec.ts.example` with every `<TOPIC>`, `<route>` and
+   `<Page heading>` placeholder substituted. The instructional header from
+   the template is stripped out (a short banner pointing back at
+   `learn/TEMPLATE.md` replaces it).
+3. **Two new npm scripts** in `learn/playwright/package.json`:
+   - `npm run <topic>` — runs the spec headlessly.
+   - `npm run <topic>:headed` — same, with a visible browser.
+
+Example:
+
+```bash
+cd learn/playwright
+npm run new -- devices \
+    --title="Devices" \
+    --route="/devices" \
+    --weight=308
+```
+
+The scaffolder refuses to overwrite existing files unless you pass
+`--force`, so it's safe to re-run with different options while iterating.
+
+### Updating an existing page
+
+The same script also supports incremental edits, so you can grow a page
+section by section (or capture by capture) without hand-editing
+boilerplate.
+
+**Add a new section to an existing doc page:**
+
+```bash
+cd learn/playwright
+npm run new -- <topic> --add-section="Pagination" --screenshot=pagination
+```
+
+Appends `## Pagination` (with a `TODO` body) to
+`docs/hub/<topic>/index.md`. When `--screenshot=<name>` is also passed,
+embeds a `figure` shortcode for `hub-<topic>-<name>.png` under the
+heading so the screenshot is referenced as soon as you commit. Use
+`--level=3` for an `###` subsection.
+
+**Add a new screenshot capture to an existing spec:**
+
+```bash
+cd learn/playwright
+npm run new -- <topic> --add-capture="empty-state" \
+                       --describe="empty placeholder" \
+                       --update-doc
+```
+
+Appends a new `test('captures the empty placeholder', ...)` block to
+`tests/<topic>.spec.ts` that writes `hub-<topic>-empty-state.png`. With
+`--update-doc`, the matching `figure` reference is also appended to the
+doc page. Edit the generated test body to drive the UI to the state you
+want to capture, then re-run `npm run <topic>`.
+
 ## Generating the screenshots
 
 The screenshots that illustrate a Hub page are produced by Playwright
@@ -205,13 +300,15 @@ Edit `.env` and set:
 
 ### 3. Write the spec
 
-Copy the generic spec template and adapt it:
+Use the scaffolder described in
+[Scaffolding a new page](#scaffolding-a-new-page) — it copies the
+template and substitutes every `<TOPIC>` / `<route>` / `<Page heading>`
+placeholder for you, and registers the matching npm scripts:
 
 ```bash
-cp tests/TEMPLATE.spec.ts.example tests/<topic>.spec.ts
+cd learn/playwright
+npm run new -- <topic> --title="<Title>"
 ```
-
-Replace every `<TOPIC>`, `<route>` and `<Page heading>` placeholder.
 The template wires up:
 
 - `login(page)` — signs in with the credentials from `.env`.
@@ -234,17 +331,7 @@ if (!(await isPresent(tile, 15_000))) {
 This way the spec stays green on a freshly-seeded environment but still
 reproduces the same UI captures on a dev account that has real data.
 
-### 4. Wire it into npm scripts
-
-Add convenience scripts to `learn/playwright/package.json` next to the
-existing `cases` / `livestream` entries:
-
-```json
-"<topic>":          "playwright test tests/<topic>.spec.ts",
-"<topic>:headed":   "playwright test tests/<topic>.spec.ts --headed"
-```
-
-### 5. Run it
+### 4. Run it
 
 ```bash
 cd learn/playwright
@@ -252,11 +339,15 @@ npm run <topic>            # headless — what CI will do
 npm run <topic>:headed     # visible browser — useful while iterating
 ```
 
+(The npm scripts were registered for you by `npm run new`. If you wrote
+the spec by hand instead, add them to `learn/playwright/package.json`
+yourself next to the existing `cases` / `livestream` entries.)
+
 The PNGs land directly in `learn/app/content/docs/hub/<topic>/`,
 overwriting any previous version. Commit them together with the
 Markdown changes so the docs and the spec stay in lockstep.
 
-### 6. Preview the rendered docs
+### 5. Preview the rendered docs
 
 ```bash
 cd learn/app

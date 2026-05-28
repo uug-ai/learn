@@ -63,6 +63,8 @@
  * `SCREENSHOT_DIR` env var (relative to `learn/playwright/`).
  */
 
+// --- template-header-end --- (everything above is stripped by scripts/new-hub-page.mjs)
+
 import { test, expect, Page } from '@playwright/test';
 import { login } from './utils/auth';
 import { captureFor } from './utils/screenshots';

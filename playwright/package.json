@@ -6,6 +6,7 @@
   "scripts": {
     "install:browsers": "playwright install chromium",
     "test": "playwright test",
+    "new": "node scripts/new-hub-page.mjs",
     "cases": "playwright test tests/cases.spec.ts",
     "cases:headed": "playwright test tests/cases.spec.ts --headed",
     "media": "playwright test tests/media.spec.ts",

@@ -47,8 +47,19 @@ references them.
 Every documentation page that needs screenshots follows the same recipe
 — see the full guide in [`../TEMPLATE.md`](../TEMPLATE.md) for the
 end-to-end workflow (where to find the source of truth in the monorepo,
-how to start the Hub stack, how to wire the spec into the docs). A short
-summary:
+how to start the Hub stack, how to wire the spec into the docs).
+
+The fastest path is the scaffolder, which generates the doc page, the
+Playwright spec and the npm scripts in one shot:
+
+```bash
+cd learn/playwright
+npm run new -- <topic> --title="<Title>" --route="/<route>"
+```
+
+See `scripts/new-hub-page.mjs --help` for the full option list.
+
+If you'd rather write the files by hand:
 
 1. Make sure `learn/app/content/docs/hub/<topic>/index.md` exists.
 2. Copy `tests/TEMPLATE.spec.ts.example` to `tests/<topic>.spec.ts` and
