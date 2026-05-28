@@ -1,7 +1,7 @@
 ---
 title: "Live view"
-description: "Watch your devices in real time from Kerberos Hub."
-lead: "Watch your devices in real time from Kerberos Hub."
+description: "Watch your devices in real time from the Hub."
+lead: "Watch your devices in real time from the Hub."
 date: 2020-10-06T08:49:31+00:00
 lastmod: 2020-10-06T08:49:31+00:00
 draft: false
@@ -13,7 +13,7 @@ weight: 304
 toc: true
 ---
 
-The **Live view** page in Kerberos Hub streams the cameras connected to
+The **Live view** page in the Hub streams the cameras connected to
 your account directly in the browser. It is the page you land on most
 often during day-to-day monitoring: every connected agent shows up as a
 tile, every tile streams its camera at the resolution your subscription
@@ -27,7 +27,7 @@ serves the route `/livestream`.
 
 ## How the streams reach your browser
 
-Kerberos Hub never asks you to open ports on the network where your
+The Hub never asks you to open ports on the network where your
 cameras live. Two transports are used to bring the video to the browser,
 selected on a per-tile basis with the Preview/Live toggle:
 
@@ -36,7 +36,7 @@ selected on a per-tile basis with the Preview/Live toggle:
   WebSockets (WSS), so no port forwarding is required.
 - **Live — WebRTC.** The full-resolution video is sent over WebRTC. NAT
   traversal is handled by the STUN/TURN infrastructure shipped with
-  Kerberos Hub, so again no inbound ports need to be opened.
+  the Hub, so again no inbound ports need to be opened.
 
 The two transports cohabit on the same tile — when you flip a tile from
 Preview to Live, only the underlying stream component changes; the rest
@@ -46,7 +46,7 @@ of the UI (camera name, controls, badges) stays in place.
 {
   "groups": [
     { "id": "edge",    "label": "On-premise site", "x":    0, "y":  20, "w": 460, "h": 560 },
-    { "id": "cloud",   "label": "Kerberos Hub",    "x":  560, "y":  20, "w": 320, "h": 560 },
+    { "id": "cloud",   "label": "Hub",             "x":  560, "y":  20, "w": 320, "h": 560 },
     { "id": "browser", "label": "Browser",         "x":  980, "y":  20, "w": 320, "h": 560 }
   ],
   "nodes": [
@@ -61,7 +61,7 @@ of the UI (camera name, controls, badges) stays in place.
       "header": "STUN / TURN", "title": "WebRTC relay", "subtitle": "Used only when direct fails" },
     { "id": "preview", "kind": "pipeline", "x": 1020, "y":  70, "w": 240, "h": 130,
       "header": "PREVIEW TILE", "title": "JPEG <img>", "subtitle": "Low-res snapshots" },
-    { "id": "live",    "kind": "pipeline", "x": 1020, "y": 280, "w": 240, "h": 130,
+    { "id": "live",    "kind": "pipeline", "x": 1020, "y": 245, "w": 240, "h": 130,
       "header": "LIVE TILE", "title": "WebRTC <video>", "subtitle": "Full-resolution media" }
   ],
   "connections": [
