@@ -14,7 +14,9 @@
     "media:headed": "node scripts/run-headed.mjs tests/media.spec.ts",
     "livestream": "playwright test tests/livestream.spec.ts",
     "livestream:headed": "node scripts/run-headed.mjs tests/livestream.spec.ts",
-    "livestream:diagnose": "playwright test tests/livestream-diagnose.spec.ts"
+    "livestream:diagnose": "playwright test tests/livestream-diagnose.spec.ts",
+    "analytics": "playwright test tests/analytics.spec.ts",
+    "analytics:headed": "node scripts/run-headed.mjs tests/analytics.spec.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.47.0",

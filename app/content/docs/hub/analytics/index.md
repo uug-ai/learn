@@ -1,9 +1,9 @@
 ---
 title: "Analytics"
-description: "Various types of video analytics are calculated."
-lead: "Various types of video analytics are calculated."
+description: "Explore your video landscape through KPIs and charts."
+lead: "Explore your video landscape through KPIs and charts."
 date: 2020-10-06T08:49:31+00:00
-lastmod: 2020-10-06T08:49:31+00:00
+lastmod: 2026-05-28T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -13,64 +13,163 @@ weight: 305
 toc: true
 ---
 
-Kerberos Hub provides insights through video analytics. Recordings being uploaded to Kerberos Vault are triggering [the Kerberos Hub pipeline](/hub/pipeline/). Inside the pipeline, several computations are being done: sequencing, alerting and video analytics.  
+The **Analytics** page in the Hub turns a day's worth of recordings,
+counts and region detections into a handful of KPI cards, hourly charts
+and drill-down tables. It is the page you open when you want to answer
+questions like *"how many people did camera 3 count this afternoon?"* or
+*"which devices were online today and how many recordings did they
+produce?"*.
 
-Having said that, please note that [you can build your own pipeline by](/vault/machine-learning/) integrating with Kerberos Vault. For example you could create your own cat/dog detector and inject your own machine learning algorithms, or interface with your favorite data science solution stack.
+The page is reachable from the main sidebar under **Analytics** and
+serves the route `/analytics`.
 
-So what can you expect from the video analytics in Kerberos Hub? It provides two types of analytics: CPU  and GPU enabled computations.
+{{< figure src="hub-analytics-overview.png" alt="The Analytics page rendered for a day with KPIs, hourly charts and drill-down tables." caption="The Analytics page consolidates a single day's KPIs, hourly charts and per-event tables. Filter the day, the sites and the devices at the top, then read the cards and charts top to bottom." class="stretch">}}
 
-## CPU 
+## How it works
 
-These analytics are running on a CPU, and don't require a GPU installed in one of your nodes, as they are rather simple analytics. Following calculations or computer vision algorithms are executed in the pipeline. This list is still growing over time, as the Kerberos.io team is advancing the Kerberos Hub solution day by day.
+Analytics is not a separate ingestion path: it is a read-only view on
+top of the data the [Hub pipeline](/hub/pipeline/) already produces.
 
-### Thumbnail
+- **Recordings** are uploaded to the [Vault](/vault/) by the agent and
+  registered in the Hub database by `hub-api`.
+- **Counts and region detections** are produced by the
+  [`hub-pipeline-analysis`](https://github.com/uug-ai/hub-pipeline-analysis)
+  service when an [alert](/hub/alerts/) of type `counting_line`,
+  `counting_region` or `multi` matches an object track on a recording.
+- The Analytics page aggregates those rows for the selected day, sites
+  and devices, and asks `hub-api` for hourly buckets to feed the
+  charts. No new analytics are computed at view time — flipping the
+  filters only re-queries the existing data.
 
-Creating thumbnails might not bring any insightful analytics, but it helps to get already a sneak peek or context of the recording before it is downloaded from your Kerberos Vault. This also saves some bandwidth as videos do not need to be preloaded when searching for a particular event.
+The set of KPIs and the hourly buckets you see on this page therefore
+exactly mirror what your [alerts](/hub/alerts/) have produced and what
+your devices have uploaded. If a KPI stays at zero, the most common
+cause is either *"no alert is configured for this device"* or *"no
+recording was uploaded for the selected day"*.
 
-{{< figure src="thumbnail.png" alt="Thumbnail is the first image of the recording." class="stretch">}}
+## Walkthrough
 
-A simple scale down function is being used and converted to a `base64` encoded image. This `base64` object is stored in the Kerberos Hub database.
+### Filtering the day, sites and devices
 
-### Dominant color
+The top **control bar** scopes every KPI, chart and table on the page.
+Three filters cooperate:
 
-A color histogram is created for every the first frame of the recordings. The dominant color can be used for looking for specific objects of interest.
+- **Date picker** — pick any day for which at least one recording was
+  uploaded. Days without data are disabled.
+- **Sites** multi-select — restrict the view to one or more sites.
+- **Devices** multi-select — further restrict by individual camera.
 
-{{< figure src="dominantcolor.png" alt="Thumbnail is the first image of the recording." class="stretch">}}
+All three filters re-query the data in place; no full page reload is
+triggered.
 
-## GPU 
+{{< figure src="hub-analytics-filters.png" alt="The Analytics control bar with the Sites filter open." caption="The control bar at the top of the page scopes every KPI and chart below it. Sites and Devices are independent multi-selects, so you can mix a whole site with a single device from another." class="stretch">}}
 
-More complex analytics are calculated using a GPU. Specific machine learning models are loaded inside the GPU memory and predict specific objects, patterns and more. Post-processes (heatmap, counting, etc) can leverage the results of the classifications, and do a more specific calculation.
+### KPIs at a glance
 
-### Object detection and tracking
+A 5-card strip summarises the selected day:
 
-The classification service executes a YOLOv3 algorithm on the recorded media. Moving or stationary objects are located in the recording, while the traject of moving objects are computed. 
+- **Devices online** — the number of agents that were connected during
+  the day.
+- **Total recordings** — the number of recordings uploaded for the
+  selected scope.
+- **Objects counted** — the total of every `counting_line` alert.
+- **Objects in regions** — the total of every `counting_region` alert.
+- **Time in regions** — the cumulative dwell time matched by `multi`
+  region alerts, formatted as `HH:MM:SS`.
 
-{{< figure src="classification.png" alt="A pedestrian detected and tracked." class="stretch">}}
+{{< figure src="hub-analytics-kpis.png" alt="The five-card KPI strip on the Analytics page." caption="The KPI strip is the fastest way to spot an outlier day. Each card responds to the date, sites and devices filters." class="stretch">}}
 
-The GPU workload is not available in the Kerberos Hub pipeline by default, and requires to be installed seperately. More information about the installation of the `hub-objecttracker` can be found on our [Github page](https://github.com/kerberos-io/hub-objecttracker).
+### Per-alert track
 
-![Analytics in Hub](analytics-media.png)
+Below the KPIs, every alert that fired at least once on the selected
+day gets its own card on the **alert track**. The visual depends on
+the alert type:
 
-### Heatmap
+- `counting_line` cards show the *in / out* split next to the total.
+- `counting_region` cards show the dwell time and the number of
+  objects that entered the region.
+- `multi` cards combine both — directional counts and cumulative time
+  in the region.
 
-The detected objects are displayed on a canvas when drilling down to the media page. On top of that a heatmap is shown which visualises the occurence of objects using a colormap.
+When no alert is configured (or none fired), the track is replaced by
+a placeholder that links straight to the [Alerts](/hub/alerts/) page
+so you can configure one.
 
-![Counted some pedestrians](heatmap.png)
+### Hourly charts
 
-### Counting 
+Two side-by-side charts break the day down into 24 hourly buckets:
 
-The results of the object detection are passed to the counting service. Objects moving over a distance and crossing a line segment (defined in an alert) are counted.
+- **Counted per hour** — switch between *per device* (one series per
+  camera) and *per alert* using the camera / alerts toggle in the top
+  right of the block. The alert series can additionally be filtered
+  by direction (`all`, `in`, `out`).
+- **Region time per hour** — total seconds spent in any region per
+  hour, broken down by camera.
 
-![Counted some pedestrians](counting.png)
+{{< figure src="hub-analytics-counted-chart.png" alt="The Counted per hour chart with the camera/alerts toggle visible." caption="The Counted per hour chart toggles between a per-device and a per-alert breakdown. The arrow next to the alerts toggle opens a direction filter (all / in / out)." class="stretch">}}
 
-### Region detection
+### Count and region tables
 
-One or more regions can be specified. Objects of interest moving in a region will trigger
+Two tables below the charts list the individual events behind the
+totals: every counted object (with date, hour, device, alert and a
+direction arrow) and every region detection (with the same columns plus
+the dwell duration). Clicking a row navigates to the underlying
+[recording](/hub/recordings/) so you can replay the moment that
+triggered the count.
 
-![Regions detected](region.png)
+### Recordings per hour
 
-## Analytics overview page
+The final block plots the number of recordings uploaded per hour for
+the selected scope. Use it to correlate spikes in analytics with the
+volume of footage your agents actually pushed up.
 
-All analytics are consolidated on the analytics overview page. On this page you'll find an overview for each day, site and camera. The total number of recordings, number of counts and number of region detections are shown on a hour graph. For each camera the full-day heatmap is shown, which illustrates the most active zones of that specific day.
+{{< figure src="hub-analytics-recordings-chart.png" alt="The Recordings per hour chart at the bottom of the Analytics page." caption="Recordings per hour reflects what the agents uploaded, regardless of whether an alert matched. A flat line here usually means the cameras were offline, not that the analytics are broken." class="stretch">}}
 
-![Analytics overview](analytics-page.gif)
+## Permissions and roles
+
+Analytics is a read-only view. Any user with access to the parent site
+can open the page; the result set is automatically scoped to the
+devices that user is allowed to see (same scoping as the [Live
+view](/hub/livestream/) and [Recordings](/hub/recordings/) pages).
+
+The **Manage alerts** button in the breadcrumb only navigates — it
+does not grant access. Editing alerts still requires the
+`alerts` permission; see the
+[roles documentation]({{< ref "/docs/hub/roles" >}}) for the full
+matrix.
+
+## Configuration
+
+Analytics has no dedicated configuration of its own. The data it
+visualises is produced by the alerts engine and the analysis pipeline,
+which are configured per Helm chart value:
+
+```yaml
+# helm-charts/charts/hub/values.yaml
+hubPipelineAnalysis:
+  enabled: true       # required to populate Objects counted /
+                      # Objects in regions / Time in regions
+```
+
+If `hubPipelineAnalysis` is disabled in the deployment, the
+**Total recordings** and **Recordings per hour** widgets still work
+(they only need recordings), but every other KPI stays at zero.
+
+## Troubleshooting
+
+- **Every KPI is zero.** Check that at least one
+  [alert](/hub/alerts/) is enabled for the selected site / device and
+  that recordings were uploaded that day. The KPI strip never
+  back-fills counts retroactively.
+- **The date picker only lists a single day.** The picker is fed by
+  the days for which the Hub has indexed recordings. A brand-new
+  account or a long offline period will collapse the picker to
+  today's date.
+- **Charts show "No chart data" but the KPIs are non-zero.** The
+  totals come from a different aggregation than the hourly buckets.
+  This usually means the per-hour query timed out — refresh the page
+  with the **Refresh** button in the breadcrumb to retry.
+- **A count row is missing from the table but the KPI counts it.**
+  The tables are paginated server-side; the KPI counts everything,
+  the table only shows the first page. Narrow the filters or use the
+  [Recordings](/hub/recordings/) page to find the specific event.
