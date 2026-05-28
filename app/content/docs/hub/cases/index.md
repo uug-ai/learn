@@ -384,22 +384,22 @@ temporary directory, compresses it, and uploads the resulting `.zip`
 back to Vault. The Hub UI tracks progress on the task record and reveals
 the **Download** action once a fresh bundle is available.
 
-{{< rete caption="How a case export is generated and delivered." alt="Architecture of the case export flow: browser to hub-api to RabbitMQ to hub-pipeline-export, with MongoDB for task state and Vault for source media and the resulting .zip bundle." height="500" >}}
+{{< rete caption="How a case export is generated and delivered." alt="Architecture of the case export flow: Hub Frontend to Hub API to RabbitMQ to hub-pipeline-export, with MongoDB for task state and Vault for source media and the resulting .zip bundle." height="560" >}}
 {
   "groups": [],
   "nodes": [
-    { "id": "browser",  "kind": "default",         "x":   0, "y":  60, "w": 200, "h": 130,
-      "header": "USER",     "title": "Hub UI",        "subtitle": "Operator browser" },
-    { "id": "hubapi",   "kind": "hub",             "x": 250, "y":  60, "w": 220, "h": 130,
-      "header": "API",      "title": "hub-api",       "subtitle": "REST + job dispatch" },
-    { "id": "rabbit",   "kind": "amqp",            "x": 520, "y":  60, "w": 220, "h": 130,
+    { "id": "browser",  "kind": "default",         "x":   0, "y":  60, "w": 220, "h": 130,
+      "header": "USER",     "title": "Hub Frontend",  "subtitle": "Operator browser" },
+    { "id": "hubapi",   "kind": "hub",             "x": 320, "y":  60, "w": 240, "h": 130,
+      "header": "API",      "title": "Hub API",       "subtitle": "REST + job dispatch" },
+    { "id": "rabbit",   "kind": "amqp",            "x": 660, "y":  60, "w": 240, "h": 130,
       "header": "AMQP",     "title": "RabbitMQ",      "subtitle": "kcloud-export-queue" },
-    { "id": "exporter", "kind": "pipeline-export", "x": 790, "y":  60, "w": 240, "h": 130,
+    { "id": "exporter", "kind": "pipeline-export", "x": 1000, "y":  60, "w": 260, "h": 130,
       "header": "PIPELINE", "title": "Export worker", "subtitle": "hub-pipeline-export" },
 
-    { "id": "mongo",    "kind": "storage",         "x": 360, "y": 320, "w": 220, "h": 130,
+    { "id": "mongo",    "kind": "storage",         "x": 460, "y": 380, "w": 240, "h": 130,
       "header": "DB",       "title": "MongoDB",       "subtitle": "task + case rows" },
-    { "id": "vault",    "kind": "vault",           "x": 790, "y": 320, "w": 240, "h": 130,
+    { "id": "vault",    "kind": "vault",           "x": 1000, "y": 380, "w": 260, "h": 130,
       "header": "STORE",    "title": "Vault",         "subtitle": "Recordings + bundle" }
   ],
   "connections": [
