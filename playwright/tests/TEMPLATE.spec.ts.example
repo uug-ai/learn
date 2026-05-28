@@ -1,0 +1,117 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/**
+ * Generic Playwright spec template for capturing documentation screenshots
+ * of a Hub frontend page.
+ *
+ * QUICK START
+ * -----------
+ * 1. Copy this file to `tests/<topic>.spec.ts`, where `<topic>` matches the
+ *    folder of the documentation page you are illustrating, e.g.
+ *    `learn/app/content/docs/hub/<topic>/index.md`.
+ * 2. Replace every `<TOPIC>`, `<route>` and `<Page heading>` placeholder.
+ * 3. Rewrite the `test(...)` blocks so they navigate the page and click
+ *    the UI elements you want to document, then call
+ *    `shoot(page, 'hub-<topic>-<name>.png')` for each screenshot.
+ * 4. Reference the captured PNGs from the matching Markdown page using
+ *    Hugo's `figure` shortcode:
+ *
+ *        {{< figure src="hub-<topic>-overview.png" alt="..." caption="..." class="stretch">}}
+ *
+ * 5. Add convenience scripts to `learn/playwright/package.json`:
+ *
+ *        "<topic>":          "playwright test tests/<topic>.spec.ts",
+ *        "<topic>:headed":   "playwright test tests/<topic>.spec.ts --headed"
+ *
+ * PREREQUISITES
+ * -------------
+ * The spec drives a *running* Hub frontend, so before you run it you need:
+ *
+ *   - hub-api running locally (default `http://localhost:8080`), with a
+ *     MongoDB it can reach. From the monorepo:
+ *
+ *         cd hub-api && ENV_FILE=api/.env.local go run ./api serve
+ *
+ *   - hub-frontend running locally on `http://localhost:4200`. From the
+ *     monorepo:
+ *
+ *         cd hub-frontend/kerberos.ng && npm install --legacy-peer-deps
+ *         npm run start-dev
+ *
+ *     (Or use the `stack: start frontend + api` VS Code task.)
+ *
+ *   - `learn/playwright/.env` populated with `HUB_BASE_URL=http://localhost:4200`
+ *     and credentials for a Hub user that can see the data you want to
+ *     screenshot. See `.env.example`.
+ *
+ * SELECTOR CONVENTIONS
+ * --------------------
+ * - Angular components like `<Breadcrumb>` or `<ButtonField>` are emitted as
+ *   the lower-case tags `breadcrumb` / `buttonfield` in the DOM, so prefer
+ *   `page.locator('buttonfield, ButtonField, button')` style selectors.
+ * - Modals declared with `<Modal>` keep their `<modal>` host hidden — target
+ *   the visible `.bg.open` overlay child instead of the host element.
+ * - Hover-revealed controls (stream controls, action menus, …) require an
+ *   explicit `hover()` — use the `revealHoverControls()` helper.
+ * - When the underlying data may be empty (no cases, no recordings, no
+ *   devices, …) skip the screenshot via `skipBecause(testInfo, '...', '...')`
+ *   so CI does not fail on test environments without seeded data.
+ *
+ * SCREENSHOT OUTPUT
+ * -----------------
+ * `captureFor('<topic>')` writes its PNGs to
+ * `learn/app/content/docs/hub/<topic>/`. Override the destination via the
+ * `SCREENSHOT_DIR` env var (relative to `learn/playwright/`).
+ */
+
+// --- template-header-end --- (everything above is stripped by scripts/new-hub-page.mjs)
+
+import { test, expect, Page } from '@playwright/test';
+import { login } from './utils/auth';
+import { captureFor } from './utils/screenshots';
+import {
+  gotoAndWait,
+  isPresent,
+  revealHoverControls,
+  skipBecause,
+} from './utils/page';
+
+// Replace <TOPIC> with the docs slug, e.g. 'livestream', 'devices', 'sites'.
+const shoot = captureFor('<TOPIC>');
+
+/**
+ * Convenience helper that drives the browser to the target route and waits
+ * for the page to settle. Adapt the URL and the readiness heading to the
+ * page you are documenting.
+ */
+async function gotoTarget(page: Page): Promise<void> {
+  await gotoAndWait(page, '/<route>', '<Page heading>', {
+    // Optional: a CSS selector that must also be visible before continuing
+    // (e.g. the table host, the empty-state placeholder, …).
+    // readySelector: 'tasks-list, placeholder',
+  });
+}
+
+test.describe('Hub — <TOPIC> documentation screenshots', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
+  test('captures the <TOPIC> overview', async ({ page }) => {
+    await gotoTarget(page);
+    await shoot(page, 'hub-<TOPIC>-overview.png');
+  });
+
+  test('captures a hover-revealed control', async ({ page }, testInfo) => {
+    await gotoTarget(page);
+    const target = page.locator('<your-locator>').first();
+    if (!(await isPresent(target, 10_000))) {
+      return skipBecause(testInfo, 'no-target', 'Nothing to capture.');
+    }
+    await revealHoverControls(target);
+    await shoot(page, 'hub-<TOPIC>-<thing>.png');
+  });
+
+  // Add one `test(...)` per screenshot you want to ship with the docs.
+  // Keep the steps that drive the UI minimal — every additional click is a
+  // selector that has to keep working as the frontend evolves.
+});

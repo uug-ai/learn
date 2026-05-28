@@ -245,6 +245,10 @@ function init(container) {
         svg.style.height = (maxY - minY + pad * 2) + 'px';
 
         svg.innerHTML = '';
+        // Two passes: draw every connection path first, then every label
+        // on top. Without this, a later (e.g. dashed fallback) path can
+        // paint over an earlier connection's label and hide it.
+        const labelJobs = [];
         (config.connections || []).forEach(c => {
             const from = nodeById.get(c.from);
             const to   = nodeById.get(c.to);
@@ -261,23 +265,27 @@ function init(container) {
             svg.appendChild(path);
 
             if (c.label) {
-                // Midpoint = straight average of endpoints (good enough for label placement).
-                const mx = (a.x + b.x) / 2;
-                const my = (a.y + b.y) / 2;
-                let angle = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
-                // Keep text upright: never read upside-down.
-                if (angle > 90)  angle -= 180;
-                if (angle < -90) angle += 180;
-                const text = document.createElementNS(SVG_NS, 'text');
-                text.setAttribute('x', mx);
-                text.setAttribute('y', my);
-                text.setAttribute('class', 'rete-connection__label');
-                text.setAttribute('text-anchor', 'middle');
-                text.setAttribute('dominant-baseline', 'middle');
-                text.setAttribute('transform', `rotate(${angle} ${mx} ${my})`);
-                text.textContent = c.label;
-                svg.appendChild(text);
+                labelJobs.push({ a, b, label: c.label });
             }
+        });
+
+        labelJobs.forEach(({ a, b, label }) => {
+            // Midpoint = straight average of endpoints (good enough for label placement).
+            const mx = (a.x + b.x) / 2;
+            const my = (a.y + b.y) / 2;
+            let angle = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+            // Keep text upright: never read upside-down.
+            if (angle > 90)  angle -= 180;
+            if (angle < -90) angle += 180;
+            const text = document.createElementNS(SVG_NS, 'text');
+            text.setAttribute('x', mx);
+            text.setAttribute('y', my);
+            text.setAttribute('class', 'rete-connection__label');
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('dominant-baseline', 'middle');
+            text.setAttribute('transform', `rotate(${angle} ${mx} ${my})`);
+            text.textContent = label;
+            svg.appendChild(text);
         });
     }
 

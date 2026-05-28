@@ -113,17 +113,27 @@ html.dark .rete-group__label,
     animation: none;
 }
 
-/* Inline label drawn on top of a connection's bezier midpoint. */
+/* Inline label drawn on top of a connection's bezier midpoint. The text
+   sits on top of the (coloured) edge: black ink on a white halo in light
+   mode, white ink on a black halo in dark mode. `paint-order: stroke`
+   draws the halo first so the fill is never clipped. */
 .rete-connection__label {
-    fill: #ffffff;
-    stroke: none;
+    fill: #1a1a1a;
+    stroke: #ffffff;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+    paint-order: stroke fill;
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    paint-order: stroke;
     pointer-events: none;
+}
+
+.dark .rete-connection__label {
+    fill: #ffffff;
+    stroke: #0b0f1a;
 }
 
 /* Nodes. The card is a soft-shadowed white panel; the header is a coloured
