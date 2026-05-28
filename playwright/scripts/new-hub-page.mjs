@@ -274,7 +274,7 @@ async function updatePackageJsonScripts(topic) {
     pkg.scripts[name] = command;
   };
   add(topic, `playwright test tests/${topic}.spec.ts`);
-  add(`${topic}:headed`, `playwright test tests/${topic}.spec.ts --headed`);
+  add(`${topic}:headed`, `node scripts/run-headed.mjs tests/${topic}.spec.ts`);
   // Preserve a trailing newline if the source had one.
   const trailing = raw.endsWith('\n') ? '\n' : '';
   await fs.writeFile(

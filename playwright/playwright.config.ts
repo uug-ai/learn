@@ -32,7 +32,25 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          // Live view tiles autoplay <video> elements as soon as the
+          // WebRTC track arrives (HD mode) and feed <img>/canvas from
+          // MQTT (SD mode). The default headless autoplay policy
+          // (`document-user-activation-required`) keeps unmuted videos
+          // paused and causes the tile to be captured before the first
+          // frame is painted. The flags below let WebRTC negotiate and
+          // play without a synthetic user gesture, and surface ICE
+          // candidates using the container's real IPs so signaling
+          // works inside the devcontainer.
+          args: [
+            '--autoplay-policy=no-user-gesture-required',
+            '--use-fake-ui-for-media-stream',
+            '--disable-features=WebRtcHideLocalIpsWithMdns',
+          ],
+        },
+      },
     },
   ],
 });

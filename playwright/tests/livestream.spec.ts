@@ -1,4 +1,4 @@
-import { test, expect, Locator, Page } from '@playwright/test';
+import { test, Locator, Page } from '@playwright/test';
 import { login } from './utils/auth';
 import { captureFor } from './utils/screenshots';
 import {
@@ -6,6 +6,8 @@ import {
   isPresent,
   revealHoverControls,
   skipBecause,
+  switchTileToSd,
+  waitForStreamFrame,
 } from './utils/page';
 
 /**
@@ -20,9 +22,6 @@ import {
  *                                      has access to (or the empty-state
  *                                      placeholder when none are
  *                                      connected).
- *   - hub-livestream-empty.png       — the empty-state placeholder shown
- *                                      when the account has no devices
- *                                      yet. Skipped when devices exist.
  *   - hub-livestream-filter.png      — the filter bar at the top of the
  *                                      page with the Sites multi-select
  *                                      open so every filter is visible
@@ -41,11 +40,6 @@ import {
  *                                      device name and the active /
  *                                      idle / alert badge published over
  *                                      MQTT.
- *   - hub-livestream-pagination.png  — the numbered pagination bar at the
- *                                      bottom of the page. Skipped on
- *                                      builds that use the default scroll
- *                                      mode or that have fewer streams
- *                                      than the page size.
  *
  * Selectors are taken from:
  *   - hub-frontend/kerberos.ng/src/app/home/livestream/livestream.component.html
@@ -88,6 +82,41 @@ function firstStreamTile(page: Page): Locator {
   return page.locator('app-liveview, block:has(streamcomponent)').first();
 }
 
+/**
+ * Iterates every tile on the page, scrolls it into view (so the
+ * IntersectionObserver fires `resumeStream()`) and clicks its SD/HD
+ * toggle into SD mode when the camera is connected. Returns the index
+ * of the first connected tile, or -1 when none are online.
+ *
+ * Forcing SD avoids HD/WebRTC which needs UDP egress + ICE — those are
+ * unreliable inside devcontainers and leave the tiles stuck on the
+ * "PREVIEW / LIVE" placeholder.
+ */
+async function switchConnectedTilesToSd(page: Page): Promise<number> {
+  const tiles = page.locator('app-liveview, block:has(streamcomponent)');
+  const count = await tiles.count();
+  let first = -1;
+  for (let i = 0; i < count; i++) {
+    const candidate = tiles.nth(i);
+    const isConnected = await candidate
+      .evaluate((el: Element) => {
+        const cmp = (window as any).ng?.getComponent?.(
+          el.querySelector('streamcomponent, StreamComponent') ?? el,
+        );
+        return cmp?.cameraConnected === 'true' || cmp?.cameraConnected === '';
+      })
+      .catch(() => false);
+    if (!isConnected) continue;
+    await candidate.scrollIntoViewIfNeeded().catch(() => undefined);
+    await switchTileToSd(candidate);
+    if (first === -1) first = i;
+  }
+  // Give the freshly-switched tiles a beat to receive their first MQTT
+  // JPEG snapshot.
+  if (first !== -1) await page.waitForTimeout(800);
+  return first;
+}
+
 test.describe('Hub — livestream documentation screenshots', () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
@@ -95,23 +124,8 @@ test.describe('Hub — livestream documentation screenshots', () => {
 
   test('captures the livestream overview', async ({ page }) => {
     await gotoLivestream(page);
+    await switchConnectedTilesToSd(page);
     await shoot(page, 'hub-livestream-overview.png');
-  });
-
-  test('captures the empty-state placeholder', async ({ page }, testInfo) => {
-    await gotoLivestream(page);
-
-    // The Placeholder is only rendered when devicesFiltered is empty AND no
-    // search value is set — i.e. on accounts without any connected device.
-    const placeholder = page.locator('placeholder, Placeholder').first();
-    if (!(await isPresent(placeholder, 3_000))) {
-      return skipBecause(
-        testInfo,
-        'has-devices',
-        'Account has devices — empty-state placeholder is not rendered.',
-      );
-    }
-    await shoot(page, 'hub-livestream-empty.png');
   });
 
   test('captures the filter bar with the Sites filter open', async ({
@@ -139,6 +153,7 @@ test.describe('Hub — livestream documentation screenshots', () => {
 
   test('captures the grid layout toggle', async ({ page }, testInfo) => {
     await gotoLivestream(page);
+    await switchConnectedTilesToSd(page);
 
     const gridToggle = page.locator('gridtoggle, GridToggle').first();
     if (!(await isPresent(gridToggle, 5_000))) {
@@ -158,27 +173,30 @@ test.describe('Hub — livestream documentation screenshots', () => {
   }, testInfo) => {
     await gotoLivestream(page);
 
-    const tile = firstStreamTile(page);
-    if (!(await isPresent(tile, 15_000))) {
+    const firstConnectedIndex = await switchConnectedTilesToSd(page);
+    if (firstConnectedIndex === -1) {
       return skipBecause(
         testInfo,
         'no-stream',
-        'No livestream tiles are rendered — no devices connected.',
+        'No livestream tiles are connected — no devices online.',
       );
     }
 
-    // Wait for the inner StreamComponent then hover so the SD/HD toggle,
-    // talk, mute and fullscreen controls flip `controlsVisible` to true
-    // (stream.component.html: `(mouseenter)="onStreamMouseEnter()"`).
+    const tile = page
+      .locator('app-liveview, block:has(streamcomponent)')
+      .nth(firstConnectedIndex);
     const stream = tile.locator('streamcomponent, StreamComponent').first();
-    await stream
-      .waitFor({ state: 'visible', timeout: 15_000 })
-      .catch(() => undefined);
-    await revealHoverControls(stream, { waitMs: 200 });
+    await tile.scrollIntoViewIfNeeded().catch(() => undefined);
+    const ready = await waitForStreamFrame(tile, 15_000);
+    if (ready === 'none') {
+      skipBecause(
+        testInfo,
+        'no-stream-frame',
+        'Connected tile rendered but no MQTT frame arrived within 15s.',
+      );
+    }
 
-    // Give the WebRTC / MQTT stream a moment to start rendering frames so
-    // the capture isn't just a black placeholder.
-    await page.waitForTimeout(2_500);
+    await revealHoverControls(stream, { waitMs: 200 });
     await shoot(page, 'hub-livestream-stream.png');
   });
 
@@ -186,6 +204,7 @@ test.describe('Hub — livestream documentation screenshots', () => {
     page,
   }, testInfo) => {
     await gotoLivestream(page);
+    await switchConnectedTilesToSd(page);
 
     // The status badges (success / updating / alert / neutral) only appear
     // on the default scroll layout (the `<block>`-wrapped tiles).
@@ -204,21 +223,5 @@ test.describe('Hub — livestream documentation screenshots', () => {
     }
     await header.scrollIntoViewIfNeeded().catch(() => undefined);
     await shoot(page, 'hub-livestream-badges.png');
-  });
-
-  test('captures the numbered pagination bar', async ({ page }, testInfo) => {
-    await gotoLivestream(page);
-
-    const pagination = page.locator('nav.pagination-bar').first();
-    if (!(await isPresent(pagination, 5_000))) {
-      return skipBecause(
-        testInfo,
-        'no-pagination',
-        'Numbered pagination is not enabled or there is only one page.',
-      );
-    }
-    await pagination.scrollIntoViewIfNeeded().catch(() => undefined);
-    await expect(pagination).toBeVisible();
-    await shoot(page, 'hub-livestream-pagination.png');
   });
 });

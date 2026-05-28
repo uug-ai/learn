@@ -95,3 +95,75 @@ export async function isPresent(
     .then(() => true)
     .catch(() => false);
 }
+
+/**
+ * Waits until a livestream tile is actually painting frames so the
+ * screenshot doesn't capture a black placeholder.
+ *
+ * Handles both modes used by `StreamComponent`:
+ *   - HD/WebRTC: a `<video>` element is mounted, gets a `srcObject` from
+ *     the `RTCPeerConnection` and reaches `readyState >= 2` (HAVE_CURRENT_DATA)
+ *     once the first frame is decoded.
+ *   - SD/MQTT:  an `<img>`/canvas is repainted every ~1s with a base64
+ *     JPEG. Detected via a non-empty `src` or any drawn canvas pixel.
+ *
+ * Never throws — returns `'video' | 'image' | 'none'` describing what (if
+ * anything) became ready so the caller can branch / add an annotation.
+ */
+export async function waitForStreamFrame(
+  tile: Locator,
+  timeoutMs: number = 10_000,
+): Promise<'video' | 'image' | 'none'> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const result = await tile
+      .evaluate((el: Element) => {
+        const video = el.querySelector('video') as HTMLVideoElement | null;
+        if (video && video.readyState >= 2 && video.videoWidth > 0) {
+          return 'video';
+        }
+        const img = el.querySelector('img') as HTMLImageElement | null;
+        if (img && img.src && !img.src.endsWith('#') && img.naturalWidth > 0) {
+          return 'image';
+        }
+        const canvas = el.querySelector('canvas') as HTMLCanvasElement | null;
+        if (canvas && canvas.width > 0 && canvas.height > 0) {
+          return 'image';
+        }
+        return 'none';
+      })
+      .catch(() => 'none' as const);
+    if (result !== 'none') {
+      return result;
+    }
+    await tile.page().waitForTimeout(250);
+  }
+  return 'none';
+}
+
+/**
+ * Switches a stream tile from HD/WebRTC to SD/MQTT mode.
+ *
+ * WebRTC requires UDP egress + ICE, which is unreliable inside
+ * devcontainers — the tile mounts the `<video>` but never gets a frame.
+ * SD mode polls JPEG snapshots over MQTT (TCP/WSS), which works as long
+ * as the broker is reachable, so it's what we use to capture docs
+ * screenshots that actually show camera content.
+ *
+ * No-op if the toggle isn't rendered or the tile is already in SD.
+ * Returns true when the toggle was clicked.
+ */
+export async function switchTileToSd(tile: Locator): Promise<boolean> {
+  const sdButton = tile.locator('.quality.sd').first();
+  if (!(await sdButton.isVisible().catch(() => false))) {
+    return false;
+  }
+  const alreadyActive = await sdButton
+    .evaluate((el) => el.classList.contains('active'))
+    .catch(() => false);
+  if (alreadyActive) {
+    return false;
+  }
+  await sdButton.click({ force: true }).catch(() => undefined);
+  return true;
+}

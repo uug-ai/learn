@@ -7,12 +7,14 @@
     "install:browsers": "playwright install chromium",
     "test": "playwright test",
     "new": "node scripts/new-hub-page.mjs",
+    "headed": "node scripts/run-headed.mjs",
     "cases": "playwright test tests/cases.spec.ts",
-    "cases:headed": "playwright test tests/cases.spec.ts --headed",
+    "cases:headed": "node scripts/run-headed.mjs tests/cases.spec.ts",
     "media": "playwright test tests/media.spec.ts",
-    "media:headed": "playwright test tests/media.spec.ts --headed",
+    "media:headed": "node scripts/run-headed.mjs tests/media.spec.ts",
     "livestream": "playwright test tests/livestream.spec.ts",
-    "livestream:headed": "playwright test tests/livestream.spec.ts --headed"
+    "livestream:headed": "node scripts/run-headed.mjs tests/livestream.spec.ts",
+    "livestream:diagnose": "playwright test tests/livestream-diagnose.spec.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.47.0",
