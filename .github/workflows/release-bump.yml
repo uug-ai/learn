@@ -19,6 +19,8 @@ permissions:
 jobs:
   bump-release:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -75,3 +77,21 @@ jobs:
             --target "$GITHUB_SHA" \
             --title "$TAG" \
             --generate-notes
+
+  # Run the original release pipeline for the freshly created tag.
+  # A release created with the default GITHUB_TOKEN does not emit the
+  # `release: created` event, so we invoke the reusable workflow directly.
+  release:
+    needs: bump-release
+    uses: uug-ai/workflows/.github/workflows/release-create.yml@main
+    with:
+      project: ${{ github.event.repository.name }}
+      tag: ${{ needs.bump-release.outputs.tag }}
+      docker_context: "."
+      runner_matrix: '[{"architecture":"amd64","runner":"ubuntu-24.04"},{"architecture":"arm64","runner":"ubuntu-24.04-arm"}]'
+      create_gitops_pr: true
+      gitops_repo: "uug-ai/gitops"
+      gitops_file: "environments/staging/learn/deployment.yaml"
+      gitops_key: ".spec.template.spec.containers[0].image"
+      gitops_value: "ghcr.io/uug-ai/learn:${{ needs.bump-release.outputs.tag }}"
+    secrets: inherit
