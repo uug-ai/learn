@@ -242,9 +242,7 @@ The details column has two tabs at the top:
   case with. The header row toggles every recording at once. The
   three-dots menu on each row exposes per-recording actions:
   - **Open media detail** — opens the recording's full detail page.
-  - **Edit video** — opens the face redaction editor on that recording
-    (see the [face redaction documentation]({{< ref "/docs/hub/pipeline" >}})
-    for details).
+  - **Edit video** — opens the editor on that recording.
 - **Attachments** — additional files attached to the case (PDF reports,
   photos, witness statements, exported clips, …). Files can be added by
   clicking the **Upload** button or by **dragging them onto the panel**.
