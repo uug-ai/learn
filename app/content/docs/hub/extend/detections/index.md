@@ -8,57 +8,57 @@ draft: false
 images: []
 menu:
   hub:
-    parent: "hub"
-weight: 305
+    parent: "extend"
+weight: 310
 toc: true
 ---
 
-A **detection run** is a self-contained bundle of tracks produced by a single source for a single recording. It answers one question — *"what did a detector see in this media?"* — and nothing more. It is candidate data stored verbatim for later retrieval.
+A **detection run** is a self-contained bundle of tracks produced by a single source for a single recording. It answers one question — *"what was detected in this media?"* — and nothing more. It is candidate data stored verbatim for later retrieval.
 
-Detections reach the Hub through a **standalone detection service**: your classifier hands it the boxes, and the service **`POST`s the run to the Hub API**, naming the target recording in the body. This is a REST contract, not a queue one — a single authenticated HTTP request with a synchronous result, no exchange to bind to. The API validates and normalises the payload, then stores it in a dedicated **`detections` collection keyed by the recording**. Bringing your own detection model is the primary use case: detect the boxes, let the service deliver them, and read them back through the API.
+Detections reach the Hub through a **detection service** that you, the integrator, run. The Hub does not care how that service obtains the boxes — a model, a manual annotation tool, an export from a third-party platform, anything — only that the service **`POST`s a run to the Hub API**, naming the target recording in the body. This is a REST contract, not a queue one: a single authenticated HTTP request with a synchronous result, no exchange to bind to. The API validates and normalises the payload, then stores it in a dedicated **`detections` collection keyed by the recording**.
+
+This page is written from the integrator's point of view. It describes the two things you own:
+
+- **Input** — what the Hub gives you to detect against: an existing recording (addressed by `mediaId` or `analysisId`) and, if you need them, the recording's media properties (width, height, fps, frame count).
+- **Output** — what your detection service sends back: one detection run per `POST /detections`, carrying a `source`, a coordinate space, optional `media` and `categories`, and one or more `tracks` of boxes.
+
+Everything else — storage layout, search enrichment, retention — is the Hub's responsibility and is documented here only so you know what to expect after a successful post.
 
 ## How it fits together
 
-The detection service is a **standalone service**, not a new stage of the internal pipeline. **A classifier** — the built-in detector or your own — feeds the **detection service**, which posts to the **Hub API** over REST — the Hub never pulls; the detection service always pushes. Stored runs are read back through the same Hub API (`GET /detections`).
+The detection service is a **standalone integration**, not a stage of the internal Hub pipeline. It sits between **whatever produces your boxes** (a detector, a tracker, an annotation export) and the **Hub API**, and it always *pushes*: the Hub never reaches into your service. Stored runs are read back through the same Hub API (`GET /detections`).
 
-The dashed `may trigger` arrow reflects orchestration, not the contract: the **built-in** detector typically runs as a pipeline stage off the back of `hub-pipeline-analysis`, so analysis kicks off classification on the same recording. That coupling is optional — `import` and third-party `model` producers post against an existing recording on their own schedule and never touch analysis at all.
-
-{{< rete caption="Where detections fit: your classifier hands output to the standalone detection service, which POSTs to the Hub API; the Hub validates, normalises and stores each run in the detections collection" alt="Detection service placement in the pipeline" height="660" >}}
+{{< rete caption="Where detections fit: any producer hands output to your detection service, which POSTs to the Hub API; the Hub validates, normalises and stores each run in the detections collection" alt="Detection service placement in the pipeline" height="500" >}}
 {
   "groups": [
-    { "id": "internal", "label": "Internal analysis (queue-driven)",  "x":    0, "y":  20, "w": 340, "h": 220 },
-    { "id": "ingest",   "label": "Detection ingestion (standalone)",  "x":    0, "y": 300, "w": 660, "h": 200 },
-    { "id": "hub",      "label": "Hub",                                "x":  740, "y": 300, "w": 360, "h": 340 }
+    { "id": "ingest", "label": "Detection ingestion (integrator-owned)", "x":   0, "y":  20, "w": 660, "h": 220 },
+    { "id": "hub",    "label": "Hub",                                    "x": 740, "y":  20, "w": 360, "h": 380 }
   ],
   "nodes": [
-    { "id": "analysis", "kind": "pipeline-analysis", "x": 40, "y": 90, "w": 260, "h": 140,
-      "header": "PIPELINE", "title": "hub-pipeline-analysis", "subtitle": "Motion analysis" },
-    { "id": "model", "kind": "camera", "x": 40, "y": 330, "w": 240, "h": 140,
-      "header": "DETECTOR", "title": "Classifier", "subtitle": "Built-in or custom" },
-    { "id": "detsvc", "kind": "detection", "x": 360, "y": 330, "w": 260, "h": 140,
-      "header": "STANDALONE", "title": "Detection service", "subtitle": "Ingests \u2192 posts the run" },
-    { "id": "hubapi", "kind": "hub", "x": 780, "y": 330, "w": 280, "h": 140,
-      "header": "HUB API", "title": "Hub API", "subtitle": "Serves /analysis \u00b7 /detections" },
-    { "id": "detections", "kind": "storage", "x": 780, "y": 510, "w": 280, "h": 110,
+    { "id": "producer", "kind": "camera", "x": 40, "y": 60, "w": 240, "h": 140,
+      "header": "PRODUCER", "title": "Boxes source", "subtitle": "Model / tracker / import" },
+    { "id": "detsvc", "kind": "detection", "x": 360, "y": 60, "w": 260, "h": 140,
+      "header": "INTEGRATOR", "title": "Detection service", "subtitle": "Assembles \u2192 posts the run" },
+    { "id": "hubapi", "kind": "hub", "x": 780, "y": 60, "w": 280, "h": 140,
+      "header": "HUB API", "title": "POST /detections", "subtitle": "Validate \u00b7 normalise \u00b7 store" },
+    { "id": "detections", "kind": "storage", "x": 780, "y": 250, "w": 280, "h": 130,
       "header": "DETECTIONS", "title": "detections collection", "subtitle": "Keyed by recording" }
   ],
   "connections": [
-    { "from": "analysis", "to": "model", "fromSide": "bottom", "toSide": "top", "kind": "dashed", "label": "may trigger" },
-    { "from": "analysis", "to": "hubapi", "fromSide": "right", "toSide": "top", "kind": "dashed", "label": "motion analysis" },
-    { "from": "model", "to": "detsvc", "fromSide": "right", "toSide": "left", "label": "detections" },
+    { "from": "producer", "to": "detsvc", "fromSide": "right", "toSide": "left", "label": "boxes" },
     { "from": "detsvc", "to": "hubapi", "fromSide": "right", "toSide": "left", "kind": "thick", "label": "POST /detections" },
     { "from": "hubapi", "to": "detections", "fromSide": "bottom", "toSide": "top", "label": "store" }
   ]
 }
 {{< /rete >}}
 
-The `detections` collection is **append-only provenance**: one document per source run, keyed by the recording. The server stores it verbatim (after normalising coordinates) and never edits it. Detections are **immutable** — they record what a detector reported, nothing more.
+The `detections` collection is **append-only provenance**: one document per source run, keyed by the recording. The server stores it verbatim (after normalising coordinates) and never edits it. Detections are **immutable** — they record what a producer reported, nothing more.
 
-Keeping detections in their own collection means the analysis service never interprets third-party data, the original detector output stays auditable, and the analysis document stays small no matter how many runs accumulate.
+Keeping detections in their own collection means the rest of the Hub never interprets third-party data, the original producer output stays auditable, and other documents (analysis, media) stay small no matter how many runs accumulate.
 
 ## Multiple sources
 
-The `detections` collection holds **one document per run**, so several detectors can contribute to the same recording without colliding:
+The `detections` collection holds **one document per run**, so several producers can contribute to the same recording without colliding:
 
 ```text
 detections (for one recording key) = [
@@ -71,29 +71,25 @@ Each run is tagged with the `source` that produced it. The server never merges o
 
 ## Lifecycle of a detection run
 
-End to end, a run travels from a classifier, through the standalone detection service, into the `detections` collection in six steps. Where the diagram above shows *where* detections sit, this one follows a single run through its lifecycle.
+End to end, a run travels from your detection service into the `detections` collection in six steps. Where the diagram above shows *where* detections sit, this one follows a single run through its lifecycle.
 
-{{< rete caption="Lifecycle of a detection run — from your classifier, through the standalone detection service, into the detections collection" alt="Detection run lifecycle" height="660" >}}
+{{< rete caption="Lifecycle of a detection run — from your detection service into the detections collection" alt="Detection run lifecycle" height="660" >}}
 {
   "groups": [
-    { "id": "producer", "label": "Classifier",                     "x":    0, "y": 20, "w": 300, "h": 630 },
-    { "id": "service",  "label": "Detection service (standalone)", "x":  340, "y": 20, "w": 320, "h": 630 },
-    { "id": "hub",      "label": "Hub API (synchronous)",          "x":  700, "y": 20, "w": 440, "h": 630 }
+    { "id": "service", "label": "Detection service (integrator-owned)", "x":   0, "y": 20, "w": 320, "h": 630 },
+    { "id": "hub",     "label": "Hub API (synchronous)",                "x": 360, "y": 20, "w": 440, "h": 630 }
   ],
   "nodes": [
-    { "id": "model", "kind": "camera", "x": 40, "y": 300, "w": 220, "h": 150,
-      "header": "DETECTOR", "title": "Classifier", "subtitle": "Emits detection boxes" },
-    { "id": "detsvc", "kind": "detection", "x": 400, "y": 300, "w": 240, "h": 150,
-      "header": "STANDALONE", "title": "Detection service", "subtitle": "Assemble \u2192 post the run" },
-    { "id": "hubapi", "kind": "hub", "x": 780, "y": 90, "w": 280, "h": 150,
+    { "id": "detsvc", "kind": "detection", "x": 40, "y": 300, "w": 240, "h": 150,
+      "header": "INTEGRATOR", "title": "Detection service", "subtitle": "Assemble \u2192 post the run" },
+    { "id": "hubapi", "kind": "hub", "x": 440, "y": 90, "w": 280, "h": 150,
       "header": "HUB API", "title": "Validate + normalise", "subtitle": "Resolve recording key" },
-    { "id": "detections", "kind": "storage", "x": 780, "y": 300, "w": 280, "h": 150,
+    { "id": "detections", "kind": "storage", "x": 440, "y": 300, "w": 280, "h": 150,
       "header": "DETECTIONS", "title": "detections collection", "subtitle": "Upsert by (key, runId)" },
-    { "id": "search", "kind": "storage", "x": 780, "y": 510, "w": 280, "h": 120,
-      "header": "REGION SEARCH", "title": "sequences + media", "subtitle": "Best-effort centroids" }
+    { "id": "search", "kind": "storage", "x": 440, "y": 510, "w": 280, "h": 120,
+      "header": "REGION SEARCH", "title": "media.metadata.classifications", "subtitle": "Best-effort centroids" }
   ],
   "connections": [
-    { "from": "model", "to": "detsvc", "fromSide": "right", "toSide": "left", "label": "detections" },
     { "from": "detsvc", "to": "hubapi", "fromSide": "right", "toSide": "left", "kind": "thick", "label": "POST /detections" },
     { "from": "hubapi", "to": "detsvc", "fromSide": "left", "toSide": "top", "kind": "dashed", "label": "201 / 207" },
     { "from": "hubapi", "to": "detections", "fromSide": "bottom", "toSide": "top", "label": "store" },
@@ -102,11 +98,11 @@ End to end, a run travels from a classifier, through the standalone detection se
 }
 {{< /rete >}}
 
-1. **Produce.** The classifier runs over an existing recording and emits boxes. It hands them to the **detection service**, which assembles one run: a `source` (with a stable `runId`), the boxes as `tracks[]`, and the target (`mediaId` or `analysisId`). Coordinates go out as `"pixel"` or `"normalized"`.
+1. **Assemble.** Your detection service collects the boxes it wants to submit and builds one run: a `source` (with a stable `runId`), the boxes as `tracks[]`, and the target (`mediaId` or `analysisId`). Coordinates go out as `"pixel"` or `"normalized"`.
 2. **Post.** The detection service sends a single authenticated `POST /detections` carrying the run. The Hub side is synchronous REST — there is no queue to bind to and the result comes back in the response.
-3. **Validate + normalise.** The server checks `schemaVersion`, requires a target, and validates every box. Pixel boxes are normalised to `[0,1]` using `media.width/height`; `{x1,y1,x2,y2}` is converted to the editor's `TrackBox` form. Slightly-out boxes are clamped, out-of-frame boxes are rejected and listed, soft mismatches become warnings.
+3. **Validate + normalise.** The server checks `schemaVersion`, requires a target, and validates every box. Pixel boxes are normalised to `[0,1]` using `media.width/height`; `{x1,y1,x2,y2}` is converted to the canonical `TrackBox` form. Slightly-out boxes are clamped, out-of-frame boxes are rejected and listed, soft mismatches become warnings.
 4. **Resolve the recording.** The target id is resolved to the recording's stable `key` (and its start time, denormalised into `recordingTimestamp` so cleanup expires the run on the recording's retention clock). An unknown or inaccessible target ends here with `404`.
-5. **Store + enrich.** The normalised run is **upserted by `(key, source.runId)`** into the `detections` collection — same `runId` replaces, new `runId` adds a sibling. The box centers are then best-effort `$addToSet`-pushed into both region-search paths (`sequences.images.$.regionCoordinates` and `media.metadata.classifications.centroids`) so the detection is spatially discoverable.
+5. **Store + enrich.** The normalised run is **upserted by `(key, source.runId)`** into the `detections` collection — same `runId` replaces, new `runId` adds a sibling. The box centers are then best-effort `$addToSet`-pushed into `media.metadata.classifications.centroids` so the detection is spatially discoverable through region search.
 6. **Respond.** The caller gets a synchronous result: `201` stored, `200` replaced, `207` stored-with-rejections, or a `4xx`. Because the write is idempotent on `runId`, retries are safe.
 
 ## The endpoint
@@ -154,7 +150,7 @@ A single detection run plus the target identifier.
 Provenance for the run. Three `kind`s are first-class:
 
 - `pipeline` — produced by an internal Kerberos pipeline microservice.
-- `model` — produced by an external detection / tracking model (the bring-your-own case).
+- `model` — produced by a detection or tracking model run by an integrator.
 - `import` — produced by a manual upload or annotation tool export (e.g. CVAT, Label Studio).
 
 ```json
@@ -289,7 +285,7 @@ A **box** is one detection of the subject at one frame.
 - `(x, y)` is the **top-left** corner of the box — not the centre. This matches COCO, MediaPipe, CVAT, Roboflow and DeepStream.
 - For pixel coordinates, supply the values in source-frame pixels and include `media.width/height` so the server can normalise.
 - For normalized coordinates, every value satisfies `0 ≤ x, y, x+w, y+h ≤ 1` (with a 0.01 tolerance for float rounding). A box within that tolerance is **clamped** to `[0, 1]` on write; a box beyond it is rejected and reported in the response.
-- The server also accepts the legacy `{x1, y1, x2, y2}` form already used internally by `hub-pipeline-analysis`'s `TrackBox`. On write it is converted as `x = x1, y = y1, w = x2 − x1, h = y2 − y1`.
+- The server also accepts the legacy `{x1, y1, x2, y2}` corner form. On write it is converted as `x = x1, y = y1, w = x2 − x1, h = y2 − y1`.
 
 ## Storage in the detections collection
 
@@ -302,12 +298,11 @@ The run is stored in a dedicated **`detections` collection keyed by the recordin
 
 ### Search enrichment
 
-Storing a run feeds the recording's detection boxes into the two spatial region-search indexes, so detection-sourced objects are findable without reading the `detections` collection:
+Storing a run feeds the recording's detection boxes into the media-side region-search index, so detection-sourced objects are findable without reading the `detections` collection:
 
-- **Sequences path (legacy fetch).** Each track's box centers are projected into the `100×100` space the spatial query uses (`(x1+x2)/2, (y1+y2)/2`, scaled) and `$addToSet`-pushed onto the recording's sequence image (`sequences.images.$.regionCoordinates`). A long track is compressed to at most 10 centroids.
-- **Media path (modern list + chart).** The same compressed centroids are written to `media.metadata.classifications.centroids` (the field the media-document region query reads), one entry per track keyed by its label (or `object` when unlabeled).
-- **Spatial only — no facet.** Only region-search geometry is written. The media-side entry's key is never surfaced as a classification chip or filter; the real facet fields (`sequences.images.properties` / `classificationSummary`) are intentionally left untouched, and no timeline markers are created, so detections stay spatially discoverable without masquerading as motion classifications.
-- **Additive and best-effort.** Both writes use `$addToSet`, so they never clobber analysis-derived points and a re-posted run contributes the same points idempotently. The enrichment is best-effort: if it fails, the run is still stored and the call still succeeds.
+- **Centroids.** Each track's box centers are projected into the `100×100` space the spatial query uses (`(x1+x2)/2, (y1+y2)/2`, scaled). A long track is compressed to at most 10 centroids and written to `media.metadata.classifications.centroids` (the field the media-document region query reads), one entry per track keyed by its label (or `object` when unlabeled).
+- **Spatial only — no facet.** Only region-search geometry is written. The entry's `key` is never surfaced as a classification chip or filter; the real facet field (`classificationSummary`) is intentionally left untouched, and no timeline markers are created, so detections stay spatially discoverable without masquerading as motion classifications.
+- **Additive and best-effort.** The write uses `$addToSet`, so it never clobbers analysis-derived points and a re-posted run contributes the same points idempotently. The enrichment is best-effort: if it fails, the run is still stored and the call still succeeds.
 
 ## Reading and deleting runs
 
@@ -372,7 +367,7 @@ Warnings are non-fatal: the run is stored and the offending boxes are kept. They
 
 The request body is capped at **32 MiB**; a larger body is rejected with `413 Payload Too Large` before it is parsed. There is no chunking protocol: a run that exceeds the cap must be split into multiple `POST`s, each with its own `source.runId`, which appear as sibling runs from the same `source.name`. In normalized form, the cap comfortably holds a 5 000-track run, so this rarely binds.
 
-## Example request (bring-your-own model)
+## Example request
 
 ```
 POST /detections
