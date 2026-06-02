@@ -171,6 +171,7 @@ html.dark .rete-node,
 .rete-node--vault   { --rete-node-color: #555f8e; } /* indigo */
 .rete-node--storage { --rete-node-color: #6b7280; } /* gray   */
 .rete-node--hub     { --rete-node-color: #84559f; } /* purple */
+.rete-node--detection { --rete-node-color: #047857; } /* emerald */
 .rete-node--agent   { --rete-node-color: #4a796b; } /* teal   */
 .rete-node--factory { --rete-node-color: #4a796b; } /* teal   */
 .rete-node--camera  { --rete-node-color: #374151; } /* slate  */
@@ -191,6 +192,7 @@ html.dark .rete-node,
 .rete-node--pipeline-licenseplate  { --rete-node-color: #be185d; }
 .rete-node--pipeline-nohelmet      { --rete-node-color: #be185d; }
 .rete-node--pipeline-llm           { --rete-node-color: #be185d; }
+.rete-node--pipeline-redaction     { --rete-node-color: #be185d; }
 
 .rete-node__header {
     padding: 8px 14px;
