@@ -15,14 +15,14 @@ toc: true
 
 A **detection run** is a self-contained bundle of tracks produced by a single source for a single recording. It answers one question — *"what was detected in this media?"* — and nothing more. It is candidate data stored verbatim for later retrieval.
 
-Detections reach the Hub through a **detection service** that you, the integrator, run. The Hub does not care how that service obtains the boxes — a model, a manual annotation tool, an export from a third-party platform, anything — only that the service **`POST`s a run to the Hub API**, naming the target recording in the body. This is a REST contract, not a queue one: a single authenticated HTTP request with a synchronous result, no exchange to bind to. The API validates and normalises the payload, then stores it in a dedicated **`detections` collection keyed by the recording**.
+Detections reach the Hub through a **detection service** — a small HTTP client that posts runs against the Hub API. How that service obtains its boxes (a model, an annotation tool, a third-party export) is outside the contract; what matters is that each run is delivered as a single authenticated `POST /detections` naming the target recording in the body. The API validates and normalises the payload, then stores it in a dedicated **`detections` collection keyed by the recording**. The exchange is plain REST: one request, one synchronous response, no queue to bind to.
 
-This page is written from the integrator's point of view. It describes the two things you own:
+The contract has two halves:
 
-- **Input** — what the Hub gives you to detect against: an existing recording (addressed by `mediaId` or `analysisId`) and, if you need them, the recording's media properties (width, height, fps, frame count).
-- **Output** — what your detection service sends back: one detection run per `POST /detections`, carrying a `source`, a coordinate space, optional `media` and `categories`, and one or more `tracks` of boxes.
+- A recording already exists in the Hub, addressed by `mediaId` or `analysisId` and (optionally) described by its media properties — width, height, fps, frame count.
+- The detection service returns one run per `POST /detections`, carrying a `source`, a coordinate space, optional `media` and `categories`, and one or more `tracks` of boxes.
 
-Everything else — storage layout, search enrichment, retention — is the Hub's responsibility and is documented here only so you know what to expect after a successful post.
+Storage layout, search enrichment and retention sit on the Hub side and are documented below only so the post-write behaviour is predictable.
 
 ## How it fits together
 
@@ -105,19 +105,43 @@ End to end, a run travels from your detection service into the `detections` coll
 5. **Store + enrich.** The normalised run is **upserted by `(key, source.runId)`** into the `detections` collection — same `runId` replaces, new `runId` adds a sibling. The box centers are then best-effort `$addToSet`-pushed into `media.metadata.classifications.centroids` so the detection is spatially discoverable through region search.
 6. **Respond.** The caller gets a synchronous result: `201` stored, `200` replaced, `207` stored-with-rejections, or a `4xx`. Because the write is idempotent on `runId`, retries are safe.
 
-## The endpoint
+## `POST /detections`
 
-```
-POST /detections
+`POST /detections` is the single contract your detection service implements. One request carries one detection run for one recording; everything in this section describes either the wire format or how the server reacts to it.
+
+```http
+POST /detections HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer <token>
 ```
 
-The target recording is named **in the body** — supply either `mediaId` (the recording/media key) or `analysisId` (the analysis document id). When both are present `mediaId` wins. The caller must have write access to the recording's organisation.
+- **Auth.** Bearer token belonging to a user with write access to the recording's organisation.
+- **Target.** The recording is named **in the body** (`mediaId` or `analysisId`) — never in the URL.
+- **Idempotency key.** `source.runId` — re-posting the same run replaces, a new `runId` inserts a sibling. See [Write semantics](#write-semantics-upsert-by-runid).
+- **Body cap.** 32 MiB; larger requests fail with `413` before parsing. See [Size](#size).
+- **Result.** Synchronous. See [Responses](#responses) for the full status table.
+
+### Minimal request
+
+The smallest payload the server accepts: a target, a `source`, a coordinate space, and one track with one box.
+
+```json
+{
+  "mediaId":         "camera-1_1700000000_recording",
+  "schemaVersion":   "1.0",
+  "source":          { "kind": "model", "name": "acme-face-v2", "version": "2.3.1" },
+  "coordinateSpace": "normalized",
+  "tracks": [
+    { "id": "trk_001", "boxes": [ { "frame": 0, "x": 0.1, "y": 0.2, "w": 0.08, "h": 0.14 } ] }
+  ]
+}
+```
+
+Anything beyond this — `categories`, `media`, per-box `confidence`, multi-frame tracks — is documented below but optional for the contract to succeed.
 
 ### Request body
 
-A single detection run plus the target identifier.
+A single detection run plus the target identifier. Each field is detailed in its own subsection underneath.
 
 ```jsonc
 {
@@ -304,14 +328,14 @@ Storing a run feeds the recording's detection boxes into the media-side region-s
 - **Spatial only — no facet.** Only region-search geometry is written. The entry's `key` is never surfaced as a classification chip or filter; the real facet field (`classificationSummary`) is intentionally left untouched, and no timeline markers are created, so detections stay spatially discoverable without masquerading as motion classifications.
 - **Additive and best-effort.** The write uses `$addToSet`, so it never clobbers analysis-derived points and a re-posted run contributes the same points idempotently. The enrichment is best-effort: if it fails, the run is still stored and the call still succeeds.
 
-## Reading and deleting runs
+## `GET` and `DELETE /detections`
 
 The stored runs are addressable as a REST resource so the editor can list them and a producer can drop a stale one.
 
-```
-GET    /detections?mediaId={recordingKey}   — list every run for a recording (oldest first)
-GET    /detections/{runId}                  — fetch a single run by source.runId
-DELETE /detections/{runId}                  — remove a single run by source.runId
+```http
+GET    /detections?mediaId={recordingKey}   # list every run for a recording (oldest first)
+GET    /detections/{runId}                  # fetch a single run by source.runId
+DELETE /detections/{runId}                  # remove a single run by source.runId
 ```
 
 All three are organisation-scoped: a caller only ever sees or deletes runs their organisation owns.
@@ -324,7 +348,7 @@ All three are organisation-scoped: a caller only ever sees or deletes runs their
 
 ## Responses
 
-The call is synchronous, so validation results come back in the response — there is no DLQ and no out-of-band event.
+Applies to `POST /detections`. The call is synchronous, so validation results come back in the response — there is no DLQ and no out-of-band event.
 
 | Status | Meaning |
 |---|---|
