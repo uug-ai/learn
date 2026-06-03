@@ -19,7 +19,7 @@ Detections reach the Hub through a **detection service** — a small HTTP client
 
 The contract has two halves:
 
-- A recording already exists in the Hub, addressed by `mediaId` or `analysisId` and (optionally) described by its media properties — width, height, fps, frame count.
+- A recording already exists in the Hub, addressed by `mediaKey` (the recording **key** — `media.videoFile` / `analysis.key`, not the media `_id`) or `analysisId` (the analysis document `_id`) and (optionally) described by its media properties — width, height, fps, frame count.
 - The detection service returns one run per `POST /detections`, carrying a `source`, a coordinate space, optional `media` and `categories`, and one or more `tracks` of boxes.
 
 Storage layout, search enrichment and retention sit on the Hub side and are documented below only so the post-write behaviour is predictable.
@@ -98,7 +98,7 @@ End to end, a run travels from your detection service into the `detections` coll
 }
 {{< /rete >}}
 
-1. **Assemble.** Your detection service collects the boxes it wants to submit and builds one run: a `source` (with a stable `runId`), the boxes as `tracks[]`, and the target (`mediaId` or `analysisId`). Coordinates go out as `"pixel"` or `"normalized"`.
+1. **Assemble.** Your detection service collects the boxes it wants to submit and builds one run: a `source` (with a stable `runId`), the boxes as `tracks[]`, and the target (`mediaKey` or `analysisId`). Coordinates go out as `"pixel"` or `"normalized"`.
 2. **Post.** The detection service sends a single authenticated `POST /detections` carrying the run. The Hub side is synchronous REST — there is no queue to bind to and the result comes back in the response.
 3. **Validate + normalise.** The server checks `schemaVersion`, requires a target, and validates every box. Pixel boxes are normalised to `[0,1]` using `media.width/height`; `{x1,y1,x2,y2}` is converted to the canonical `TrackBox` form. Slightly-out boxes are clamped, out-of-frame boxes are rejected and listed, soft mismatches become warnings.
 4. **Resolve the recording.** The target id is resolved to the recording's stable `key` (and its start time, denormalised into `recordingTimestamp` so cleanup expires the run on the recording's retention clock). An unknown or inaccessible target ends here with `404`.
@@ -116,7 +116,7 @@ Authorization: Bearer <token>
 ```
 
 - **Auth.** Bearer token belonging to a user with write access to the recording's organisation.
-- **Target.** The recording is named **in the body** (`mediaId` or `analysisId`) — never in the URL.
+- **Target.** The recording is named **in the body** (`mediaKey` or `analysisId`) — never in the URL.
 - **Idempotency key.** `source.runId` — re-posting the same run replaces, a new `runId` inserts a sibling. See [Write semantics](#write-semantics-upsert-by-runid).
 - **Body cap.** 32 MiB; larger requests fail with `413` before parsing. See [Size](#size).
 - **Result.** Synchronous. See [Responses](#responses) for the full status table.
@@ -127,7 +127,7 @@ The smallest payload the server accepts: a target, a `source`, a coordinate spac
 
 ```json
 {
-  "mediaId":         "camera-1_1700000000_recording",
+  "mediaKey":         "camera-1_1700000000_recording",
   "schemaVersion":   "1.0",
   "source":          { "kind": "model", "name": "acme-face-v2", "version": "2.3.1" },
   "coordinateSpace": "normalized",
@@ -145,7 +145,7 @@ A single detection run plus the target identifier. Each field is detailed in its
 
 ```jsonc
 {
-  "mediaId":         "camera-1_1700000000_...",  // recording key; or use analysisId
+  "mediaKey":         "camera-1_1700000000_...",  // recording key; or use analysisId
   "analysisId":      "65a1b2c3d4e5f60001234567", // alternative target
   "task":            "detection",                // optional discriminator
   "schemaVersion":   "1.0",
@@ -159,8 +159,8 @@ A single detection run plus the target identifier. Each field is detailed in its
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `mediaId` | string | conditional | The recording/media key. Provide this **or** `analysisId`. Missing both is rejected with `400 detections_target_missing`. |
-| `analysisId` | string | conditional | Targets the recording via its analysis id. Ignored when `mediaId` is set. |
+| `mediaKey` | string | conditional | The recording **key** — the stable string stored as `media.videoFile` and `analysis.key` (**not** the media document's `_id`). Resolved against `analysis.key`. Provide this **or** `analysisId`. Missing both is rejected with `400 detections_target_missing`. |
+| `analysisId` | string | conditional | Targets the recording via its analysis document `_id` (an ObjectID hex). Ignored when `mediaKey` is set. |
 | `task` | string (≤ 64) | no | Forward-compatibility discriminator for the run kind. Defaults to `"detection"`. |
 | `schemaVersion` | string (semver) | yes | Currently `"1.0"`. A major mismatch is rejected with `400 unsupported_schema_version`; minor mismatches succeed with a warning in the response. |
 | `source` | object | yes | See [Source](#source). |
@@ -333,7 +333,7 @@ Storing a run feeds the recording's detection boxes into the media-side region-s
 The stored runs are addressable as a REST resource so the editor can list them and a producer can drop a stale one.
 
 ```http
-GET    /detections?mediaId={recordingKey}   # list every run for a recording (oldest first)
+GET    /detections?mediaKey={recordingKey}   # list every run for a recording (oldest first)
 GET    /detections/{runId}                  # fetch a single run by source.runId
 DELETE /detections/{runId}                  # remove a single run by source.runId
 ```
@@ -343,7 +343,7 @@ All three are organisation-scoped: a caller only ever sees or deletes runs their
 | Status | Meaning |
 |---|---|
 | `200 OK` | List returned (possibly empty), run fetched, or run deleted. |
-| `400 Bad Request` | `GET /detections` without `mediaId`, or a missing `runId`. |
+| `400 Bad Request` | `GET /detections` without `mediaKey`, or a missing `runId`. |
 | `404 Not Found` | No run with that `runId` exists for the caller (`GET`/`DELETE` by id). |
 
 ## Responses
@@ -355,7 +355,7 @@ Applies to `POST /detections`. The call is synchronous, so validation results co
 | `201 Created` | Run stored. Body echoes the assigned `source.runId` and any per-box warnings/rejections. |
 | `200 OK` | The upsert replaced an existing run with the same `source.runId`. |
 | `207 Multi-Status` | Run stored, but some boxes were rejected (e.g. out of frame). The body lists each rejected box with a reason. The run is still usable. |
-| `400 Bad Request` | Malformed JSON, no `mediaId`/`analysisId`, `schemaVersion` major mismatch, a track with no boxes, or **every** box invalid. Nothing is stored. |
+| `400 Bad Request` | Malformed JSON, no `mediaKey`/`analysisId`, `schemaVersion` major mismatch, a track with no boxes, or **every** box invalid. Nothing is stored. |
 | `404 Not Found` | The target recording does not exist or the caller cannot access it. |
 | `413 Payload Too Large` | Body exceeds the request size limit (see [Size](#size)). |
 
@@ -399,7 +399,7 @@ POST /detections
 
 ```json
 {
-  "mediaId":         "camera-1_1700000000_recording",
+  "mediaKey":         "camera-1_1700000000_recording",
   "schemaVersion":   "1.0",
   "source":          { "kind": "model", "name": "acme-face-v2", "version": "2.3.1", "runId": "01HF8C3K9X4Y6Q7Z2N8M5W3R1A" },
   "coordinateSpace": "pixel",
