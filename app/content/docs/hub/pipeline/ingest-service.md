@@ -140,6 +140,36 @@ func Ingest(ctx context.Context, scope Scope, target Target, kind string, payloa
 
 The dispatcher owns only shared plumbing (look up handler, run actions, map errors). Each action owns its own validation **and its own sink** — which is essential, because the sinks genuinely differ (own collection vs enrich-in-place). The moment the dispatcher starts `switch`-ing on kind to do real work, it has become the hardcoded switch it was meant to replace.
 
+## Two registries, two jobs
+
+There are **two** registries that both key on the operation id, and conflating them is the easy mistake. They govern different ends of the journey:
+
+| | Stage registry (config) | Ingest handlers (Go) |
+|---|---|---|
+| Lives in | `workflows` values / operation registry — see [Integrations](integrations/#registering-a-stage) | `models/pkg/ingest` `handlers` map |
+| Governs | enqueue, queue name, allow-list, completion tracking (the **outbound** half) | the typed actions run on a **returned** result (the **inbound** half) |
+| Needed for | **every** stage | only when the producer **delegates** persistence to the platform |
+| Cost to add | a config edit | a code change + release |
+
+**The core write is never optional — only its location moves.** A returned result is never just "tracked and dropped"; something is always written. The fork is *who writes it*:
+
+- **Self-persist (own collection).** An in-cluster worker writes its own collection directly and just acks. The mandatory write still happens — in the worker. No ingest handler; the platform only records `resolvedoperations`.
+- **Delegated persist (ingest handler).** The worker hands back a typed `payload` and the **handler** does the write. When a handler exists, its **first action is the mandatory persistence** (e.g. `UpsertDetectionRun`); it is never side-effect-only. Any further actions are the *optional* side-effects, and those are the only thing `RunFor(source)` gates.
+
+So a stage with **no** ingest handler is not a stage with no effect — it is a **self-persisting** stage. The adapter routes a completion to `Ingest` **only when a handler is registered** for that kind; otherwise it's a self-persist / generic [`data.<op>`](integrations/#enrich-in-place) completion — recorded, not routed. Hitting `Ingest` for a handler-less kind would be the bug, not the absence of a handler.
+
+### Who persists vs which transport
+
+"Self-persist vs delegated" is **not** the same line as "pipeline vs API" — they're independent axes:
+
+| Axis | Values | Driven by |
+|---|---|---|
+| Who writes the core | self-persist / delegated | does the producer have DB access — an **API** client never does, so API is **always** delegated |
+| Optional side-effects | run / skip | trust of the **source** (`RunFor`) — *this* is the real pipeline-vs-API difference |
+| Completion ack | ack / none | is a dispatched op waiting (pipeline yes; a standalone API push no) |
+
+API push is therefore always **delegated** (an HTTP client can't write Mongo); an in-cluster pipeline stage may self-persist **or** delegate. When the *same* delegated handler is invoked from both transports, the **core write is identical** — only the `RunFor`-gated side-effects (e.g. promoting to redaction regions) and the ack differ. The transport never changes *what* is persisted; it changes *which optional effects* run and *whether anything is waiting*.
+
 ## Detection — the reference kind
 
 Detection's two-action sequence is not hypothetical; the [models](../../../) are shaped for it. In `analysis.go`:

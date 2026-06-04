@@ -117,6 +117,8 @@ So the result is recorded against the analysis and the operation is marked resol
 
 Stages are grouped into named **workflows**. Each stage is described once, as an entry under a workflow's `stages` list whose **key is the operation id**. One flag — `enabled` — both renders the Deployment *and* registers the operation, so the worker and the orchestrator can never drift apart. The workflow `name` simply labels the group (shown in the UI, toggled as a unit); **operation ids stay globally unique** across every workflow — they are what binds the queue, dispatch and resolution.
 
+> **Config registers a stage; it does not register a typed handler.** This values block is the *stage registry* — it governs the queue, dispatch and completion tracking. It is **all you need** for a self-persisting stage (one that writes its own collection and acks). A stage that instead *delegates* persistence to the platform — handing back a `payload` for a typed side-effect on shared state — also needs a Go handler in `models/pkg/ingest`. See [Ingest service → Two registries, two jobs](ingest-service/#two-registries-two-jobs).
+
 ```yaml
 # values.yaml
 workflows:
