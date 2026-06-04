@@ -109,7 +109,7 @@ $set        data.<operation> = <your result>
 $addToSet   resolvedoperations = <operation>
 ```
 
-So the result is recorded against the analysis and the operation is marked resolved **with no orchestrator code** — until you need a typed side-effect on the shared document, which is the one case that warrants a handler in the analysis router.
+So the result is recorded against the analysis and the operation is marked resolved **with no orchestrator code** — until you need a typed side-effect on the shared document, which is the one case that warrants a handler in the analysis router. That typed handler is the [Ingest service](ingest-service/) path: the result then travels as the typed `payload` and the handler owns the side-effect, instead of the generic `data.<operation>` bag used here. `data.<operation>` is the handler-less default; `payload` + a handler is the typed upgrade for a kind that needs one.
 
 > The difference between the sinks is only *who reads the result* — your collection, or the shared analysis document. Either way the operation is recorded the same way: through the completion ack.
 

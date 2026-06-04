@@ -71,7 +71,7 @@ The kind dispatcher is a thin router over a **registry of handlers**. The task r
 
 ## The envelope is the shared contract
 
-The unifying move: the API endpoint is *"an HTTP door onto the same envelope the queue carries."* One shape in, regardless of transport:
+The unifying move: **`{operation, payload}` is the ingest core's input contract** — not necessarily the literal wire of every transport. Each *door* (the queue consumer, a general ingest API endpoint, the existing typed `/detections` endpoint) maps its own wire onto this shape before calling `Ingest`. The doors differ; the contract they feed does not.
 
 | Field | Role |
 |---|---|
@@ -79,7 +79,9 @@ The unifying move: the API endpoint is *"an HTTP door onto the same envelope the
 | `fileName` · `payload.fileName` | the **recording reference** — resolves *which* media the result attaches to |
 | `payload` | the **typed result** (e.g. a `DetectionRun`-shaped body) |
 
-> **Caveat — evolve, don't reuse `data`.** Today `PipelineEvent.Data` is a deprecated `map[string]interface{}` and on dispatch carries only storage credentials. "Same structure as the broker" means the **`payload`** carries the typed result; it does *not* mean stashing the result in the legacy `data` bag. The envelope is being evolved so `payload` is the typed home for a stage's result.
+**Two API doors, one core.** We keep the existing typed [`/detections`](../../extend/detections/api/) endpoint *alongside* a general ingest door — both are thin adapters over the same `Ingest`. The specific endpoint is a convenience alias: the **kind is implied by the route** (`detection`) and its body *is* the `payload` (`api.PostDetectionsRequest`), so it simply calls `Ingest(…, "detection", body)`. The general door accepts the full `{operation, payload}` envelope and selects the kind from `operation`. A new kind gets the general door for free; detection keeps its ergonomic typed endpoint. Nothing routes twice — each door resolves the kind once, then hands off.
+
+> **Caveat — `payload` is the result channel; `data` is not.** Today `PipelineEvent.Data` is a deprecated `map[string]interface{}` and on dispatch carries only storage credentials. The ingest core reads the typed result from **`payload`**, never from the legacy `data` bag. The generic `data.<operation>` enrich-in-place sink (see [Integrations](integrations/#enrich-in-place)) still exists for stages **without** an ingest handler; once a kind has a handler, its result travels as the typed `payload` and the handler owns the side-effect in place of a generic `$set data.<op>`.
 
 ## Where it lives
 
