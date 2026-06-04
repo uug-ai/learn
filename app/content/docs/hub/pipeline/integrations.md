@@ -17,7 +17,7 @@ The pipeline is **open**: every built-in service is just a queue consumer, and y
 
 This page is the **mechanism**, shared by built-in *and* custom stages: the message you receive, how to return a result, how to deploy it, and how the orchestrator tracks it. It is **capability-agnostic** — it never assumes *what* your stage does. For a concrete contract delivered this way (the run shape, the collection, the op name), see the capability pages under [Extend](../../extend/) — for example [Detections → Pipeline](../../extend/detections/pipeline/).
 
-> **Status — proposed.** The queue, envelope and completion mechanics described here are how the pipeline already works internally. The config-driven **stage registration** (the `stages` values block and operation registry below) is the proposed addition that lets a *custom* operation join the pipeline without changing orchestrator code. Custom stages are **asynchronous only** in this design — there is no blocking "required" stage.
+> **Status — proposed.** The queue, envelope and completion mechanics described here are how the pipeline already works internally. The config-driven **stage registration** (the `workflows` values block and operation registry below) is the proposed addition that lets a *custom* operation join the pipeline without changing orchestrator code. Custom stages are **asynchronous only** in this design — there is no blocking "required" stage.
 >
 > This page is about how a worker *delivers* a result. For the complementary *receiving* side — one shared service that takes a result from either the API or the queue and runs the right sequence of actions for its kind — see [Ingest service](ingest-service/).
 
@@ -177,16 +177,19 @@ type StageCondition struct {
 }
 ```
 
-The orchestrator folds the registry into its dispatch list — every `always` stage becomes an **async** operation, enqueued to `kcloud-<operation>-queue.fifo` at the start of each analysis:
+The registry is the **flattened union of every workflow's stages** — the `name` groups are organisational only; what the orchestrator consumes is the list of operations. It folds that into its dispatch as a **separate, non-gating tier** — registry stages become **workflow operations**, kept apart from the built-in async operations so the built-in dispatch is never touched, and enqueued to `kcloud-<operation>-queue.fifo` at the start of each analysis:
 
 ```go
 for _, s := range registry {
     if s.Dispatch == "always" {
-        analysis.AsyncOperations = append(analysis.AsyncOperations, s.Operation)
+        // a dedicated tier — NOT AsyncOperations — so built-ins stay untouched
+        analysis.WorkflowOperations = append(analysis.WorkflowOperations, s.Operation)
     }
     // conditional stages are enqueued reactively — see Conditional routing
 }
 ```
+
+Like the built-in async operations, workflow operations are **non-gating**: a custom stage can never stall a run. See [Ingest service → Pipeline tracking](ingest-service/#pipeline-tracking-workflow-operations--the-allow-list) for how the same registry doubles as the **allow-list** that validates enqueue and resolution.
 
 Because the **operation id** is the stage key, it is the single string shared by the queue, the dispatch entry and the completion key — they cannot drift. A stage the orchestrator knows about but no worker consumes can't happen: the same `enabled` flag produces both sides.
 
