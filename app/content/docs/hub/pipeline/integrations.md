@@ -115,35 +115,36 @@ So the result is recorded against the analysis and the operation is marked resol
 
 ## Registering a stage
 
-A stage is described once, as a block under `stages` whose **key is the operation id**. One flag — `enabled` — both renders the Deployment *and* registers the operation, so the worker and the orchestrator can never drift apart.
+Stages are grouped into named **workflows**. Each stage is described once, as an entry under a workflow's `stages` list whose **key is the operation id**. One flag — `enabled` — both renders the Deployment *and* registers the operation, so the worker and the orchestrator can never drift apart. The workflow `name` simply labels the group (shown in the UI, toggled as a unit); **operation ids stay globally unique** across every workflow — they are what binds the queue, dispatch and resolution.
 
 ```yaml
 # values.yaml
-kerberospipeline:
-  stages:
-    detection:                 # key = operation id = queue suffix
-      enabled: true            # renders the Deployment AND registers the operation
+workflows:
+  - name: anpr                     # names a group of stages run together
+    stages:
+      - detection:                 # key = operation id = queue suffix
+          enabled: true            # renders the Deployment AND registers the operation
 
-      # --- deployment (Helm-only; the orchestrator never sees these) ---
-      repository: ghcr.io/acme/hub-pipeline-detection
-      tag: "1.0.0"
-      replicas: 1
-      pullPolicy: IfNotPresent
-      logLevel: info
-      resources: {}
-      env: []
-      volumes: []
+          # --- deployment (Helm-only; the orchestrator never sees these) ---
+          repository: ghcr.io/acme/hub-pipeline-detection
+          tag: "1.0.0"
+          replicas: 1
+          pullPolicy: IfNotPresent
+          logLevel: info
+          resources: {}
+          env: []
+          volumes: []
 
-      # --- dispatch (projected to the orchestrator) ---
-      dispatch: always         # always | conditional
-      needs: ""                # upstream operation that triggers it (conditional only)
-      condition: {}            # predicate on the upstream result (conditional only)
+          # --- dispatch (projected to the orchestrator) ---
+          dispatch: always         # always | conditional
+          needs: ""                # upstream operation that triggers it (conditional only)
+          condition: {}            # predicate on the upstream result (conditional only)
 ```
 
 The chart renders a normal `pipe-<operation>` Deployment, gated to pipeline deployments exactly like the built-in stages:
 
 ```yaml
-# templates/kerberos-pipeline/pipe-detection.yaml (abridged)
+# templates/workflows/pipe-detection.yaml (abridged)
 {{- if or (eq .Values.mode "all") (eq .Values.mode "pipeline") -}}
 # ...image, broker + Mongo env wired from the same values block...
 {{- end -}}
@@ -187,7 +188,7 @@ for _, s := range registry {
 }
 ```
 
-Because the **operation id** is the map key, it is the single string shared by the queue, the dispatch entry and the completion key — they cannot drift. A stage the orchestrator knows about but no worker consumes can't happen: the same `enabled` flag produces both sides.
+Because the **operation id** is the stage key, it is the single string shared by the queue, the dispatch entry and the completion key — they cannot drift. A stage the orchestrator knows about but no worker consumes can't happen: the same `enabled` flag produces both sides.
 
 **Minimal stage.** The smallest useful stage is just `enabled` + the deployment fields + `dispatch: always`. `needs` / `condition` are purely additive — you can add conditional routing later without changing the object's shape.
 
@@ -201,11 +202,14 @@ Two kinds of "conditional" exist, and they live in different places:
 A conditional stage is **not** enqueued at analysis start. Instead, when the `needs` operation resolves, the orchestrator evaluates `condition` against its result and — only on a match — enqueues the stage's queue. Recordings that don't match never touch the stage.
 
 ```yaml
-    nohelmet:
-      enabled: true
-      dispatch: conditional
-      needs: classify
-      condition: { path: labels, op: contains, value: person }   # only recordings the classifier flagged as containing a person
+workflows:
+  - name: ppe
+    stages:
+      - nohelmet:
+          enabled: true
+          dispatch: conditional
+          needs: classify
+          condition: { path: labels, op: contains, value: person }   # only recordings the classifier flagged as containing a person
 ```
 
 This is the declarative form of a pattern the built-in classifier already uses imperatively: when classification returns, the analyser inspects the result and re-enqueues follow-up work for matched objects. The `needs` / `condition` descriptor moves that decision out of Go and into config.
@@ -225,8 +229,8 @@ Whichever [sink](#sending-a-result-back) you use, your worker should echo a **co
 
 ## Checklist
 
-- [ ] Pick a unique **operation id** — it's the values key, the queue suffix (`kcloud-<id>-queue.fifo`) and the completion key
-- [ ] Add a `stages.<id>` block with `enabled: true`, the deployment fields and `dispatch: always`
+- [ ] Pick a unique **operation id** — it's the stage key, the queue suffix (`kcloud-<id>-queue.fifo`) and the completion key
+- [ ] Add the stage as an entry under a workflow's `stages` list with `enabled: true`, the deployment fields and `dispatch: always`
 - [ ] Consume the **envelope**, resolve the recording from `fileName`, fetch media with the **storage credentials** in `data`
 - [ ] Pick a **sink** — own collection (recommended) or enrich-in-place
 - [ ] **Idempotent** writes (upsert by recording + run id)

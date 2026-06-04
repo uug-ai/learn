@@ -15,7 +15,7 @@ toc: true
 
 A result can reach the Hub two ways — an authenticated **API push** or an in-pipeline **queue message** — and today each path re-implements its own validation, normalisation and persistence. The **ingest service** collapses that into one transport-agnostic core: you send a result in **the same envelope you'd put on the queue**, and the service **routes it by kind** and runs **that kind's ordered sequence of actions**. The HTTP endpoint and the queue consumer become thin doors onto the same logic.
 
-> **"Service" means a package, not a process.** There is **no new microservice, deployment, queue or network hop**. The ingest service is a shared library (`models/pkg/detections`) compiled *into* both the hub-api and analyser binaries; each calls `Ingest(...)` in-process on its own request. "Service" here names a consistent code path, not a running component.
+> **"Service" means a package, not a process.** There is **no new microservice, deployment, queue or network hop**. The ingest service is a shared library (`models/pkg/ingest`) compiled *into* both the hub-api and analyser binaries; each calls `Ingest(...)` in-process on its own request. "Service" here names a consistent code path, not a running component.
 
 > **Status — proposed.** This page captures a design, not shipped behaviour. Today, detection results are ingested by the API only ([hub-api `PostDetections`](../../extend/detections/api/)), and the pipeline's per-operation result handling is a hardcoded `switch` in the analyser. The model below describes how those converge into a single shared service. It builds on the transport mechanics in [Integrations](integrations/) — read that first for how a worker *delivers* a result; this page is about how the platform *receives* one.
 
@@ -87,12 +87,12 @@ Because the pipeline (`hub-pipeline-analysis`) must call this too, the routing *
 
 | Concern | Why | Home |
 |---|---|---|
-| **Routing** — validate, task-route, normalise, build the run | pure; needs only types already in `models` | **`models/pkg/detections`** (new, infra-free) |
+| **Routing** — validate, task-route, normalise, build the run | pure; needs only types already in `models` | **`models/pkg/ingest`** (new, infra-free) |
 | **Persistence** — the `(Key, RunId)` upsert, region promotion | needs a live `*mongo` handle + context | each app's repo (or shared via the `database` repo) |
 | **Auth / scope** — bearer user vs recording owner | genuinely differs per transport | each adapter |
 | **Transport** — gin handler / queue consumer + ack | HTTP status vs ack/nack | each app |
 
-Keeping `models/pkg/detections` infra-free keeps it a fast, testable library while still giving **one** implementation of the routing.
+Keeping `models/pkg/ingest` infra-free keeps it a fast, testable library while still giving **one** implementation of the routing. The package is named generally on purpose — it routes *every* kind, and detection is simply the first handler; structure it with no `models`-internal coupling so it can lift out into its own module later with a move, not a rewrite.
 
 ## A handler is an action pipeline
 
@@ -182,12 +182,38 @@ var taskRegistry = map[string]TaskHandler{
 
 Because `api.PostDetectionsRequest` lives in shared `models/pkg/api`, the pipeline worker constructs the **exact same input type** — no DTO duplication. The only real refactor friction is generalising the repository's `user` parameter to an explicit `Scope` (the pipeline path has no bearer token).
 
+**API push: standalone or status update.** An API push that is *not* fulfilling a pipeline-dispatched operation is **standalone** — it writes its own collection and sends no ack; nothing is waiting on it, and the rest of the Hub reads the collection directly. Only when a detection *fulfils a dispatched operation* does the adapter echo a completion ack so `resolvedoperations` reflects it. The shared ingest call is identical either way — the adapter alone decides whether to ack, because it alone knows whether a run dispatched the work.
+
+## Pipeline tracking: workflow operations & the allow-list
+
+When a result arrives over the **queue** (not the API), the orchestrator also has to *track* it. Three rules keep that safe.
+
+**A separate `workflowOperations` tier.** Registry-driven custom stages get their own list on the analysis, alongside the built-in `asyncOperations` / `requiredOperations` / `resolvedOperations`:
+
+```go
+analysis.WorkflowOperations = []string{} // custom/registry stages only — built-ins stay in AsyncOperations
+```
+
+The built-in dispatch (`thumby`, `dominantcolor`, …) is untouched; only registered stages land here. Like async operations, `workflowOperations` are **non-gating** — a workflow stage can never stall a run.
+
+**Safe resolution.** A worker signals completion by echoing an ack with its `operation` set; the orchestrator records it with the existing idempotent update — `$set data.<op>` + `$addToSet resolvedoperations`. Because it's `$addToSet`, a redelivered ack is a no-op; and because workflow operations don't gate completion, a *missing* ack can't wedge the run (the 15-minute backstop already bounds it). Resolution is provenance, not a barrier.
+
+**The registry is the allow-list.** The enabled-stage registry doubles as the set of permitted operations. Validate at the two ends that currently drift freely:
+
+- **Enqueue:** only emit `kcloud-<id>-queue.fifo` for an `id` in the registry.
+- **Resolve:** only `$addToSet resolvedoperations` when `operation` is in the registry; log-and-drop unknowns.
+
+This closes the queue-name drift class outright — including the live `classify → kcloud-thumby-queue` bug (missing `.fifo`), which an exact allow-list would reject. The list stays correct automatically because it *is* the `enabled`-driven registry keys: no worker, no entry.
+
+> **Idempotency lives in the action, not the list.** `resolvedoperations` tracks *that* an operation completed (at-most-once recording). It does **not** make the side-effect idempotent — that has to be the action's own keyed upsert (`(Key, RunId)` for detections, `(media, operation)` for enrich-in-place) so a redelivery replaces rather than duplicates.
+
 ## Consistency & idempotency
 
 This is the genuinely hard part — not the routing.
 
 - **At-least-once delivery.** The broker can redeliver, so a handler's whole action sequence can re-run. Every action must be **idempotent**: upsert the run by `(Key, RunId)`; make region promotion *replace* a run's contribution keyed by `RunId` rather than append. A replay then becomes a no-op.
 - **Multi-document writes.** Action 1 writes `detections`; action 2 mutates the analysis doc. Idempotent keyed actions make a partial apply self-healing on retry — preferable to a distributed transaction. A Mongo session transaction (same cluster) is the fallback if two effects must ever be truly atomic.
+  - **Known limitation (accepted for now).** The queue path self-heals on redelivery, but the API path is a *single request with no redelivery* — a crash between the two writes leaves a partial apply with nothing to retry it. Revisit with a session transaction or a reconcile pass; not a blocker today.
 - **Per-source gating.** An external API push auto-mutating a media's redaction regions is a **policy** decision, not just routing. The `RunFor(source)` predicate lets the same kind run a fuller sequence internally (pipeline) than externally (untrusted producer) — e.g. external posts store the run but don't auto-promote to redaction.
 
 ## What's real today vs proposed
@@ -198,17 +224,19 @@ This is the genuinely hard part — not the routing.
 | `DetectionRun.Tracks` reuses `FaceRedactionTrack` (promotion-ready) | **exists** in `models` |
 | Per-operation result handling in the pipeline | **exists** as a hardcoded `switch` in the analyser |
 | Region-promotion as an automatic ingest action | **proposed** — the API stores the run only today |
-| Shared `models/pkg/detections` routing package | **proposed** |
+| Shared `models/pkg/ingest` routing package | **proposed** |
 | Kind dispatcher + task sub-registry | **proposed** |
+| Separate `workflowOperations` tier | **proposed** — built-ins use `asyncOperations` today |
+| Registry-as-allow-list (enqueue + resolve validation) | **proposed** — queue names are unguarded today |
 | `RunFor` per-source action gating | **proposed** |
 
 ## Suggested build order
 
 Bottom-up, so nothing speculative ships and the box path stays provably unchanged:
 
-1. Create **`models/pkg/detections`** with the box `TaskHandler` (lift validate/normalise, return typed errors instead of HTTP constants).
+1. Create **`models/pkg/ingest`** with the box `TaskHandler` (lift validate/normalise, return typed errors instead of HTTP constants).
 2. Wire hub-api's `PostDetections` to delegate to it — box task only, `PromoteTracksToRegions` behind a `RunFor` gate that's off, so behaviour is identical.
-3. Add the **queue adapter** in the analyser that builds the same request and calls `Ingest` — detection over the pipeline.
+3. Add the **queue adapter** in the analyser that builds the same request and calls `Ingest` — detection over the pipeline — plus the `workflowOperations` tier and registry **allow-list** validation at enqueue and resolve.
 4. Flip `PromoteTracksToRegions` on (internally first via `RunFor`).
 5. Generalise to a **kind dispatcher**, migrating the analyser's `thumbnail`/`sprite` switch arms into handlers as a follow-up.
 6. Add **ANPR** (new task + action), then **POSE** (new task + `Payload` contract extension) as the model proves out.
