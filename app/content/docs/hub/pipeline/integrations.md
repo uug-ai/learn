@@ -18,6 +18,8 @@ The pipeline is **open**: every built-in service is just a queue consumer, and y
 This page is the **mechanism**, shared by built-in *and* custom stages: the message you receive, how to return a result, how to deploy it, and how the orchestrator tracks it. It is **capability-agnostic** — it never assumes *what* your stage does. For a concrete contract delivered this way (the run shape, the collection, the op name), see the capability pages under [Extend](../../extend/) — for example [Detections → Pipeline](../../extend/detections/pipeline/).
 
 > **Status — proposed.** The queue, envelope and completion mechanics described here are how the pipeline already works internally. The config-driven **stage registration** (the `stages` values block and operation registry below) is the proposed addition that lets a *custom* operation join the pipeline without changing orchestrator code. Custom stages are **asynchronous only** in this design — there is no blocking "required" stage.
+>
+> This page is about how a worker *delivers* a result. For the complementary *receiving* side — one shared service that takes a result from either the API or the queue and runs the right sequence of actions for its kind — see [Ingest service](ingest-service/).
 
 ## When to add a stage
 

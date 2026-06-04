@@ -1,0 +1,220 @@
+---
+title: "Ingest service"
+description: "One transport-agnostic service that receives a result — from the API or the pipeline queue — and runs the right sequence of actions for its kind."
+lead: "Send a result in the same envelope you'd put on the queue; the ingest service routes it by kind and runs that kind's ordered, idempotent actions — the same way whether it arrived over HTTP or the broker."
+date: 2026-06-04T00:00:00+00:00
+lastmod: 2026-06-04T00:00:00+00:00
+draft: false
+images: []
+menu:
+  hub:
+    parent: "pipeline"
+weight: 20
+toc: true
+---
+
+A result can reach the Hub two ways — an authenticated **API push** or an in-pipeline **queue message** — and today each path re-implements its own validation, normalisation and persistence. The **ingest service** collapses that into one transport-agnostic core: you send a result in **the same envelope you'd put on the queue**, and the service **routes it by kind** and runs **that kind's ordered sequence of actions**. The HTTP endpoint and the queue consumer become thin doors onto the same logic.
+
+> **"Service" means a package, not a process.** There is **no new microservice, deployment, queue or network hop**. The ingest service is a shared library (`models/pkg/detections`) compiled *into* both the hub-api and analyser binaries; each calls `Ingest(...)` in-process on its own request. "Service" here names a consistent code path, not a running component.
+
+> **Status — proposed.** This page captures a design, not shipped behaviour. Today, detection results are ingested by the API only ([hub-api `PostDetections`](../../extend/detections/api/)), and the pipeline's per-operation result handling is a hardcoded `switch` in the analyser. The model below describes how those converge into a single shared service. It builds on the transport mechanics in [Integrations](integrations/) — read that first for how a worker *delivers* a result; this page is about how the platform *receives* one.
+
+## The idea
+
+> Send your data in the same structure you'd send to the broker. The service orders that data and triggers the correct actions — for example, **detection** data is both *inserted into its collection* **and** used to *adjust the region-selection on the corresponding media*. A future **ANPR** kind would run a similar but different sequence.
+
+So "ingest" is not "store the thing". It is **"run the kind's action pipeline"**. Detection happens to be two actions; another kind might be one, or three, with different sinks.
+
+{{< rete caption="Both transports call the same in-process ingest package, which routes by kind and runs that kind's ordered actions — no separate service or network hop" alt="Unified ingest package" height="460" >}}
+{
+  "groups": [
+    { "id": "in",   "label": "Transports (thin doors)", "x":   0, "y":  20, "w": 320, "h": 380 },
+    { "id": "svc",  "label": "Ingest package (in-process, shared)",  "x": 380, "y":  20, "w": 300, "h": 380 },
+    { "id": "out",  "label": "Actions / sinks",          "x": 740, "y":  20, "w": 340, "h": 380 }
+  ],
+  "nodes": [
+    { "id": "api",    "kind": "vault",             "x":  40, "y":  70, "w": 240, "h": 120,
+      "header": "HTTP", "title": "API push", "subtitle": "bearer user \u00b7 maps result\u2192status" },
+    { "id": "queue",  "kind": "amqp",              "x":  40, "y": 240, "w": 240, "h": 120,
+      "header": "BROKER", "title": "Queue consumer", "subtitle": "system identity \u00b7 ack / nack" },
+    { "id": "ingest", "kind": "pipeline-analysis", "x": 410, "y": 150, "w": 240, "h": 130,
+      "header": "PACKAGE", "title": "Ingest", "subtitle": "in-process · route by kind → run actions" },
+    { "id": "coll",   "kind": "storage",           "x": 780, "y":  70, "w": 260, "h": 120,
+      "header": "DATABASE", "title": "detections", "subtitle": "action 1 \u00b7 upsert by (Key, RunId)" },
+    { "id": "region", "kind": "storage",           "x": 780, "y": 240, "w": 260, "h": 120,
+      "header": "DATABASE", "title": "region selection", "subtitle": "action 2 \u00b7 promote Tracks" }
+  ],
+  "connections": [
+    { "from": "api",    "to": "ingest", "fromSide": "right", "toSide": "left",  "kind": "thick",  "label": "envelope" },
+    { "from": "queue",  "to": "ingest", "fromSide": "right", "toSide": "left",  "kind": "thick",  "label": "envelope" },
+    { "from": "ingest", "to": "coll",   "fromSide": "right", "toSide": "left",  "label": "action 1" },
+    { "from": "ingest", "to": "region", "fromSide": "right", "toSide": "left",  "kind": "dashed", "label": "action 2" }
+  ]
+}
+{{< /rete >}}
+
+## Two routing axes (don't conflate them)
+
+The single biggest design risk is merging two different "routings" into one switch. Keep them separate:
+
+- **Kind** — *what is this result?* `detection` vs `thumbnail` vs `sprite` vs `dominantcolor`. Different shapes, **different sinks**, different action sequences.
+- **Task** — *which flavour within a kind?* Inside `detection`: `box` / `anpr` / `pose`. All produce a `DetectionRun`, share the same validation skeleton and the **same `detections` collection**.
+
+```text
+envelope ──▶ route by KIND ──▶ detection handler ──▶ route by TASK ──▶ box | anpr | pose
+                           ├──▶ thumbnail handler
+                           ├──▶ sprite handler
+                           └──▶ dominantcolor handler
+```
+
+The kind dispatcher is a thin router over a **registry of handlers**. The task router lives *inside* the detection handler. This nesting matters because tasks share a contract (`DetectionRun`) while kinds do not.
+
+## The envelope is the shared contract
+
+The unifying move: the API endpoint is *"an HTTP door onto the same envelope the queue carries."* One shape in, regardless of transport:
+
+| Field | Role |
+|---|---|
+| `operation` | the **kind** selector — the registry key the dispatcher routes on |
+| `fileName` · `payload.fileName` | the **recording reference** — resolves *which* media the result attaches to |
+| `payload` | the **typed result** (e.g. a `DetectionRun`-shaped body) |
+
+> **Caveat — evolve, don't reuse `data`.** Today `PipelineEvent.Data` is a deprecated `map[string]interface{}` and on dispatch carries only storage credentials. "Same structure as the broker" means the **`payload`** carries the typed result; it does *not* mean stashing the result in the legacy `data` bag. The envelope is being evolved so `payload` is the typed home for a stage's result.
+
+## Where it lives
+
+Because the pipeline (`hub-pipeline-analysis`) must call this too, the routing **cannot** stay under hub-api's `internal/` — Go's `internal/` rule makes it un-importable. It moves to the shared `models` module that both apps already depend on. Split by dependency weight:
+
+| Concern | Why | Home |
+|---|---|---|
+| **Routing** — validate, task-route, normalise, build the run | pure; needs only types already in `models` | **`models/pkg/detections`** (new, infra-free) |
+| **Persistence** — the `(Key, RunId)` upsert, region promotion | needs a live `*mongo` handle + context | each app's repo (or shared via the `database` repo) |
+| **Auth / scope** — bearer user vs recording owner | genuinely differs per transport | each adapter |
+| **Transport** — gin handler / queue consumer + ack | HTTP status vs ack/nack | each app |
+
+Keeping `models/pkg/detections` infra-free keeps it a fast, testable library while still giving **one** implementation of the routing.
+
+## A handler is an action pipeline
+
+A handler is not `ingest → upsert`. It is an **ordered list of idempotent effects** sharing one context:
+
+```go
+type Action interface {
+    Name() string
+    Apply(ctx context.Context, scope Scope, target Target, run any) error
+    RunFor(source Source) bool // gate an action by transport / trust
+}
+
+type Handler struct {
+    Kind    string
+    Actions []Action
+}
+
+var handlers = map[string]Handler{
+    "detection": {
+        Kind:    "detection",
+        Actions: []Action{UpsertDetectionRun{}, PromoteTracksToRegions{}},
+    },
+    // "thumbnail": { ... }, "sprite": { ... } — migrated from the analyser switch later
+}
+
+// the ONE entry point both transports call:
+func Ingest(ctx context.Context, scope Scope, target Target, kind string, payload json.RawMessage) (Report, error) {
+    h, ok := handlers[kind]
+    if !ok {
+        return Report{}, fmt.Errorf("%w: %s", ErrUnknownKind, kind)
+    }
+    for _, a := range h.Actions {
+        if !a.RunFor(scope.Source) {
+            continue
+        }
+        if err := a.Apply(ctx, scope, target, payload); err != nil {
+            return Report{}, err
+        }
+    }
+    return report, nil
+}
+```
+
+The dispatcher owns only shared plumbing (look up handler, run actions, map errors). Each action owns its own validation **and its own sink** — which is essential, because the sinks genuinely differ (own collection vs enrich-in-place). The moment the dispatcher starts `switch`-ing on kind to do real work, it has become the hardcoded switch it was meant to replace.
+
+## Detection — the reference kind
+
+Detection's two-action sequence is not hypothetical; the [models](../../../) are shaped for it. In `analysis.go`:
+
+- `DetectionRun.Tracks` is `[]FaceRedactionTrack` — the **same type** as `FaceRedaction.Tracks`.
+- The model comment says it outright: *"Tracks reuse FaceRedactionTrack so promoting a run into a redaction is a direct copy."*
+- `Analysis` carries both `FaceRedaction []FaceRedaction` and `Regions []Region` — the "region selection".
+
+So:
+
+1. **`UpsertDetectionRun`** — upsert the `DetectionRun` into the `detections` collection, keyed by `(Key, Source.RunId)`.
+2. **`PromoteTracksToRegions`** — copy the run's `Tracks` onto the corresponding media's `FaceRedaction` / `Regions` (a near-direct copy by design).
+
+ANPR (also box-based) could reuse action 1 with a *different* action 2 (e.g. record plate text; perhaps no auto-redact). POSE (keypoints, not boxes) would need a different contract and a different sequence entirely. Same router, different action lists — exactly the "similar but different sequence" the design targets.
+
+### Task sub-registry within detection
+
+Inside the detection handler, the `Task` discriminator selects the validator / normaliser:
+
+```go
+type TaskHandler interface {
+    Validate(req api.PostDetectionsRequest) error
+    Normalize(req api.PostDetectionsRequest) (models.DetectionRun, Report)
+}
+
+var taskRegistry = map[string]TaskHandler{
+    models.DetectionTask: boxTask{},  // today's validateDetections + normalizeDetections
+    // "anpr": anprTask{}, "pose": poseTask{},
+}
+```
+
+`box` is box-only today; `anpr`/`pose` arrive as new entries (and, for `pose`, a `DetectionRun.Payload json.RawMessage` selected by `Task` for geometry the box contract can't hold). Neither transport changes when a task is added.
+
+## The two adapters collapse onto it
+
+| Concern | API adapter (hub-api) | Pipeline adapter (analyser/worker) |
+|---|---|---|
+| Input | `MaxBytesReader` + `ShouldBindJSON` | consume message → build the same `api.PostDetectionsRequest` |
+| Target | `mediaKey` / `analysisId` from body | recording key from the event (`fileName`) |
+| Identity | authenticated bearer user | recording's owner, resolved from the media (no token) |
+| Output | map `Report`/error → HTTP status (201/200/207/400/404) | ack on success, nack on failure; echo completion |
+
+Because `api.PostDetectionsRequest` lives in shared `models/pkg/api`, the pipeline worker constructs the **exact same input type** — no DTO duplication. The only real refactor friction is generalising the repository's `user` parameter to an explicit `Scope` (the pipeline path has no bearer token).
+
+## Consistency & idempotency
+
+This is the genuinely hard part — not the routing.
+
+- **At-least-once delivery.** The broker can redeliver, so a handler's whole action sequence can re-run. Every action must be **idempotent**: upsert the run by `(Key, RunId)`; make region promotion *replace* a run's contribution keyed by `RunId` rather than append. A replay then becomes a no-op.
+- **Multi-document writes.** Action 1 writes `detections`; action 2 mutates the analysis doc. Idempotent keyed actions make a partial apply self-healing on retry — preferable to a distributed transaction. A Mongo session transaction (same cluster) is the fallback if two effects must ever be truly atomic.
+- **Per-source gating.** An external API push auto-mutating a media's redaction regions is a **policy** decision, not just routing. The `RunFor(source)` predicate lets the same kind run a fuller sequence internally (pipeline) than externally (untrusted producer) — e.g. external posts store the run but don't auto-promote to redaction.
+
+## What's real today vs proposed
+
+| Piece | Status |
+|---|---|
+| Detection validate / normalise / upsert | **exists** — in hub-api `PostDetections`, but under `internal/` (not shareable) |
+| `DetectionRun.Tracks` reuses `FaceRedactionTrack` (promotion-ready) | **exists** in `models` |
+| Per-operation result handling in the pipeline | **exists** as a hardcoded `switch` in the analyser |
+| Region-promotion as an automatic ingest action | **proposed** — the API stores the run only today |
+| Shared `models/pkg/detections` routing package | **proposed** |
+| Kind dispatcher + task sub-registry | **proposed** |
+| `RunFor` per-source action gating | **proposed** |
+
+## Suggested build order
+
+Bottom-up, so nothing speculative ships and the box path stays provably unchanged:
+
+1. Create **`models/pkg/detections`** with the box `TaskHandler` (lift validate/normalise, return typed errors instead of HTTP constants).
+2. Wire hub-api's `PostDetections` to delegate to it — box task only, `PromoteTracksToRegions` behind a `RunFor` gate that's off, so behaviour is identical.
+3. Add the **queue adapter** in the analyser that builds the same request and calls `Ingest` — detection over the pipeline.
+4. Flip `PromoteTracksToRegions` on (internally first via `RunFor`).
+5. Generalise to a **kind dispatcher**, migrating the analyser's `thumbnail`/`sprite` switch arms into handlers as a follow-up.
+6. Add **ANPR** (new task + action), then **POSE** (new task + `Payload` contract extension) as the model proves out.
+
+## See also
+
+- [Integrations](integrations/) — how a worker *delivers* a result (transport, queues, completion ack).
+- [Detections → Pipeline](../../extend/detections/pipeline/) — the detection capability delivered as a stage.
+- [Detections → API](../../extend/detections/api/) — the same detection contract over HTTP.
