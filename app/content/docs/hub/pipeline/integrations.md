@@ -17,7 +17,7 @@ The pipeline is **open**: every built-in service is just a queue consumer, and y
 
 This page is the **mechanism**, shared by built-in *and* custom stages: the message you receive, how to return a result, how to deploy it, and how the orchestrator tracks it. It is **capability-agnostic** — it never assumes *what* your stage does. For a concrete contract delivered this way (the run shape, the collection, the op name), see the capability pages under [Extend](../../extend/) — for example [Detections → Pipeline](../../extend/detections/pipeline/).
 
-> **Status — shipped.** The queue, envelope and completion mechanics described here are how the pipeline works internally. The config-driven **stage registration** (the `kerberospipeline.workflows` values block and operation registry below) is in place too: the Helm chart projects the registry into `PIPELINE_STAGE_REGISTRY`, the analyser loads it at boot (`registry.Load`) and only ever enqueues operations the registry declared — so a *custom* operation joins the pipeline without changing orchestrator code. Both `dispatch: always` and `dispatch: conditional` (predicate on an upstream result) stages work today. Custom stages are **asynchronous only** — there is no blocking "required" stage.
+> **Config-driven stage registration.** A custom stage joins the pipeline through the `kerberospipeline.workflows` values block (the operation registry below) — no orchestrator code changes. The Helm chart projects the registry into `PIPELINE_STAGE_REGISTRY`, the analyser loads it at boot (`registry.Load`) and only ever enqueues operations the registry declared. Both `dispatch: always` and `dispatch: conditional` (a predicate on an upstream result) stages are supported. Custom stages are **asynchronous only** — there is no blocking "required" stage.
 >
 > This page is about how a worker *delivers* a result. For the complementary *receiving* side — one shared service that takes a result from either the API or the queue and runs the right sequence of actions for its kind — see [Ingest service](ingest-service/).
 
@@ -240,7 +240,7 @@ for _, s := range registry {
 }
 ```
 
-Like the built-in async operations, workflow operations are **non-gating**: a custom stage can never stall a run. See [Ingest service → Pipeline tracking](ingest-service/#pipeline-tracking-workflow-operations--the-allow-list) for how the same registry doubles as the **allow-list** that validates enqueue and resolution.
+Like the built-in async operations, workflow operations are **non-gating**: a custom stage can never stall a run. The same registry doubles as an **allow-list**: only registered operations are enqueued here, and on the receiving side the [Ingest service → Admission control](ingest-service/#admission-control-only-known-operations-are-ingested) drops results for any operation it doesn't recognise.
 
 Because the **operation id** is the stage key, it is the single string shared by the queue, the dispatch entry and the completion key — they cannot drift. A stage the orchestrator knows about but no worker consumes can't happen: the same `enabled` flag produces both sides.
 

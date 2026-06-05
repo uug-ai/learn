@@ -17,7 +17,7 @@ A result can reach the Hub two ways — an authenticated **API push** or an in-p
 
 > **"Service" means a package, not a process.** There is **no separate microservice, deployment, queue or network hop**. The ingest service is a shared library (`models/pkg/ingest`) compiled *into* both the hub-api and analyser binaries; each calls `Ingest(...)` in-process on its own request. "Service" here names a consistent code path, not a running component.
 
-> **Status — shipped.** The shared `models/pkg/ingest` core, the kind dispatcher and detection's task sub-registry are in place. The hub-api `/ingest` door and the typed [`/detections`](../../extend/detections/api/) endpoint both delegate to it, and the analyser routes its `detection`/`pose` queue completions through the same core via the pipeline adapter. This page describes that behaviour. It builds on the transport mechanics in [Integrations](integrations/) — read that first for how a worker *delivers* a result; this page is about how the platform *receives* one.
+> This page builds on the transport mechanics in [Integrations](integrations/) — read that first for how a worker *delivers* a result; this page is about how the platform *receives* one. The hub-api `/ingest` door and the typed [`/detections`](../../extend/detections/api/) endpoint both delegate to the same core, and the analyser routes its `detection`/`pose` queue completions through it via the pipeline adapter.
 
 ## The idea
 
@@ -226,30 +226,11 @@ Both adapters hand the same opaque `payload` (a `json.RawMessage` carrying the d
 
 **API push: standalone or status update.** An API push that is *not* fulfilling a pipeline-dispatched operation is **standalone** — it writes its own collection and sends no ack; nothing is waiting on it, and the rest of the Hub reads the collection directly. Only when a detection *fulfils a dispatched operation* does the adapter echo a completion ack so `resolvedoperations` reflects it. The shared ingest call is identical either way — the adapter alone decides whether to ack, because it alone knows whether a run dispatched the work.
 
-## Pipeline tracking: workflow operations & the allow-list
+## Admission control: only known operations are ingested
 
-> **Status — shipped.** When a result arrives over the queue, the analyser tracks it on a dedicated `workflowOperations` tier and gates both enqueue and resolve against the Helm-projected registry (`PIPELINE_STAGE_REGISTRY`). The rules below describe the live behaviour.
+A result arriving over the queue is only ingested if its `operation` is recognised — a built-in op or a registered custom stage (`isKnownOperation` → `registry.Active().Has`). An unknown, drifted, or removed worker's result is **log-and-dropped before any action runs**, so it can never inflate `resolvedoperations` or persist arbitrary `data.<op>` keys. The orchestrator's separate `workflowOperations` tier and the enqueue side of this registry are dispatch concerns — see [Integrations → The operation registry](integrations/#the-operation-registry).
 
-When a result arrives over the **queue** (not the API), the orchestrator also has to *track* it. Three rules keep that safe.
-
-**A separate `workflowOperations` tier.** Registry-driven custom stages get their own list on the analysis, alongside the built-in `asyncOperations` / `requiredOperations` / `resolvedOperations`:
-
-```go
-analysis.WorkflowOperations = []string{} // custom/registry stages only — built-ins stay in AsyncOperations
-```
-
-The built-in dispatch (`thumby`, `dominantcolor`, …) is untouched; only registered stages land here. Like async operations, `workflowOperations` are **non-gating** — a workflow stage can never stall a run.
-
-**Safe resolution.** A worker signals completion by echoing an ack with its `operation` set; the orchestrator records it with the existing idempotent update — `$set data.<op>` + `$addToSet resolvedoperations`. Because it's `$addToSet`, a redelivered ack is a no-op; and because workflow operations don't gate completion, a *missing* ack can't wedge the run (the 15-minute backstop already bounds it). Resolution is provenance, not a barrier.
-
-**The registry is the allow-list.** The enabled-stage registry doubles as the set of permitted operations, validated at the two ends that would otherwise drift freely:
-
-- **Enqueue:** the analyser only emits `kcloud-<id>-queue.fifo` for custom-stage `id`s that are in the registry (`registry.Active().AlwaysOperations()`), so an unregistered stage is never dispatched.
-- **Resolve:** a returning result is recorded only when `isKnownOperation` admits it — a built-in op or a registry entry (`registry.Active().Has`); unknown ops are log-and-dropped, so a stray, drifted, or removed worker can never inflate `resolvedoperations` or persist arbitrary `data.<op>` keys.
-
-The custom-stage list stays correct automatically because it *is* the `enabled`-driven registry keys: no worker, no entry. (Built-in queue names like `thumby` are still hardcoded constants, outside this registry — the allow-list governs custom stages.)
-
-> **Idempotency lives in the action, not the list.** `resolvedoperations` tracks *that* an operation completed (at-most-once recording). It does **not** make the side-effect idempotent — that has to be the action's own keyed upsert (`(Key, RunId)` for detections, `(media, operation)` for enrich-in-place) so a redelivery replaces rather than duplicates.
+> **Idempotency lives in the action, not the registry.** Recognising an operation only decides *whether* to ingest it; it does **not** make the side-effect idempotent. That has to be the action's own keyed upsert (`(Key, RunId)` for detections, `(media, operation)` for enrich-in-place) so a redelivery replaces rather than duplicates.
 
 ## Consistency & idempotency
 
@@ -258,31 +239,7 @@ This is the genuinely hard part — not the routing.
 - **At-least-once delivery.** The broker can redeliver, so a handler's whole action sequence can re-run. Every action must be **idempotent**: upsert the run by `(Key, RunId)`; make region promotion *replace* a run's contribution keyed by `RunId` rather than append. A replay then becomes a no-op.
 - **Multi-document writes.** Action 1 writes `detections`; action 2 mutates the analysis doc. Idempotent keyed actions make a partial apply self-healing on retry — preferable to a distributed transaction. A Mongo session transaction (same cluster) is the fallback if two effects must ever be truly atomic.
   - **Known limitation (accepted for now).** The queue path self-heals on redelivery, but the API path is a *single request with no redelivery* — a crash between the two writes leaves a partial apply with nothing to retry it. Revisit with a session transaction or a reconcile pass; not a blocker today.
-- **Per-source gating.** An external API push auto-mutating a media's redaction regions is a **policy** decision, not just routing. The `RunFor(source)` predicate lets the same kind run a fuller sequence internally (pipeline) than externally (untrusted producer) — e.g. external posts store the run but don't auto-promote to redaction. Promotion is doubly contingent: an action runs only if `RunFor` admits the source **and** a `RegionPromoter` is wired into the scope; with no promoter, `PromoteTracksToRegions` is a no-op rather than an error, which is how the pipeline adapter stays store-only today.
-
-## What's shipped
-
-| Piece | Status |
-|---|---|
-| Shared `models/pkg/ingest` routing package | **shipped** — infra-free, compiled into both binaries |
-| Kind dispatcher + detection task sub-registry (`box`, `pose`) | **shipped** |
-| Detection validate / normalise / upsert | **shipped** — lifted into `models/pkg/ingest`, reused by both transports |
-| `DetectionRun.Tracks` reuses `FaceRedactionTrack` (promotion-ready) | **shipped** in `models` |
-| hub-api `/ingest` door + typed `/detections` delegating to the core | **shipped** — `api.IngestRequest` / `api.IngestResponse` |
-| Pipeline adapter (`detection` / `pose` queue completions → `Ingest`) | **shipped** — reads `event.Payload.Result`, `SourcePipeline` |
-| `RunFor` per-source action gating | **shipped** — plus promoter-wiring contingency |
-| Region-promotion as an automatic ingest action | **partial** — the action exists and is `RunFor`-gated to `SourcePipeline`, but no `RegionPromoter` is wired yet, so promotion is currently a no-op (store-only) |
-| Separate `workflowOperations` tier | **shipped** — registry-driven custom stages tracked apart from built-in `asyncOperations` |
-| Registry-as-allow-list (enqueue + resolve validation) | **shipped** — `registry.Active()` gates dispatch; `isKnownOperation` gates resolve |
-
-## What's next
-
-The core is in place; the remaining work is breadth and hardening:
-
-1. Wire a `RegionPromoter` so `PromoteTracksToRegions` actually promotes for `SourcePipeline` (flip promotion on internally first).
-2. Bring built-in queue dispatch under the same allow-list discipline (the `thumby`/`sprite` names are still hardcoded constants).
-3. Generalise the dispatcher's reach by migrating the analyser's `thumbnail`/`sprite` switch arms into handlers.
-4. Add **ANPR** (new task + its own action 2), then a keypoint-native **POSE** contract (new task + `Payload` extension) as the model proves out.
+- **Per-source gating.** An external API push auto-mutating a media's redaction regions is a **policy** decision, not just routing. The `RunFor(source)` predicate lets the same kind run a fuller sequence internally (pipeline) than externally (untrusted producer) — e.g. external posts store the run but don't auto-promote to redaction. Promotion is doubly contingent: an action runs only if `RunFor` admits the source **and** a `RegionPromoter` is wired into the scope; with no promoter, `PromoteTracksToRegions` is a no-op rather than an error, which is how a store-only adapter opts out of promotion.
 
 ## See also
 
