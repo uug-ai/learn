@@ -17,7 +17,7 @@ The pipeline is **open**: every built-in service is just a queue consumer, and y
 
 This page is the **mechanism**, shared by built-in *and* custom stages: the message you receive, how to return a result, how to deploy it, and how the orchestrator tracks it. It is **capability-agnostic** — it never assumes *what* your stage does. For a concrete contract delivered this way (the run shape, the collection, the op name), see the capability pages under [Extend](../../extend/) — for example [Detections → Pipeline](../../extend/detections/pipeline/).
 
-> **Status — proposed.** The queue, envelope and completion mechanics described here are how the pipeline already works internally. The config-driven **stage registration** (the `workflows` values block and operation registry below) is the proposed addition that lets a *custom* operation join the pipeline without changing orchestrator code. Custom stages are **asynchronous only** in this design — there is no blocking "required" stage.
+> **Status — proposed.** The queue, envelope and completion mechanics described here are how the pipeline already works internally. The config-driven **stage registration** (the `kerberospipeline.workflows` values block and operation registry below) is the proposed addition that lets a *custom* operation join the pipeline without changing orchestrator code. Custom stages are **asynchronous only** in this design — there is no blocking "required" stage.
 >
 > This page is about how a worker *delivers* a result. For the complementary *receiving* side — one shared service that takes a result from either the API or the queue and runs the right sequence of actions for its kind — see [Ingest service](ingest-service/).
 
@@ -117,30 +117,34 @@ So the result is recorded against the analysis and the operation is marked resol
 
 Stages are grouped into named **workflows**. Each stage is described once, as an entry under a workflow's `stages` list whose **key is the operation id**. One flag — `enabled` — both renders the Deployment *and* registers the operation, so the worker and the orchestrator can never drift apart. The workflow `name` simply labels the group (shown in the UI, toggled as a unit); **operation ids stay globally unique** across every workflow — they are what binds the queue, dispatch and resolution.
 
+> **`kerberospipeline.workflows`, not the front-end `workflows` flag.** Custom stages live under `kerberospipeline.workflows` — the same `kerberospipeline` subtree as the built-in stages (`analysis`, `dominantColor`, …), so all pipeline config stays in one place. Don't confuse it with `kerberoshub.…features.workflows.enabled`, the unrelated front-end feature toggle. The `kerberospipeline.` prefix disambiguates the two. Note `workflows` here is a **reserved key** in that subtree, not a service name: built-in stages are keyed by service, this one key holds the list of custom-stage groups.
+
 > **Config registers a stage; it does not register a typed handler.** This values block is the *stage registry* — it governs the queue, dispatch and completion tracking. It is **all you need** for a self-persisting stage (one that writes its own collection and acks). A stage that instead *delegates* persistence to the platform — handing back a `payload` for a typed side-effect on shared state — also needs a Go handler in `models/pkg/ingest`. See [Ingest service → Two registries, two jobs](ingest-service/#two-registries-two-jobs).
 
 ```yaml
 # values.yaml
-workflows:
-  - name: anpr                     # names a group of stages run together
-    stages:
-      - detection:                 # key = operation id = queue suffix
-          enabled: true            # renders the Deployment AND registers the operation
+kerberospipeline:
+  # … built-in stages (analysis, dominantColor, thumbnail, …) live here too
+  workflows:                         # reserved key — custom stage groups (NOT a service)
+    - name: anpr                     # names a group of stages run together
+      stages:
+        - detection:                 # key = operation id = queue suffix
+            enabled: true            # renders the Deployment AND registers the operation
 
-          # --- deployment (Helm-only; the orchestrator never sees these) ---
-          repository: ghcr.io/acme/hub-pipeline-detection
-          tag: "1.0.0"
-          replicas: 1
-          pullPolicy: IfNotPresent
-          logLevel: info
-          resources: {}
-          env: []
-          volumes: []
+            # --- deployment (Helm-only; the orchestrator never sees these) ---
+            repository: ghcr.io/acme/hub-pipeline-detection
+            tag: "1.0.0"
+            replicas: 1
+            pullPolicy: IfNotPresent
+            logLevel: info
+            resources: {}
+            env: []
+            volumes: []
 
-          # --- dispatch (projected to the orchestrator) ---
-          dispatch: always         # always | conditional
-          needs: ""                # upstream operation that triggers it (conditional only)
-          condition: {}            # predicate on the upstream result (conditional only)
+            # --- dispatch (projected to the orchestrator) ---
+            dispatch: always         # always | conditional
+            needs: ""                # upstream operation that triggers it (conditional only)
+            condition: {}            # predicate on the upstream result (conditional only)
 ```
 
 The chart renders a normal `pipe-<operation>` Deployment, gated to pipeline deployments exactly like the built-in stages:
@@ -152,9 +156,13 @@ The chart renders a normal `pipe-<operation>` Deployment, gated to pipeline depl
 {{- end -}}
 ```
 
+> **One generic template, not one per stage.** Built-in stages each have their own hand-written template (`pipe-analysis.yaml`, `pipe-dominantcolor.yaml`, …) reading a per-service key (`kerberospipeline.analysis`, `kerberospipeline.dominantColor`, …). Custom stages instead `range` over the `kerberospipeline.workflows` list and render from a **single generic** `templates/workflows/pipe-<operation>.yaml`, so adding a stage is a values edit with no new template. The built-ins are intentionally **not** migrated to this tree — they keep their per-service keys and templates; the generic path is additive.
+
 ### The operation registry
 
-For every **enabled** stage, the chart also projects the *routing-relevant* fields into a single artifact the orchestrator reads at boot (an env var or mounted ConfigMap):
+For every **enabled** stage, the chart flattens the *routing-relevant* fields of every workflow under `kerberospipeline.workflows` into a single JSON document and hands it to the analyser as **one environment variable, `PIPELINE_STAGE_REGISTRY`**, on the existing `pipe-analysis` Deployment. The orchestrator reads it once at boot — there is **no ConfigMap, mount or extra API call**; the registry travels with the pod spec, so a `helm upgrade` that changes a stage rolls the analyser automatically and the new value is in effect the moment the pod restarts.
+
+The rendered value is the flattened list of enabled operations:
 
 ```json
 [
@@ -163,6 +171,36 @@ For every **enabled** stage, the chart also projects the *routing-relevant* fiel
     "needs": "classify", "condition": { "path": "labels", "op": "contains", "value": "person" } }
 ]
 ```
+
+The chart builds that string from the `kerberospipeline.workflows` values with a helper and injects it next to the analyser's existing env:
+
+```yaml
+# templates/kerberos-pipeline/pipe-analysis.yaml — added to the existing env: list
+        - name: PIPELINE_STAGE_REGISTRY
+          value: {{ include "hub.stageRegistry" . | quote }}
+```
+
+```go-template
+{{- /* templates/_helpers.tpl — flatten every enabled stage across all workflows */ -}}
+{{- define "hub.stageRegistry" -}}
+{{- $stages := list -}}
+{{- range .Values.kerberospipeline.workflows -}}
+  {{- range .stages -}}
+    {{- range $op, $cfg := . -}}
+      {{- if $cfg.enabled -}}
+        {{- $entry := dict "operation" $op "dispatch" (default "always" $cfg.dispatch) -}}
+        {{- if $cfg.needs }}{{- $_ := set $entry "needs" $cfg.needs -}}{{- end -}}
+        {{- if $cfg.condition }}{{- $_ := set $entry "condition" $cfg.condition -}}{{- end -}}
+        {{- $stages = append $stages $entry -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $stages | toJson -}}
+{{- end -}}
+```
+
+Only the four routing fields cross this boundary — the deployment fields (`repository`, `tag`, `replicas`, …) stay Helm-side and never reach the orchestrator. The analyser parses that string into a slice of descriptors:
 
 ```go
 type StageDescriptor struct {
@@ -176,6 +214,17 @@ type StageCondition struct {
     Path  string `json:"path"`  // field in the upstream op's result
     Op    string `json:"op"`    // eq | ne | contains | exists | gt | lt
     Value any    `json:"value"`
+}
+```
+
+At boot the analyser unmarshals `PIPELINE_STAGE_REGISTRY` once and keeps the slice for the lifetime of the process — an empty or unset variable simply means no custom stages:
+
+```go
+var registry []StageDescriptor
+if raw := os.Getenv("PIPELINE_STAGE_REGISTRY"); raw != "" {
+    if err := json.Unmarshal([]byte(raw), &registry); err != nil {
+        log.Fatalf("invalid PIPELINE_STAGE_REGISTRY: %v", err) // fail fast — a malformed registry must not start
+    }
 }
 ```
 
@@ -207,14 +256,15 @@ Two kinds of "conditional" exist, and they live in different places:
 A conditional stage is **not** enqueued at analysis start. Instead, when the `needs` operation resolves, the orchestrator evaluates `condition` against its result and — only on a match — enqueues the stage's queue. Recordings that don't match never touch the stage.
 
 ```yaml
-workflows:
-  - name: ppe
-    stages:
-      - nohelmet:
-          enabled: true
-          dispatch: conditional
-          needs: classify
-          condition: { path: labels, op: contains, value: person }   # only recordings the classifier flagged as containing a person
+kerberospipeline:
+  workflows:
+    - name: ppe
+      stages:
+        - nohelmet:
+            enabled: true
+            dispatch: conditional
+            needs: classify
+            condition: { path: labels, op: contains, value: person }   # only recordings the classifier flagged as containing a person
 ```
 
 This is the declarative form of a pattern the built-in classifier already uses imperatively: when classification returns, the analyser inspects the result and re-enqueues follow-up work for matched objects. The `needs` / `condition` descriptor moves that decision out of Go and into config.
