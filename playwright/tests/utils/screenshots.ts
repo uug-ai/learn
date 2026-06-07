@@ -54,6 +54,12 @@ export interface CaptureOptions {
    * for backwards compatibility.
    */
   topic?: string;
+  /**
+   * Scroll the page to this Y offset (in px) before taking the
+   * screenshot. Defaults to 0 (top of the page). Use this when the
+   * element you want to document sits below the fold.
+   */
+  scrollY?: number;
 }
 
 /**
@@ -82,8 +88,10 @@ export async function capture(
   await page.waitForLoadState('networkidle').catch(() => {
     /* ignore — Hub keeps long-poll connections open on some pages */
   });
-  // Make sure we're at the top of the page.
-  await page.evaluate(() => window.scrollTo(0, 0));
+  // Make sure we're at the requested scroll offset (top of the page by
+  // default — pass `scrollY` to capture content below the fold).
+  const scrollY = options.scrollY ?? 0;
+  await page.evaluate((y) => window.scrollTo(0, y), scrollY);
   await page.waitForTimeout(500);
 
   await page.screenshot({
