@@ -50,6 +50,8 @@ A device block has only outputs, a model block has only inputs, and the throttle
 
 Edges connect an *output port* of one block to an *input port* of another. They define how events flow from a device, through any number of throttle and active-window blocks, into one or more models.
 
+An edge can also carry a **condition** — a simple predicate on the upstream block's result (for example *labels contains "person"*). The downstream block then only runs for events that match, which is what powers the *first detect a person, then run face recognition* style of chaining in the examples below. The edges are the source of truth for this routing: the orchestrator compiles each block's incoming edges into the conditions it evaluates at run time, so you never edit that wiring by hand — you draw it on the canvas.
+
 ### Workflow status
 
 A workflow can be **enabled** or **disabled** with a single switch in the list view. Disabled workflows are kept on the user's account but no longer dispatch events through the pipeline — handy for seasonal automations or while iterating on a design.

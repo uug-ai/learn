@@ -143,8 +143,7 @@ kerberospipeline:
 
             # --- dispatch (projected to the orchestrator) ---
             dispatch: always         # always | conditional
-            needs: ""                # upstream operation that triggers it (conditional only)
-            condition: {}            # predicate on the upstream result (conditional only)
+            needs: []                # conditional only: upstream fan-in (see below)
 ```
 
 The chart renders a normal `pipe-<operation>` Deployment, gated to pipeline deployments exactly like the built-in stages:
@@ -168,7 +167,10 @@ The rendered value is the flattened list of enabled operations:
 [
   { "operation": "detection", "dispatch": "always" },
   { "operation": "nohelmet",  "dispatch": "conditional",
-    "needs": "classify", "condition": { "path": "labels", "op": "contains", "value": "person" } }
+    "needs": [
+      { "operation": "classify",
+        "condition": { "path": "labels", "op": "contains", "value": "person" } }
+    ] }
 ]
 ```
 
@@ -190,7 +192,6 @@ The chart builds that string from the `kerberospipeline.workflows` values with a
       {{- if $cfg.enabled -}}
         {{- $entry := dict "operation" $op "dispatch" (default "always" $cfg.dispatch) -}}
         {{- if $cfg.needs }}{{- $_ := set $entry "needs" $cfg.needs -}}{{- end -}}
-        {{- if $cfg.condition }}{{- $_ := set $entry "condition" $cfg.condition -}}{{- end -}}
         {{- $stages = append $stages $entry -}}
       {{- end -}}
     {{- end -}}
@@ -200,27 +201,38 @@ The chart builds that string from the `kerberospipeline.workflows` values with a
 {{- end -}}
 ```
 
-Only the four routing fields cross this boundary — the deployment fields (`repository`, `tag`, `replicas`, …) stay Helm-side and never reach the orchestrator. The analyser parses that string into a slice of descriptors:
+Only the routing fields cross this boundary — the deployment fields (`repository`, `tag`, `replicas`, …) stay Helm-side and never reach the orchestrator. The descriptors the orchestrator parses are the **routing slice of the shared `models.WorkflowStage`** type, so the registry can never drift from the engine's own model:
 
 ```go
-type StageDescriptor struct {
-    Operation string          `json:"operation"`           // unique — binds queue, dispatch and resolution
-    Dispatch  string          `json:"dispatch"`            // "always" | "conditional"
-    Needs     string          `json:"needs,omitempty"`     // upstream op that triggers a conditional stage
-    Condition *StageCondition `json:"condition,omitempty"` // structured predicate (no free-form expressions)
+// from models/pkg/models — only the routing fields are shown here
+type WorkflowStage struct {
+    Operation string            `json:"operation"`          // unique — binds queue, dispatch and resolution
+    Dispatch  Dispatch          `json:"dispatch,omitempty"` // "always" (default) | "conditional"
+    Needs     []StageDependency `json:"needs,omitempty"`    // upstream fan-in (conditional stages)
+    // … contract (params, inputs, outputs) and deployment fields omitted here …
+}
+
+// A conditional stage waits on one or more upstreams. Each dependency pairs an
+// upstream operation with the predicate that must match its result — so a stage
+// can fan in from several upstreams, each gated by its own condition.
+type StageDependency struct {
+    Operation string          `json:"operation"`           // upstream op that can trigger this stage
+    Condition *StageCondition `json:"condition,omitempty"` // predicate on that upstream's result (nil = unconditional)
 }
 
 type StageCondition struct {
-    Path  string `json:"path"`  // field in the upstream op's result
-    Op    string `json:"op"`    // eq | ne | contains | exists | gt | lt
-    Value any    `json:"value"`
+    Path  string      `json:"path"`  // dot-path into the upstream op's result
+    Op    ConditionOp `json:"op"`    // eq | ne | contains | in | exists | gt | gte | lt | lte
+    Value any         `json:"value"` // operand (ignored for exists)
 }
 ```
+
+`Dispatch` and `ConditionOp` are **named string enums** in the model — the permitted values (`always`/`conditional`; the operators above) live in the type, not just a comment — but on the wire they are plain strings, so a hand-written registry entry stays readable JSON.
 
 At boot the analyser unmarshals `PIPELINE_STAGE_REGISTRY` once and keeps the slice for the lifetime of the process — an empty or unset variable simply means no custom stages:
 
 ```go
-var registry []StageDescriptor
+var registry []models.WorkflowStage
 if raw := os.Getenv("PIPELINE_STAGE_REGISTRY"); raw != "" {
     if err := json.Unmarshal([]byte(raw), &registry); err != nil {
         log.Fatalf("invalid PIPELINE_STAGE_REGISTRY: %v", err) // fail fast — a malformed registry must not start
@@ -232,7 +244,7 @@ The registry is the **flattened union of every workflow's stages** — the `name
 
 ```go
 for _, s := range registry {
-    if s.Dispatch == "always" {
+    if s.Dispatch == models.DispatchAlways || s.Dispatch == "" { // empty defaults to always
         // a dedicated tier — NOT AsyncOperations — so built-ins stay untouched
         analysis.WorkflowOperations = append(analysis.WorkflowOperations, s.Operation)
     }
@@ -244,16 +256,16 @@ Like the built-in async operations, workflow operations are **non-gating**: a cu
 
 Because the **operation id** is the stage key, it is the single string shared by the queue, the dispatch entry and the completion key — they cannot drift. A stage the orchestrator knows about but no worker consumes can't happen: the same `enabled` flag produces both sides.
 
-**Minimal stage.** The smallest useful stage is just `enabled` + the deployment fields + `dispatch: always`. `needs` / `condition` are purely additive — you can add conditional routing later without changing the object's shape.
+**Minimal stage.** The smallest useful stage is just `enabled` + the deployment fields + `dispatch: always`. `needs` is purely additive — you can add conditional routing later without changing the object's shape.
 
 ## Conditional routing
 
 Two kinds of "conditional" exist, and they live in different places:
 
 - **Per-deployment** — *is this stage present at all?* Controlled by `enabled` in the stage's values block.
-- **Per-recording** — *should this particular recording go through the stage?* This decision can't be made up front, because the deciding signal often isn't computed yet. It is declared with `dispatch: conditional` plus a `needs` (the upstream operation) and a `condition` (a predicate on that operation's result).
+- **Per-recording** — *should this particular recording go through the stage?* This decision can't be made up front, because the deciding signal often isn't computed yet. It is declared with `dispatch: conditional` plus a `needs` list — each entry an upstream **operation** paired with an optional **condition** (a predicate on that operation's result).
 
-A conditional stage is **not** enqueued at analysis start. Instead, when the `needs` operation resolves, the orchestrator evaluates `condition` against its result and — only on a match — enqueues the stage's queue. Recordings that don't match never touch the stage.
+A conditional stage is **not** enqueued at analysis start. Instead, whenever any listed upstream resolves, the orchestrator evaluates that dependency's `condition` against its result and — only on a match — enqueues the stage's queue. A dependency with no `condition` matches as soon as its upstream resolves. Recordings that match no dependency never touch the stage.
 
 ```yaml
 kerberospipeline:
@@ -263,11 +275,15 @@ kerberospipeline:
         - nohelmet:
             enabled: true
             dispatch: conditional
-            needs: classify
-            condition: { path: labels, op: contains, value: person }   # only recordings the classifier flagged as containing a person
+            needs:
+              - operation: classify
+                # only recordings the classifier flagged as containing a person
+                condition: { path: labels, op: contains, value: person }
 ```
 
-This is the declarative form of a pattern the built-in classifier already uses imperatively: when classification returns, the analyser inspects the result and re-enqueues follow-up work for matched objects. The `needs` / `condition` descriptor moves that decision out of Go and into config.
+Because `needs` is a **list**, a stage can fan in from several upstreams — each gated by its own condition — and fires for the first dependency that matches. The condition `op` is one of `eq`, `ne`, `contains`, `in`, `exists`, `gt`, `gte`, `lt`, `lte`.
+
+This is the declarative form of a pattern the built-in classifier already uses imperatively: when classification returns, the analyser inspects the result and re-enqueues follow-up work for matched objects. The `needs` descriptor moves that decision out of Go and into config.
 
 ## Completion and acknowledgement
 
@@ -290,4 +306,4 @@ Whichever [sink](#sending-a-result-back) you use, your worker should echo a **co
 - [ ] Pick a **sink** — own collection (recommended) or enrich-in-place
 - [ ] **Idempotent** writes (upsert by recording + run id)
 - [ ] Echo a **completion ack** to `kcloud-analysis-queue` with `operation` set
-- [ ] (Optional) gate per-recording with `dispatch: conditional` + `needs` + `condition`
+- [ ] (Optional) gate per-recording with `dispatch: conditional` + a `needs` list of `{ operation, condition }` upstreams
