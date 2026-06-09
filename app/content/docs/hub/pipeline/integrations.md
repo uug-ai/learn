@@ -36,11 +36,11 @@ Reach for a stage only when you control the deployment **and** want the capabili
 
 A stage has exactly two runtime dependencies: the **message broker** (to receive events and hand results back) and the **database** (to read and write event metadata). There is no service-to-service HTTP and no shared in-process state — every hand-off goes through the broker. That loose coupling is what lets any stage scale, restart or be replaced without touching the rest of the pipeline.
 
-{{< rete caption="On classify, analysis keeps running the normal tail (throttler \u2192 notification) and in parallel tees the result to hub-workflows, which enqueues onto your stage's queue; the broker delivers the event to your worker, which hands a result back" alt="Custom pipeline stage placement" height="400" >}}
+{{< rete caption="On classify, analysis keeps running the normal tail (throttler → notification) and in parallel tees the result to hub-workflows, which dispatches each registered stage onto its own queue; your worker(s) consume the event and hand a result back" alt="Custom pipeline stage placement" height="460" >}}
 {
   "groups": [
-    { "id": "hub",   "label": "Hub pipeline",                  "x":   0, "y":   0, "w": 980, "h": 460 },
-    { "id": "yours", "label": "Your stage (integrator-owned)", "x": 720, "y": 470, "w": 290, "h": 200 }
+    { "id": "hub",   "label": "Hub pipeline",        "x":   0, "y":   0, "w": 980, "h": 460 },
+    { "id": "yours", "label": "Workflow (example)",  "x":   0, "y": 540, "w": 980, "h": 260 }
   ],
   "nodes": [
     { "id": "throttler",    "kind": "pipeline-monitor",       "x": 360, "y":  40, "w": 240, "h": 110,
@@ -50,19 +50,21 @@ A stage has exactly two runtime dependencies: the **message broker** (to receive
     { "id": "analysis",     "kind": "pipeline-analysis",      "x":  40, "y": 180, "w": 240, "h": 100,
       "header": "PIPELINE", "title": "Analysis", "subtitle": "Built-ins \u00b7 tees classify", "groupId": "hub" },
     { "id": "workflows",    "kind": "hub",                    "x": 360, "y": 320, "w": 240, "h": 110,
-      "header": "ORCHESTRATOR", "title": "hub-workflows", "subtitle": "Fans out \u00b7 tracks completion", "groupId": "hub" },
-    { "id": "broker",       "kind": "amqp",                   "x": 360, "y": 500, "w": 220, "h": 140,
-      "header": "BROKER", "title": "Message broker", "subtitle": "Kafka / AMQP \u00b7 your stage's queue" },
-    { "id": "worker",       "kind": "detection",              "x": 760, "y": 505, "w": 210, "h": 130,
-      "header": "STAGE", "title": "Your worker", "subtitle": "Consume \u2192 process \u2192 hand back", "groupId": "yours" }
+      "header": "ORCHESTRATOR", "title": "Workflows", "subtitle": "Hub-Workflows", "groupId": "hub" },
+    { "id": "worker",       "kind": "detection",              "x":  90, "y": 600, "w": 210, "h": 130,
+      "header": "STAGE", "title": "Pose detection", "subtitle": "your worker", "groupId": "yours" },
+    { "id": "licenseplate", "kind": "pipeline-licenseplate",  "x": 385, "y": 600, "w": 210, "h": 130,
+      "header": "STAGE", "title": "License plate", "subtitle": "kcloud-licenseplate-queue.fifo", "groupId": "yours" },
+    { "id": "llm",          "kind": "pipeline-llm",           "x": 680, "y": 600, "w": 210, "h": 130,
+      "header": "STAGE", "title": "LLM summary", "subtitle": "kcloud-llm-queue.fifo", "groupId": "yours" }
   ],
   "connections": [
     { "from": "analysis",  "to": "throttler",    "fromSide": "right", "toSide": "left" },
     { "from": "throttler", "to": "notification", "fromSide": "right", "toSide": "left" },
-    { "from": "analysis",  "to": "workflows",    "fromSide": "right", "toSide": "left",   "label": "on classify" },
-    { "from": "workflows", "to": "broker",       "fromSide": "bottom","toSide": "top",    "label": "enqueue" },
-    { "from": "broker",    "to": "worker",       "fromSide": "right", "toSide": "left",   "kind": "thick", "label": "deliver event" },
-    { "from": "worker",    "to": "broker",       "fromSide": "bottom","toSide": "bottom", "kind": "dashed", "label": "hand back" }
+    { "from": "analysis",  "to": "workflows",    "fromSide": "right", "toSide": "left", "label": "on classify" },
+    { "from": "workflows", "to": "worker",       "fromSide": "bottom", "toSide": "top", "label": "dispatch" },
+    { "from": "workflows", "to": "licenseplate", "fromSide": "bottom", "toSide": "top" },
+    { "from": "workflows", "to": "llm",          "fromSide": "bottom", "toSide": "top" }
   ]
 }
 {{< /rete >}}
@@ -127,8 +129,6 @@ A custom operation is registered by adding a **stage descriptor** to the hub-wor
 
 > **`kerberoshub.workflows`, not the front-end `workflows` flag.** The stage registry lives under `kerberoshub.workflows`, the values block for the hub-workflows engine. Don't confuse it with `kerberoshub.…features.workflows.enabled`, the unrelated front-end feature toggle.
 
-> **Registering a stage ≠ deploying its worker.** The registry tells the orchestrator *how to route* an operation; it does **not** render the worker Deployment. Deploy your stage's worker separately (its own image / Deployment) and make sure it consumes `kcloud-<id>-queue.fifo`. A registered operation with no worker draining its queue just piles up messages — so register and deploy together.
-
 > **Config registers a stage; it does not register a typed handler.** The registry governs the queue, dispatch and completion tracking. It is **all you need** for a self-persisting stage (one that writes its own collection and acks). A stage that instead *delegates* persistence to the platform — handing back a `payload` for a typed side-effect on shared state — also needs a Go handler in `models/pkg/ingest`. See [Ingest service → Two registries, two jobs](ingest-service/#two-registries-two-jobs).
 
 ```yaml
@@ -190,31 +190,9 @@ type StageCondition struct {
 
 `Dispatch` and `ConditionOp` are **named string enums** in the model — the permitted values (`always`/`conditional`; the operators above) live in the type, not just a comment — but on the wire they are plain strings, so a hand-written registry entry stays readable JSON.
 
-At boot hub-workflows unmarshals `PIPELINE_STAGE_REGISTRY` once and keeps the slice for the lifetime of the process — an empty or unset variable simply means no custom stages:
-
-```go
-var registry []models.WorkflowStage
-if raw := os.Getenv("PIPELINE_STAGE_REGISTRY"); raw != "" {
-    if err := json.Unmarshal([]byte(raw), &registry); err != nil {
-        log.Fatalf("invalid PIPELINE_STAGE_REGISTRY: %v", err) // fail fast — a malformed registry must not start
-    }
-}
-```
-
-For every event it seeds a **workflow run**, dispatches the registry's `always` stages immediately to `kcloud-<operation>-queue.fifo`, and holds the `conditional` ones for reactive dispatch. Workflow operations are **non-gating** — a custom stage can never stall a run:
-
-```go
-for _, s := range registry {
-    if s.Dispatch == models.DispatchAlways || s.Dispatch == "" { // empty defaults to always
-        run.WorkflowOperations = append(run.WorkflowOperations, s.Operation)
-    }
-    // conditional stages are enqueued reactively — see Conditional routing
-}
-```
+At boot hub-workflows parses `PIPELINE_STAGE_REGISTRY` once and keeps the slice for the life of the process — a malformed array **fails fast** (the pod won't start), and an empty or unset variable simply means no custom stages. For every event it then seeds a **workflow run**, dispatches the `always` stages immediately to `kcloud-<operation>-queue.fifo`, and holds the `conditional` ones for reactive dispatch. Workflow operations are **non-gating** — a custom stage can never stall a run.
 
 The same registry doubles as the **allow-list** that validates enqueue and resolution, so an operation the orchestrator never registered can neither be dispatched nor resolved.
-
-Because the **operation id** is the descriptor key, it is the single string shared by the queue, the dispatch entry and the completion key — they cannot drift.
 
 **Minimal stage.** The smallest useful descriptor is `{ "operation": "<id>", "dispatch": "always" }` plus a separately-deployed worker. `needs` is purely additive — you can add conditional routing later without changing the descriptor's shape.
 
@@ -228,17 +206,17 @@ Two kinds of "conditional" exist, and they live in different places:
 A conditional stage is **not** enqueued when the run is seeded. Instead, whenever any listed upstream resolves, the orchestrator evaluates that dependency's `condition` against its result and — only on a match — enqueues the stage's queue. A dependency with no `condition` matches as soon as its upstream resolves. Recordings that match no dependency never touch the stage.
 
 ```yaml
-kerberospipeline:
+# values.yaml — same stageRegistry array as "Registering a stage", with a needs list
+kerberoshub:
   workflows:
-    - name: ppe
-      stages:
-        - nohelmet:
-            enabled: true
-            dispatch: conditional
-            needs:
-              - operation: classify
-                # only recordings the classifier flagged as containing a person
-                condition: { path: labels, op: contains, value: person }
+    stageRegistry: |
+      [
+        { "operation": "nohelmet", "dispatch": "conditional",
+          "needs": [
+            { "operation": "classify",
+              "condition": { "path": "labels", "op": "contains", "value": "person" } }
+          ] }
+      ]
 ```
 
 Because `needs` is a **list**, a stage can fan in from several upstreams — each gated by its own condition — and fires for the first dependency that matches. The condition `op` is one of `eq`, `ne`, `contains`, `in`, `exists`, `gt`, `gte`, `lt`, `lte`.
