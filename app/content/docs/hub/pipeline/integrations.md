@@ -138,7 +138,7 @@ kerberoshub:
         dispatch: conditional
         needs:
           - operation: classify
-            condition: { path: labels, op: contains, value: person }
+            condition: { path: properties, op: contains, value: person }
         queue: "kcloud-nohelmet-queue.fifo"
         repository: ghcr.io/uug-ai/hub-nohelmet
         tag: "v1.0.0"
@@ -209,13 +209,31 @@ kerberoshub:
         dispatch: conditional
         needs:
           - operation: classify
-            condition: { path: labels, op: contains, value: person }
+            condition: { path: properties, op: contains, value: person }
         queue: "kcloud-nohelmet-queue.fifo"
         repository: ghcr.io/uug-ai/hub-nohelmet
         tag: "v1.0.0"
 ```
 
 Because `needs` is a **list**, a stage can fan in from several upstreams — each gated by its own condition — and fires for the first dependency that matches. The condition `op` is one of `eq`, `ne`, `contains`, `in`, `exists`, `gt`, `gte`, `lt`, `lte`.
+
+> **What a condition can match — and the array caveat.** `path` is a **dot-separated lookup into string-keyed maps only**; it **cannot index into arrays** (no `details.0.classified`, no wildcards). The `value` is compared by `op`: `eq`/`ne` against a scalar, `contains` against a string substring **or** a list's members, `in` against a list operand, `gt`/`gte`/`lt`/`lte` numerically. So which `path` you can use depends entirely on the **shape of the upstream operation's result** — the raw `data` that operation forwards.
+>
+> For the **`classify`** result the fields available at the top level are:
+>
+> | `path` | Shape | Use with |
+> | --- | --- | --- |
+> | `properties` | array of class strings for every detected object, e.g. `["car","car","pedestrian"]` | `contains` (label present) |
+> | `objectCount` | number of detected objects | `eq` / `gt` / `gte` / `lt` / `lte` |
+> | `details` | array of per-object objects (each with `classified`, `distance`, `isStatic`, …) | **not directly matchable** — it's an array, so `path` can't reach `classified` inside it; use `properties` instead |
+>
+> **To route on a detected class, match the `properties` array with `contains`** — e.g. fire a stage when any car is present:
+>
+> ```json
+> { "operation": "classify", "condition": { "path": "properties", "op": "contains", "value": "car" } }
+> ```
+>
+> A `{ "path": "label", "op": "eq", "value": "car" }` style condition will **never match** a classify result: there is no top-level `label`/`labels` field, and the per-object `classified` values live inside the `details` array, which `path` cannot traverse. Match `properties` instead. (Class strings come from the classifier's own vocabulary, e.g. `car`, `pedestrian`.)
 
 > **`conditional` with no `needs` becomes `always`.** A conditional stage with no upstream dependencies has nothing that could ever trigger it, so the engine treats it as an `always` stage (dispatched on every run) rather than rejecting the registry. Add at least one `needs` entry for a stage you actually want gated.
 
