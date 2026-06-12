@@ -13,13 +13,15 @@ weight: 10
 toc: true
 ---
 
-The pipeline is **open**: every built-in service is just a queue consumer, and your own service is no different. An integration is a worker that **consumes an event from a queue, does its work, and hands a result back** — written in whatever language fits the job, deployed alongside the built-in stages, and scaled independently.
+The Hub pipeline is **open**: every built-in stage — classification, thumbnails, sprites — is just a service that consumes a message off a queue, does one job, and hands the result back. Your own service plugs in the same way.
 
-This page is the **mechanism**, shared by built-in *and* custom stages: the message you receive, how to return a result, how to deploy it, and how the orchestrator tracks it. It is **capability-agnostic** — it never assumes *what* your stage does. For a concrete contract delivered this way (the run shape, the collection, the op name), see the capability pages under [Extend](../../extend/) — for example [Detections → Pipeline](../../extend/detections/pipeline/).
+A **pipeline integration** (a *stage*) is a worker the pipeline triggers automatically for every recording: it **receives a run from a queue, does the work, and returns the result** — in whatever language suits the job, deployed and scaled on its own. Stages are **asynchronous**: they run alongside the built-in analysis and never block it.
 
-> **Status — proposed.** The queue, envelope and completion mechanics described here are how the pipeline already works internally. The config-driven **stage registration** (the `kerberospipeline.workflows` values block and operation registry below) is the proposed addition that lets a *custom* operation join the pipeline without changing orchestrator code. Custom stages are **asynchronous only** in this design — there is no blocking "required" stage.
+This page is the **contract your worker codes against** — the queue it listens on, the message it receives, how it returns a result, and how the engine tracks it to completion. It is **capability-agnostic**: it never assumes *what* your stage does, so the same mechanism serves a licence-plate reader, a custom detector, or any other step. For a concrete capability built on it, see the pages under [Extend](../../extend/).
+
+> **Status — rolling out.** The queue, envelope and completion mechanics here are already how the pipeline works internally. The config-driven **stage registration** (the `kerberoshub.workflows.stages` values block — see [Registering a stage](#registering-a-stage)) is the addition that lets a *custom* operation join without changing engine code — dispatched by the standalone **workflows engine** (`hub-workflows`), which runs alongside the **analysis service** and consumes the classify results it tees over. It is landing now for self-hosted deployments.
 >
-> This page is about how a worker *delivers* a result. For the complementary *receiving* side — one shared service that takes a result from either the API or the queue and runs the right sequence of actions for its kind — see [Ingest service](ingest-service/).
+> This page covers how a worker *delivers* a result. For the complementary *receiving* side — one shared service that takes a result from either the API or the queue and runs the right actions for its kind — see [Ingest service](ingest-service/).
 
 ## When to add a stage
 
@@ -30,264 +32,326 @@ A stage is one of **two transports** for getting your data into the Hub. The oth
 
 Reach for a stage only when you control the deployment **and** want the capability to run automatically as a built-in step of every recording's analysis.
 
-## Anatomy of a stage
+## Registering a stage
 
-A stage has exactly two runtime dependencies: the **message broker** (to receive events and hand results back) and the **database** (to read and write event metadata). There is no service-to-service HTTP and no shared in-process state — every hand-off goes through the broker. That loose coupling is what lets any stage scale, restart or be replaced without touching the rest of the pipeline.
+You add a stage entirely in the chart's `values.yaml` — no engine code changes. A stage is **two halves that share one name** under `kerberoshub`, and both only take effect when the workflows engine is on (`kerberoshub.workflows.enabled: true`):
 
-{{< rete caption="A custom stage is a queue consumer: the analyser fans an event out to your stage's queue; your worker does its work and either writes its own collection or hands a result back to the analyser" alt="Custom pipeline stage placement" height="520" >}}
-{
-  "groups": [
-    { "id": "hub",  "label": "Hub pipeline",            "x":   0, "y":  20, "w": 640, "h": 420 },
-    { "id": "yours","label": "Your stage (integrator-owned)", "x": 700, "y": 20, "w": 360, "h": 420 }
-  ],
-  "nodes": [
-    { "id": "broker",   "kind": "amqp",              "x":  40, "y": 180, "w": 220, "h": 130,
-      "header": "BROKER", "title": "Message broker", "subtitle": "Kafka / AMQP \u00b7 per-stage queue" },
-    { "id": "analysis", "kind": "pipeline-analysis", "x": 320, "y":  60, "w": 260, "h": 130,
-      "header": "ORCHESTRATOR", "title": "Analyser", "subtitle": "Fans out \u00b7 tracks completion" },
-    { "id": "store",    "kind": "storage",           "x": 320, "y": 300, "w": 260, "h": 110,
-      "header": "DATABASE", "title": "Your collection", "subtitle": "Keyed by recording" },
-    { "id": "worker",   "kind": "detection",         "x": 760, "y": 170, "w": 240, "h": 140,
-      "header": "STAGE", "title": "Your worker", "subtitle": "Consume \u2192 process \u2192 hand back" }
-  ],
-  "connections": [
-    { "from": "analysis", "to": "broker", "fromSide": "left",  "toSide": "top",   "label": "enqueue" },
-    { "from": "broker",   "to": "worker", "fromSide": "right", "toSide": "left",  "kind": "thick", "label": "deliver event" },
-    { "from": "worker",   "to": "broker", "fromSide": "bottom","toSide": "right", "kind": "dashed", "label": "hand back" },
-    { "from": "worker",   "to": "store",  "fromSide": "left",  "toSide": "right", "label": "or self-write" }
-  ]
-}
-{{< /rete >}}
+- the **workflow stage object** (`kerberoshub.workflows.stages.<name>`) — declares the stage and how the engine routes to it;
+- the **service deployment** (`kerberoshub.services.<name>`) — deploys your worker.
+
+Each half has its own `enabled`, so turn **both** on (plus the engine): routing with no worker queues messages nobody reads, and a worker with no routing never receives any.
+
+```yaml
+# values.yaml
+kerberoshub:
+  workflows:
+    enabled: true                  # master switch: the workflows engine
+
+    # ── the workflow stage object: declare + route ──────────────
+    stages:
+      anpr:                        # stage name (and default operation id)
+        enabled: true              # route to this stage
+        dispatch: conditional      # always | conditional
+        # conditional only — see Conditional routing:
+        needsMode: any             # any | all
+        needs:
+          - operation: classify
+            condition: { path: inputs.classify.properties, op: contains, value: car }
+        # kind: anpr               # only if you delegate persistence (see Sending a result back)
+
+  # ── the service deployment: deploy your worker ────────────────
+  services:
+    anpr:                          # same name as the stage object
+      enabled: true                # deploy the worker
+      repository: ghcr.io/acme/anpr
+      tag: "v1.0.0"
+      queue: "acme-anpr-jobs"      # the queue your worker consumes
+      replicas: 1
+      pullPolicy: IfNotPresent
+      logLevel: info               # trace | debug | info | warn | error
+      resources: {}
+```
+
+**Workflow stage object — `kerberoshub.workflows.stages.<name>`**
+
+| Field | Required | Value | What you use it for |
+|---|---|---|---|
+| `enabled` | yes | bool | Route to the stage. Off = the engine doesn't know it exists. |
+| `operation` | no | string | The stage's **operation id** — the key your result is filed under (`results.<operation>`) and that other stages depend on. Defaults to the stage name; set it only to differ from the key. |
+| `dispatch` | no | `always` \| `conditional` | `always` (default) runs on every recording; `conditional` runs only when the recording matches — see [Conditional routing](#conditional-routing). |
+| `needs` | conditional only | list | The match rule — see [Conditional routing](#conditional-routing). |
+| `needsMode` | no | `any` \| `all` | How multiple `needs` combine — `any` (default) or `all`. |
+| `kind` | no | string | Set **only** if your worker hands its result back for the platform to store; the value names the ingest handler (e.g. `anpr`). Leave it unset when your worker writes its own collection. See [Sending a result back](#sending-a-result-back). |
+
+**Service deployment — `kerberoshub.services.<name>`**
+
+A normal worker Deployment, keyed to the same name as the stage object.
+
+| Field | Required | Value | What you use it for |
+|---|---|---|---|
+| `enabled` | yes | bool | Deploy the worker pod. Off = nothing runs. |
+| `repository` | yes | string | Your worker's container image. |
+| `tag` | yes | string | Image tag. |
+| `queue` | yes | string | The queue your worker consumes; the engine dispatches to this exact name. See [Queue naming](#queue-naming). |
+| `replicas` | no | int | Pod count. |
+| `pullPolicy` | no | `IfNotPresent` \| `Always` \| … | Image pull policy. |
+| `logLevel` | no | `trace`…`error` | Worker log verbosity. |
+| `resources` | no | object | Standard pod requests/limits. |
+| `topologySpreadConstraints`, `volumes`, `volumeMounts` | no | list | Standard optional Deployment extras. |
+
+> **It's the engine switch, not the front-end one.** `kerberoshub.workflows.enabled` toggles the **workflows engine** that dispatches stages. Don't confuse it with the unrelated `kerberoshub.…features.workflows.enabled` front-end feature flag.
+
+**Minimal stage.** The smallest live stage is `enabled: true` on both halves, the image + `queue` on the deployment, and `dispatch: always`. Everything else is additive — you can switch to conditional routing later without touching the rest.
+
+## Conditional routing
+
+By default (`dispatch: always`) a stage runs on **every** recording. Set `dispatch: conditional` to run it only on recordings that match a rule you declare in the stage object — handy when the deciding signal (e.g. *the classifier saw a car*) isn't known until the run is already underway. A conditional stage is never queued up front; the engine re-checks it as the run progresses and fires it the moment the rule holds. Recordings that never match never touch the stage.
+
+The rule is a list of **`needs`** combined by **`needsMode`**:
+
+```yaml
+stages:
+  anpr:
+    enabled: true
+    dispatch: conditional
+    needsMode: any                 # any (default) | all
+    needs:
+      - operation: classify        # GATE — wait until this op is on the run
+        condition:                 # PREDICATE — tested once the gate is ready
+          path: inputs.classify.properties
+          op: contains
+          value: car
+```
+
+- **`operation`** — the **gate**: an upstream operation id whose result must be present on the run before this need is checked (e.g. `classify`, or another stage's id). Leave it **empty** to check the run with no gate — for `device` / `user` / identity rules that are known the moment the run opens.
+- **`condition`** — the **predicate** tested once the gate is ready. Omit it to fire on the gate alone (i.e. "as soon as `classify` is present").
+- **`needsMode`** — with more than one need: `any` (default) fires on the **first** satisfied need (OR); `all` fires only when **every** need is satisfied (AND — a join).
+
+```yaml
+# only on one camera, and only when a car was seen — both must hold
+needsMode: all
+needs:
+  - operation: classify
+    condition: { path: inputs.classify.properties, op: contains, value: car }
+  - operation:                     # no gate — checked the moment the run opens
+    condition: { path: device.deviceKey, op: eq, value: device02 }
+```
+
+### The condition object
+
+A condition is `{ path, op, value }`.
+
+**`path`** — a dot-path **relative to the `WorkflowRun`** your stage receives (the [envelope](#envelope)). It walks objects only and **cannot index into an array**. Valid roots:
+
+| Root | Example | Notes |
+|---|---|---|
+| `inputs.<op>.<field>` | `inputs.classify.properties` | An upstream result. `classify` is always present (the trigger); its fields are `properties`, `objectCount`, `details` (`details` is an array — not reachable). |
+| `results.<op>.<field>` | `results.anpr.plates` | A finished stage's output. Fields of your own custom operations are accepted as-is. |
+| `device.<field>` | `device.deviceKey` | One of `deviceKey`, `deviceName`, `provider`, `storageSolution`. |
+| `user.<field>` | `user.organisationId` | One of `id`, `organisationId`. |
+| scalar | `key`, `operation`, `runId`, `traceId` | Top-level identity values (not traversable). |
+
+Credentials (`storage`, `user.storage`) are deliberately **not** matchable.
+
+**`op`** and **`value`** — the comparison and its operand:
+
+| `op` | `value` | Matches when |
+|---|---|---|
+| `exists` | *(none)* | the `path` resolves to anything. |
+| `eq` | scalar | the value equals `value` (numbers compared numerically). |
+| `ne` | scalar | the value differs, or the `path` is absent. |
+| `contains` | scalar | the value is an **array containing** `value`, **or** a **string containing** `value`. |
+| `in` | list | the value **is one of** the entries in `value`. |
+| `gt` / `gte` / `lt` / `lte` | number | the value is numerically `>` / `>=` / `<` / `<=` `value`. |
+
+> `contains` and `in` are mirror images: use `contains` when the run holds a **list** and you test for a member (`inputs.classify.properties contains car`); use `in` when the run holds a **single value** and you test it against a set (`device.deviceKey in [device01, device02]`).
+
+The engine validates every condition path at boot and refuses to start on an unknown one — a typo fails fast instead of silently never firing.
+
+## How your worker connects
+
+The chart deploys your worker from `kerberoshub.services.<name>` and injects a fixed set of environment variables — the **connection contract**. Whatever language your worker is in, it reads these to reach the broker, find its queues, and fetch media; nothing else is wired for it.
+
+| Variable | Example | What it is |
+|---|---|---|
+| `QUEUE_SYSTEM` | `RABBITMQ` | The broker driver to connect with (the deployment's `queueProvider`). |
+| `RABBITMQ_HOST` | `rabbitmq.rabbitmq:5672` | Broker address — with `RABBITMQ_EXCHANGE`, `RABBITMQ_USERNAME`, `RABBITMQ_PASSWORD` completing the connection. |
+| `<NAME>_QUEUE` | `ANPR_QUEUE` | The queue you **consume** dispatched runs from. The variable name is your stage's key upper-cased (hyphens become underscores — `my-stage` → `MY_STAGE_QUEUE`); its value is `services.<name>.queue`. See [Queue naming](#queue-naming). |
+| `WORKFLOWS_QUEUE` | `kcloud-workflows-queue` | The engine queue you **publish the finished run** back to. See [Sending a result back](#sending-a-result-back). |
+| `KERBEROS_STORAGE_URI` | `https://api.vault.example.com` | Global media-storage endpoint — with `KERBEROS_STORAGE_ACCESS_KEY` and `KERBEROS_STORAGE_SECRET`. Per-recording overrides also travel on each run's `storage`; prefer those when present. |
+| `LOG_LEVEL` | `info` | Worker log verbosity (`services.<name>.logLevel`). |
+
+Two things to note:
+
+- **No datastore by default.** The stage-worker contract is broker + queues + media storage; the chart injects no database connection. A delegated stage hands its result back over `WORKFLOWS_QUEUE` for the platform to persist, while a stage that writes its [own collection](#sending-a-result-back) brings its own datastore access.
+- **Deploying outside the chart.** To run the worker yourself, leave `services.<name>.enabled` off (so the chart deploys no pod) but keep the stage under `workflows.stages` so the engine still routes to it; then wire these same variables into your own deployment. The consume and return queue names are the only hard requirement.
 
 ## The message you receive
 
 ### Queue naming
 
-The analyser enqueues each operation on its own queue, named by convention from the **operation name**:
+Your worker consumes from **one** queue, and **you choose its name**. The source of truth is the `queue` value on your stage's deployment in the Helm chart — `kerberoshub.services.<name>.queue`:
 
-```text
-kcloud-<operation>-queue.fifo
+```yaml
+kerberoshub:
+  services:
+    anpr:
+      queue: "acme-anpr-jobs"   # ← anything you want; your worker consumes this exact name
 ```
 
-Your stage consumes from exactly one queue — pick a unique operation name (e.g. `detection`) and your queue is `kcloud-detection-queue.fifo`. The name is the only thing that binds the orchestrator to your worker; nothing else is shared.
+The engine reads that **same** value from the stage registry and dispatches there, so the only rule is that the two agree — the queue is the one thing that binds the engine to your worker. The name is an arbitrary string your broker accepts (`acme-anpr-jobs`, `lpr.requests`, `team7-detector`); it does **not** have to follow the platform's `kcloud-…` convention.
+
+If you omit `queue`, the engine falls back to a derived default, `kcloud-<operation>-queue.fifo` — so the convention is just that fallback, not the source of truth. Queue names are literal strings: the default deployment runs RabbitMQ, so a `.fifo` suffix is only part of a name, not an SQS feature.
 
 ### Envelope
 
-Every event carries the same envelope. The fields your stage reads are:
+Your worker does **not** receive the pipeline's internal `PipelineEvent`. The engine dispatches a single, self-contained **`models.WorkflowRun`** as JSON: the run's identity, the read-only context your worker needs, and the credentials to fetch the media. Model your worker's input type on this — every field below is present on the inbound dispatch, and nothing else is:
 
-| Field (wire name) | Meaning |
-|---|---|
-| `operation` | The operation name — equals your stage's name on the inbound message, and the key you echo back on completion. |
-| `fileName` · `payload.fileName` | The **recording reference**. Resolve *which* recording the event is about from here — it is **not** in `data`. |
-| `data` | A string-keyed bag. On dispatch it carries the **storage credentials** (`storage_uri`, `storage_access_key`, `storage_secret`) your worker needs to fetch the media; on the way back it carries your result for the enrich-in-place sink. |
-| `events` | The stage trail (the Go field is `Stages`). Leave it intact unless you are explicitly re-targeting. |
+```json
+{
+  "operation": "anpr",
+  "runId": "665f1b2c3d4e5f6071829304",
+  "key": "front-gate/2026/06/12/08-30-00.mp4",
+  "traceId": "8f3a1c2b4d5e6f70",
+  "user": {
+    "organisationId": "64f0a1b2c3d4e5f600112233",
+    "storage": { "uri": "s3://kerberos-vault", "access_key": "AKIA…", "provider": "kerberos-vault", "secret_key": "…" }
+  },
+  "device": {
+    "deviceKey": "front-gate",
+    "deviceName": "Front Gate",
+    "provider": "kerberos-vault",
+    "storageSolution": "vault"
+  },
+  "inputs": {
+    "classify": {
+      "properties": ["car", "person"],
+      "objectCount": 2,
+      "details": [{ "classified": "car", "distance": 142.6, "isStatic": false }]
+    }
+  },
+  "results": {},
+  "storage": {
+    "uri": "s3://kerberos-storage",
+    "accessKey": "AKIA…",
+    "secret": "…",
+    "vaultOverrideUri": "s3://tenant-bucket",
+    "vaultOverrideAccessKey": "AKIA…",
+    "vaultOverrideSecret": "…",
+    "vaultOverrideProvider": "kerberos-vault"
+  }
+}
+```
 
-The envelope is **opaque to the orchestrator** — it routes by `operation`, never by inspecting `data`. Your worker is the only thing that interprets its own payload. (`data` is a legacy bag the platform is gradually replacing with typed per-stage structures; treat it as the transport for credentials and results, not a place to stash state.)
+**Top-level fields**
+
+| Field | Type | What it is |
+|---|---|---|
+| `operation` | string | Your stage's **operation id** (the name you registered, e.g. `anpr`). It is also the key you file your result under on the way back (`results.<operation>`). |
+| `runId` | string | The run's unique id. Use it as your **idempotency key** — a redelivery carries the same `runId`. |
+| `key` | string | The **recording reference** (media key) the run is about. Resolve *which* recording to fetch from this. |
+| `traceId` | string | Distributed-trace id; propagate it on your logs/spans so the run stays traceable end-to-end. |
+| `user` | object | Curated, secret-free **account context** — see below. |
+| `device` | object | The recording's **device context** — see below. |
+| `inputs` | object | The run's **immutable start context**, keyed by the upstream operation that produced it — see below. Read-only. |
+| `results` | object | **Accumulated upstream stage outputs**, keyed by operation (e.g. `results.detection`). Empty if your stage runs first. Read-only inbound; on return, `results.<operation>` carries your result — filled by the engine from your `payload` (delegated) or set by you (own collection). |
+| `storage` | object | The **credentials to fetch the media** — see below. Present **only** on the inbound dispatch; clear it before returning the run. |
+
+> `payload`, `workflowId` and `workflowName` are **not** sent inbound. `payload` is the channel *you* fill on the way back (delegated-ingest stages only); `workflowId` / `workflowName` are engine-internal.
+
+**`user` — account context**
+
+| Field | Type | What it is |
+|---|---|---|
+| `user.organisationId` | string | The organisation that owns the recording. The run, and everything derived from it, is scoped to this id — scope your own writes to it too. |
+| `user.storage` | object | The account's storage block, carried so the *engine* can resolve a per-recording vault override. You normally don't need it — fetch media with the top-level `storage`. |
+| `user.storage.uri` | string | Account storage endpoint. |
+| `user.storage.access_key` | string | Account storage access key. |
+| `user.storage.provider` | string | Account storage provider. |
+| `user.storage.secret_key` | string | Account storage secret. |
+
+(`user.storage` uses **snake_case** keys — it is the account `Storage` block. The media-fetch `storage` below uses camelCase.)
+
+**`device` — recording context**
+
+| Field | Type | What it is |
+|---|---|---|
+| `device.deviceKey` | string | Stable id of the camera/device the recording came from. |
+| `device.deviceName` | string | Human-readable device name (for logs/labels). |
+| `device.provider` | string | Where the media is **served** from (the media `VideoProvider`). |
+| `device.storageSolution` | string | Where the media is **stored** (the media `StorageSolution`). |
+
+**`inputs.classify` — the trigger result**
+
+`inputs` is keyed by upstream operation. Every run opens from the classifier, so `inputs.classify` is always present — it is the classification result that triggered the run:
+
+| Field | Type | What it is |
+|---|---|---|
+| `inputs.classify.properties` | string[] | Flat list of the detected class strings, e.g. `["car","person"]`. Gate on it with `contains` / `in` / `exists`. |
+| `inputs.classify.objectCount` | int | Number of detected objects. Gate on it numerically (`gt` / `gte` / `lt` / `lte` / `eq`). |
+| `inputs.classify.details` | object[] | Per-object detail — each entry carries `classified` (the class), `distance`, `isStatic` and trajectory/frame geometry. It is an **array**, so a condition `path` can't index into it: read it in worker code, but gate on `properties` / `objectCount`. |
+
+**`storage` — media-fetch credentials**
+
+The credentials your worker uses to fetch the recording. The base trio is always set; the `vaultOverride*` quartet appears when the recording lives on its own (per-tenant) backend — **prefer the override when present**, otherwise use the base.
+
+| Field | Type | What it is |
+|---|---|---|
+| `storage.uri` | string | Base storage endpoint. |
+| `storage.accessKey` | string | Base storage access key. |
+| `storage.secret` | string | Base storage secret. |
+| `storage.vaultOverrideUri` | string | Per-recording override endpoint (when set). |
+| `storage.vaultOverrideAccessKey` | string | Override access key. |
+| `storage.vaultOverrideSecret` | string | Override secret. |
+| `storage.vaultOverrideProvider` | string | Override provider. |
+
+`inputs` and `results` are your **read-only upstream context** — the same bags the condition matcher evaluates `needs` against. The engine routes purely by `operation` and the registry; it never inspects your output to decide where the run goes.
 
 ### Acknowledgement
 
-The broker delivers at least once. Acknowledge a message only **after** the work is durably done (result written or handed back); on failure, let it nack so the broker can redeliver. Because redelivery is possible, **make your stage idempotent** — keying your output by the recording (and a stable run id) so a replay replaces rather than duplicates.
+The broker delivers at least once. Acknowledge a message only **after** the work is durably done (result written or routed back); on failure, let it nack so the broker can redeliver. Because redelivery is possible, **make your stage idempotent** — key your output by the recording (`key`) and the run (`runId`) so a replay replaces rather than duplicates.
 
 ## Doing the work
 
-Your worker is a stateless consumer: pull an event, fetch the media using the credentials in `data`, compute, emit. It can be written in any language — the only contract is the queue it reads and how it returns a result. Keep it single-purpose; if you need a second capability, add a second stage.
+Your worker is a stateless consumer: pull a run, fetch the media with the credentials in `storage`, compute, route the result back. It can be written in any language that can speak the broker and the `WorkflowRun` JSON — the only contract is the queue it reads and the run it returns. Reuse the context already on the run (`inputs` / `results`) rather than re-fetching it. Keep it single-purpose; if you need a second capability, add a second stage.
 
 ## Sending a result back
 
-There are **two sinks**. The choice decides *where your result data lands* — but in **both** cases your worker echoes a completion ack so the orchestrator can mark the operation resolved (see [Completion and acknowledgement](#completion-and-acknowledgement)).
+You return the **same `WorkflowRun` you received** — echo `runId`, `key`, `traceId` and `user` so the engine can locate and scope the run — with `storage` cleared and your result in **exactly one** channel. Publish it back to the engine's queue (`WORKFLOWS_QUEUE`, default `kcloud-workflows-queue`); the engine records the operation resolved and fires any conditional stage that was waiting on it.
 
-### Own collection (recommended)
-
-Your worker writes its result to **its own collection, keyed by the recording**, and the rest of the Hub reads that collection directly. The orchestrator never interprets your data — it stays a dumb router. This is the cleanest option for anything that is *new* data (detections, descriptions, embeddings). The completion ack you send back carries no payload — it is purely the "done" signal.
+There are **two sinks**. Default to letting the platform persist your result — hand it back and an ingest handler stores it, so your worker needs no datastore of its own. A stage that produces genuinely *new* data can instead own its storage and write its own collection.
 
 ### Enrich in place
 
-If your result must be merged into a **shared** document (e.g. a field on the recording's analysis), your worker republishes the event with its `operation` set and the result in `data`. The analyser persists it generically:
+The **default sink**: declare an ingest **`kind`** on the stage and hand the typed body back in `payload` — e.g. a `PostDetectionsRequest` for `kind: detection`, a `PostANPRRequest` for `kind: anpr`. The engine runs that kind's [Ingest service](ingest-service/) actions against the run's own recording and mirrors the decoded result into `results` so downstream conditions can read it. Because the engine owns the write, your worker needs no database access. Set `payload` **or** `results[operation]`, never both. (A *built-in* analysis stage without a `kind` instead falls back to a generic `$set data.<operation>` on the analysis document — the handler-less default; a registry-driven workflow stage always uses `results` / `payload`.)
 
-```text
-$set        data.<operation> = <your result>
-$addToSet   resolvedoperations = <operation>
-```
+### Own collection
 
-So the result is recorded against the analysis and the operation is marked resolved **with no orchestrator code** — until you need a typed side-effect on the shared document, which is the one case that warrants a handler in the analysis router. That typed handler is the [Ingest service](ingest-service/) path: the result then travels as the typed `payload` and the handler owns the side-effect, instead of the generic `data.<operation>` bag used here. `data.<operation>` is the handler-less default; `payload` + a handler is the typed upgrade for a kind that needs one.
+For genuinely *new, standalone* data — detections, descriptions, embeddings — a stage can write its **own collection, keyed by the recording**, and set only its routing values under `results.<operation>` on the returned run (leave `payload` empty). The platform just records the resolution; your worker owns the write, and so brings its own datastore access. This is how [detections](../../extend/detections/) deliver their runs — see that page for a worked example.
 
-> The difference between the sinks is only *who reads the result* — your collection, or the shared analysis document. Either way the operation is recorded the same way: through the completion ack.
-
-## Registering a stage
-
-Stages are grouped into named **workflows**. Each stage is described once, as an entry under a workflow's `stages` list whose **key is the operation id**. One flag — `enabled` — both renders the Deployment *and* registers the operation, so the worker and the orchestrator can never drift apart. The workflow `name` simply labels the group (shown in the UI, toggled as a unit); **operation ids stay globally unique** across every workflow — they are what binds the queue, dispatch and resolution.
-
-> **`kerberospipeline.workflows`, not the front-end `workflows` flag.** Custom stages live under `kerberospipeline.workflows` — the same `kerberospipeline` subtree as the built-in stages (`analysis`, `dominantColor`, …), so all pipeline config stays in one place. Don't confuse it with `kerberoshub.…features.workflows.enabled`, the unrelated front-end feature toggle. The `kerberospipeline.` prefix disambiguates the two. Note `workflows` here is a **reserved key** in that subtree, not a service name: built-in stages are keyed by service, this one key holds the list of custom-stage groups.
-
-> **Config registers a stage; it does not register a typed handler.** This values block is the *stage registry* — it governs the queue, dispatch and completion tracking. It is **all you need** for a self-persisting stage (one that writes its own collection and acks). A stage that instead *delegates* persistence to the platform — handing back a `payload` for a typed side-effect on shared state — also needs a Go handler in `models/pkg/ingest`. See [Ingest service → Two registries, two jobs](ingest-service/#two-registries-two-jobs).
-
-```yaml
-# values.yaml
-kerberospipeline:
-  # … built-in stages (analysis, dominantColor, thumbnail, …) live here too
-  workflows:                         # reserved key — custom stage groups (NOT a service)
-    - name: anpr                     # names a group of stages run together
-      stages:
-        - detection:                 # key = operation id = queue suffix
-            enabled: true            # renders the Deployment AND registers the operation
-
-            # --- deployment (Helm-only; the orchestrator never sees these) ---
-            repository: ghcr.io/acme/hub-pipeline-detection
-            tag: "1.0.0"
-            replicas: 1
-            pullPolicy: IfNotPresent
-            logLevel: info
-            resources: {}
-            env: []
-            volumes: []
-
-            # --- dispatch (projected to the orchestrator) ---
-            dispatch: always         # always | conditional
-            needs: ""                # upstream operation that triggers it (conditional only)
-            condition: {}            # predicate on the upstream result (conditional only)
-```
-
-The chart renders a normal `pipe-<operation>` Deployment, gated to pipeline deployments exactly like the built-in stages:
-
-```yaml
-# templates/workflows/pipe-detection.yaml (abridged)
-{{- if or (eq .Values.mode "all") (eq .Values.mode "pipeline") -}}
-# ...image, broker + Mongo env wired from the same values block...
-{{- end -}}
-```
-
-> **One generic template, not one per stage.** Built-in stages each have their own hand-written template (`pipe-analysis.yaml`, `pipe-dominantcolor.yaml`, …) reading a per-service key (`kerberospipeline.analysis`, `kerberospipeline.dominantColor`, …). Custom stages instead `range` over the `kerberospipeline.workflows` list and render from a **single generic** `templates/workflows/pipe-<operation>.yaml`, so adding a stage is a values edit with no new template. The built-ins are intentionally **not** migrated to this tree — they keep their per-service keys and templates; the generic path is additive.
-
-### The operation registry
-
-For every **enabled** stage, the chart flattens the *routing-relevant* fields of every workflow under `kerberospipeline.workflows` into a single JSON document and hands it to the analyser as **one environment variable, `PIPELINE_STAGE_REGISTRY`**, on the existing `pipe-analysis` Deployment. The orchestrator reads it once at boot — there is **no ConfigMap, mount or extra API call**; the registry travels with the pod spec, so a `helm upgrade` that changes a stage rolls the analyser automatically and the new value is in effect the moment the pod restarts.
-
-The rendered value is the flattened list of enabled operations:
-
-```json
-[
-  { "operation": "detection", "dispatch": "always" },
-  { "operation": "nohelmet",  "dispatch": "conditional",
-    "needs": "classify", "condition": { "path": "labels", "op": "contains", "value": "person" } }
-]
-```
-
-The chart builds that string from the `kerberospipeline.workflows` values with a helper and injects it next to the analyser's existing env:
-
-```yaml
-# templates/kerberos-pipeline/pipe-analysis.yaml — added to the existing env: list
-        - name: PIPELINE_STAGE_REGISTRY
-          value: {{ include "hub.stageRegistry" . | quote }}
-```
-
-```go-template
-{{- /* templates/_helpers.tpl — flatten every enabled stage across all workflows */ -}}
-{{- define "hub.stageRegistry" -}}
-{{- $stages := list -}}
-{{- range .Values.kerberospipeline.workflows -}}
-  {{- range .stages -}}
-    {{- range $op, $cfg := . -}}
-      {{- if $cfg.enabled -}}
-        {{- $entry := dict "operation" $op "dispatch" (default "always" $cfg.dispatch) -}}
-        {{- if $cfg.needs }}{{- $_ := set $entry "needs" $cfg.needs -}}{{- end -}}
-        {{- if $cfg.condition }}{{- $_ := set $entry "condition" $cfg.condition -}}{{- end -}}
-        {{- $stages = append $stages $entry -}}
-      {{- end -}}
-    {{- end -}}
-  {{- end -}}
-{{- end -}}
-{{- $stages | toJson -}}
-{{- end -}}
-```
-
-Only the four routing fields cross this boundary — the deployment fields (`repository`, `tag`, `replicas`, …) stay Helm-side and never reach the orchestrator. The analyser parses that string into a slice of descriptors:
-
-```go
-type StageDescriptor struct {
-    Operation string          `json:"operation"`           // unique — binds queue, dispatch and resolution
-    Dispatch  string          `json:"dispatch"`            // "always" | "conditional"
-    Needs     string          `json:"needs,omitempty"`     // upstream op that triggers a conditional stage
-    Condition *StageCondition `json:"condition,omitempty"` // structured predicate (no free-form expressions)
-}
-
-type StageCondition struct {
-    Path  string `json:"path"`  // field in the upstream op's result
-    Op    string `json:"op"`    // eq | ne | contains | exists | gt | lt
-    Value any    `json:"value"`
-}
-```
-
-At boot the analyser unmarshals `PIPELINE_STAGE_REGISTRY` once and keeps the slice for the lifetime of the process — an empty or unset variable simply means no custom stages:
-
-```go
-var registry []StageDescriptor
-if raw := os.Getenv("PIPELINE_STAGE_REGISTRY"); raw != "" {
-    if err := json.Unmarshal([]byte(raw), &registry); err != nil {
-        log.Fatalf("invalid PIPELINE_STAGE_REGISTRY: %v", err) // fail fast — a malformed registry must not start
-    }
-}
-```
-
-The registry is the **flattened union of every workflow's stages** — the `name` groups are organisational only; what the orchestrator consumes is the list of operations. It folds that into its dispatch as a **separate, non-gating tier** — registry stages become **workflow operations**, kept apart from the built-in async operations so the built-in dispatch is never touched, and enqueued to `kcloud-<operation>-queue.fifo` at the start of each analysis:
-
-```go
-for _, s := range registry {
-    if s.Dispatch == "always" {
-        // a dedicated tier — NOT AsyncOperations — so built-ins stay untouched
-        analysis.WorkflowOperations = append(analysis.WorkflowOperations, s.Operation)
-    }
-    // conditional stages are enqueued reactively — see Conditional routing
-}
-```
-
-Like the built-in async operations, workflow operations are **non-gating**: a custom stage can never stall a run. See [Ingest service → Pipeline tracking](ingest-service/#pipeline-tracking-workflow-operations--the-allow-list) for how the same registry doubles as the **allow-list** that validates enqueue and resolution.
-
-Because the **operation id** is the stage key, it is the single string shared by the queue, the dispatch entry and the completion key — they cannot drift. A stage the orchestrator knows about but no worker consumes can't happen: the same `enabled` flag produces both sides.
-
-**Minimal stage.** The smallest useful stage is just `enabled` + the deployment fields + `dispatch: always`. `needs` / `condition` are purely additive — you can add conditional routing later without changing the object's shape.
-
-## Conditional routing
-
-Two kinds of "conditional" exist, and they live in different places:
-
-- **Per-deployment** — *is this stage present at all?* Controlled by `enabled` in the stage's values block.
-- **Per-recording** — *should this particular recording go through the stage?* This decision can't be made up front, because the deciding signal often isn't computed yet. It is declared with `dispatch: conditional` plus a `needs` (the upstream operation) and a `condition` (a predicate on that operation's result).
-
-A conditional stage is **not** enqueued at analysis start. Instead, when the `needs` operation resolves, the orchestrator evaluates `condition` against its result and — only on a match — enqueues the stage's queue. Recordings that don't match never touch the stage.
-
-```yaml
-kerberospipeline:
-  workflows:
-    - name: ppe
-      stages:
-        - nohelmet:
-            enabled: true
-            dispatch: conditional
-            needs: classify
-            condition: { path: labels, op: contains, value: person }   # only recordings the classifier flagged as containing a person
-```
-
-This is the declarative form of a pattern the built-in classifier already uses imperatively: when classification returns, the analyser inspects the result and re-enqueues follow-up work for matched objects. The `needs` / `condition` descriptor moves that decision out of Go and into config.
+> The difference between the sinks is only *who writes the result* — the engine through an ingest `kind`, or your worker into its own collection. Either way the engine marks the operation resolved when your run comes back.
 
 ## Completion and acknowledgement
 
-Every custom stage is **asynchronous**: the run never waits on it. The analyser continues as soon as its own built-in steps are satisfied, and your stage's result lands whenever the worker finishes. (Blocking, "required" stages are intentionally out of scope in this design — there is no way for a custom stage to stall a run.)
+Every custom stage is **asynchronous**: nothing blocks on it. The analysis service's built-in pipeline continues independently, the workflows engine tracks the stage's run on its own, and your stage's result lands whenever the worker finishes. (Blocking, "required" stages are intentionally out of scope in this design — there is no way for a custom stage to stall a run.)
 
-Whichever [sink](#sending-a-result-back) you use, your worker should echo a **completion ack** back to `kcloud-analysis-queue` with its `operation` set once the work is durably done. The analyser records it generically (`$addToSet resolvedoperations`), which keeps the run's provenance complete and stops a re-analysis from redoing the work. The ack carries no payload for an own-collection stage — it is just the signal that the operation resolved. A run that never hears back from a stage still completes on the existing rules (with a 15-minute safety timeout as a backstop), so a crashed worker can't wedge the pipeline.
+Whichever [sink](#sending-a-result-back) you use, your worker routes the run back to the workflows engine — its `WORKFLOWS_QUEUE` — once the work is durably done. The engine records the operation on the run (`$addToSet resolvedoperations`), which keeps the run's provenance complete and stops a re-run from redoing the work. An own-collection stage's returned run carries just its routing values under `results.<operation>`; a delegated stage carries the typed `payload`. A run that never hears back from a stage still completes on the engine's own rules (with a safety timeout as a backstop), so a crashed worker can't wedge the pipeline.
 
 ## Failure modes & gotchas
 
-- **Queue with no consumer.** An operation registered but not deployed would pile messages up — which is exactly why a single `enabled` flag drives both the Deployment and the registry entry. Don't register an operation from anywhere else.
-- **No completion ack.** A worker that writes its result but never echoes back to `kcloud-analysis-queue` leaves the operation absent from `resolvedoperations`. Harmless to the run (stages are async), but it breaks provenance and lets a re-analysis repeat the work. Always ack.
+- **Routing without a worker (or vice-versa).** The two `enabled` flags are independent: routing (`workflows.stages.<name>.enabled`) with no worker queues messages no one consumes; a worker (`services.<name>.enabled`) with no routing never receives any. Keep them enabled together — they share the stage name, so they always address the same queue.
+- **No completion ack.** A worker that writes its result but never echoes back to the workflows engine (`WORKFLOWS_QUEUE`) leaves the operation absent from `resolvedoperations`. Harmless to the run (stages are async), but it breaks provenance and lets a re-run repeat the work. Always ack.
 - **Re-decode cost.** A stage that re-fetches and re-decodes the video pays that cost per recording; reuse data already in the envelope or the database where you can.
 - **Non-idempotent writes.** Redelivery will duplicate output unless you upsert on a stable key.
 
 ## Checklist
 
-- [ ] Pick a unique **operation id** — it's the stage key, the queue suffix (`kcloud-<id>-queue.fifo`) and the completion key
-- [ ] Add the stage as an entry under a workflow's `stages` list with `enabled: true`, the deployment fields and `dispatch: always`
-- [ ] Consume the **envelope**, resolve the recording from `fileName`, fetch media with the **storage credentials** in `data`
-- [ ] Pick a **sink** — own collection (recommended) or enrich-in-place
-- [ ] **Idempotent** writes (upsert by recording + run id)
-- [ ] Echo a **completion ack** to `kcloud-analysis-queue` with `operation` set
-- [ ] (Optional) gate per-recording with `dispatch: conditional` + `needs` + `condition`
+- [ ] Pick a unique **operation id** — it's the routing key, the result key (`results.<id>`) and the completion key (the queue is whatever you set in `services.<id>.queue`)
+- [ ] Add **routing** under `kerberoshub.workflows.stages.<id>` (`enabled: true`, `dispatch: always`) and **deployment** under `kerberoshub.services.<id>` (`enabled: true`, image + `queue`)
+- [ ] Make sure the **workflows engine** is enabled (`kerberoshub.workflows.enabled`)
+- [ ] Consume the dispatched **`WorkflowRun`**, resolve the recording from `key`, fetch media with the credentials in `storage`
+- [ ] Read upstream context from `inputs` / `results` instead of re-fetching it
+- [ ] Pick a **sink** — enrich in place (set `payload` + a `kind`, the default) or your own collection (set `results.<id>`)
+- [ ] **Idempotent** writes (upsert by `key` + `runId`)
+- [ ] Route the run back to the workflows engine (`WORKFLOWS_QUEUE`) with `storage` cleared and your result in one channel
+- [ ] (Optional) gate per-recording with `dispatch: conditional` + `needs` + `needsMode`

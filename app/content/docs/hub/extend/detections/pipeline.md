@@ -23,7 +23,7 @@ This page covers **only what is detection-specific**. Everything about *how* a s
 |---|---|
 | **Operation name** | `detection` → queue `kcloud-detection-queue.fifo` |
 | **Output contract** | a [`DetectionRun`](../#the-detection-run) — identical to the API body, minus the transport-only fields |
-| **Sink** | **own collection**: write the run to `detections`, keyed by the recording (the recommended [own-collection sink](../../../pipeline/integrations/#own-collection-recommended)) |
+| **Sink** | **own collection**: write the run to `detections`, keyed by the recording (the [own-collection sink](../../../pipeline/integrations/#own-collection)) |
 | **Immutability** | runs are stored verbatim and never edited — same guarantee as the API path |
 
 Because the sink is the `detections` collection — not a shared document — the orchestrator never interprets your run. Your stage **writes the run itself** and marks the operation resolved; no detection-specific handler is needed in the analyser.
