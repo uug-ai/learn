@@ -7,6 +7,10 @@ ARG github_token
 ENV HUGO_ENVIRONMENT=production
 ENV HUGO_ENV=production
 
+# Allow Go to download a newer toolchain when a dependency (e.g. Hugo)
+# requires a Go version newer than the one bundled in the base image.
+ENV GOTOOLCHAIN=auto
+
 WORKDIR /build
 
 # Copy the code necessary to build the application
