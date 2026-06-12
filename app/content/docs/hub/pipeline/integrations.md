@@ -3,7 +3,7 @@ title: "Integrations"
 description: "Plug your own microservice into the Hub pipeline — receive events, do work, and hand results back."
 lead: "Plug your own microservice into the Hub pipeline as a stage: consume an event, do the work, and hand the result back — in any language."
 date: 2026-06-04T00:00:00+00:00
-lastmod: 2026-06-04T00:00:00+00:00
+lastmod: 2026-06-12T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -41,6 +41,8 @@ You add a stage entirely in the chart's `values.yaml` — no engine code changes
 
 Each half has its own `enabled`, so turn **both** on (plus the engine): routing with no worker queues messages nobody reads, and a worker with no routing never receives any.
 
+The two blocks divide by concern. `kerberoshub.workflows` is the engine's **behaviour** — its `enabled` switch and the `stages` routing registry. `kerberoshub.services` holds the **deployments** of the whole workflows subsystem in one uniform shape: the engine itself (`services.workflows`, a chart default you don't normally touch) and one worker per stage (`services.<name>`). So adding a stage is always the same two edits — a routing entry under `workflows.stages`, and your worker under `services`.
+
 ```yaml
 # values.yaml
 kerberoshub:
@@ -59,8 +61,9 @@ kerberoshub:
             condition: { path: inputs.classify.properties, op: contains, value: car }
         # kind: anpr               # only if you delegate persistence (see Sending a result back)
 
-  # ── the service deployment: deploy your worker ────────────────
+  # ── the deployments: the engine (chart default) + your worker ─
   services:
+    # workflows: …                # the engine itself — a chart default; you don't set this here
     anpr:                          # same name as the stage object
       enabled: true                # deploy the worker
       repository: ghcr.io/acme/anpr
@@ -85,7 +88,7 @@ kerberoshub:
 
 **Service deployment — `kerberoshub.services.<name>`**
 
-A normal worker Deployment, keyed to the same name as the stage object.
+A normal worker Deployment, keyed to the same name as the stage object. (The workflows engine itself is deployed from this same block as `services.workflows` — the one `services` entry with no matching stage, and a chart default you don't normally touch.)
 
 | Field | Required | Value | What you use it for |
 |---|---|---|---|
