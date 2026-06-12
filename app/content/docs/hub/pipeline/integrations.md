@@ -32,6 +32,43 @@ A stage is one of **two transports** for getting your data into the Hub. The oth
 
 Reach for a stage only when you control the deployment **and** want the capability to run automatically as a built-in step of every recording's analysis.
 
+## Anatomy of a stage
+
+A stage has exactly two runtime dependencies: the **message broker** (to receive events and hand results back) and the **database** (to read and write event metadata). There is no service-to-service HTTP and no shared in-process state — every hand-off goes through the broker. That loose coupling is what lets any stage scale, restart or be replaced without touching the rest of the pipeline.
+
+{{< rete caption="On classify, analysis keeps running the normal tail (throttler → notification) and in parallel hands a single WorkflowRun to hub-workflows, which dispatches each registered stage onto its own queue; your worker(s) consume the run and hand a result back" alt="Custom pipeline stage placement" height="460" >}}
+{
+  "groups": [
+    { "id": "hub",   "label": "Hub pipeline",        "x":   0, "y":   0, "w": 980, "h": 460 },
+    { "id": "yours", "label": "Workflow (example)",  "x":   0, "y": 540, "w": 980, "h": 260 }
+  ],
+  "nodes": [
+    { "id": "throttler",    "kind": "pipeline-monitor",       "x": 360, "y":  40, "w": 240, "h": 110,
+      "header": "PIPELINE", "title": "Throttler", "subtitle": "hub-pipeline-throttler", "groupId": "hub" },
+    { "id": "notification", "kind": "pipeline-notification",  "x": 700, "y":  40, "w": 240, "h": 110,
+      "header": "PIPELINE", "title": "Notification", "subtitle": "hub-pipeline-notification", "groupId": "hub" },
+    { "id": "analysis",     "kind": "pipeline-analysis",      "x":  40, "y": 180, "w": 240, "h": 100,
+      "header": "PIPELINE", "title": "Analysis", "subtitle": "Built-ins · opens run", "groupId": "hub" },
+    { "id": "workflows",    "kind": "hub",                    "x": 360, "y": 320, "w": 240, "h": 110,
+      "header": "ORCHESTRATOR", "title": "Workflows", "subtitle": "Hub-Workflows", "groupId": "hub" },
+    { "id": "worker",       "kind": "detection",              "x":  90, "y": 600, "w": 210, "h": 130,
+      "header": "STAGE", "title": "Pose detection", "subtitle": "your worker", "groupId": "yours" },
+    { "id": "licenseplate", "kind": "pipeline-licenseplate",  "x": 385, "y": 600, "w": 210, "h": 130,
+      "header": "STAGE", "title": "License plate", "subtitle": "kcloud-licenseplate-queue.fifo", "groupId": "yours" },
+    { "id": "llm",          "kind": "pipeline-llm",           "x": 680, "y": 600, "w": 210, "h": 130,
+      "header": "STAGE", "title": "LLM summary", "subtitle": "kcloud-llm-queue.fifo", "groupId": "yours" }
+  ],
+  "connections": [
+    { "from": "analysis",  "to": "throttler",    "fromSide": "right", "toSide": "left", "kind": "solid" },
+    { "from": "throttler", "to": "notification", "fromSide": "right", "toSide": "left", "kind": "solid" },
+    { "from": "analysis",  "to": "workflows",    "fromSide": "right", "toSide": "left", "kind": "solid", "label": "on classify" },
+    { "from": "workflows", "to": "worker",       "fromSide": "bottom", "toSide": "top", "kind": "solid", "label": "dispatch" },
+    { "from": "workflows", "to": "licenseplate", "fromSide": "bottom", "toSide": "top", "kind": "solid", "label": "dispatch" },
+    { "from": "workflows", "to": "llm",          "fromSide": "bottom", "toSide": "top", "kind": "solid", "label": "dispatch" }
+  ]
+}
+{{< /rete >}}
+
 ## Registering a stage
 
 You add a stage entirely in the chart's `values.yaml` — no engine code changes. A stage is **two halves that share one name** under `kerberoshub`, and both only take effect when the workflows engine is on (`kerberoshub.workflows.enabled: true`):

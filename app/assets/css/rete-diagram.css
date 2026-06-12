@@ -107,6 +107,13 @@ html.dark .rete-group__label,
 }
 .rete-connection--dashed { stroke-dasharray: 6 6; }
 
+/* Static solid edge — opt out of the flowing-liquid default for diagrams that
+   read better as plain lines. */
+.rete-connection--solid {
+    stroke-dasharray: none;
+    animation: none;
+}
+
 /* Labelled edges read better as a static solid line so the label stays legible. */
 .rete-connection--labelled {
     stroke-dasharray: none;

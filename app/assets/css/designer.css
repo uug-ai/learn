@@ -764,6 +764,17 @@ html.dark .designer__field textarea,
     cursor: pointer;
 }
 
+/* In the editor a freshly drawn link uses the `default` kind. The shared
+   `.rete-connection` base style carries the docs' animated "flowing-liquid"
+   dashes, so without this override a default edge would render dashed. Make
+   the default kind a plain solid line; `--thick` / `--dashed` keep their own
+   looks. Scoped to `.designer` so published documentation diagrams are
+   unaffected. */
+.designer .rete-connection--default {
+    stroke-dasharray: none;
+    animation: none;
+}
+
 .designer .rete-connection.is-selected {
     stroke: #555f8e;
 }
