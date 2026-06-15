@@ -80,20 +80,23 @@ To make this work an additional `volumeMount` has to be created and relevant PVC
 
 ## Custom translations
 
-Kerberos Hub ships with built-in internationalization (i18n) files for the supported languages. These translation files live in the front-end container under the `assets/i18n` directory, and contain one `.json` file per language (e.g. `en.json`, `nl.json`, `fr.json`, ...). You can override any of these files with your own translations, which is handy to rename labels, reword sentences or fully white-label the wording used throughout the application.
+Kerberos Hub ships with built-in internationalization (i18n) files for the supported languages. These translation files live in the front-end container under the `assets/i18n` directory, and contain one `.json` file per language (e.g. `en.json`, `nl.json`, `fr.json`, ...). You can override any of these strings with your own translations, which is handy to rename labels, reword sentences or fully white-label the wording used throughout the application.
 
-Each translation file is a JSON document containing the keys used by the front-end. The easiest way to start is to take the original English translation file as a baseline and adjust the values to your liking. An example of the [English translation file can be found here](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/i18n/en.json).
+To customize the wording, you provide your own files in the `assets/i18n-custom` directory. Each file only needs the keys you want to change; any key you leave out keeps the shipped translation, so you only maintain your own changes and only need files for the languages you actually customize.
+
+The easiest way to find the right keys is to use the original English translation file as a reference. An example of the [English translation file can be found here](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/i18n/en.json), and a partial override example lives in [custom-layout/i18n-custom/en.json](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/i18n-custom/en.json).
+
+To rename the **Dashboard** label in the navigation, for example, your `en.json` only needs the single key you are changing:
 
     {
-      "common": {
-        "save": "Save",
-        "cancel": "Cancel"
+      "nav": {
+        "dashboard": "Command Center"
       }
     }
 
-Translations are injected into the container just like the custom stylesheet, logo, icons and favicons. The only difference is that they are not stored in the `custom` or `favicons` directory, but are stored in the `i18n` directory. Make sure to keep the same file names (`en.json`, `nl.json`, ...) so the front-end can match them to the correct language. Files you do not override will keep using the built-in translations.
+Make sure to keep the same file names (`en.json`, `nl.json`, ...) so the front-end can match them to the correct language.
 
-To inject your translations, upload your `.json` files into a Persistent Volume and [create a Persistent Volume Claim (PVC)](https://github.com/kerberos-io/hub/blob/master/custom-layout/custom-layout-claim.yaml) so it can be shared with the Kerberos Hub front-end container. Then add an additional `volumeMount` and `volume` to the `kerberoshub.frontend` section of the Helm chart `values.yaml`, pointing the `mountPath` to `/usr/share/nginx/html/assets/i18n`.
+To inject your translations, upload your `.json` files into a Persistent Volume and [create a Persistent Volume Claim (PVC)](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/i18n-custom/custom-i18n-claim.yaml) so it can be shared with the Kerberos Hub front-end container. Then add an additional `volumeMount` and `volume` to the `kerberoshub.frontend` section of the Helm chart `values.yaml`, pointing the `mountPath` to `/usr/share/nginx/html/assets/i18n-custom`.
 
     kerberoshub:
       frontend:
@@ -102,7 +105,7 @@ To inject your translations, upload your `.json` files into a Persistent Volume 
         # Custom layout: override css, favicons and translations (i18n)
         volumeMounts:
           - name: custom-i18n
-            mountPath: /usr/share/nginx/html/assets/i18n
+            mountPath: /usr/share/nginx/html/assets/i18n-custom
         volumes:
           - name: custom-i18n
             persistentVolumeClaim:
