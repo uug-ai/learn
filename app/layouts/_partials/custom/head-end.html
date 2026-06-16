@@ -1,3 +1,21 @@
+{{- if .IsHome -}}
+<script>document.documentElement.classList.add('is-home');</script>
+{{- end -}}
+<script>
+  // Apply the "page overview" (right TOC) collapsed state before paint so the
+  // layout doesn't flash open then snap shut on load. Tutorials start collapsed
+  // by default; an explicit reader choice (stored "0"/"1") always wins.
+  (function () {
+    'use strict';
+    try {
+      var pref = localStorage.getItem('hextra-toc-collapsed');
+      var defaultCollapsed = {{ if eq .Section "tutorials" }}true{{ else }}false{{ end }};
+      if (pref === '1' || (defaultCollapsed && pref !== '0')) {
+        document.documentElement.classList.add('toc-collapsed');
+      }
+    } catch (e) {}
+  })();
+</script>
 <script>
   (function () {
     'use strict';
@@ -256,6 +274,80 @@
       document.addEventListener('DOMContentLoaded', init);
     } else {
       init();
+    }
+  })();
+</script>
+
+<script>
+  // Light / dark theme toggle wiring for the design-style switch rendered by
+  // layouts/_partials/theme-toggle.html. Drives the `.dark` class on <html>
+  // and persists to localStorage "color-theme", staying compatible with
+  // Hextra's no-flash head script (assets/js/head/theme.js).
+  (function () {
+    'use strict';
+
+    var STORAGE_KEY = 'color-theme';
+    var TOGGLE_SELECTOR = '.learn-theme-toggle';
+
+    function isDark() {
+      return document.documentElement.classList.contains('dark');
+    }
+
+    function syncToggles() {
+      var dark = isDark();
+      var label = dark ? 'Switch to light mode' : 'Switch to dark mode';
+      var toggles = document.querySelectorAll(TOGGLE_SELECTOR);
+      for (var i = 0; i < toggles.length; i++) {
+        toggles[i].classList.toggle('is-dark', dark);
+        toggles[i].setAttribute('aria-pressed', dark ? 'true' : 'false');
+        toggles[i].setAttribute('aria-label', label);
+        toggles[i].setAttribute('title', label);
+      }
+    }
+
+    function applyTheme(theme) {
+      var root = document.documentElement;
+      root.classList.remove('light', 'dark');
+      root.classList.add(theme);
+      root.style.colorScheme = theme;
+      try {
+        localStorage.setItem(STORAGE_KEY, theme);
+      } catch (e) {
+        /* ignore (e.g. private mode) */
+      }
+      syncToggles();
+    }
+
+    document.addEventListener('click', function (e) {
+      var toggle = e.target.closest && e.target.closest(TOGGLE_SELECTOR);
+      if (!toggle) return;
+      e.preventDefault();
+      applyTheme(isDark() ? 'light' : 'dark');
+    });
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', syncToggles);
+    } else {
+      syncToggles();
+    }
+
+    // Follow the OS only while no explicit choice has been stored.
+    var mql = window.matchMedia('(prefers-color-scheme: dark)');
+    var onSystemChange = function () {
+      var stored = null;
+      try {
+        stored = localStorage.getItem(STORAGE_KEY);
+      } catch (e) {
+        /* ignore */
+      }
+      if (stored !== 'light' && stored !== 'dark') {
+        setTimeout(syncToggles, 0);
+      }
+    };
+    if (mql.addEventListener) {
+      mql.addEventListener('change', onSystemChange);
+    } else if (mql.addListener) {
+      mql.addListener(onSystemChange);
     }
   })();
 </script>

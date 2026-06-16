@@ -1,0 +1,29 @@
+{{- /*
+  tutorial-panel — a highlighted panel with an icon, a title and a markdown body.
+
+  Use it for the prominent moments in a tutorial: the "What you'll build" hero,
+  a "Before you start" checklist, or any callout that deserves more presence
+  than a plain note. Lists in the body are rendered as a branded checklist.
+
+  Params:
+    title  The panel heading.
+    icon   A Hextra icon name (default: "sparkles").
+    tone   Visual tone: "brand" (default), "neutral" or "success".
+
+  @example
+    {{< tutorial-panel tone="brand" icon="cube" title="What you'll build" >}}
+    Markdown body, including a list that renders as a checklist.
+    {{< /tutorial-panel >}}
+*/ -}}
+{{- $title := .Get "title" -}}
+{{- $icon := .Get "icon" | default "sparkles" -}}
+{{- $tone := .Get "tone" | default "brand" -}}
+<aside class="tutorial-panel tutorial-panel--{{ $tone }} not-prose">
+  <div class="tutorial-panel__head">
+    <span class="tutorial-panel__icon">{{ partial "utils/icon.html" (dict "name" $icon) }}</span>
+    {{- with $title }}<span class="tutorial-panel__title">{{ . }}</span>{{ end -}}
+  </div>
+  <div class="tutorial-panel__body">
+    {{ .InnerDeindent | markdownify }}
+  </div>
+</aside>

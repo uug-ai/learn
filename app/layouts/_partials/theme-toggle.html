@@ -1,0 +1,30 @@
+{{- /*
+  Design-system light/dark theme toggle.
+
+  Overrides Hextra's default 3-state (light/dark/system) dropdown with the
+  animated sun-setting / moon-rising switch used on the UUG design site
+  (see design/src/components/ThemeToggle). The click/keyboard wiring and the
+  persistence (localStorage "color-theme" + `.dark` class on <html>, kept
+  compatible with Hextra's no-flash head script) live in
+  layouts/_partials/custom/head-end.html.
+
+  Any params passed by Hextra call sites (navbar / sidebar / footer) are
+  intentionally ignored so the toggle looks identical everywhere.
+*/ -}}
+<button
+  type="button"
+  class="learn-theme-toggle"
+  aria-label="Toggle dark mode"
+  title="Toggle dark mode"
+  aria-pressed="false"
+>
+  <span class="learn-theme-toggle__thumb">
+    <svg class="learn-theme-toggle__sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" />
+      <path d="M12 2V5M12 19V22M4 12H1M23 12H20M5.64 5.64L3.52 3.52M20.48 20.48L18.36 18.36M5.64 18.36L3.52 20.48M20.48 3.52L18.36 5.64" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+    <svg class="learn-theme-toggle__moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </span>
+</button>
