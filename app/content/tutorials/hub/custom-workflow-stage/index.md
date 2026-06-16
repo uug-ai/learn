@@ -7,7 +7,7 @@ toc: true
 
 {{< tutorial-byline author="Kilian Boute" github="kilianboute" created="Jun 16, 2026" updated="Jun 16, 2026" >}}
 
-The Hub ships with built-in analysis, but every deployment eventually needs something the pipeline doesn't do out of the box. A custom **workflow stage** lets you run your own logic on every recording — its result feeds the rest of the workflow for later stages to build on, and the **blocks** it emits are persisted back into the Hub — in any language, deployed and scaled on its own.
+The Hub ships with a built-in pipeline, but every deployment eventually needs something the pipeline doesn't do out of the box. A custom **workflow stage** lets you run your own logic on every recording — its result feeds the rest of the workflow for later stages to build on, and the **blocks** it emits are persisted back into the Hub — in any language, deployed and scaled on its own.
 
 {{< tutorial-meta time="~25 min" level="Intermediate" stack="Go · Helm · Kubernetes" prerequisites="Self-hosted Hub" >}}
 
@@ -56,7 +56,56 @@ This tutorial targets a **self-hosted Hub** that can run custom stages. Make sur
 **On a managed / cloud Hub?** You can't deploy a custom stage there, but you can deliver the *same* result over an authenticated API push instead — the [ingest service](/docs/hub/workflows/ingest-service/) accepts the same data over HTTP (for our object-detection example, that's [Extend → Detections → API](/docs/hub/extend/detections/api/)). The rest of this tutorial is for deployments you control.
 {{< /callout >}}
 
-It pays to skim the two reference pages this tutorial puts into practice — [Workflows → Stages](/docs/hub/workflows/stages/) (how a microservice connects) and [Workflows → Ingest service](/docs/hub/workflows/ingest-service/) (what it hands back). This tutorial is the hands-on path through both.
+This tutorial puts two reference pages into practice, and it helps to have skimmed them first — [Workflows → Stages](/docs/hub/workflows/stages/) (how a microservice connects) and [Workflows → Ingest service](/docs/hub/workflows/ingest-service/) (what it hands back). This tutorial is the hands-on path through both.
+
+## Pipeline vs workflows
+
+Before you build a stage, it's worth knowing where it lives. The Hub has two layers that connect at a single point.
+
+The **[pipeline](/docs/hub/pipeline/)** is the fixed flow every recording runs through by default — monitor, sequence, analysis, throttle, notify. It's the same for everyone, it always runs, and it's the baseline that turns a raw recording into a classified, alertable event.
+
+A **[workflow](/docs/hub/workflows/)** is a **branch off that flow**. At the analysis step the pipeline hands the classified recording to the workflows engine, which forks a custom flow of your own — your stages — runs it, and feeds the result back. The main pipeline keeps doing its job; the workflow is the side-path where *your* processing happens, decided per user, per device and per time window.
+
+{{< rete caption="A workflow branches off the main pipeline flow at the analysis step: the engine forks your custom flow, dispatches the recording to your stage, and the result is fed back." alt="A workflow branching off the main pipeline flow to run a custom flow" height="460" >}}
+{
+  "groups": [
+    { "id": "hub",   "label": "Hub pipeline · the main flow",    "x":   0, "y":   0, "w": 980, "h": 220 },
+    { "id": "yours", "label": "Workflow · your custom flow",  "x":   0, "y": 300, "w": 980, "h": 280 }
+  ],
+  "nodes": [
+    { "id": "analysis", "kind": "pipeline-analysis",     "x":  40, "y":  60, "w": 220, "h": 100,
+      "header": "PIPELINE", "title": "Analysis", "subtitle": "classify · opens run", "groupId": "hub" },
+    { "id": "throttle", "kind": "pipeline-threshold",    "x": 380, "y":  60, "w": 220, "h": 100,
+      "header": "PIPELINE", "title": "Throttle", "subtitle": "rate limit", "groupId": "hub" },
+    { "id": "notify",   "kind": "pipeline-notification", "x": 720, "y":  60, "w": 220, "h": 100,
+      "header": "PIPELINE", "title": "Notify", "subtitle": "alerts", "groupId": "hub" },
+    { "id": "engine",   "kind": "hub",                   "x":  40, "y": 360, "w": 220, "h": 110,
+      "header": "ENGINE", "title": "Workflows", "subtitle": "hub-workflows", "groupId": "yours" },
+    { "id": "stage",    "kind": "detection",             "x": 380, "y": 360, "w": 220, "h": 110,
+      "header": "STAGE", "title": "Your stage", "subtitle": "custom flow · your worker", "groupId": "yours" }
+  ],
+  "connections": [
+    { "from": "analysis", "to": "throttle", "fromSide": "right",  "toSide": "left", "kind": "solid" },
+    { "from": "throttle", "to": "notify",   "fromSide": "right",  "toSide": "left", "kind": "solid" },
+    { "from": "analysis", "to": "engine",   "fromSide": "bottom", "toSide": "top",  "kind": "solid",  "label": "branches on classify" },
+    { "from": "engine",   "to": "stage",    "fromSide": "right",  "toSide": "left", "kind": "solid",  "label": "dispatch" },
+    { "from": "stage",    "to": "engine",   "fromSide": "top",    "toSide": "top",  "kind": "dashed", "label": "result back" }
+  ]
+}
+{{< /rete >}}
+
+| | Pipeline | Workflow |
+|---|---|---|
+| **Shape** | The fixed flow every recording runs through | A branch that forks off the main flow to run a custom flow |
+| **Scope** | Global — the same for every recording | Per user, per device, per time window |
+| **Changed by** | The platform | You, with no code (visual editor) — or with a custom stage |
+| **Your stage lives here** | — | ✓ |
+
+A **custom stage** — what you're about to build — is the developer side of that branch: your own microservice, in any language, that the workflow dispatches recordings to and whose result the platform ingests back. The pipeline classifies the recording; the workflow branches off to your stage; your stage does the work and hands a result back.
+
+{{< callout type="info" >}}
+**The direction of travel.** Workflows are expected to gradually supersede the static pipeline as the primary way recordings are routed and enriched. Building on the workflows layer — as this tutorial does — is building on where the Hub is heading.
+{{< /callout >}}
 
 ## The end-to-end flow
 
