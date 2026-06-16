@@ -22,10 +22,10 @@ Where the pipeline is the same for everyone, a workflow is yours: pick the camer
 The default Hub pipeline is intentionally opinionated: a recording arrives from an Agent, is classified, throttled and turned into a notification. That's a great starting point, but real deployments have very different needs:
 
 - A retail store only needs people detection during opening hours.
-- A logistics site wants license-plate recognition on the parking camera, but a no-helmet model on the warehouse camera.
+- A logistics site wants vehicle detection on the parking camera, but a no-helmet model on the warehouse camera.
 - A control room wants high-frequency anomaly detection on a few critical cameras, and a low-frequency throttle on the rest to keep costs down.
 - A reception desk wants to chain models: first run person detection on the camera, and only when a person is found, pass those frames to face recognition — saving the heavier model from running on empty scenes.
-- A parking lot wants to detect vehicles first, and only forward those frames to the license-plate reader — avoiding wasted OCR runs on empty asphalt.
+- A parking lot wants to detect vehicles first, and only forward those frames to a heavier speed-estimation model — avoiding wasted inference on empty asphalt.
 
 Workflows expose the building blocks of the pipeline as a small, visual graph so a non-developer can express exactly that — per camera, per time window, per use-case.
 
@@ -40,7 +40,7 @@ Each block has one or more typed input/output ports and exposes its own configur
 | Block | Role | Configuration |
 |-------|------|----------------|
 | **Device** | The source of events — a camera or sensor that feeds the workflow. | Pick one device from the dropdown (front door, parking, warehouse, …). |
-| **ML Model** | A machine-learning model that processes incoming frames or events. | Pick one model: person/vehicle detection (YOLOv8), face recognition, license-plate reader, anomaly detector, … |
+| **ML Model** | A machine-learning model that processes incoming frames or events. | Pick one model: person/vehicle detection (YOLOv8), face recognition, anomaly detector, pose estimation, … |
 | **Throttle** | Limits the rate of events flowing through the workflow. | Pick a rate: 1/5/10 fps, or 1 frame every 5/30/60 seconds. |
 | **Active window** | Only lets events through when they fall inside a date/time window and on selected weekdays. | Pick a start & end datetime and tick the active weekdays (Mon–Sun). |
 
@@ -87,8 +87,16 @@ A few starting points to give an idea of what's possible:
 
 - **People counting during opening hours.** *Device: Camera — Reception → Active window: Mon–Sat, 08:00–18:00 → ML Model: YOLOv8 — Person detection.*
 - **Cost-optimised monitoring overnight.** *Device: Camera — Warehouse → Throttle: 1 frame every 30 seconds → ML Model: Anomaly detector.*
-- **License-plate capture on the parking lot.** *Device: Camera — Parking lot → Throttle: 5 fps → ML Model: License-plate reader.*
+- **Vehicle speed estimation on the parking lot.** *Device: Camera — Parking lot → Throttle: 5 fps → ML Model: Speed estimator.*
 
 ## Relationship with the fixed pipeline
 
 Workflows do not replace the Hub [Pipeline]({{< relref "/docs/hub/pipeline" >}}); they steer it. The pipeline microservices (sequence, analysis, throttler, notification, classifier, …) keep doing their job for every recording. What a workflow does is to declare, per user and per device, *which* of those services should run, *when* they should run and *with which* configuration — turning a one-size-fits-all pipeline into something each user can tailor to their own use-case.
+
+## Bring your own processing
+
+The blocks above are the **no-code** side of workflows. If you want a workflow to run *your own* service — a custom model, a speed estimator, any processing step, in any language — that is the **developer** side of the same system.
+
+See **[Integrations](integrations/)** for the contract your worker codes against: the queue it consumes, the `WorkflowRun` envelope it receives, how it hands a result back, and how to register the stage from the Helm chart so the engine routes recordings to it.
+
+Once your worker hands a result back, the **[Ingest service](ingest-service/)** is the shared layer on the platform side that receives it — from either the queue or the API — and runs the right actions for its kind: validate it, store it, and trigger any follow-up side-effects.

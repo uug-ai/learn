@@ -1,27 +1,27 @@
 ---
 title: "Integrations"
-description: "Plug your own microservice into the Hub pipeline — receive events, do work, and hand results back."
-lead: "Plug your own microservice into the Hub pipeline as a stage: consume an event, do the work, and hand the result back — in any language."
+description: "The developer side of Workflows — bring your own microservice into the Hub as a workflow stage that receives events, does work, and hands results back."
+lead: "The developer side of Workflows: bring your own microservice into the Hub as a workflow stage — consume an event, do the work, and hand the result back, in any language."
 date: 2026-06-04T00:00:00+00:00
-lastmod: 2026-06-12T00:00:00+00:00
+lastmod: 2026-06-16T00:00:00+00:00
 draft: false
 images: []
 menu:
   hub:
-    parent: "pipeline"
+    parent: "workflows"
 weight: 10
 toc: true
 ---
 
-The Hub pipeline is **open**: every built-in stage — classification, thumbnails, sprites — is just a service that consumes a message off a queue, does one job, and hands the result back. Your own service plugs in the same way.
+[Workflows](/docs/hub/workflows/) let you reshape the Hub pipeline without code — wire a device through a few filters into a model on a visual canvas. **Integrations** are the developer side of that same system: instead of choosing from the built-in blocks, you bring *your own* microservice in as a workflow stage. The engine is **open** — every built-in stage (classification, thumbnails, sprites) is just a service that consumes a message off a queue, does one job, and hands the result back — and your service plugs in the same way.
 
-A **pipeline integration** (a *stage*) is a worker the pipeline triggers automatically for every recording: it **receives a run from a queue, does the work, and returns the result** — in whatever language suits the job, deployed and scaled on its own. Stages are **asynchronous**: they run alongside the built-in analysis and never block it.
+A **workflow stage** (an *integration*) is a worker the workflows engine triggers automatically for every recording: it **receives a run from a queue, does the work, and returns the result** — in whatever language suits the job, deployed and scaled on its own. Stages are **asynchronous**: they run alongside the built-in analysis and never block it.
 
-This page is the **contract your worker codes against** — the queue it listens on, the message it receives, how it returns a result, and how the engine tracks it to completion. It is **capability-agnostic**: it never assumes *what* your stage does, so the same mechanism serves a licence-plate reader, a custom detector, or any other step. For a concrete capability built on it, see the pages under [Extend](../../extend/).
+This page is the **contract your worker codes against** — the queue it listens on, the message it receives, how it returns a result, and how the engine tracks it to completion. It is **capability-agnostic**: it never assumes *what* your stage does, so the same mechanism serves a speech-to-text service, a custom detector, or any other step. For a concrete capability built on it, see the pages under [Extend](../../extend/).
 
 > **Status — rolling out.** The queue, envelope and completion mechanics here are already how the pipeline works internally. The config-driven **stage registration** (the `kerberoshub.workflows.stages` values block — see [Registering a stage](#registering-a-stage)) is the addition that lets a *custom* operation join without changing engine code — dispatched by the standalone **workflows engine** (`hub-workflows`), which runs alongside the **analysis service** and consumes the classify results it tees over. It is landing now for self-hosted deployments.
 >
-> This page covers how a worker *delivers* a result. For the complementary *receiving* side — one shared service that takes a result from either the API or the queue and runs the right actions for its kind — see [Ingest service](ingest-service/).
+> This page covers how a worker *delivers* a result. For the complementary *receiving* side — one shared core that takes a result from either the API or the queue and routes each block to the right actions by its type — see [Ingest service](/docs/hub/workflows/ingest-service/).
 
 ## When to add a stage
 
@@ -53,8 +53,8 @@ A stage has exactly two runtime dependencies: the **message broker** (to receive
       "header": "ORCHESTRATOR", "title": "Workflows", "subtitle": "Hub-Workflows", "groupId": "hub" },
     { "id": "worker",       "kind": "detection",              "x":  90, "y": 600, "w": 210, "h": 130,
       "header": "STAGE", "title": "Pose detection", "subtitle": "your worker", "groupId": "yours" },
-    { "id": "licenseplate", "kind": "pipeline-licenseplate",  "x": 385, "y": 600, "w": 210, "h": 130,
-      "header": "STAGE", "title": "License plate", "subtitle": "kcloud-licenseplate-queue.fifo", "groupId": "yours" },
+    { "id": "speed",        "kind": "detection",              "x": 385, "y": 600, "w": 210, "h": 130,
+      "header": "STAGE", "title": "Speed estimate", "subtitle": "acme-speed-jobs", "groupId": "yours" },
     { "id": "llm",          "kind": "pipeline-llm",           "x": 680, "y": 600, "w": 210, "h": 130,
       "header": "STAGE", "title": "LLM summary", "subtitle": "kcloud-llm-queue.fifo", "groupId": "yours" }
   ],
@@ -63,7 +63,7 @@ A stage has exactly two runtime dependencies: the **message broker** (to receive
     { "from": "throttler", "to": "notification", "fromSide": "right", "toSide": "left", "kind": "solid" },
     { "from": "analysis",  "to": "workflows",    "fromSide": "right", "toSide": "left", "kind": "solid", "label": "on classify" },
     { "from": "workflows", "to": "worker",       "fromSide": "bottom", "toSide": "top", "kind": "solid", "label": "dispatch" },
-    { "from": "workflows", "to": "licenseplate", "fromSide": "bottom", "toSide": "top", "kind": "solid", "label": "dispatch" },
+    { "from": "workflows", "to": "speed",        "fromSide": "bottom", "toSide": "top", "kind": "solid", "label": "dispatch" },
     { "from": "workflows", "to": "llm",          "fromSide": "bottom", "toSide": "top", "kind": "solid", "label": "dispatch" }
   ]
 }
@@ -88,7 +88,7 @@ kerberoshub:
 
     # ── the workflow stage object: declare + route ──────────────
     stages:
-      anpr:                        # stage name (and default operation id)
+      speed:                       # stage name (and default operation id)
         enabled: true              # route to this stage
         dispatch: conditional      # always | conditional
         # conditional only — see Conditional routing:
@@ -96,16 +96,15 @@ kerberoshub:
         needs:
           - operation: classify
             condition: { path: inputs.classify.properties, op: contains, value: car }
-        # kind: anpr               # only if you delegate persistence (see Sending a result back)
 
   # ── the deployments: the engine (chart default) + your worker ─
   services:
     # workflows: …                # the engine itself — a chart default; you don't set this here
-    anpr:                          # same name as the stage object
+    speed:                         # same name as the stage object
       enabled: true                # deploy the worker
-      repository: ghcr.io/acme/anpr
+      repository: ghcr.io/acme/speed
       tag: "v1.0.0"
-      queue: "acme-anpr-jobs"      # the queue your worker consumes
+      queue: "acme-speed-jobs"     # the queue your worker consumes
       replicas: 1
       pullPolicy: IfNotPresent
       logLevel: info               # trace | debug | info | warn | error
@@ -121,7 +120,6 @@ kerberoshub:
 | `dispatch` | no | `always` \| `conditional` | `always` (default) runs on every recording; `conditional` runs only when the recording matches — see [Conditional routing](#conditional-routing). |
 | `needs` | conditional only | list | The match rule — see [Conditional routing](#conditional-routing). |
 | `needsMode` | no | `any` \| `all` | How multiple `needs` combine — `any` (default) or `all`. |
-| `kind` | no | string | Set **only** if your worker hands its result back for the platform to store; the value names the ingest handler (e.g. `anpr`). Leave it unset when your worker writes its own collection. See [Sending a result back](#sending-a-result-back). |
 
 **Service deployment — `kerberoshub.services.<name>`**
 
@@ -151,7 +149,7 @@ The rule is a list of **`needs`** combined by **`needsMode`**:
 
 ```yaml
 stages:
-  anpr:
+  speed:
     enabled: true
     dispatch: conditional
     needsMode: any                 # any (default) | all
@@ -181,12 +179,12 @@ needs:
 
 A condition is `{ path, op, value }`.
 
-**`path`** — a dot-path **relative to the `WorkflowRun`** your stage receives (the [envelope](#envelope)). It walks objects only and **cannot index into an array**. Valid roots:
+**`path`** — a dot-path **relative to the `WorkflowRun`** your stage receives (the [envelope](#envelope)). It walks objects, and a **`*`** segment **fans out across the elements of an array** (see [Matching inside arrays](#matching-inside-arrays)). Valid roots:
 
 | Root | Example | Notes |
 |---|---|---|
 | `inputs.<op>.<field>` | `inputs.classify.properties` | An upstream result. `classify` is always present (the trigger); its fields are `properties`, `objectCount`, `details` (`details` is an array — not reachable). |
-| `results.<op>.<field>` | `results.anpr.plates` | A finished stage's output. Fields of your own custom operations are accepted as-is. |
+| `results.<op>.<field>` | `results.speed.kmh` | A finished stage's output. Fields of your own custom operations are accepted as-is; array fields can be matched element-wise with `*` (see [Matching inside arrays](#matching-inside-arrays)). |
 | `device.<field>` | `device.deviceKey` | One of `deviceKey`, `deviceName`, `provider`, `storageSolution`. |
 | `user.<field>` | `user.organisationId` | One of `id`, `organisationId`. |
 | scalar | `key`, `operation`, `runId`, `traceId` | Top-level identity values (not traversable). |
@@ -206,6 +204,30 @@ Credentials (`storage`, `user.storage`) are deliberately **not** matchable.
 
 > `contains` and `in` are mirror images: use `contains` when the run holds a **list** and you test for a member (`inputs.classify.properties contains car`); use `in` when the run holds a **single value** and you test it against a set (`device.deviceKey in [device01, device02]`).
 
+### Matching inside arrays
+
+A `path` segment of **`*`** fans out across the elements of the array at that position and continues resolving from each element, so it reaches a field on **every object in a list**. This is how you branch on the result a delegated stage hands back: the engine mirrors your block envelope into `results.<operation>` **grouped by block type**, so a stage that emits `detection` blocks exposes `results.<operation>.detections` as an array.
+
+Say your `detector` stage returns a list of boxes:
+
+```json
+"results": { "detector": { "detections": [
+  { "label": "car", "score": 0.92 },
+  { "label": "car", "score": 0.41 }
+] } }
+```
+
+A `*` matches **across** the list — the predicate holds when **any** element satisfies a positive operator (`exists` / `eq` / `contains` / `in` / `gt` / `gte` / `lt` / `lte`):
+
+```yaml
+# fire when the stage found ANY box scoring above 0.8
+condition: { path: results.detector.detections.*.score, op: gt, value: 0.8 }
+```
+
+That is what makes per-element numbers work: each fanned-out value is a single `score`, so `gt` / `lt` compare it directly. `ne` is the inverse — it holds only when **no** element equals `value` (`…detections.*.label, op: ne, value: car` ⇒ *not one box is a car*). Nested lists compose: `results.detector.detections.*.boxes.*.x` reaches every box of every detection.
+
+Two limits to keep in mind. **`*` is the only index** — there is no numeric `[0]`, and a plain step onto an array (without `*`) matches nothing, so gate on the array itself with `contains` / `exists` or fan out with `*`. And separate needs **don't correlate**: `…*.label eq car` and `…*.score gt 0.8` can be satisfied by **different** elements — there is no "the same object has both" across two conditions. Built-in `classify` fields stay non-traversable (`inputs.classify.details` is validated as a leaf); `*` applies to your **own** operation's result arrays.
+
 The engine validates every condition path at boot and refuses to start on an unknown one — a typo fails fast instead of silently never firing.
 
 ## How your worker connects
@@ -216,7 +238,7 @@ The chart deploys your worker from `kerberoshub.services.<name>` and injects a f
 |---|---|---|
 | `QUEUE_SYSTEM` | `RABBITMQ` | The broker driver to connect with (the deployment's `queueProvider`). |
 | `RABBITMQ_HOST` | `rabbitmq.rabbitmq:5672` | Broker address — with `RABBITMQ_EXCHANGE`, `RABBITMQ_USERNAME`, `RABBITMQ_PASSWORD` completing the connection. |
-| `<NAME>_QUEUE` | `ANPR_QUEUE` | The queue you **consume** dispatched runs from. The variable name is your stage's key upper-cased (hyphens become underscores — `my-stage` → `MY_STAGE_QUEUE`); its value is `services.<name>.queue`. See [Queue naming](#queue-naming). |
+| `<NAME>_QUEUE` | `SPEED_QUEUE` | The queue you **consume** dispatched runs from. The variable name is your stage's key upper-cased (hyphens become underscores — `my-stage` → `MY_STAGE_QUEUE`); its value is `services.<name>.queue`. See [Queue naming](#queue-naming). |
 | `WORKFLOWS_QUEUE` | `kcloud-workflows-queue` | The engine queue you **publish the finished run** back to. See [Sending a result back](#sending-a-result-back). |
 | `KERBEROS_STORAGE_URI` | `https://api.vault.example.com` | Global media-storage endpoint — with `KERBEROS_STORAGE_ACCESS_KEY` and `KERBEROS_STORAGE_SECRET`. Per-recording overrides also travel on each run's `storage`; prefer those when present. |
 | `LOG_LEVEL` | `info` | Worker log verbosity (`services.<name>.logLevel`). |
@@ -235,11 +257,11 @@ Your worker consumes from **one** queue, and **you choose its name**. The source
 ```yaml
 kerberoshub:
   services:
-    anpr:
-      queue: "acme-anpr-jobs"   # ← anything you want; your worker consumes this exact name
+    speed:
+      queue: "acme-speed-jobs"  # ← anything you want; your worker consumes this exact name
 ```
 
-The engine reads that **same** value from the stage registry and dispatches there, so the only rule is that the two agree — the queue is the one thing that binds the engine to your worker. The name is an arbitrary string your broker accepts (`acme-anpr-jobs`, `lpr.requests`, `team7-detector`); it does **not** have to follow the platform's `kcloud-…` convention.
+The engine reads that **same** value from the stage registry and dispatches there, so the only rule is that the two agree — the queue is the one thing that binds the engine to your worker. The name is an arbitrary string your broker accepts (`acme-speed-jobs`, `vision.requests`, `team7-detector`); it does **not** have to follow the platform's `kcloud-…` convention.
 
 If you omit `queue`, the engine falls back to a derived default, `kcloud-<operation>-queue.fifo` — so the convention is just that fallback, not the source of truth. Queue names are literal strings: the default deployment runs RabbitMQ, so a `.fifo` suffix is only part of a name, not an SQS feature.
 
@@ -249,7 +271,7 @@ Your worker does **not** receive the pipeline's internal `PipelineEvent`. The en
 
 ```json
 {
-  "operation": "anpr",
+  "operation": "speed",
   "runId": "665f1b2c3d4e5f6071829304",
   "key": "front-gate/2026/06/12/08-30-00.mp4",
   "traceId": "8f3a1c2b4d5e6f70",
@@ -287,7 +309,7 @@ Your worker does **not** receive the pipeline's internal `PipelineEvent`. The en
 
 | Field | Type | What it is |
 |---|---|---|
-| `operation` | string | Your stage's **operation id** (the name you registered, e.g. `anpr`). It is also the key you file your result under on the way back (`results.<operation>`). |
+| `operation` | string | Your stage's **operation id** (the name you registered, e.g. `speed`). It is also the key you file your result under on the way back (`results.<operation>`). |
 | `runId` | string | The run's unique id. Use it as your **idempotency key** — a redelivery carries the same `runId`. |
 | `key` | string | The **recording reference** (media key) the run is about. Resolve *which* recording to fetch from this. |
 | `traceId` | string | Distributed-trace id; propagate it on your logs/spans so the run stays traceable end-to-end. |
@@ -363,13 +385,13 @@ There are **two sinks**. Default to letting the platform persist your result —
 
 ### Enrich in place
 
-The **default sink**: declare an ingest **`kind`** on the stage and hand the typed body back in `payload` — e.g. a `PostDetectionsRequest` for `kind: detection`, a `PostANPRRequest` for `kind: anpr`. The engine runs that kind's [Ingest service](ingest-service/) actions against the run's own recording and mirrors the decoded result into `results` so downstream conditions can read it. Because the engine owns the write, your worker needs no database access. Set `payload` **or** `results[operation]`, never both. (A *built-in* analysis stage without a `kind` instead falls back to a generic `$set data.<operation>` on the analysis document — the handler-less default; a registry-driven workflow stage always uses `results` / `payload`.)
+The **default sink**: hand the platform a **block envelope** in `payload` and it stores the result for you — your worker needs no database. The envelope is an ordered list of typed *blocks* — `{ "type": "detection", "data": … }`, `{ "type": "marker", "data": … }` — and the engine routes each block by its `type` through the shared [Ingest service](/docs/hub/workflows/ingest-service/), persists it against the run's **own** recording, and mirrors the blocks into `results.<operation>` **grouped by type** (`results.<operation>.detections`, `…markers`) so a downstream condition can branch on what the stage produced — element-wise with [`*`](#matching-inside-arrays). The stage no longer declares a `kind` — each block self-describes. Set `payload` **or** `results[operation]`, never both.
 
 ### Own collection
 
 For genuinely *new, standalone* data — detections, descriptions, embeddings — a stage can write its **own collection, keyed by the recording**, and set only its routing values under `results.<operation>` on the returned run (leave `payload` empty). The platform just records the resolution; your worker owns the write, and so brings its own datastore access. This is how [detections](../../extend/detections/) deliver their runs — see that page for a worked example.
 
-> The difference between the sinks is only *who writes the result* — the engine through an ingest `kind`, or your worker into its own collection. Either way the engine marks the operation resolved when your run comes back.
+> The difference between the sinks is only *who writes the result* — the platform, from the block envelope you hand back, or your worker into its own collection. Either way the engine marks the operation resolved when your run comes back.
 
 ## Completion and acknowledgement
 

@@ -8,7 +8,9 @@ Hands-on tutorials for [Hub](https://github.com/kerberos-io/hub) — the central
 
 ## Tutorials
 
-*Coming soon.* Planned walkthroughs:
+- [Set up your own workflow stage](custom-workflow-stage/) — bring your own microservice into the Hub as a workflow stage, end to end: register it in the Helm chart, receive recordings, and ingest results back. Object detection serves as the worked example.
+
+### Coming soon
 
 - Install Hub (self-hosted)
 - Connect an Agent to Hub
