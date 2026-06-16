@@ -69,27 +69,31 @@ A **[workflow](/docs/hub/workflows/)** is a **branch off that flow**. At the ana
 {{< rete caption="A workflow branches off the main pipeline flow at the analysis step: the engine forks your custom flow, dispatches the recording to your stage, and the result is fed back." alt="A workflow branching off the main pipeline flow to run a custom flow" height="460" >}}
 {
   "groups": [
-    { "id": "hub",   "label": "Hub pipeline · the main flow",    "x":   0, "y":   0, "w": 980, "h": 220 },
-    { "id": "yours", "label": "Workflow · your custom flow",  "x":   0, "y": 300, "w": 980, "h": 280 }
+    { "id": "hub",   "label": "Pipeline",    "x":   0, "y":   0, "w": 980, "h": 220 },
+    { "id": "yours", "label": "Workflow",  "x":   0, "y": 300, "w": 980, "h": 280 }
   ],
   "nodes": [
     { "id": "analysis", "kind": "pipeline-analysis",     "x":  40, "y":  60, "w": 220, "h": 100,
-      "header": "PIPELINE", "title": "Analysis", "subtitle": "classify · opens run", "groupId": "hub" },
+      "header": "PIPELINE", "title": "Analysis", "subtitle": "kcloud-classify-queue.fifo", "groupId": "hub" },
     { "id": "throttle", "kind": "pipeline-threshold",    "x": 380, "y":  60, "w": 220, "h": 100,
-      "header": "PIPELINE", "title": "Throttle", "subtitle": "rate limit", "groupId": "hub" },
+      "header": "PIPELINE", "title": "Throttle", "subtitle": "kcloud-throttler-queue", "groupId": "hub" },
     { "id": "notify",   "kind": "pipeline-notification", "x": 720, "y":  60, "w": 220, "h": 100,
-      "header": "PIPELINE", "title": "Notify", "subtitle": "alerts", "groupId": "hub" },
-    { "id": "engine",   "kind": "hub",                   "x":  40, "y": 360, "w": 220, "h": 110,
+      "header": "PIPELINE", "title": "Notify", "subtitle": "kcloud-notification-queue", "groupId": "hub" },
+    { "id": "engine",   "kind": "hub",                   "x":  40, "y": 390, "w": 220, "h": 100,
       "header": "ENGINE", "title": "Workflows", "subtitle": "hub-workflows", "groupId": "yours" },
-    { "id": "stage",    "kind": "detection",             "x": 380, "y": 360, "w": 220, "h": 110,
-      "header": "STAGE", "title": "Your stage", "subtitle": "custom flow · your worker", "groupId": "yours" }
+    { "id": "stage",    "kind": "detection",             "x": 420, "y": 390, "w": 210, "h": 100,
+      "header": "STAGE", "title": "Your stage #1", "subtitle": "hub-workflows-stage1", "groupId": "yours" },
+    { "id": "stage2",   "kind": "detection",             "x": 700, "y": 390, "w": 210, "h": 100,
+      "header": "STAGE", "title": "Your stage #2", "subtitle": "hub-workflows-stage2", "groupId": "yours" }
   ],
   "connections": [
     { "from": "analysis", "to": "throttle", "fromSide": "right",  "toSide": "left", "kind": "solid" },
     { "from": "throttle", "to": "notify",   "fromSide": "right",  "toSide": "left", "kind": "solid" },
-    { "from": "analysis", "to": "engine",   "fromSide": "bottom", "toSide": "top",  "kind": "solid",  "label": "branches on classify" },
+    { "from": "analysis", "to": "engine",   "fromSide": "bottom", "toSide": "top",  "kind": "solid",  "label": "" },
     { "from": "engine",   "to": "stage",    "fromSide": "right",  "toSide": "left", "kind": "solid",  "label": "dispatch" },
-    { "from": "stage",    "to": "engine",   "fromSide": "top",    "toSide": "top",  "kind": "dashed", "label": "result back" }
+    { "from": "engine",   "to": "stage2",   "fromSide": "top",    "toSide": "top",  "kind": "solid",  "label": "" },
+    { "from": "stage",    "to": "engine",   "fromSide": "bottom", "toSide": "bottom", "kind": "dashed", "label": "result back" },
+    { "from": "stage2",   "to": "engine",   "fromSide": "bottom", "toSide": "bottom", "kind": "dashed", "label": "" }
   ]
 }
 {{< /rete >}}
