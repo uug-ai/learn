@@ -17,7 +17,7 @@ A result can reach the Hub two ways — an authenticated **API push** or an in-p
 
 > **"Service" means a package, not a process.** There is **no new microservice, deployment, queue or network hop**. The ingest service is a shared library (`models/pkg/ingest`) compiled *into* both the hub-api and analyser binaries; each calls `Ingest(...)` in-process on its own request. "Service" here names a consistent code path, not a running component.
 
-> **Status — shipped, still growing.** The core (`models/pkg/ingest`), its `detection` and `anpr` kinds, and both callers are live: hub-api's general `POST /ingest` door and the analyser's detection/pose result-handling both route through `Ingest(...)`. What's still rolling in is breadth, not the model — migrating the analyser's remaining built-in result handling (`thumbnail`, `sprite`, …) from its `switch` into handlers, and wiring the optional region-promotion sink. This page builds on the transport mechanics in [Integrations](integrations/) — read that first for how a worker *delivers* a result; this page is about how the platform *receives* one.
+> **Status — shipped, still growing.** The core (`models/pkg/ingest`), its `detection` and `anpr` kinds, and both callers are live: hub-api's general `POST /ingest` door and the analyser's detection/pose result-handling both route through `Ingest(...)`. What's still rolling in is breadth, not the model — migrating the analyser's remaining built-in result handling (`thumbnail`, `sprite`, …) from its `switch` into handlers, and wiring the optional region-promotion sink. This page builds on the transport mechanics in [Workflows → Integrations](/docs/hub/workflows/integrations/) — read that first for how a worker *delivers* a result; this page is about how the platform *receives* one.
 
 ## The idea
 
@@ -83,7 +83,7 @@ Over HTTP this contract is `api.IngestRequest`:
 
 **Two doors, one core — but only one delegates today.** The general `POST /ingest` door is the thin adapter over `Ingest`: it binds the `{operation, payload}` envelope, builds a `Scope`/`Target`, and routes by `operation`. The existing typed [`/detections`](../../extend/detections/api/) endpoint is kept **exactly as-is** alongside it — rather than have it call `Ingest`, the `/ingest` door **reuses the detections repository** (through a `DetectionStore` sink) so the battle-tested upsert, duplicate-key retry and region-search enrichment stay intact. So a new kind gets the general door for free; detection keeps its ergonomic typed endpoint; and the shared write lives in one place. Collapsing the typed endpoint onto `Ingest` too is possible later, but isn't needed.
 
-> **Caveat — `payload` is the result channel; `data` is not.** `PipelineEvent.Data` is a deprecated `map[string]interface{}` and on dispatch carries only storage credentials. The ingest core reads the typed result from **`payload`** (`PipelineEvent.Payload.Result` on the queue), never from the legacy `data` bag. The generic `data.<operation>` enrich-in-place sink (see [Integrations](integrations/#enrich-in-place)) still exists for stages **without** an ingest handler; once a kind has a handler, its result travels as the typed `payload` and the handler owns the side-effect in place of a generic `$set data.<op>`.
+> **Caveat — `payload` is the result channel; `data` is not.** `PipelineEvent.Data` is a deprecated `map[string]interface{}` and on dispatch carries only storage credentials. The ingest core reads the typed result from **`payload`** (`PipelineEvent.Payload.Result` on the queue), never from the legacy `data` bag. The generic `data.<operation>` enrich-in-place sink (see [Integrations](/docs/hub/workflows/integrations/#enrich-in-place)) still exists for stages **without** an ingest handler; once a kind has a handler, its result travels as the typed `payload` and the handler owns the side-effect in place of a generic `$set data.<op>`.
 
 ## Where it lives
 
@@ -155,7 +155,7 @@ There are **two** registries that both key on the operation id, and conflating t
 
 | | Stage registry (config) | Ingest handlers (Go) |
 |---|---|---|
-| Lives in | `workflows` values / operation registry — see [Integrations](integrations/#registering-a-stage) | `models/pkg/ingest` `handlers` map |
+| Lives in | `workflows` values / operation registry — see [Integrations](/docs/hub/workflows/integrations/#registering-a-stage) | `models/pkg/ingest` `handlers` map |
 | Governs | enqueue, queue name, allow-list, completion tracking (the **outbound** half) | the typed actions run on a **returned** result (the **inbound** half) |
 | Needed for | **every** stage | only when the producer **delegates** persistence to the platform |
 | Cost to add | a config edit | a code change + release |
@@ -165,7 +165,7 @@ There are **two** registries that both key on the operation id, and conflating t
 - **Self-persist (own collection).** An in-cluster worker writes its own collection directly and just acks. The mandatory write still happens — in the worker. No ingest handler; the platform only records `resolvedoperations`.
 - **Delegated persist (ingest handler).** The worker hands back a typed `payload` and the **handler** does the write. When a handler exists, its **first action is the mandatory persistence** (e.g. `UpsertDetectionRun`); it is never side-effect-only. Any further actions are the *optional* side-effects, and those are the only thing `RunFor(source)` gates.
 
-So a stage with **no** ingest handler is not a stage with no effect — it is a **self-persisting** stage. The adapter routes a completion to `Ingest` **only when a handler is registered** for that kind; otherwise it's a self-persist / generic [`data.<op>`](integrations/#enrich-in-place) completion — recorded, not routed. Hitting `Ingest` for a handler-less kind would be the bug, not the absence of a handler.
+So a stage with **no** ingest handler is not a stage with no effect — it is a **self-persisting** stage. The adapter routes a completion to `Ingest` **only when a handler is registered** for that kind; otherwise it's a self-persist / generic [`data.<op>`](/docs/hub/workflows/integrations/#enrich-in-place) completion — recorded, not routed. Hitting `Ingest` for a handler-less kind would be the bug, not the absence of a handler.
 
 ### Who persists vs which transport
 
@@ -232,7 +232,7 @@ When a result arrives over the **queue** (not the API), the platform also has to
 
 **Resolution reuses the existing tier.** There is **no separate `workflowOperations` list** — completion is recorded on the analysis's existing `resolvedOperations` with an idempotent `$addToSet resolvedoperations`. Because it's `$addToSet`, a redelivered result is a no-op; and because custom/async stages are **non-gating** (completion is bounded by `requiredOperations` plus a backstop timeout), a *missing* record can't wedge the run. Resolution is provenance, not a barrier.
 
-**The stage registry is the allow-list.** Which operations may be dispatched (and to which queue) is governed by the workflows engine's enabled-stage registry — the `kerberoshub.workflows.stages` block described in [Integrations](integrations/#registering-a-stage). The derived queue name is `kcloud-<id>-queue.fifo`; the registry is the source of truth for what is allowed to run. (Hardening the analyser's own dispatch to reject any operation *not* in the registry — which would catch latent queue-name drift such as the hardcoded `classify → kcloud-thumby-queue`, missing its `.fifo` — is a worthwhile follow-up; the registry already gives the exact allow-list to check against.)
+**The stage registry is the allow-list.** Which operations may be dispatched (and to which queue) is governed by the workflows engine's enabled-stage registry — the `kerberoshub.workflows.stages` block described in [Integrations](/docs/hub/workflows/integrations/#registering-a-stage). The derived queue name is `kcloud-<id>-queue.fifo`; the registry is the source of truth for what is allowed to run. (Hardening the analyser's own dispatch to reject any operation *not* in the registry — which would catch latent queue-name drift such as the hardcoded `classify → kcloud-thumby-queue`, missing its `.fifo` — is a worthwhile follow-up; the registry already gives the exact allow-list to check against.)
 
 > **Idempotency lives in the action, not the list.** `resolvedOperations` tracks *that* an operation completed (at-most-once recording). It does **not** make the side-effect idempotent — that has to be the action's own keyed upsert (`(Key, RunId)` for detection/anpr runs, a stable identity for markers) so a redelivery replaces rather than duplicates.
 
@@ -271,6 +271,6 @@ The model is in place; what's left is breadth and a few hardening passes:
 
 ## See also
 
-- [Integrations](integrations/) — how a worker *delivers* a result (transport, queues, completion ack).
+- [Workflows → Integrations](/docs/hub/workflows/integrations/) — how a worker *delivers* a result (transport, queues, completion ack).
 - [Detections → Pipeline](../../extend/detections/pipeline/) — the detection capability delivered as a stage.
 - [Detections → API](../../extend/detections/api/) — the same detection contract over HTTP.

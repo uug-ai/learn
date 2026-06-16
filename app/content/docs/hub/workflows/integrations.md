@@ -1,27 +1,27 @@
 ---
 title: "Integrations"
-description: "Plug your own microservice into the Hub pipeline — receive events, do work, and hand results back."
-lead: "Plug your own microservice into the Hub pipeline as a stage: consume an event, do the work, and hand the result back — in any language."
+description: "The developer side of Workflows — bring your own microservice into the Hub as a workflow stage that receives events, does work, and hands results back."
+lead: "The developer side of Workflows: bring your own microservice into the Hub as a workflow stage — consume an event, do the work, and hand the result back, in any language."
 date: 2026-06-04T00:00:00+00:00
-lastmod: 2026-06-12T00:00:00+00:00
+lastmod: 2026-06-16T00:00:00+00:00
 draft: false
 images: []
 menu:
   hub:
-    parent: "pipeline"
+    parent: "workflows"
 weight: 10
 toc: true
 ---
 
-The Hub pipeline is **open**: every built-in stage — classification, thumbnails, sprites — is just a service that consumes a message off a queue, does one job, and hands the result back. Your own service plugs in the same way.
+[Workflows](/docs/hub/workflows/) let you reshape the Hub pipeline without code — wire a device through a few filters into a model on a visual canvas. **Integrations** are the developer side of that same system: instead of choosing from the built-in blocks, you bring *your own* microservice in as a workflow stage. The engine is **open** — every built-in stage (classification, thumbnails, sprites) is just a service that consumes a message off a queue, does one job, and hands the result back — and your service plugs in the same way.
 
-A **pipeline integration** (a *stage*) is a worker the pipeline triggers automatically for every recording: it **receives a run from a queue, does the work, and returns the result** — in whatever language suits the job, deployed and scaled on its own. Stages are **asynchronous**: they run alongside the built-in analysis and never block it.
+A **workflow stage** (an *integration*) is a worker the workflows engine triggers automatically for every recording: it **receives a run from a queue, does the work, and returns the result** — in whatever language suits the job, deployed and scaled on its own. Stages are **asynchronous**: they run alongside the built-in analysis and never block it.
 
 This page is the **contract your worker codes against** — the queue it listens on, the message it receives, how it returns a result, and how the engine tracks it to completion. It is **capability-agnostic**: it never assumes *what* your stage does, so the same mechanism serves a licence-plate reader, a custom detector, or any other step. For a concrete capability built on it, see the pages under [Extend](../../extend/).
 
 > **Status — rolling out.** The queue, envelope and completion mechanics here are already how the pipeline works internally. The config-driven **stage registration** (the `kerberoshub.workflows.stages` values block — see [Registering a stage](#registering-a-stage)) is the addition that lets a *custom* operation join without changing engine code — dispatched by the standalone **workflows engine** (`hub-workflows`), which runs alongside the **analysis service** and consumes the classify results it tees over. It is landing now for self-hosted deployments.
 >
-> This page covers how a worker *delivers* a result. For the complementary *receiving* side — one shared service that takes a result from either the API or the queue and runs the right actions for its kind — see [Ingest service](ingest-service/).
+> This page covers how a worker *delivers* a result. For the complementary *receiving* side — one shared service that takes a result from either the API or the queue and runs the right actions for its kind — see [Ingest service](/docs/hub/pipeline/ingest-service/).
 
 ## When to add a stage
 
@@ -363,7 +363,7 @@ There are **two sinks**. Default to letting the platform persist your result —
 
 ### Enrich in place
 
-The **default sink**: declare an ingest **`kind`** on the stage and hand the typed body back in `payload` — e.g. a `PostDetectionsRequest` for `kind: detection`, a `PostANPRRequest` for `kind: anpr`. The engine runs that kind's [Ingest service](ingest-service/) actions against the run's own recording and mirrors the decoded result into `results` so downstream conditions can read it. Because the engine owns the write, your worker needs no database access. Set `payload` **or** `results[operation]`, never both. (A *built-in* analysis stage without a `kind` instead falls back to a generic `$set data.<operation>` on the analysis document — the handler-less default; a registry-driven workflow stage always uses `results` / `payload`.)
+The **default sink**: declare an ingest **`kind`** on the stage and hand the typed body back in `payload` — e.g. a `PostDetectionsRequest` for `kind: detection`, a `PostANPRRequest` for `kind: anpr`. The engine runs that kind's [Ingest service](/docs/hub/pipeline/ingest-service/) actions against the run's own recording and mirrors the decoded result into `results` so downstream conditions can read it. Because the engine owns the write, your worker needs no database access. Set `payload` **or** `results[operation]`, never both. (A *built-in* analysis stage without a `kind` instead falls back to a generic `$set data.<operation>` on the analysis document — the handler-less default; a registry-driven workflow stage always uses `results` / `payload`.)
 
 ### Own collection
 

@@ -92,3 +92,9 @@ A few starting points to give an idea of what's possible:
 ## Relationship with the fixed pipeline
 
 Workflows do not replace the Hub [Pipeline]({{< relref "/docs/hub/pipeline" >}}); they steer it. The pipeline microservices (sequence, analysis, throttler, notification, classifier, …) keep doing their job for every recording. What a workflow does is to declare, per user and per device, *which* of those services should run, *when* they should run and *with which* configuration — turning a one-size-fits-all pipeline into something each user can tailor to their own use-case.
+
+## Bring your own processing
+
+The blocks above are the **no-code** side of workflows. If you want a workflow to run *your own* service — a custom model, a licence-plate reader, any processing step, in any language — that is the **developer** side of the same system.
+
+See **[Integrations](integrations/)** for the contract your worker codes against: the queue it consumes, the `WorkflowRun` envelope it receives, how it hands a result back, and how to register the stage from the Helm chart so the engine routes recordings to it.

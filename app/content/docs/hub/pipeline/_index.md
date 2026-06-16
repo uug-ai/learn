@@ -12,7 +12,10 @@ menu:
 weight: 304
 toc: true
 ---
- 
+
+> [!WARNING] Workflows are the future direction
+> The pipeline described here is the **static default** every recording flows through today. [Workflows](/docs/hub/workflows/) build on it to let each user customise *which* processing runs — per camera, per time window and per model, with no code. Over time, workflows are expected to **supersede this static pipeline** as the primary way recordings are routed and enriched, so treat this page as the current baseline rather than a fixed design.
+
 Hub processes every recording through a pipeline of small, focused microservices. As soon as a camera triggers an Agent, the resulting recording is pushed to Vault, an event lands on the message broker and Hub picks it up — kicking off a chain of services that enrich, classify and alert on that single event.
 
 {{< rete caption="Pipelines to scale the processing." alt="Pipelines to scale the processing." height="500" >}}
@@ -83,7 +86,7 @@ Hub processes every recording through a pipeline of small, focused microservices
 }
 {{< /rete >}}
 
-Each microservice in the Hub pipeline owns a single responsibility. Together they form an event mesh that passes messages from one service to the next asynchronously, so any step can scale, fail or be replaced independently. The pipeline is also open: you can drop in your own microservices, written in whatever language fits the job, and slot them in next to the built-in ones — see [Integrations](integrations/) for how to plug your own stage in, and [Ingest service](ingest-service/) for the shared layer that receives a result from either the API or the queue and runs the right actions for it.
+Each microservice in the Hub pipeline owns a single responsibility. Together they form an event mesh that passes messages from one service to the next asynchronously, so any step can scale, fail or be replaced independently. The pipeline is also open: you can drop in your own microservices, written in whatever language fits the job, and slot them in next to the built-in ones — see [Workflows → Integrations](/docs/hub/workflows/integrations/) for how to plug your own service in as a workflow stage, and [Ingest service](ingest-service/) for the shared layer that receives a result from either the API or the queue and runs the right actions for it.
 
 # How it works
 
