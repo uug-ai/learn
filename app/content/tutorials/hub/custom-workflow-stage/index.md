@@ -17,7 +17,7 @@ If you can express it as "*take a recording, do some work, return a result*", it
 
 ## How it works
 
-This tutorial walks you through bringing a microservice of your own into the Hub as a [workflow stage](/docs/hub/workflows/integrations/) that the pipeline triggers automatically. You'll wire it end-to-end: register the stage in the Helm chart, deploy a worker, do whatever work your stage does on each recording, and hand the result back so it's **ingested into the Hub**.
+This tutorial walks you through bringing a microservice of your own into the Hub as a [ stage](/docs/hub/workflows/stages/) that the pipeline triggers automatically. You'll wire it end-to-end: register the stage in the Helm chart, deploy a worker, do whatever work your stage does on each recording, and hand the result back so it's **ingested into the Hub**.
 
 To keep every step concrete, we follow one **example: a small object-detection service** that returns bounding boxes. Treat the detection specifics as illustration; the **flow** is what carries over to any stage of your own. The example worker is written in Go, but a stage is **language-agnostic** — the only contract is the queue it reads and the JSON it returns, so the same steps apply in Python, Node.js or anything that can speak your broker.
 
