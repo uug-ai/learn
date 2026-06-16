@@ -7,7 +7,7 @@ toc: true
 
 {{< tutorial-byline author="Kilian Boute" github="kilianboute" created="Jun 16, 2026" updated="Jun 16, 2026" >}}
 
-The Hub ships with built-in analysis, but every deployment eventually needs something the pipeline doesn't do out of the box. A custom **workflow stage** lets you run your own logic on every recording and have the result land right back on it — in any language, deployed and scaled on its own.
+The Hub ships with built-in analysis, but every deployment eventually needs something the pipeline doesn't do out of the box. A custom **workflow stage** lets you run your own logic on every recording — its result feeds the rest of the workflow for later stages to build on, and the **blocks** it emits are persisted back into the Hub — in any language, deployed and scaled on its own.
 
 {{< tutorial-meta time="~25 min" level="Intermediate" stack="Go · Helm · Kubernetes" prerequisites="Self-hosted Hub" >}}
 
@@ -17,7 +17,8 @@ A small **object-detection** service that plugs into the Hub as a custom workflo
 - A custom stage **worker running in your cluster**
 - The stage **registered through `values.yaml`** — no engine code changes
 - The workflows engine **dispatching matching recordings** to your worker automatically
-- Your result **ingested back onto the recording** and visible in the Hub UI
+- Your result **kept on the workflow run** so later stages can build on it
+- Your detection **block persisted to the Hub** and drawn on the recording
 {{< /tutorial-panel >}}
 
 ## What can a stage do?
@@ -36,7 +37,7 @@ If you can express it as *"take a recording, do some work, return a result,"* it
 
 ## How it works
 
-This tutorial walks you through bringing a microservice of your own into the Hub as a [stage](/docs/hub/workflows/stages/) that the pipeline triggers automatically. You'll wire it end-to-end: register the stage in the Helm chart, deploy a worker, do whatever work your stage does on each recording, and hand the result back so it's **ingested into the Hub**.
+This tutorial walks you through bringing a microservice of your own into the Hub as a [stage](/docs/hub/workflows/stages/) that the workflow triggers automatically. You'll wire it end-to-end: register the stage in the Helm chart, deploy a worker, do whatever work your stage does on each recording, and hand the result back — where the workflow carries it to later stages and the **blocks** you emit are **persisted into the Hub**.
 
 The example worker is written in Go, but a stage is **language-agnostic** — the only contract is the queue it reads and the JSON it returns, so the same steps apply in Python, Node.js or anything that can speak your broker.
 
@@ -60,7 +61,7 @@ It pays to skim the two reference pages this tutorial puts into practice — [Wo
 
 ## The end-to-end flow
 
-A recording is classified by the built-in pipeline. On classify, the analysis service hands the classify result to the **workflows engine** (`hub-workflows`), which opens a `WorkflowRun` and dispatches every registered stage onto its own queue. Your worker consumes the run, does its work, and routes the result back. The engine then runs the shared **ingest core**, which persists each result block into a platform-owned collection.
+A recording is classified by the built-in pipeline. On classify, the analysis service hands the classify result to the **workflows engine** (`hub-workflows`), which opens a `WorkflowRun` and dispatches every registered stage onto its own queue. Your worker consumes the run, does its work, and routes the result back. The engine records that result on the run — so later stages can branch on it — and runs the shared **ingest core**, which persists any **blocks** you emit into a platform-owned collection.
 
 ```mermaid
 flowchart LR
