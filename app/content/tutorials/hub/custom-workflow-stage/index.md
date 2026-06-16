@@ -1,0 +1,432 @@
+---
+title: 'Set up your own workflow stage'
+description: 'Bring your own microservice into the Hub as a workflow stage — register it in the Helm chart, receive recordings, do the work, and ingest results back. Object detection serves as the worked example.'
+weight: 1
+toc: true
+---
+
+This tutorial walks you through **setting up your own workflow** — bringing a microservice of your own into the Hub as a [workflow stage](/docs/hub/workflows/integrations/) that the pipeline triggers automatically. You'll wire it end-to-end: register the stage in the Helm chart, deploy a worker, do whatever work your stage does on each recording, and hand the result back so it's **ingested into the Hub**.
+
+The mechanics are the same whatever your stage does — a licence-plate reader, a custom classifier, an LLM summary. To keep every step concrete, we follow one **example: a small object-detection service** that returns bounding boxes. Treat the detection specifics as illustration; the **flow** is what carries over to any stage of your own.
+
+The example worker is written in Go, but a stage is **language-agnostic** — the only contract is the queue it reads and the JSON it returns, so the same steps apply in Python, Node.js or anything that can speak your broker.
+
+By the end you will have:
+
+1. A custom stage worker running in your cluster.
+2. The stage **registered** through `values.yaml` — no engine code changes.
+3. The workflows engine **dispatching** matching recordings to your worker automatically.
+4. Your stage's result **ingested back** into the platform and visible on the recording.
+
+## Prerequisites
+
+This tutorial targets a **self-hosted Hub** that can run custom stages. Before you start, make sure you have:
+
+- A **self-hosted Hub** deployed with the [Helm chart](/docs/hub/installation/), including its RabbitMQ broker and MongoDB.
+- `helm` and `kubectl` access to the cluster running Hub.
+- A **container registry** you can push an image to (e.g. `ghcr.io/acme`).
+- The **workflows engine** available in your chart (`kerberoshub.workflows`). It ships alongside the analysis service and consumes the classify results it tees over.
+- *(Optional, to follow the reference code)* Go 1.25+ (the `models` and `queue` modules require it).
+
+> **On a managed / cloud Hub?** You can't deploy a custom stage there, but you can deliver the *same* result over an authenticated API push instead — the [ingest service](/docs/hub/workflows/ingest-service/) accepts the same data over HTTP (for our object-detection example, that's [Extend → Detections → API](/docs/hub/extend/detections/api/)). The rest of this tutorial is for deployments you control.
+
+It pays to skim the two reference pages this tutorial puts into practice — [Workflows → Integrations](/docs/hub/workflows/integrations/) (how a worker connects) and [Workflows → Ingest service](/docs/hub/workflows/ingest-service/) (what it hands back). This tutorial is the hands-on path through both.
+
+## The end-to-end flow
+
+A recording is classified by the built-in pipeline. On classify, the analysis service hands the classify result to the **workflows engine** (`hub-workflows`), which opens a `WorkflowRun` and dispatches every registered stage onto its own queue. Your worker consumes the run, does its work, and routes the result back. The engine then runs the shared **ingest core**, which persists each result block into a platform-owned collection.
+
+```mermaid
+flowchart LR
+    A[Agent recording] --> B[Analysis · classify]
+    B -->|hands off classify result| C[Workflows engine]
+    C -->|dispatch on your queue| D[Your stage worker]
+    D -->|fetch clip| E[(Vault storage)]
+    D -->|result block envelope to WORKFLOWS_QUEUE| C
+    C -->|IngestBlocks| F[(platform collection)]
+    F --> G[Result shown on the recording]
+```
+
+Two names do all the routing, and it's worth keeping them straight:
+
+- **The stage / operation id** — *who* the engine dispatches to and the key your result is filed under (`results.<id>`). In our example it's `detector`.
+- **The block type** — *what shape* your result is. A stage emits whichever block type fits its output: a `detection` block for boxes/tracks, a `marker` block for a timeline annotation. Our object detector emits a `detection` block.
+
+The platform already knows how to store these block types — a `detection` block becomes boxes/tracks keyed to the recording — so **your worker needs no database of its own**: it hands the data back and the platform persists it. That's the *delegated* sink; see [Ingest service](/docs/hub/workflows/ingest-service/) for the full contract.
+
+## Step 1 — Decide your stage's identity
+
+A stage is defined by four choices. Pick them now; everything else follows (the values here are our object-detection example):
+
+| Choice | Example | Why it matters |
+|---|---|---|
+| **Operation id** | `detector` | Routing key, result key (`results.detector`), and the name you register. |
+| **Queue** | `hub-workflows-detections` | The one string that binds the engine to your worker. Any name your broker accepts. |
+| **Block type** | `detection` | The result shape you emit. `detection` → boxes/tracks in the `detections` collection. |
+| **Sink** | delegated | Hand a block envelope back; the platform persists it. No database in your worker. |
+
+## Step 2 — Scaffold the worker
+
+Create a new Go module for the worker:
+
+```bash
+mkdir detector && cd detector
+go mod init github.com/acme/detector
+go get github.com/uug-ai/models@v1.6.2
+go get github.com/uug-ai/queue@v1.3.6
+go get github.com/sirupsen/logrus@v1.9.4
+```
+
+The worker reads its configuration from the **connection contract** — a fixed set of environment variables the chart injects into every stage worker. You don't invent these names; the chart provides them:
+
+| Variable | Example | What it is |
+|---|---|---|
+| `QUEUE_SYSTEM` | `RABBITMQ` | The broker driver. |
+| `RABBITMQ_HOST` / `RABBITMQ_EXCHANGE` / `RABBITMQ_USERNAME` / `RABBITMQ_PASSWORD` | `rabbitmq.rabbitmq:5672` | Broker connection. |
+| `DETECTOR_QUEUE` | `hub-workflows-detections` | The queue you **consume** runs from (your stage id, upper-cased, `+ _QUEUE`). |
+| `WORKFLOWS_QUEUE` | `kcloud-workflows-queue` | The engine queue you **return** the finished run to. |
+| `KERBEROS_STORAGE_URI` / `KERBEROS_STORAGE_ACCESS_KEY` / `KERBEROS_STORAGE_SECRET` | `https://vault…` | Fallback media-storage endpoint (per-recording overrides also travel on each run). |
+| `LOG_LEVEL` | `info` | Log verbosity. |
+
+Here is `main.go` — connect to the broker, consume raw `WorkflowRun` messages, and hand each one to a handler:
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/sirupsen/logrus"
+
+	"github.com/uug-ai/models/pkg/models"
+	queue "github.com/uug-ai/queue/pkg/queue"
+)
+
+// operation is this stage's id. It must match the operation registered in the
+// Helm chart, and it is the key the engine files your result under.
+const operation = "detector"
+
+func main() {
+	logger := logrus.New()
+	logger.SetFormatter(&logrus.JSONFormatter{})
+
+	// The queue we consume dispatches from, and the engine queue we return to.
+	consumerQueue := envOr("DETECTOR_QUEUE", "hub-workflows-detections")
+	workflowsQueue := envOr("WORKFLOWS_QUEUE", "kcloud-workflows-queue")
+
+	options := queue.NewRabbitOptions().
+		SetHost(os.Getenv("RABBITMQ_HOST")).
+		SetExchange(os.Getenv("RABBITMQ_EXCHANGE")).
+		SetUsername(os.Getenv("RABBITMQ_USERNAME")).
+		SetPassword(os.Getenv("RABBITMQ_PASSWORD")).
+		SetConsumerQueue(consumerQueue).
+		SetRouterQueue("kcloud-event-queue").
+		SetAnalysisQueue(consumerQueue).
+		SetDeadletterQueue("dead-letter-queue").
+		Build()
+
+	q, err := queue.New(options)
+	if err != nil {
+		logger.Fatalf("failed to create queue: %v", err)
+	}
+	if err := q.Client.Connect(); err != nil {
+		logger.Fatalf("failed to connect to broker: %v", err)
+	}
+	logger.Infof("detector started: consuming %q, returning results to %q", consumerQueue, workflowsQueue)
+
+	// The workflow subsystem exchanges models.WorkflowRun (not the pipeline's
+	// PipelineEvent), so decode the run ourselves. A body that isn't a
+	// WorkflowRun is dead-lettered; otherwise the handler routes it back.
+	handler := func(payload []byte, _ ...any) (models.PipelineAction, []byte, int) {
+		var run models.WorkflowRun
+		if err := json.Unmarshal(payload, &run); err != nil {
+			logger.Errorf("not a WorkflowRun, dead-lettering: %v", err)
+			return models.PipelineError, payload, 0
+		}
+		return handleRun(logger, q.Client, workflowsQueue, &run), payload, 0
+	}
+
+	rmq, ok := q.Client.(*queue.RabbitMQ)
+	if !ok {
+		logger.Fatalf("detector requires a *queue.RabbitMQ client, got %T", q.Client)
+	}
+	for {
+		if err := rmq.ReadRawMessages(handler, func(models.PipelineMetrics) {}); err != nil {
+			logger.Errorf("failed to read messages: %v", err)
+		}
+		if err := rmq.Reconnect(); err != nil {
+			logger.Errorf("failed to reconnect: %v", err)
+			time.Sleep(5 * time.Second)
+		}
+	}
+}
+
+func envOr(name, fallback string) string {
+	if v := strings.TrimSpace(os.Getenv(name)); v != "" {
+		return v
+	}
+	return fallback
+}
+```
+
+> **Any language works.** The contract is just JSON: consume a `WorkflowRun` from your queue, return a `WorkflowRun` (with your result in `payload`) to `WORKFLOWS_QUEUE`. The [envelope reference](/docs/hub/workflows/integrations/#envelope) lists every field you receive.
+
+## Step 3 — Do the work
+
+This is the one step that's truly yours: whatever your stage actually does. Your worker is a stateless consumer — pull a run, fetch the media with the credentials on the run, compute, and return. The run tells you **which** recording to fetch (`key`) and **how** (`storage`).
+
+In our example the work is object detection, so the function below stands in for a model: download the clip referenced by `run.Key` using `run.Storage`, run inference, and map each result to a normalised box. Whatever your stage does, this is where it slots in.
+
+Create `detect.go`:
+
+```go
+package main
+
+import (
+	"github.com/uug-ai/models/pkg/api"
+	"github.com/uug-ai/models/pkg/models"
+)
+
+// runDetector is where your model runs. Download the clip referenced by
+// run.Key with the credentials in run.Storage, run inference, and turn each
+// result into a normalised ([0,1]) box. This stub returns one fixed track so
+// you can prove the wiring before plugging in a real model.
+func runDetector(run *models.WorkflowRun) []api.DetectionTrackInput {
+	x1, y1, x2, y2 := 0.30, 0.40, 0.55, 0.85
+	return []api.DetectionTrackInput{{
+		Id:         "person-1",
+		Label:      "person",
+		Confidence: 0.92,
+		Boxes: []api.DetectionBoxInput{{
+			Frame:      0,
+			X1:         &x1,
+			Y1:         &y1,
+			X2:         &x2,
+			Y2:         &y2,
+			Confidence: 0.92,
+			Label:      "person",
+		}},
+	}}
+}
+```
+
+Boxes here are emitted **already normalised** to `[0,1]` (`coordinateSpace: "normalized"`), so no media dimensions are needed to interpret them. You can also send pixel `{x, y, w, h}` boxes and set `coordinateSpace: "pixel"` with the media dimensions — see the [detection run contract](/docs/hub/extend/detections/#the-detection-run).
+
+## Step 4 — Return the result as a block envelope
+
+Now hand the result back. You return the **same `WorkflowRun` you received** — echo its identity so the engine can locate and scope it — with `storage` cleared and your result wrapped in a self-describing **block envelope** on `payload`. Publish it to `WORKFLOWS_QUEUE`; the engine routes each block through the ingest core into the right platform collection and marks the operation resolved. In our example that's a single `detection` block landing in the `detections` collection.
+
+Add the handler to `detect.go`:
+
+```go
+import (
+	"encoding/json"
+
+	"github.com/sirupsen/logrus"
+
+	ingest "github.com/uug-ai/models/pkg/ingest"
+	queue "github.com/uug-ai/queue/pkg/queue"
+)
+
+func handleRun(logger *logrus.Logger, q queue.QueueInterface, workflowsQueue string, run *models.WorkflowRun) models.PipelineAction {
+	logger.WithFields(logrus.Fields{
+		"operation": run.Operation,
+		"runId":     run.RunId,
+		"mediaKey":  run.Key,
+		"deviceKey": run.Device.DeviceKey,
+	}).Info("detector received dispatch")
+
+	// 1. Run the model (Step 3).
+	tracks := runDetector(run)
+
+	// 2. Build the typed detection result. Source.RunId is your idempotency key:
+	//    the run is upserted by (recording key, source.runId), so a redelivery
+	//    refreshes the same document instead of duplicating it.
+	detection := api.PostDetectionsRequest{
+		Task:            models.DetectionTask,
+		CoordinateSpace: "normalized",
+		Source: models.DetectionSource{
+			Kind:  "pipeline",
+			Name:  operation,
+			RunId: run.RunId,
+		},
+		Tracks: tracks,
+	}
+
+	// 3. Wrap it in a block envelope. A detector emits one detection block; a
+	//    richer stage could append markers or other block types in the same list.
+	data, err := json.Marshal(detection)
+	if err != nil {
+		logger.Errorf("failed to marshal detection: %v", err)
+		return models.PipelineCancel
+	}
+	envelope, err := json.Marshal(ingest.BlockEnvelope{
+		Blocks: []ingest.Block{{Type: ingest.KindDetection, Data: data}},
+	})
+	if err != nil {
+		logger.Errorf("failed to marshal envelope: %v", err)
+		return models.PipelineCancel
+	}
+
+	// 4. Return the SAME run: echo identity, clear storage, attach the envelope.
+	result := *run
+	result.Operation = operation
+	result.Storage = nil // credentials are never echoed back
+	result.Payload = envelope
+
+	body, err := json.Marshal(&result)
+	if err != nil {
+		logger.Errorf("failed to marshal result: %v", err)
+		return models.PipelineCancel
+	}
+	if err := q.Publish(workflowsQueue, body); err != nil {
+		logger.Errorf("failed to return result to %q: %v", workflowsQueue, err)
+	}
+
+	// We've already routed the result back ourselves, so there's nothing for the
+	// queue library to forward.
+	return models.PipelineCancel
+}
+```
+
+Build it to be sure everything resolves:
+
+```bash
+go mod tidy
+go build ./...
+```
+
+That's the whole worker: **consume a run → do the work → return a block envelope.** Everything else — storing the result, keying it to the recording, surfacing it in the UI — is the platform's job.
+
+## Step 5 — Containerise the worker
+
+A minimal multi-stage build:
+
+```dockerfile
+# Dockerfile
+FROM golang:1.25-bookworm AS builder
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -tags timetzdata,netgo -ldflags '-s -w' -o /out/detector .
+
+FROM alpine:latest
+RUN apk add --no-cache ca-certificates && adduser -S detector
+USER detector
+COPY --from=builder /out/detector /usr/local/bin/detector
+ENTRYPOINT ["detector"]
+```
+
+Build and push to your registry:
+
+```bash
+docker build -t ghcr.io/acme/detector:v1.0.0 .
+docker push ghcr.io/acme/detector:v1.0.0
+```
+
+## Step 6 — Register the stage in the Helm chart
+
+This is the only platform change, and it's pure configuration. A stage is **two halves that share one name** under `kerberoshub`, and both only take effect when the workflows engine is on. Add them to your Hub `values.yaml` (or an environment overlay):
+
+```yaml
+kerberoshub:
+  workflows:
+    enabled: true                  # master switch: the workflows engine
+
+    # ── the workflow stage object: declare + route ──────────────
+    stages:
+      detector:                    # stage id (and default operation id)
+        enabled: true              # route to this stage
+        dispatch: conditional      # only on matching recordings (see below)
+        needsMode: any
+        needs:
+          - operation: classify    # wait until the classifier has run…
+            condition:             # …and only if it saw a person
+              path: inputs.classify.properties
+              op: contains
+              value: person
+
+  # ── the deployments: your worker ────────────────────────────
+  services:
+    detector:                      # same name as the stage object
+      enabled: true                # deploy the worker pod
+      repository: ghcr.io/acme/detector
+      tag: "v1.0.0"
+      queue: "hub-workflows-detections"  # the queue your worker consumes
+      replicas: 1
+      pullPolicy: IfNotPresent
+      logLevel: info
+```
+
+A few things to get right here:
+
+- **Both `enabled` flags, plus the engine.** Routing with no worker queues messages nobody reads; a worker with no routing never receives any. Turn on `workflows.enabled`, `workflows.stages.detector.enabled` **and** `services.detector.enabled`.
+- **The queue must match.** The engine dispatches to `services.detector.queue`, and your worker consumes that exact value via `DETECTOR_QUEUE`. They are the one binding between the two.
+- **`dispatch: conditional` is optional.** Use `dispatch: always` to run on every recording. Here we gate on the classifier seeing a `person`, so the detector never runs on empty scenes. The engine validates every condition `path` at boot and refuses to start on an unknown one. See [Conditional routing](/docs/hub/workflows/integrations/#conditional-routing) for the full rule grammar.
+- **It's the engine switch, not the UI one.** `kerberoshub.workflows.enabled` toggles the engine. Don't confuse it with the unrelated `…features.workflows` front-end feature flag.
+
+## Step 7 — Deploy
+
+Apply the values and roll it out:
+
+```bash
+helm upgrade hub kerberos/hub -n kerberos-hub -f values.yaml
+```
+
+Confirm both the engine and your worker are running:
+
+```bash
+kubectl -n kerberos-hub get pods | grep -E 'workflows|detector'
+kubectl -n kerberos-hub logs deploy/hub-detector
+# detector started: consuming "hub-workflows-detections", returning results to "kcloud-workflows-queue"
+```
+
+## Step 8 — Verify end-to-end
+
+Trigger a recording that matches your rule (here: one where the classifier sees a **person**) — either wait for a live event from a connected Agent, or re-analyse an existing recording from the Hub UI.
+
+1. **Watch the engine dispatch.** The workflows engine logs the run opening and dispatching the `detector` stage to `hub-workflows-detections`:
+
+   ```bash
+   kubectl -n kerberos-hub logs deploy/hub-workflows -f
+   ```
+
+2. **Watch your worker.** It logs the dispatch it received and the result it returned:
+
+   ```bash
+   kubectl -n kerberos-hub logs deploy/hub-detector -f
+   # detector received dispatch  runId=… mediaKey=front-gate/2026/06/12/08-30-00.mp4
+   ```
+
+3. **See the boxes in the Hub.** Open that recording in the Hub and edit the media — the detection boxes your worker produced are drawn over the frames. Under the hood they were stored as a `DetectionRun` in the `detections` collection, keyed to the recording. You can confirm directly:
+
+   ```js
+   // mongosh
+   db.detections.find({ key: "front-gate/2026/06/12/08-30-00.mp4" }).pretty()
+   ```
+
+That's the full loop: a recording was classified, the engine dispatched it to **your** service, your service did its work (here, detected an object) and handed the result back, and the platform ingested it onto the recording — with no engine code changed.
+
+## Troubleshooting
+
+- **Nothing reaches the worker.** Check all three switches are on (`workflows.enabled`, `workflows.stages.detector.enabled`, `services.detector.enabled`) and that `services.detector.queue` exactly equals the worker's `DETECTOR_QUEUE`. A conditional stage also never fires if its rule never matches — try `dispatch: always` to isolate routing from the condition.
+- **The engine won't start after adding the stage.** A condition `path` is validated at boot; a typo (e.g. `inputs.classify.property`) fails fast. Check the `hub-workflows` pod logs for the rejected path.
+- **Duplicate results on redelivery.** Delivery is at-least-once. Key your result by the run — for a detection block, set `Source.RunId` from `run.RunId` so the upsert refreshes instead of duplicating.
+- **Result returned but the operation never resolves.** Make sure you publish the run back to `WORKFLOWS_QUEUE` after the work is done, with the run's identity (`runId`, `key`, `traceId`, `user`) echoed and `storage` cleared.
+- **Boxes look misplaced (object-detection example).** Confirm your `coordinateSpace` matches the box geometry — normalised `[0,1]` `x1/y1/x2/y2`, or pixel `x/y/w/h` with the media dimensions in `media`.
+
+## Next steps
+
+- Emit **several block types at once.** A single envelope can carry more than one block — e.g. add a `marker` block to annotate the timeline alongside a detection. See [Block types](/docs/hub/workflows/ingest-service/#block-types).
+- **Own your data instead.** If your stage produces genuinely new data and you'd rather write your own collection, use the self-persisting sink — see [Sending a result back → Own collection](/docs/hub/workflows/integrations/#own-collection).
+- **Chain stages.** Have a downstream stage depend on your stage's result (e.g. `results.detector`) so it only runs once your stage produced something — [Conditional routing](/docs/hub/workflows/integrations/#conditional-routing).
+
+## See also
+
+- [Workflows → Integrations](/docs/hub/workflows/integrations/) — the full worker contract: queue, envelope, registration.
+- [Workflows → Ingest service](/docs/hub/workflows/ingest-service/) — what your worker hands back and how the platform routes it.
+- [Extend → Detections](/docs/hub/extend/detections/) — the detection contract, in pipeline and over the API.
