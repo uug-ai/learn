@@ -72,7 +72,7 @@ Create a new Go module for the worker:
 ```bash
 mkdir detector && cd detector
 go mod init github.com/acme/detector
-go get github.com/uug-ai/models@v1.6.2
+go get github.com/uug-ai/models@v1.6.3
 go get github.com/uug-ai/queue@v1.3.6
 go get github.com/sirupsen/logrus@v1.9.4
 ```
