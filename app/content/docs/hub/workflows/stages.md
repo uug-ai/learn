@@ -1,5 +1,5 @@
 ---
-title: "Integrations"
+title: "Stages"
 description: "The developer side of Workflows — bring your own microservice into the Hub as a workflow stage that receives events, does work, and hands results back."
 lead: "The developer side of Workflows: bring your own microservice into the Hub as a workflow stage — consume an event, do the work, and hand the result back, in any language."
 date: 2026-06-04T00:00:00+00:00

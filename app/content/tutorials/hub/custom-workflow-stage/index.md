@@ -5,7 +5,7 @@ weight: 1
 toc: true
 ---
 
-The Hub ships with built-in analysis, but every deployment eventually needs something the pipeline doesn't do out of the box. A custom **workflow stage** lets you run your own logic on every recording and have the result land back on the recording — no forked engine, no separate database. A few things people build as a stage:
+The Hub ships with built-in analysis, but every deployment eventually needs something the pipeline doesn't do out of the box. A custom **workflow stage** lets you run your own logic on every recording and have the result land back on the recording. A few things people build as a stage:
 
 - **Licence-plate recognition** — read plates off vehicles entering a site and file them as markers you can search and alert on.
 - **Domain-specific classification** — flag PPE compliance on a worksite, detect empty shelves in retail, or spot leaks on industrial equipment with a model you trained.
