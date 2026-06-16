@@ -14,11 +14,11 @@ The Hub ships with built-in analysis, but every deployment eventually needs some
 {{< tutorial-panel tone="brand" icon="cube" title="What you'll build" >}}
 A small **object-detection** service that plugs into the Hub as a custom workflow stage and draws bounding boxes back onto every matching recording. The detection specifics are only an illustration — the **flow** carries over to any stage of your own. By the end you'll have:
 
-- A custom stage **worker running in your cluster**
+- A custom stage **running in your cluster**
 - The stage **registered through `values.yaml`** — no engine code changes
-- The workflows engine **dispatching matching recordings** to your worker automatically
+- The workflows engine **dispatching matching recordings** to your stage automatically
 - Your result **kept on the workflow run** so later stages can build on it
-- Your detection **block persisted to the Hub** and drawn on the recording
+- Your detection block **persisted to the Hub** and drawn on the recording
 {{< /tutorial-panel >}}
 
 ## What can a stage do?
@@ -37,27 +37,26 @@ If you can express it as *"take a recording, do some work, return a result,"* it
 
 ## How it works
 
-This tutorial walks you through bringing a microservice of your own into the Hub as a [stage](/docs/hub/workflows/stages/) that the workflow triggers automatically. You'll wire it end-to-end: register the stage in the Helm chart, deploy a worker, do whatever work your stage does on each recording, and hand the result back — where the workflow carries it to later stages and the **blocks** you emit are **persisted into the Hub**.
+This tutorial walks you through bringing a microservice of your own into the Hub as a [stage](/docs/hub/workflows/stages/) that the workflow triggers automatically. You'll wire it end-to-end: deploy a microservice, bind the microservice to a stage in a workflow using the Helm chart, do whatever work your stage does on each recording, and hand the result back — where the workflow carries the results of your stage to later stages and the **blocks** you emit are **persisted into the Hub**.
 
-The example worker is written in Go, but a stage is **language-agnostic** — the only contract is the queue it reads and the JSON it returns, so the same steps apply in Python, Node.js or anything that can speak your broker.
+The example microservice is written in Go, but a stage is **language-agnostic** — the only contract is the queue it reads and the JSON it returns, so the same steps apply in Python, Node.js or anything that can speak your broker.
 
 ## Before you start
 
 {{< tutorial-panel tone="neutral" icon="clipboard-check" title="Prerequisites" >}}
 This tutorial targets a **self-hosted Hub** that can run custom stages. Make sure you have:
 
-- A **self-hosted Hub** deployed with the [Helm chart](/docs/hub/installation/), including its RabbitMQ broker and MongoDB
+- A **self-hosted Hub** deployed with the [Helm chart](/docs/hub/installation/), including a RabbitMQ broker and MongoDB database
 - `helm` and `kubectl` access to the cluster running Hub
 - A **container registry** you can push an image to (e.g. `ghcr.io/acme`)
-- The **workflows engine** in your chart (`kerberoshub.workflows`) — it ships alongside the analysis service and consumes the classify results it tees over
-- *(Optional, to follow the reference code)* Go 1.25+ (the `models` and `queue` modules require it)
+- The **workflows engine** in your chart (`kerberoshub.workflows`)
 {{< /tutorial-panel >}}
 
 {{< callout type="info" >}}
 **On a managed / cloud Hub?** You can't deploy a custom stage there, but you can deliver the *same* result over an authenticated API push instead — the [ingest service](/docs/hub/workflows/ingest-service/) accepts the same data over HTTP (for our object-detection example, that's [Extend → Detections → API](/docs/hub/extend/detections/api/)). The rest of this tutorial is for deployments you control.
 {{< /callout >}}
 
-It pays to skim the two reference pages this tutorial puts into practice — [Workflows → Integrations](/docs/hub/workflows/integrations/) (how a worker connects) and [Workflows → Ingest service](/docs/hub/workflows/ingest-service/) (what it hands back). This tutorial is the hands-on path through both.
+It pays to skim the two reference pages this tutorial puts into practice — [Workflows → Stages](/docs/hub/workflows/stages/) (how a microservice connects) and [Workflows → Ingest service](/docs/hub/workflows/ingest-service/) (what it hands back). This tutorial is the hands-on path through both.
 
 ## The end-to-end flow
 
