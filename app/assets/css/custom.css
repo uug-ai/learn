@@ -654,7 +654,7 @@ body.lightbox-open {
 .tutorial-panel {
   position: relative;
   margin: 2rem 0;
-  padding: 1.4rem 1.6rem 1.4rem 1.85rem;
+  padding: 1.4rem 1.6rem;
   border: 1px solid var(--border);
   border-radius: 18px;
   background: var(--surface);
@@ -664,16 +664,6 @@ body.lightbox-open {
 .dark .tutorial-panel {
   border-color: rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.03);
-}
-
-.tutorial-panel::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: var(--primary-color);
 }
 
 .tutorial-panel--brand {
@@ -688,15 +678,6 @@ body.lightbox-open {
   background:
     radial-gradient(120% 140% at 0% 0%, rgba(86, 66, 255, 0.22), transparent 60%),
     linear-gradient(180deg, rgba(39, 19, 255, 0.12), rgba(255, 0, 89, 0.05));
-}
-
-.tutorial-panel--neutral::before {
-  background: var(--text-secondary);
-  opacity: 0.45;
-}
-
-.tutorial-panel--success::before {
-  background: #16a34a;
 }
 
 .tutorial-panel__head {
@@ -1030,6 +1011,7 @@ main:has(.tutorial-byline) h1 {
   line-height: 1.08;
   letter-spacing: -0.025em;
   font-weight: 700;
+  text-align: left;
 }
 
 /* Byline sits right under the title. */
