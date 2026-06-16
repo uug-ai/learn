@@ -91,9 +91,9 @@ A **[workflow](/docs/hub/workflows/)** is a **branch off that flow**. At the ana
     { "from": "throttle", "to": "notify",   "fromSide": "right",  "toSide": "left", "kind": "solid" },
     { "from": "analysis", "to": "engine",   "fromSide": "bottom", "toSide": "top",  "kind": "solid",  "label": "" },
     { "from": "engine",   "to": "stage",    "fromSide": "right",  "toSide": "left", "kind": "solid",  "label": "dispatch" },
-    { "from": "engine",   "to": "stage2",   "fromSide": "top",    "toSide": "top",  "kind": "solid",  "label": "" },
-    { "from": "stage",    "to": "engine",   "fromSide": "bottom", "toSide": "bottom", "kind": "dashed", "label": "result back" },
-    { "from": "stage2",   "to": "engine",   "fromSide": "bottom", "toSide": "bottom", "kind": "dashed", "label": "" }
+    { "from": "engine",   "to": "stage2",   "fromSide": "top",    "toSide": "top",  "kind": "solid",  "label": "dispatch" },
+    { "from": "stage",    "to": "engine",   "fromSide": "bottom", "toSide": "bottom", "kind": "dashed", "label": "result back", "offset": 20, "animated": true },
+    { "from": "stage2",   "to": "engine",   "fromSide": "bottom", "toSide": "bottom", "kind": "dashed", "label": "result back", "offset": 60 }
   ]
 }
 {{< /rete >}}
@@ -113,7 +113,7 @@ A **custom stage** — what you're about to build — is the developer side of t
 
 ## The end-to-end flow
 
-A recording is classified by the built-in pipeline. On classify, the analysis service hands the classify result to the **workflows engine** (`hub-workflows`), which opens a `WorkflowRun` and dispatches every registered stage onto its own queue. Your worker consumes the run, does its work, and routes the result back. The engine records that result on the run — so later stages can branch on it — and runs the shared **ingest core**, which persists any **blocks** you emit into a platform-owned collection.
+A recording is classified by the built-in pipeline. On classification, the analysis service hands the classification result to the **workflows engine** (`hub-workflows`), which opens a `WorkflowRun` and dispatches every registered stage onto its own queue. Your microservice consumes the run, does its work, and routes the result back through the concept of **Blocks**. The engine records that result on the run — so later stages can branch on it — and runs the shared **ingest core**, which persists any **blocks** you emit into a platform-owned collection.
 
 ```mermaid
 flowchart LR

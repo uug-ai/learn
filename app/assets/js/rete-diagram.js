@@ -102,27 +102,90 @@ function createGroupEl(g) {
     return el;
 }
 
-function bezierPath(x1, y1, x2, y2, fromSide, toSide) {
-    // Vertical sides (top/bottom) get vertical control offsets so the curve
-    // flows straight along the y axis instead of sideways-S'ing.
-    const fromVertical = fromSide === 'top' || fromSide === 'bottom';
-    const toVertical   = toSide   === 'top' || toSide   === 'bottom';
-    let c1x, c1y, c2x, c2y;
-    if (fromVertical) {
-        const dy = Math.max(40, Math.abs(y2 - y1) * 0.4) * (fromSide === 'top' ? -1 : 1);
-        c1x = x1; c1y = y1 + dy;
+// Orthogonal connector. The line leaves `fromSide` and enters `toSide`
+// perpendicular to the node face, then joins the two stubs with axis-aligned
+// segments so every corner is a clean 90°. `offset` shifts the shared
+// riser/channel so parallel edges between the same faces don't overlap.
+// Returns the polyline points (corners included).
+function orthogonalPoints(x1, y1, x2, y2, fromSide, toSide, offset = 0) {
+    const STUB = 20; // perpendicular lead-in / lead-out from each node face
+    const DIR = {
+        left: [-1, 0], right: [1, 0],
+        top: [0, -1],  bottom: [0, 1],
+    };
+    const [fdx, fdy] = DIR[fromSide] || DIR.right;
+    const [tdx, tdy] = DIR[toSide]   || DIR.left;
+    const p1 = { x: x1 + fdx * STUB, y: y1 + fdy * STUB };
+    const p2 = { x: x2 + tdx * STUB, y: y2 + tdy * STUB };
+    const fromH = fdy === 0; // horizontal stub (left/right face)
+    const toH   = tdy === 0;
+
+    const pts = [{ x: x1, y: y1 }, p1];
+    if (fromH && toH) {
+        // Two horizontal stubs joined by a vertical riser at the mid-x.
+        const mx = (p1.x + p2.x) / 2 + offset;
+        pts.push({ x: mx, y: p1.y }, { x: mx, y: p2.y });
+    } else if (!fromH && !toH) {
+        // Two vertical stubs joined by a horizontal channel at the mid-y.
+        const my = (p1.y + p2.y) / 2 + offset;
+        pts.push({ x: p1.x, y: my }, { x: p2.x, y: my });
+    } else if (fromH) {
+        // Horizontal then vertical: a single right-angle elbow.
+        pts.push({ x: p2.x, y: p1.y });
     } else {
-        const dx = Math.max(40, Math.abs(x2 - x1) * 0.4) * (fromSide === 'left' ? -1 : 1);
-        c1x = x1 + dx; c1y = y1;
+        // Vertical then horizontal: a single right-angle elbow.
+        pts.push({ x: p1.x, y: p2.y });
     }
-    if (toVertical) {
-        const dy = Math.max(40, Math.abs(y2 - y1) * 0.4) * (toSide === 'top' ? -1 : 1);
-        c2x = x2; c2y = y2 + dy;
-    } else {
-        const dx = Math.max(40, Math.abs(x2 - x1) * 0.4) * (toSide === 'left' ? -1 : 1);
-        c2x = x2 + dx; c2y = y2;
+    pts.push(p2, { x: x2, y: y2 });
+
+    // Drop zero-length steps so coincident points don't leave stray nubs.
+    return pts.filter((p, i) =>
+        i === 0 || p.x !== pts[i - 1].x || p.y !== pts[i - 1].y);
+}
+
+// Build an SVG path from an orthogonal polyline. Each corner is softened by a
+// short quadratic arc (`radius`), capped so it can never overshoot a short
+// segment; pass radius 0 for perfectly square corners.
+function orthogonalPath(pts, radius = 8) {
+    if (pts.length < 2) return '';
+    if (radius <= 0 || pts.length === 2) {
+        return 'M ' + pts.map(p => `${p.x} ${p.y}`).join(' L ');
     }
-    return `M ${x1} ${y1} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x2} ${y2}`;
+    let d = `M ${pts[0].x} ${pts[0].y}`;
+    for (let i = 1; i < pts.length - 1; i++) {
+        const prev = pts[i - 1], cur = pts[i], next = pts[i + 1];
+        const inLen  = Math.hypot(cur.x - prev.x, cur.y - prev.y);
+        const outLen = Math.hypot(next.x - cur.x, next.y - cur.y);
+        const r = Math.min(radius, inLen / 2, outLen / 2);
+        const inx  = cur.x - Math.sign(cur.x - prev.x) * r;
+        const iny  = cur.y - Math.sign(cur.y - prev.y) * r;
+        const outx = cur.x + Math.sign(next.x - cur.x) * r;
+        const outy = cur.y + Math.sign(next.y - cur.y) * r;
+        d += ` L ${inx} ${iny} Q ${cur.x} ${cur.y} ${outx} ${outy}`;
+    }
+    const last = pts[pts.length - 1];
+    return d + ` L ${last.x} ${last.y}`;
+}
+
+// Point halfway along the polyline (by length) — used to place an edge label.
+function polylineMidpoint(pts) {
+    let total = 0;
+    for (let i = 1; i < pts.length; i++) {
+        total += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+    }
+    let half = total / 2;
+    for (let i = 1; i < pts.length; i++) {
+        const seg = Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+        if (half <= seg) {
+            const t = seg === 0 ? 0 : half / seg;
+            return {
+                x: pts[i - 1].x + (pts[i].x - pts[i - 1].x) * t,
+                y: pts[i - 1].y + (pts[i].y - pts[i - 1].y) * t,
+            };
+        }
+        half -= seg;
+    }
+    return pts[pts.length - 1];
 }
 
 function anchorPoint(node, side) {
@@ -257,33 +320,29 @@ function init(container) {
             const toSide   = c.toSide   || 'left';
             const a = anchorPoint(from, fromSide);
             const b = anchorPoint(to,   toSide);
+            const pts = orthogonalPoints(a.x, a.y, b.x, b.y, fromSide, toSide, c.offset || 0);
             const path = document.createElementNS(SVG_NS, 'path');
-            path.setAttribute('d', bezierPath(a.x, a.y, b.x, b.y, fromSide, toSide));
+            path.setAttribute('d', orthogonalPath(pts));
             const classes = ['rete-connection', `rete-connection--${c.kind || 'default'}`];
             if (c.label) classes.push('rete-connection--labelled');
+            if (c.animated) classes.push('rete-connection--animated');
             path.setAttribute('class', classes.join(' '));
             svg.appendChild(path);
 
             if (c.label) {
-                labelJobs.push({ a, b, label: c.label });
+                labelJobs.push({ mid: polylineMidpoint(pts), label: c.label });
             }
         });
 
-        labelJobs.forEach(({ a, b, label }) => {
-            // Midpoint = straight average of endpoints (good enough for label placement).
-            const mx = (a.x + b.x) / 2;
-            const my = (a.y + b.y) / 2;
-            let angle = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
-            // Keep text upright: never read upside-down.
-            if (angle > 90)  angle -= 180;
-            if (angle < -90) angle += 180;
+        labelJobs.forEach(({ mid, label }) => {
+            // Orthogonal edges read best with an upright label sat on the
+            // mid-point of the route (white halo keeps it legible over the line).
             const text = document.createElementNS(SVG_NS, 'text');
-            text.setAttribute('x', mx);
-            text.setAttribute('y', my);
+            text.setAttribute('x', mid.x);
+            text.setAttribute('y', mid.y);
             text.setAttribute('class', 'rete-connection__label');
             text.setAttribute('text-anchor', 'middle');
             text.setAttribute('dominant-baseline', 'middle');
-            text.setAttribute('transform', `rotate(${angle} ${mx} ${my})`);
             text.textContent = label;
             svg.appendChild(text);
         });
