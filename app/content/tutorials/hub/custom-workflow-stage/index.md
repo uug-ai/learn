@@ -1,6 +1,6 @@
 ---
 title: 'Set up your own workflow stage'
-description: 'Bring your own microservice into the Hub as a workflow stage — register it in the Helm chart, receive recordings, do the work, and ingest results back. Object detection serves as the worked example.'
+description: 'Bring your own microservice into the Hub as a workflow stage — register it in the Helm chart, receive recordings, do the work, and ingest results back. A loitering / dwell-time stage serves as the worked example.'
 weight: 1
 toc: true
 ---
@@ -12,13 +12,15 @@ The Hub ships with a built-in pipeline, but every deployment eventually needs so
 {{< tutorial-meta time="~25 min" level="Intermediate" stack="Go · Helm · Kubernetes" prerequisites="Self-hosted Hub" >}}
 
 {{< tutorial-panel tone="brand" icon="cube" title="What you'll build" >}}
-A small **object-detection** service that plugs into the Hub as a custom workflow stage and draws bounding boxes back onto every matching recording. The detection specifics are only an illustration — the **flow** carries over to any stage of your own. By the end you'll have:
+A small **loitering** service that plugs into the Hub as a custom workflow stage and adds a **dwell-time marker** to the timeline of every matching recording. The loitering specifics are only an illustration — the **flow** carries over to any stage of your own. By the end you'll have:
 
 - A custom stage **running in your cluster**
 - The stage **registered through `values.yaml`** — no engine code changes
 - The workflows engine **dispatching matching recordings** to your stage automatically
 - Your result **kept on the workflow run** so later stages can build on it
-- Your detection block **persisted to the Hub** and drawn on the recording
+- Your marker block **persisted to the Hub** and shown on the recording's timeline
+
+This is the same microservice published at [`github.com/uug-ai/hub-loitering`](https://github.com/uug-ai/hub-loitering) — clone it to follow along, or build it up yourself below.
 {{< /tutorial-panel >}}
 
 ## What can a stage do?
@@ -53,7 +55,7 @@ This tutorial targets a **self-hosted Hub** that can run custom stages. Make sur
 {{< /tutorial-panel >}}
 
 {{< callout type="info" >}}
-**On a managed / cloud Hub?** You can't deploy a custom stage there, but you can deliver the *same* result over HTTP instead — the [ingest API](/docs/hub/workflows/ingest/#over-the-api-post-ingest) accepts the same `detection` block (the run shape is the [detection contract](/docs/hub/workflows/ingest/blocks/detection/)). The rest of this tutorial is for deployments you control.
+**On a managed / cloud Hub?** You can't deploy a custom stage there, but you can deliver the *same* result over HTTP instead — the [ingest API](/docs/hub/workflows/ingest/#over-the-api-post-ingest) accepts the same `marker` block (the run shape is the [marker contract](/docs/hub/workflows/ingest/blocks/marker/)). The rest of this tutorial is for deployments you control.
 {{< /callout >}}
 
 This tutorial puts two reference pages into practice, and it helps to have skimmed them first — [Workflows → Stages](/docs/hub/workflows/stages/) (how a microservice connects) and [Workflows → Ingest](/docs/hub/workflows/ingest/) (what it hands back). This tutorial is the hands-on path through both.
@@ -81,9 +83,9 @@ A **[workflow](/docs/hub/workflows/)** is a **branch off that flow**. At the ana
       "header": "PIPELINE", "title": "Notify", "subtitle": "kcloud-notification-queue", "groupId": "hub" },
     { "id": "engine",   "kind": "hub",                   "x":  40, "y": 390, "w": 220, "h": 100,
       "header": "ENGINE", "title": "Workflows", "subtitle": "hub-workflows", "groupId": "yours" },
-    { "id": "stage",    "kind": "detection",             "x": 420, "y": 390, "w": 210, "h": 100,
+    { "id": "stage",    "x": 420, "y": 390, "w": 210, "h": 100,
       "header": "STAGE", "title": "Your stage #1", "subtitle": "hub-workflows-stage1", "groupId": "yours" },
-    { "id": "stage2",   "kind": "detection",             "x": 700, "y": 390, "w": 210, "h": 100,
+    { "id": "stage2",   "x": 700, "y": 390, "w": 210, "h": 100,
       "header": "STAGE", "title": "Your stage #2", "subtitle": "hub-workflows-stage2", "groupId": "yours" }
   ],
   "connections": [
@@ -128,17 +130,17 @@ flowchart LR
 
 Two names do all the routing, and it's worth keeping them straight:
 
-- **The stage / operation id** — *who* the engine dispatches to and the key your result is filed under (`results.<id>`). In our example it's `detector`.
-- **The block type** — *what shape* your result is. A stage emits whichever block type fits its output: a `detection` block for boxes/tracks, a `marker` block for a timeline annotation. Our object detector emits a `detection` block.
+- **The stage / operation id** — *who* the engine dispatches to and the key your result is filed under (`results.<id>`). In our example it's `loitering`.
+- **The block type** — *what shape* your result is. A stage emits whichever block type fits its output: a `detection` block for boxes/tracks, a `marker` block for a timeline annotation. Our loitering stage emits a `marker` block.
 
-The platform already knows how to store these block types — a `detection` block becomes boxes/tracks keyed to the recording — so **your microservice needs no database of its own**: it hands the data back and the platform persists it. That's the *delegated* sink; see [Ingest](/docs/hub/workflows/ingest/) for the full contract.
+The platform already knows how to store these block types — a `marker` block becomes a timeline annotation keyed to the recording — so **your microservice needs no database of its own**: it hands the data back and the platform persists it. That's the *delegated* sink; see [Ingest](/docs/hub/workflows/ingest/) for the full contract.
 
 A **block** is one self-describing piece of that result: a `type` naming its shape (`detection`, `marker`, …) and a `data` body in that shape. Your microservice returns them as a **block envelope** — a small JSON object with a `blocks` array — set on the run's `payload`:
 
 ```json
 {
   "blocks": [
-    { "type": "detection", "data": { "...": "your result, in that block's shape" } }
+    { "type": "marker", "data": { "...": "your result, in that block's shape" } }
   ]
 }
 ```
@@ -147,19 +149,19 @@ A single envelope can carry several blocks (a detection plus a marker, say), and
 
 ## Build the stage
 
-Eight steps, from an empty folder to detection boxes drawn on a recording. Steps 1–5 build the microservice; 6–8 register, deploy and verify it.
+Eight steps, from an empty folder to a dwell-time marker on a recording. Steps 1–5 build the microservice; 6–8 register, deploy and verify it.
 
 {{% steps %}}
 
 ### Decide your stage's identity
 
-A stage is defined by four choices. Pick them now; everything else follows (the values here are our object-detection example):
+A stage is defined by four choices. Pick them now; everything else follows (the values here are our loitering example):
 
 | Choice | Example | Why it matters |
 |---|---|---|
-| **Operation id** | `detector` | Routing key, result key (`results.detector`), and the name you register. |
-| **Queue** | `hub-workflows-detections` | The one string that binds the engine to your microservice. Any name your broker accepts. |
-| **Block type** | `detection` | The result shape you emit. `detection` → boxes/tracks in the `detections` collection. |
+| **Operation id** | `loitering` | Routing key, result key (`results.loitering`), and the name you register. |
+| **Queue** | `workflows-loitering` | The one string that binds the engine to your microservice. Any name your broker accepts. |
+| **Block type** | `marker` | The result shape you emit. `marker` → a timeline span in the `markers` collection. |
 | **Sink** | delegated | Hand a block envelope back; the platform persists it. No database in your microservice. |
 
 ### Scaffold the microservice
@@ -167,12 +169,16 @@ A stage is defined by four choices. Pick them now; everything else follows (the 
 Create a new Go module for the microservice:
 
 ```bash
-mkdir detector && cd detector
-go mod init github.com/acme/detector
+mkdir hub-loitering && cd hub-loitering
+go mod init github.com/uug-ai/hub-loitering
 go get github.com/uug-ai/models@v1.6.3
 go get github.com/uug-ai/queue@v1.3.6
 go get github.com/sirupsen/logrus@v1.9.4
 ```
+
+{{< callout type="info" >}}
+**Prefer the finished microservice?** Everything Steps 2–5 build is published as a clone-and-build module — `git clone https://github.com/uug-ai/hub-loitering && cd hub-loitering && go build ./...` — so you can clone it and jump straight to registering the stage.
+{{< /callout >}}
 
 The microservice reads its configuration from the **connection contract** — a fixed set of environment variables the chart injects into every microservice. You don't invent these names; the chart provides them:
 
@@ -180,7 +186,7 @@ The microservice reads its configuration from the **connection contract** — a 
 |---|---|---|
 | `QUEUE_SYSTEM` | `RABBITMQ` | The broker driver. |
 | `RABBITMQ_HOST` / `RABBITMQ_EXCHANGE` / `RABBITMQ_USERNAME` / `RABBITMQ_PASSWORD` | `rabbitmq.rabbitmq:5672` | Broker connection. |
-| `DETECTOR_QUEUE` | `hub-workflows-detections` | The queue you **consume** runs from (your stage id, upper-cased, `+ _QUEUE`). |
+| `LOITERING_QUEUE` | `workflows-loitering` | The queue you **consume** runs from (your stage id, upper-cased, `+ _QUEUE`). |
 | `WORKFLOWS_QUEUE` | `kcloud-workflows-queue` | The engine queue you **return** the finished run to. |
 | `KERBEROS_STORAGE_URI` / `KERBEROS_STORAGE_ACCESS_KEY` / `KERBEROS_STORAGE_SECRET` | `https://vault…` | Fallback media-storage endpoint (per-recording overrides also travel on each run). |
 | `LOG_LEVEL` | `info` | Log verbosity. |
@@ -204,14 +210,14 @@ import (
 
 // operation is this stage's id. It must match the operation registered in the
 // Helm chart, and it is the key the engine files your result under.
-const operation = "detector"
+const operation = "loitering"
 
 func main() {
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{})
 
 	// The queue we consume dispatches from, and the engine queue we return to.
-	consumerQueue := envOr("DETECTOR_QUEUE", "hub-workflows-detections")
+	consumerQueue := envOr("LOITERING_QUEUE", "workflows-loitering")
 	workflowsQueue := envOr("WORKFLOWS_QUEUE", "kcloud-workflows-queue")
 
 	options := queue.NewRabbitOptions().
@@ -232,7 +238,7 @@ func main() {
 	if err := q.Client.Connect(); err != nil {
 		logger.Fatalf("failed to connect to broker: %v", err)
 	}
-	logger.Infof("detector started: consuming %q, returning results to %q", consumerQueue, workflowsQueue)
+	logger.Infof("loitering started: consuming %q, returning results to %q", consumerQueue, workflowsQueue)
 
 	// The workflow subsystem exchanges models.WorkflowRun (not the pipeline's
 	// PipelineEvent), so decode the run ourselves. A body that isn't a
@@ -248,7 +254,7 @@ func main() {
 
 	rmq, ok := q.Client.(*queue.RabbitMQ)
 	if !ok {
-		logger.Fatalf("detector requires a *queue.RabbitMQ client, got %T", q.Client)
+		logger.Fatalf("loitering requires a *queue.RabbitMQ client, got %T", q.Client)
 	}
 	for {
 		if err := rmq.ReadRawMessages(handler, func(models.PipelineMetrics) {}); err != nil {
@@ -275,63 +281,62 @@ func envOr(name, fallback string) string {
 
 ### Do the work
 
-This is the one step that's truly yours: whatever your stage actually does. Your microservice is a stateless consumer — pull a run, fetch the media with the credentials on the run, compute, and return. The run tells you **which** recording to fetch (`key`) and **how** (`storage`).
+This is the one step that's truly yours: whatever your stage actually does. Your microservice is a stateless consumer — pull a run, read (or fetch) what it needs, compute, and return. The run tells you **which** recording it is (`key`), **how** to fetch the media if you need it (`storage`), and carries the upstream `classify` result you can build on.
 
-In our example the work is object detection, so the function below stands in for a model: download the clip referenced by `run.Key` using `run.Storage`, run inference, and map each result to a normalised box. Whatever your stage does, this is where it slots in.
+In our example the work is loitering — *how long the longest-lingering subject stays in frame.* The classifier has already tracked every subject, so this stage needs no model and no media download: it measures the dwell span straight from the `classify` trajectory on the run and turns it into a **marker**. Whatever your stage does, this is where it slots in.
 
-Create `detect.go`:
+Create `loiter.go`:
 
 ```go
 package main
 
 import (
-	"github.com/uug-ai/models/pkg/api"
 	"github.com/uug-ai/models/pkg/models"
 )
 
-// runDetector is where your model runs. Download the clip referenced by
-// run.Key with the credentials in run.Storage, run inference, and turn each
-// result into a normalised ([0,1]) box. This stub returns one fixed track so
-// you can prove the wiring before plugging in a real model.
-func runDetector(run *models.WorkflowRun) []api.DetectionTrackInput {
-	x1, y1, x2, y2 := 0.30, 0.40, 0.55, 0.85
-	return []api.DetectionTrackInput{{
-		Id:         "person-1",
-		Label:      "person",
-		Confidence: 0.92,
-		Boxes: []api.DetectionBoxInput{{
-			Frame:      0,
-			X1:         &x1,
-			Y1:         &y1,
-			X2:         &x2,
-			Y2:         &y2,
-			Confidence: 0.92,
-			Label:      "person",
+// measureLoitering is where your stage's logic runs. Here it reads the dwell
+// span the classifier already tracked and turns the longest one into a marker.
+// A heavier stage would instead fetch the clip referenced by run.Key with the
+// credentials in run.Storage and run its own model. This stub returns one fixed
+// 30-second marker so you can prove the wiring before plugging in real analysis.
+func measureLoitering(run *models.WorkflowRun) models.Marker {
+	const start, duration = 1_700_000_000, 30 // recording epoch + dwell seconds
+	return models.Marker{
+		Name:           "loitering-person-1",
+		Description:    "Subject lingered in frame",
+		StartTimestamp: start,
+		EndTimestamp:   start + duration,
+		Categories:     []models.MarkerCategory{{Name: "alert"}, {Name: "person"}},
+		Tags:           []models.MarkerTag{{Name: operation}},
+		Events: []models.MarkerEvent{{
+			Name:           "Loitering",
+			StartTimestamp: start,
+			EndTimestamp:   start + duration,
 		}},
-	}}
+	}
 }
 ```
 
-Boxes here are emitted **already normalised** to `[0,1]` (`coordinateSpace: "normalized"`), so no media dimensions are needed to interpret them. You can also send pixel `{x, y, w, h}` boxes and set `coordinateSpace: "pixel"` with the media dimensions — see the [detection run contract](/docs/hub/workflows/ingest/blocks/detection/#the-detection-run).
+A marker is a **named span on the recording's timeline** — a `Name` plus start/end timestamps — optionally carrying categories, tags and events. You leave `Duration` unset; the platform fills it from the timestamps. It keys the marker by `(device, name, startTimestamp)`, so a redelivery refreshes the same marker instead of duplicating it — see the [marker run contract](/docs/hub/workflows/ingest/blocks/marker/) for every field.
 
 ### Return the result as a block envelope
 
-Now hand the result back. You return the **same `WorkflowRun` you received** — echo its identity so the engine can locate and scope it — with `storage` cleared and your result wrapped in a self-describing **block envelope** on `payload`. Publish it to `WORKFLOWS_QUEUE`; the engine routes each block through the ingest core into the right platform collection and marks the operation resolved. In our example that's a single `detection` block landing in the `detections` collection.
+Now hand the result back. You return the **same `WorkflowRun` you received** — echo its identity so the engine can locate and scope it — with `storage` cleared and your result wrapped in a self-describing **block envelope** on `payload`. Publish it to `WORKFLOWS_QUEUE`; the engine routes each block through the ingest core into the right platform collection and marks the **stage** resolved. In our example that's a single `marker` block landing in the `markers` collection.
 
-Concretely, the `payload` you publish is that envelope with one `detection` block whose `data` is the detection result from Step 4:
+Concretely, the `payload` you publish is that envelope with one `marker` block whose `data` is the marker from Step 3:
 
 ```json
 {
   "blocks": [
     {
-      "type": "detection",
-      "data": { "task": "box", "coordinateSpace": "normalized", "tracks": ["…"] }
+      "type": "marker",
+      "data": { "name": "loitering-person-1", "startTimestamp": 1700000000, "endTimestamp": 1700000030 }
     }
   ]
 }
 ```
 
-In Go you don't hand-write that JSON — the `ingest` package builds and tags the envelope for you. Add the handler to `detect.go`:
+In Go you don't hand-write that JSON — the `ingest` package builds and tags the envelope for you. Add the handler to `loiter.go`:
 
 ```go
 import (
@@ -349,41 +354,29 @@ func handleRun(logger *logrus.Logger, q queue.QueueInterface, workflowsQueue str
 		"runId":     run.RunId,
 		"mediaKey":  run.Key,
 		"deviceKey": run.Device.DeviceKey,
-	}).Info("detector received dispatch")
+	}).Info("loitering received dispatch")
 
-	// 1. Run the model (Step 3).
-	tracks := runDetector(run)
+	// 1. Measure the dwell (Step 3).
+	marker := measureLoitering(run)
 
-	// 2. Build the typed detection result. Source.RunId is your idempotency key:
-	//    the run is upserted by (recording key, source.runId), so a redelivery
-	//    refreshes the same document instead of duplicating it.
-	detection := api.PostDetectionsRequest{
-		Task:            models.DetectionTask,
-		CoordinateSpace: "normalized",
-		Source: models.DetectionSource{
-			Kind:  "pipeline",
-			Name:  operation,
-			RunId: run.RunId,
-		},
-		Tracks: tracks,
-	}
-
-	// 3. Wrap it in a block envelope. A detector emits one detection block; a
-	//    richer stage could append markers or other block types in the same list.
-	data, err := json.Marshal(detection)
+	// 2. Wrap the marker in a block envelope. A loitering stage emits one marker
+	//    block; a richer stage could append detections or other block types in
+	//    the same list. The platform keys the marker by (device, name,
+	//    startTimestamp), so a redelivery refreshes it instead of duplicating.
+	data, err := json.Marshal(marker)
 	if err != nil {
-		logger.Errorf("failed to marshal detection: %v", err)
+		logger.Errorf("failed to marshal marker: %v", err)
 		return models.PipelineCancel
 	}
 	envelope, err := json.Marshal(ingest.BlockEnvelope{
-		Blocks: []ingest.Block{{Type: ingest.KindDetection, Data: data}},
+		Blocks: []ingest.Block{{Type: ingest.KindMarker, Data: data}},
 	})
 	if err != nil {
 		logger.Errorf("failed to marshal envelope: %v", err)
 		return models.PipelineCancel
 	}
 
-	// 4. Return the SAME run: echo identity, clear storage, attach the envelope.
+	// 3. Return the SAME run: echo identity, clear storage, attach the envelope.
 	result := *run
 	result.Operation = operation
 	result.Storage = nil // credentials are never echoed back
@@ -424,20 +417,20 @@ WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 go build -tags timetzdata,netgo -ldflags '-s -w' -o /out/detector .
+RUN CGO_ENABLED=0 go build -tags timetzdata,netgo -ldflags '-s -w' -o /out/loitering .
 
 FROM alpine:latest
-RUN apk add --no-cache ca-certificates && adduser -S detector
-USER detector
-COPY --from=builder /out/detector /usr/local/bin/detector
-ENTRYPOINT ["detector"]
+RUN apk add --no-cache ca-certificates && adduser -S loitering
+USER loitering
+COPY --from=builder /out/loitering /usr/local/bin/loitering
+ENTRYPOINT ["loitering"]
 ```
 
 Build and push to your registry:
 
 ```bash
-docker build -t ghcr.io/acme/detector:v1.0.0 .
-docker push ghcr.io/acme/detector:v1.0.0
+docker build -t ghcr.io/uug-ai/hub-loitering:v1.0.0 .
+docker push ghcr.io/uug-ai/hub-loitering:v1.0.0
 ```
 
 ### Register the stage in the Helm chart
@@ -451,7 +444,7 @@ kerberoshub:
 
     # ── the workflow stage object: declare + route ──────────────
     stages:
-      detector:                    # stage id (and default operation id)
+      loitering:                   # stage id (and default operation id)
         enabled: true              # route to this stage
         dispatch: conditional      # only on matching recordings (see below)
         needsMode: any
@@ -464,11 +457,11 @@ kerberoshub:
 
   # ── the deployments: your microservice ────────────────────────────
   services:
-    detector:                      # same name as the stage object
+    loitering:                     # same name as the stage object
       enabled: true                # deploy the microservice pod
-      repository: ghcr.io/acme/detector
+      repository: ghcr.io/uug-ai/hub-loitering
       tag: "v1.0.0"
-      queue: "hub-workflows-detections"  # the queue your microservice consumes
+      queue: "workflows-loitering" # the queue your microservice consumes
       replicas: 1
       pullPolicy: IfNotPresent
       logLevel: info
@@ -476,9 +469,9 @@ kerberoshub:
 
 A few things to get right here:
 
-- **Both `enabled` flags, plus the engine.** Routing with no microservice queues messages nobody reads; a microservice with no routing never receives any. Turn on `workflows.enabled`, `workflows.stages.detector.enabled` **and** `services.detector.enabled`.
-- **The queue must match.** The engine dispatches to `services.detector.queue`, and your microservice consumes that exact value via `DETECTOR_QUEUE`. They are the one binding between the two.
-- **`dispatch: conditional` is optional.** Use `dispatch: always` to run on every recording. Here we gate on the classifier seeing a `person`, so the detector never runs on empty scenes. The engine validates every condition `path` at boot and refuses to start on an unknown one. See [Conditional routing](/docs/hub/workflows/stages/#conditional-routing) for the full rule grammar.
+- **Both `enabled` flags, plus the engine.** Routing with no microservice queues messages nobody reads; a microservice with no routing never receives any. Turn on `workflows.enabled`, `workflows.stages.loitering.enabled` **and** `services.loitering.enabled`.
+- **The queue must match.** The engine dispatches to `services.loitering.queue`, and your microservice consumes that exact value via `LOITERING_QUEUE`. They are the one binding between the two.
+- **`dispatch: conditional` is optional.** Use `dispatch: always` to run on every recording. Here we gate on the classifier seeing a `person`, so the loitering stage never runs on empty scenes. The engine validates every condition `path` at boot and refuses to start on an unknown one. See [Conditional routing](/docs/hub/workflows/stages/#conditional-routing) for the full rule grammar.
 - **It's the engine switch, not the UI one.** `kerberoshub.workflows.enabled` toggles the engine. Don't confuse it with the unrelated `…features.workflows` front-end feature flag.
 
 ### Deploy
@@ -492,16 +485,16 @@ helm upgrade hub kerberos/hub -n kerberos-hub -f values.yaml
 Confirm both the engine and your microservice are running:
 
 ```bash
-kubectl -n kerberos-hub get pods | grep -E 'workflows|detector'
-kubectl -n kerberos-hub logs deploy/hub-detector
-# detector started: consuming "hub-workflows-detections", returning results to "kcloud-workflows-queue"
+kubectl -n kerberos-hub get pods | grep -E 'workflows|loitering'
+kubectl -n kerberos-hub logs deploy/hub-loitering
+   # loitering started: consuming "workflows-loitering", returning results to "kcloud-workflows-queue"
 ```
 
 ### Verify end-to-end
 
 Trigger a recording that matches your rule (here: one where the classifier sees a **person**) — either wait for a live event from a connected Agent, or re-analyse an existing recording from the Hub UI.
 
-1. **Watch the engine dispatch.** The workflows engine logs the run opening and dispatching the `detector` stage to `hub-workflows-detections`:
+1. **Watch the engine dispatch.** The workflows engine logs the run opening and dispatching the `loitering` stage to `workflows-loitering`:
 
    ```bash
    kubectl -n kerberos-hub logs deploy/hub-workflows -f
@@ -510,18 +503,18 @@ Trigger a recording that matches your rule (here: one where the classifier sees 
 2. **Watch your microservice.** It logs the dispatch it received and the result it returned:
 
    ```bash
-   kubectl -n kerberos-hub logs deploy/hub-detector -f
-   # detector received dispatch  runId=… mediaKey=front-gate/2026/06/12/08-30-00.mp4
+   kubectl -n kerberos-hub logs deploy/hub-loitering -f
+   # loitering received dispatch  runId=… mediaKey=front-gate/2026/06/12/08-30-00.mp4
    ```
 
-3. **See the boxes in the Hub.** Open that recording in the Hub and edit the media — the detection boxes your microservice produced are drawn over the frames. Under the hood they were stored as a `DetectionRun` in the `detections` collection, keyed to the recording. You can confirm directly:
+3. **See the marker in the Hub.** Open that recording in the Hub — the loitering marker your microservice produced appears on the timeline. Under the hood it was stored as a `Marker` in the `markers` collection, keyed to the recording. You can confirm directly:
 
    ```js
    // mongosh
-   db.detections.find({ key: "front-gate/2026/06/12/08-30-00.mp4" }).pretty()
+   db.markers.find({ name: "loitering-person-1" }).pretty()
    ```
 
-That's the full loop: a recording was classified, the engine dispatched it to **your** service, your service did its work (here, detected an object) and handed the result back, and the platform ingested it onto the recording — with no engine code changed.
+That's the full loop: a recording was classified, the engine dispatched it to **your** service, your service did its work (here, measured a dwell span) and handed the result back, and the platform ingested it onto the recording — with no engine code changed.
 
 {{% /steps %}}
 
@@ -532,7 +525,7 @@ You shipped a custom capability into the Hub without touching engine code. The s
 ## Troubleshooting
 
 {{% details title="Nothing reaches the microservice" %}}
-Check all three switches are on (`workflows.enabled`, `workflows.stages.detector.enabled`, `services.detector.enabled`) and that `services.detector.queue` exactly equals the microservice's `DETECTOR_QUEUE`. A conditional stage also never fires if its rule never matches — try `dispatch: always` to isolate routing from the condition.
+Check all three switches are on (`workflows.enabled`, `workflows.stages.loitering.enabled`, `services.loitering.enabled`) and that `services.loitering.queue` exactly equals the microservice's `LOITERING_QUEUE`. A conditional stage also never fires if its rule never matches — try `dispatch: always` to isolate routing from the condition.
 {{% /details %}}
 
 {{% details title="The engine won't start after adding the stage" closed="true" %}}
@@ -540,22 +533,22 @@ A condition `path` is validated at boot; a typo (e.g. `inputs.classify.property`
 {{% /details %}}
 
 {{% details title="Duplicate results on redelivery" closed="true" %}}
-Delivery is at-least-once. Key your result by the run — for a detection block, set `Source.RunId` from `run.RunId` so the upsert refreshes instead of duplicating.
+Delivery is at-least-once, so make your result idempotent by its natural key. A marker is upserted by `(device, name, startTimestamp)` — keep those stable across redeliveries (a detection block does the same via `Source.RunId`).
 {{% /details %}}
 
-{{% details title="Result returned but the operation never resolves" closed="true" %}}
+{{% details title="Result returned but the stage never resolves" closed="true" %}}
 Make sure you publish the run back to `WORKFLOWS_QUEUE` after the work is done, with the run's identity (`runId`, `key`, `traceId`, `user`) echoed and `storage` cleared.
 {{% /details %}}
 
-{{% details title="Boxes look misplaced (object-detection example)" closed="true" %}}
-Confirm your `coordinateSpace` matches the box geometry — normalised `[0,1]` `x1/y1/x2/y2`, or pixel `x/y/w/h` with the media dimensions in `media`.
+{{% details title="The marker lands at the wrong time (loitering example)" closed="true" %}}
+A marker's `startTimestamp`/`endTimestamp` are **Unix seconds**, not frame numbers or offsets. Derive them from the recording's epoch so the span lines up with the timeline.
 {{% /details %}}
 
 ## Next steps
 
 <div class="tutorial-grid">
 {{< cards cols="3" >}}
-  {{< card link="/docs/hub/workflows/ingest/blocks/" icon="view-grid" title="Emit several block types" subtitle="A single envelope can carry more than one block — add a marker to annotate the timeline alongside a detection." >}}
+  {{< card link="/docs/hub/workflows/ingest/blocks/" icon="view-grid" title="Emit several block types" subtitle="A single envelope can carry more than one block — add a detection alongside your marker to draw boxes as well." >}}
   {{< card link="/docs/hub/workflows/stages/#own-collection" icon="database" title="Own your data instead" subtitle="Producing genuinely new data? Write your own collection with the self-persisting sink." >}}
   {{< card link="/docs/hub/workflows/stages/#conditional-routing" icon="share" title="Chain stages" subtitle="Have a downstream stage depend on your result so it only runs once your stage produced something." >}}
 {{< /cards >}}
@@ -564,9 +557,10 @@ Confirm your `coordinateSpace` matches the box geometry — normalised `[0,1]` `
 ## See also
 
 <div class="tutorial-grid">
-{{< cards cols="3" >}}
+{{< cards cols="2" >}}
+  {{< card link="https://github.com/uug-ai/hub-loitering" icon="github" title="Clone the example" subtitle="The finished hub-loitering microservice — clone, build and run the stage from this tutorial." >}}
+  {{< card link="/docs/hub/workflows/ingest/blocks/marker/" icon="eye" title="Ingest → Marker" subtitle="The marker contract this stage emits, in pipeline and over the API." >}}
   {{< card link="/docs/hub/workflows/stages/" icon="puzzle" title="Workflows → Stages" subtitle="The full microservice contract: queue, envelope, registration." >}}
   {{< card link="/docs/hub/workflows/ingest/" icon="inbox-in" title="Workflows → Ingest" subtitle="What your microservice hands back and how the platform routes it." >}}
-  {{< card link="/docs/hub/workflows/ingest/blocks/detection/" icon="eye" title="Ingest → Detection" subtitle="The detection contract, in pipeline and over the API." >}}
 {{< /cards >}}
 </div>

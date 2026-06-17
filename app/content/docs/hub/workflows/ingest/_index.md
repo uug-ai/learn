@@ -132,7 +132,7 @@ The same package sits behind both transports; only the adapter around it differs
 The workflows engine wires the core to the run it already owns:
 
 - The **target** is the run's *own* recording — its `key`, organisation and device, plus the recording timestamp persisted when the run opened, so a derived artifact expires on the recording's retention clock rather than the post time. A `data` body that carries its own recording reference (e.g. a `PostDetectionsRequest` `mediaKey`) is **ignored** on the queue path; the run decides the target.
-- After a successful ingest the engine **mirrors the blocks into `results[<operation>]`, grouped by block type** (`results.<operation>.detections`, `…markers`, one array per type that occurred) so the operation resolves and any conditional stage waiting on it can fire. The block bodies are decoded, so a downstream condition can branch on what the stage produced — including element-wise with a `*` wildcard (`results.<operation>.detections.*.score`). See [Matching inside arrays](/docs/hub/workflows/stages/#matching-inside-arrays).
+- After a successful ingest the engine **mirrors the blocks into `results[<operation>]`, grouped by block type** (`results.<operation>.detections`, `…markers`, one array per type that occurred) so the stage resolves and any conditional stage waiting on it can fire. The block bodies are decoded, so a downstream condition can branch on what the stage produced — including element-wise with a `*` wildcard (`results.<operation>.detections.*.score`). See [Matching inside arrays](/docs/hub/workflows/stages/#matching-inside-arrays).
 
 ### Over the API (`POST /ingest`)
 

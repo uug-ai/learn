@@ -15,13 +15,13 @@ weight: 10
 toc: true
 ---
 
-[Workflows](/docs/hub/workflows/) let you reshape the Hub pipeline without code — wire a device through a few filters into a model on a visual canvas. **Custom stages** are the developer side of that same system: instead of choosing from the built-in blocks, you bring *your own* microservice in as a workflow stage. The engine is **open** — every built-in stage (classification, thumbnails, sprites) is just a service that consumes a message off a queue, does one job, and hands the result back — and your service plugs in the same way.
+[Workflows](/docs/hub/workflows/) let you reshape the Hub pipeline without code — wire a device through a few filters into a model on a visual canvas. **Custom stages** are the developer side of that same system: instead of choosing from the built-in nodes, you bring *your own* microservice in as a workflow stage. The engine is **open** — every built-in stage (classification, thumbnails, sprites) is just a service that consumes a message off a queue, does one job, and hands the result back — and your service plugs in the same way.
 
 A **workflow stage** is a step in a workflow, implemented as a **microservice** the workflows engine triggers automatically for every recording: it **receives a run from a queue, does the work, and returns the result** — in whatever language suits the job, deployed and scaled on its own. Stages are **asynchronous**: they run alongside the built-in analysis and never block it.
 
 This page is the **contract your microservice codes against** — the queue it listens on, the message it receives, how it returns a result, and how the engine tracks it to completion. It is **capability-agnostic**: it never assumes *what* your stage does, so the same mechanism serves a speech-to-text service, a custom detector, or any other step. For a concrete capability built on it, see the [block types](/docs/hub/workflows/ingest/blocks/) a stage can produce.
 
-> **Status — rolling out.** The queue, the `WorkflowRun` it dispatches and the completion mechanics here are already how the pipeline works internally. The config-driven **stage registration** (the `kerberoshub.workflows.stages` values block — see [Registering a stage](#registering-a-stage)) is the addition that lets a *custom* operation join without changing engine code — dispatched by the standalone **workflows engine** (`hub-workflows`), which runs alongside the **analysis service** and consumes the classify results it tees over. It is landing now for self-hosted deployments.
+> **Status — rolling out.** The queue, the `WorkflowRun` it dispatches and the completion mechanics here are already how the pipeline works internally. The config-driven **stage registration** (the `kerberoshub.workflows.stages` values section — see [Registering a stage](#registering-a-stage)) is the addition that lets a *custom* stage join without changing engine code — dispatched by the standalone **workflows engine** (`hub-workflows`), which runs alongside the **analysis service** and consumes the classify results it tees over. It is landing now for self-hosted deployments.
 >
 > This page covers how a microservice *delivers* a result. For the complementary *receiving* side — one shared core that takes a result from either the API or the queue and routes each block to the right actions by its type — see [Ingest](/docs/hub/workflows/ingest/).
 
@@ -56,9 +56,9 @@ A stage has exactly two runtime dependencies: the **message broker** (to receive
     { "id": "pose",         "kind": "detection",              "x":  90, "y": 600, "w": 210, "h": 130,
       "header": "STAGE", "title": "Pose detection", "subtitle": "your microservice", "groupId": "yours" },
     { "id": "speed",        "kind": "detection",              "x": 385, "y": 600, "w": 210, "h": 130,
-      "header": "STAGE", "title": "Speed estimate", "subtitle": "acme-speed-jobs", "groupId": "yours" },
+      "header": "STAGE", "title": "Speed estimate", "subtitle": "workflows-speed", "groupId": "yours" },
     { "id": "llm",          "kind": "pipeline-llm",           "x": 680, "y": 600, "w": 210, "h": 130,
-      "header": "STAGE", "title": "LLM summary", "subtitle": "kcloud-llm-queue.fifo", "groupId": "yours" }
+      "header": "STAGE", "title": "LLM summary", "subtitle": "workflows-llm", "groupId": "yours" }
   ],
   "connections": [
     { "from": "analysis",  "to": "throttler",    "fromSide": "right", "toSide": "left", "kind": "solid" },
@@ -80,7 +80,7 @@ You add a stage entirely in the chart's `values.yaml` — no engine code changes
 
 Each half has its own `enabled`, so turn **both** on (plus the engine): routing with no microservice queues messages nobody reads, and a microservice with no routing never receives any.
 
-The two blocks divide by concern. `kerberoshub.workflows` is the engine's **behaviour** — its `enabled` switch and the `stages` routing registry. `kerberoshub.services` holds the **deployments** of the whole workflows subsystem in one uniform shape: the engine itself (`services.workflows`, a chart default you don't normally touch) and one microservice per stage (`services.<name>`). So adding a stage is always the same two edits — a routing entry under `workflows.stages`, and your microservice under `services`.
+The two sections divide by concern. `kerberoshub.workflows` is the engine's **behaviour** — its `enabled` switch and the `stages` routing registry. `kerberoshub.services` holds the **deployments** of the whole workflows subsystem in one uniform shape: the engine itself (`services.workflows`, a chart default you don't normally touch) and one microservice per stage (`services.<name>`). So adding a stage is always the same two edits — a routing entry under `workflows.stages`, and your microservice under `services`.
 
 ```yaml
 # values.yaml
@@ -106,7 +106,7 @@ kerberoshub:
       enabled: true                # deploy the microservice
       repository: ghcr.io/acme/speed
       tag: "v1.0.0"
-      queue: "acme-speed-jobs"     # the queue your microservice consumes
+      queue: "workflows-speed"     # the queue your microservice consumes
       replicas: 1
       pullPolicy: IfNotPresent
       logLevel: info               # trace | debug | info | warn | error
@@ -123,9 +123,11 @@ kerberoshub:
 | `needs` | conditional only | list | The match rule — see [Conditional routing](#conditional-routing). |
 | `needsMode` | no | `any` \| `all` | How multiple `needs` combine — `any` (default) or `all`. |
 
+> **Stage vs. operation.** On this page, **stage** is the step and **operation** is just its *id* — the `operation` field above, which **defaults to the stage name**. See the [glossary](/docs/hub/workflows/#glossary) for the full vocabulary.
+
 **Service deployment — `kerberoshub.services.<name>`**
 
-A normal microservice Deployment, keyed to the same name as the stage object. (The workflows engine itself is deployed from this same block as `services.workflows` — the one `services` entry with no matching stage, and a chart default you don't normally touch.)
+A normal microservice Deployment, keyed to the same name as the stage object. (The workflows engine itself is deployed from this same section as `services.workflows` — the one `services` entry with no matching stage, and a chart default you don't normally touch.)
 
 | Field | Required | Value | What you use it for |
 |---|---|---|---|
@@ -260,10 +262,10 @@ Your microservice consumes from **one** queue, and **you choose its name**. The 
 kerberoshub:
   services:
     speed:
-      queue: "acme-speed-jobs"  # ← anything you want; your microservice consumes this exact name
+      queue: "workflows-speed"  # ← anything you want; your microservice consumes this exact name
 ```
 
-The engine reads that **same** value from the stage registry and dispatches there, so the only rule is that the two agree — the queue is the one thing that binds the engine to your microservice. The name is an arbitrary string your broker accepts (`acme-speed-jobs`, `vision.requests`, `team7-detector`); it does **not** have to follow the platform's `kcloud-…` convention.
+The engine reads that **same** value from the stage registry and dispatches there, so the only rule is that the two agree — the queue is the one thing that binds the engine to your microservice. These examples use a consistent `workflows-<stage>` form (`workflows-speed`, `workflows-llm`), but the name is an arbitrary string your broker accepts (`vision.requests`, `team7-detector` work just as well) and does **not** have to follow the platform's `kcloud-…` convention — it only has to match on both sides.
 
 If you omit `queue`, the engine falls back to a derived default, `kcloud-<operation>-queue.fifo` — so the convention is just that fallback, not the source of truth. Queue names are literal strings: the default deployment runs RabbitMQ, so a `.fifo` suffix is only part of a name, not an SQS feature.
 
@@ -328,13 +330,13 @@ Your microservice does **not** receive the pipeline's internal `PipelineEvent`. 
 | Field | Type | What it is |
 |---|---|---|
 | `user.organisationId` | string | The organisation that owns the recording. The run, and everything derived from it, is scoped to this id — scope your own writes to it too. |
-| `user.storage` | object | The account's storage block, carried so the *engine* can resolve a per-recording vault override. You normally don't need it — fetch media with the top-level `storage`. |
+| `user.storage` | object | The account's storage object, carried so the *engine* can resolve a per-recording vault override. You normally don't need it — fetch media with the top-level `storage`. |
 | `user.storage.uri` | string | Account storage endpoint. |
 | `user.storage.access_key` | string | Account storage access key. |
 | `user.storage.provider` | string | Account storage provider. |
 | `user.storage.secret_key` | string | Account storage secret. |
 
-(`user.storage` uses **snake_case** keys — it is the account `Storage` block. The media-fetch `storage` below uses camelCase.)
+(`user.storage` uses **snake_case** keys — it is the account `Storage` object. The media-fetch `storage` below uses camelCase.)
 
 **`device` — recording context**
 
@@ -381,7 +383,7 @@ Your microservice is a stateless consumer: pull a run, fetch the media with the 
 
 ## Sending a result back
 
-You return the **same `WorkflowRun` you received** — echo `runId`, `key`, `traceId` and `user` so the engine can locate and scope the run — with `storage` cleared and your result in **exactly one** channel. Publish it back to the engine's queue (`WORKFLOWS_QUEUE`, default `kcloud-workflows-queue`); the engine records the operation resolved and fires any conditional stage that was waiting on it.
+You return the **same `WorkflowRun` you received** — echo `runId`, `key`, `traceId` and `user` so the engine can locate and scope the run — with `storage` cleared and your result in **exactly one** channel. Publish it back to the engine's queue (`WORKFLOWS_QUEUE`, default `kcloud-workflows-queue`); the engine marks the **stage** resolved and fires any conditional stage that was waiting on it.
 
 There are **two sinks**. Default to letting the platform persist your result — hand it back and an ingest handler stores it, so your microservice needs no datastore of its own. A stage that produces genuinely *new* data can instead own its storage and write its own collection.
 
@@ -393,18 +395,18 @@ The **default sink**: hand the platform a **block envelope** in `payload` and it
 
 For genuinely *new, standalone* data with no built-in block type — embeddings, descriptions, a custom search index — a stage can write its **own collection, keyed by the recording**, and set only its routing values under `results.<operation>` on the returned run (leave `payload` empty). The platform just records the resolution; your microservice owns the write, and so brings its own datastore access.
 
-> The difference between the sinks is only *who writes the result* — the platform, from the block envelope you hand back, or your microservice into its own collection. Either way the engine marks the operation resolved when your run comes back.
+> The difference between the sinks is only *who writes the result* — the platform, from the block envelope you hand back, or your microservice into its own collection. Either way the engine marks the **stage** resolved when your run comes back.
 
 ## Completion and acknowledgement
 
 Every custom stage is **asynchronous**: nothing blocks on it. The analysis service's built-in pipeline continues independently, the workflows engine tracks the stage's run on its own, and your stage's result lands whenever the microservice finishes. (Blocking, "required" stages are intentionally out of scope in this design — there is no way for a custom stage to stall a run.)
 
-Whichever [sink](#sending-a-result-back) you use, your microservice routes the run back to the workflows engine — its `WORKFLOWS_QUEUE` — once the work is durably done. The engine records the operation on the run (`$addToSet resolvedoperations`), which keeps the run's provenance complete and stops a re-run from redoing the work. An own-collection stage's returned run carries just its routing values under `results.<operation>`; a delegated stage carries the typed `payload`. A run that never hears back from a stage still completes on the engine's own rules (with a safety timeout as a backstop), so a crashed microservice can't wedge the pipeline.
+Whichever [sink](#sending-a-result-back) you use, your microservice routes the run back to the workflows engine — its `WORKFLOWS_QUEUE` — once the work is durably done. The engine records the **stage** as resolved on the run (`$addToSet resolvedoperations`), which keeps the run's provenance complete and stops a re-run from redoing the work. An own-collection stage's returned run carries just its routing values under `results.<operation>`; a delegated stage carries the typed `payload`. A run that never hears back from a stage still completes on the engine's own rules (with a safety timeout as a backstop), so a crashed microservice can't wedge the pipeline.
 
 ## Failure modes & gotchas
 
 - **Routing without a microservice (or vice-versa).** The two `enabled` flags are independent: routing (`workflows.stages.<name>.enabled`) with no microservice queues messages no one consumes; a microservice (`services.<name>.enabled`) with no routing never receives any. Keep them enabled together — they share the stage name, so they always address the same queue.
-- **No completion ack.** A microservice that writes its result but never echoes back to the workflows engine (`WORKFLOWS_QUEUE`) leaves the operation absent from `resolvedoperations`. Harmless to the run (stages are async), but it breaks provenance and lets a re-run repeat the work. Always ack.
+- **No completion ack.** A microservice that writes its result but never echoes back to the workflows engine (`WORKFLOWS_QUEUE`) leaves the **stage** absent from `resolvedoperations`. Harmless to the run (stages are async), but it breaks provenance and lets a re-run repeat the work. Always ack.
 - **Re-decode cost.** A stage that re-fetches and re-decodes the video pays that cost per recording; reuse data already in the envelope or the database where you can.
 - **Non-idempotent writes.** Redelivery will duplicate output unless you upsert on a stable key.
 
