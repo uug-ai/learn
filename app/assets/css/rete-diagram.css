@@ -185,6 +185,9 @@ html.dark .rete-node,
 .rete-node--amqp    { --rete-node-color: #b45309; } /* amber  */
 .rete-node--turn    { --rete-node-color: #1d4ed8; } /* blue   */
 .rete-node--mqtt    { --rete-node-color: #0f766e; } /* cyan   */
+.rete-node--webrtc  { --rete-node-color: #7c3aed; } /* violet */
+.rete-node--hls     { --rete-node-color: #ea580c; } /* orange */
+.rete-node--frontend { --rete-node-color: #334155; } /* slate  */
 .rete-node--pipeline-monitor       { --rete-node-color: #be185d; } /* pink   */
 .rete-node--pipeline-sequence      { --rete-node-color: #be185d; }
 .rete-node--pipeline-analysis      { --rete-node-color: #be185d; }
