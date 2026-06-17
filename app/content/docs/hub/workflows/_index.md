@@ -31,7 +31,7 @@ Workflows expose the building blocks of the pipeline as a small, visual graph so
 
 ## Concepts
 
-A workflow is a directed graph made of **blocks** (also called *nodes*) connected through **ports** with **edges**. Every workflow has a name, an optional description, an enabled/disabled toggle and a freely arrangeable canvas of blocks.
+A workflow is a directed graph of **blocks** connected through **ports** with **edges**. A *block* is the building element you drag onto the canvas; *node* is the word for that same element when it's drawn in a diagram. Every workflow has a name, an optional description, an enabled/disabled toggle and a freely arrangeable canvas of blocks.
 
 ### Blocks
 
@@ -99,4 +99,4 @@ The blocks above are the **no-code** side of workflows. If you want a workflow t
 
 See **[Stages](stages/)** for the contract your microservice codes against: the queue it consumes, the `WorkflowRun` envelope it receives, how it hands a result back, and how to register the stage from the Helm chart so the engine routes recordings to it.
 
-Your microservice hands its result back as a **block envelope** — a small JSON list of typed *result blocks* (a detection, a marker, …), set on the run's `payload`. The **[Ingest service](ingest-service/)** is the shared layer on the platform side that receives it — from either the queue or the API — and runs the right actions for each block's type: validate it, store it, and trigger any follow-up side-effects.
+Your microservice hands its result back as a **block envelope** — a small JSON list of typed *result blocks* (a detection, a marker, …), set on the run's `payload`. The **[Ingest](ingest/)** core is the shared layer on the platform side that receives it — from either the queue or the API — and runs the right actions for each block's type: validate it, store it, and trigger any follow-up side-effects.

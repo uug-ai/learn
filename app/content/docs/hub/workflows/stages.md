@@ -19,18 +19,18 @@ toc: true
 
 A **workflow stage** is a step in a workflow, implemented as a **microservice** the workflows engine triggers automatically for every recording: it **receives a run from a queue, does the work, and returns the result** — in whatever language suits the job, deployed and scaled on its own. Stages are **asynchronous**: they run alongside the built-in analysis and never block it.
 
-This page is the **contract your microservice codes against** — the queue it listens on, the message it receives, how it returns a result, and how the engine tracks it to completion. It is **capability-agnostic**: it never assumes *what* your stage does, so the same mechanism serves a speech-to-text service, a custom detector, or any other step. For a concrete capability built on it, see the pages under [Extend](../../extend/).
+This page is the **contract your microservice codes against** — the queue it listens on, the message it receives, how it returns a result, and how the engine tracks it to completion. It is **capability-agnostic**: it never assumes *what* your stage does, so the same mechanism serves a speech-to-text service, a custom detector, or any other step. For a concrete capability built on it, see the [block types](/docs/hub/workflows/ingest/blocks/) a stage can produce.
 
-> **Status — rolling out.** The queue, envelope and completion mechanics here are already how the pipeline works internally. The config-driven **stage registration** (the `kerberoshub.workflows.stages` values block — see [Registering a stage](#registering-a-stage)) is the addition that lets a *custom* operation join without changing engine code — dispatched by the standalone **workflows engine** (`hub-workflows`), which runs alongside the **analysis service** and consumes the classify results it tees over. It is landing now for self-hosted deployments.
+> **Status — rolling out.** The queue, the `WorkflowRun` it dispatches and the completion mechanics here are already how the pipeline works internally. The config-driven **stage registration** (the `kerberoshub.workflows.stages` values block — see [Registering a stage](#registering-a-stage)) is the addition that lets a *custom* operation join without changing engine code — dispatched by the standalone **workflows engine** (`hub-workflows`), which runs alongside the **analysis service** and consumes the classify results it tees over. It is landing now for self-hosted deployments.
 >
-> This page covers how a microservice *delivers* a result. For the complementary *receiving* side — one shared core that takes a result from either the API or the queue and routes each block to the right actions by its type — see [Ingest service](/docs/hub/workflows/ingest-service/).
+> This page covers how a microservice *delivers* a result. For the complementary *receiving* side — one shared core that takes a result from either the API or the queue and routes each block to the right actions by its type — see [Ingest](/docs/hub/workflows/ingest/).
 
 ## When to add a stage
 
-A stage is one of **two transports** for getting your data into the Hub. The other is an authenticated API push. They deliver the **same data** to the **same place**; they differ in *who triggers the work* and *where your code runs*.
+A stage is one of **two transports** for getting your data into the Hub. The other is an authenticated **ingest API** push. They deliver the **same data** to the **same place**; they differ in *who triggers the work* and *where your code runs*.
 
-- **API push** — your service `POST`s whenever it has data. Works on **every** deployment, needs no cluster access. The right starting point for most integrators. See [Extend](../../extend/).
-- **In-pipeline stage (this page)** — the pipeline triggers your service automatically on every ingest / re-analysis, with queue-level delivery guarantees. Available on **self-hosted deployments** that can run custom stages.
+- **Ingest API push** — your service `POST`s whenever it has data. Works on **every** deployment, needs no cluster access. The right starting point for most integrators. See [Ingest → Over the API](/docs/hub/workflows/ingest/#over-the-api-post-ingest).
+- **Workflow stage (this page)** — the pipeline triggers your service automatically on every ingest / re-analysis, with queue-level delivery guarantees. Available on **self-hosted deployments** that can run custom stages.
 
 Reach for a stage only when you control the deployment **and** want the capability to run automatically as a built-in step of every recording's analysis.
 
@@ -53,7 +53,7 @@ A stage has exactly two runtime dependencies: the **message broker** (to receive
       "header": "PIPELINE", "title": "Analysis", "subtitle": "Built-ins · opens run", "groupId": "hub" },
     { "id": "workflows",    "kind": "hub",                    "x": 360, "y": 320, "w": 240, "h": 110,
       "header": "ORCHESTRATOR", "title": "Workflows", "subtitle": "Hub-Workflows", "groupId": "hub" },
-    { "id": "worker",       "kind": "detection",              "x":  90, "y": 600, "w": 210, "h": 130,
+    { "id": "pose",         "kind": "detection",              "x":  90, "y": 600, "w": 210, "h": 130,
       "header": "STAGE", "title": "Pose detection", "subtitle": "your microservice", "groupId": "yours" },
     { "id": "speed",        "kind": "detection",              "x": 385, "y": 600, "w": 210, "h": 130,
       "header": "STAGE", "title": "Speed estimate", "subtitle": "acme-speed-jobs", "groupId": "yours" },
@@ -64,7 +64,7 @@ A stage has exactly two runtime dependencies: the **message broker** (to receive
     { "from": "analysis",  "to": "throttler",    "fromSide": "right", "toSide": "left", "kind": "solid" },
     { "from": "throttler", "to": "notification", "fromSide": "right", "toSide": "left", "kind": "solid" },
     { "from": "analysis",  "to": "workflows",    "fromSide": "right", "toSide": "left", "kind": "solid", "label": "on classify" },
-    { "from": "workflows", "to": "worker",       "fromSide": "bottom", "toSide": "top", "kind": "solid", "label": "dispatch" },
+    { "from": "workflows", "to": "pose",         "fromSide": "bottom", "toSide": "top", "kind": "solid", "label": "dispatch" },
     { "from": "workflows", "to": "speed",        "fromSide": "bottom", "toSide": "top", "kind": "solid", "label": "dispatch" },
     { "from": "workflows", "to": "llm",          "fromSide": "bottom", "toSide": "top", "kind": "solid", "label": "dispatch" }
   ]
@@ -181,7 +181,7 @@ needs:
 
 A condition is `{ path, op, value }`.
 
-**`path`** — a dot-path **relative to the `WorkflowRun`** your stage receives (the [envelope](#envelope)). It walks objects, and a **`*`** segment **fans out across the elements of an array** (see [Matching inside arrays](#matching-inside-arrays)). Valid roots:
+**`path`** — a dot-path **relative to the `WorkflowRun`** your stage receives (see [The workflow run](#the-workflow-run)). It walks objects, and a **`*`** segment **fans out across the elements of an array** (see [Matching inside arrays](#matching-inside-arrays)). Valid roots:
 
 | Root | Example | Notes |
 |---|---|---|
@@ -267,7 +267,7 @@ The engine reads that **same** value from the stage registry and dispatches ther
 
 If you omit `queue`, the engine falls back to a derived default, `kcloud-<operation>-queue.fifo` — so the convention is just that fallback, not the source of truth. Queue names are literal strings: the default deployment runs RabbitMQ, so a `.fifo` suffix is only part of a name, not an SQS feature.
 
-### Envelope
+### The workflow run
 
 Your microservice does **not** receive the pipeline's internal `PipelineEvent`. The engine dispatches a single, self-contained **`models.WorkflowRun`** as JSON: the run's identity, the read-only context your microservice needs, and the credentials to fetch the media. Model your microservice's input type on this — every field below is present on the inbound dispatch, and nothing else is:
 
@@ -387,11 +387,11 @@ There are **two sinks**. Default to letting the platform persist your result —
 
 ### Enrich in place
 
-The **default sink**: hand the platform a **block envelope** in `payload` and it stores the result for you — your microservice needs no database. The envelope is an ordered list of typed *blocks* — `{ "type": "detection", "data": … }`, `{ "type": "marker", "data": … }` — and the engine routes each block by its `type` through the shared [Ingest service](/docs/hub/workflows/ingest-service/), persists it against the run's **own** recording, and mirrors the blocks into `results.<operation>` **grouped by type** (`results.<operation>.detections`, `…markers`) so a downstream condition can branch on what the stage produced — element-wise with [`*`](#matching-inside-arrays). The stage no longer declares a `kind` — each block self-describes. Set `payload` **or** `results[operation]`, never both.
+The **default sink**: hand the platform a **block envelope** in `payload` and it stores the result for you — your microservice needs no database. The envelope is an ordered list of typed *blocks* — `{ "type": "detection", "data": … }`, `{ "type": "marker", "data": … }` — and the engine routes each block by its `type` through the shared [ingest core](/docs/hub/workflows/ingest/), persists it against the run's **own** recording, and mirrors the blocks into `results.<operation>` **grouped by type** (`results.<operation>.detections`, `…markers`) so a downstream condition can branch on what the stage produced — element-wise with [`*`](#matching-inside-arrays). A stage no longer declares a result `kind` — each block self-describes via its `type`; see [Blocks](/docs/hub/workflows/ingest/blocks/) for each type's contract. Set `payload` **or** `results[operation]`, never both.
 
 ### Own collection
 
-For genuinely *new, standalone* data — detections, descriptions, embeddings — a stage can write its **own collection, keyed by the recording**, and set only its routing values under `results.<operation>` on the returned run (leave `payload` empty). The platform just records the resolution; your microservice owns the write, and so brings its own datastore access. This is how [detections](../../extend/detections/) deliver their runs — see that page for a worked example.
+For genuinely *new, standalone* data with no built-in block type — embeddings, descriptions, a custom search index — a stage can write its **own collection, keyed by the recording**, and set only its routing values under `results.<operation>` on the returned run (leave `payload` empty). The platform just records the resolution; your microservice owns the write, and so brings its own datastore access.
 
 > The difference between the sinks is only *who writes the result* — the platform, from the block envelope you hand back, or your microservice into its own collection. Either way the engine marks the operation resolved when your run comes back.
 
@@ -415,7 +415,7 @@ Whichever [sink](#sending-a-result-back) you use, your microservice routes the r
 - [ ] Make sure the **workflows engine** is enabled (`kerberoshub.workflows.enabled`)
 - [ ] Consume the dispatched **`WorkflowRun`**, resolve the recording from `key`, fetch media with the credentials in `storage`
 - [ ] Read upstream context from `inputs` / `results` instead of re-fetching it
-- [ ] Pick a **sink** — enrich in place (set `payload` + a `kind`, the default) or your own collection (set `results.<id>`)
+- [ ] Pick a **sink** — enrich in place (set `payload`, the default) or your own collection (set `results.<id>`)
 - [ ] **Idempotent** writes (upsert by `key` + `runId`)
 - [ ] Route the run back to the workflows engine (`WORKFLOWS_QUEUE`) with `storage` cleared and your result in one channel
 - [ ] (Optional) gate per-recording with `dispatch: conditional` + `needs` + `needsMode`

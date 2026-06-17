@@ -53,10 +53,10 @@ This tutorial targets a **self-hosted Hub** that can run custom stages. Make sur
 {{< /tutorial-panel >}}
 
 {{< callout type="info" >}}
-**On a managed / cloud Hub?** You can't deploy a custom stage there, but you can deliver the *same* result over HTTP instead — the [ingest service](/docs/hub/workflows/ingest-service/) accepts the same `detection` block over its API (the run shape is the [detection contract](/docs/hub/extend/detections/)). The rest of this tutorial is for deployments you control.
+**On a managed / cloud Hub?** You can't deploy a custom stage there, but you can deliver the *same* result over HTTP instead — the [ingest API](/docs/hub/workflows/ingest/#over-the-api-post-ingest) accepts the same `detection` block (the run shape is the [detection contract](/docs/hub/workflows/ingest/blocks/detection/)). The rest of this tutorial is for deployments you control.
 {{< /callout >}}
 
-This tutorial puts two reference pages into practice, and it helps to have skimmed them first — [Workflows → Stages](/docs/hub/workflows/stages/) (how a microservice connects) and [Workflows → Ingest service](/docs/hub/workflows/ingest-service/) (what it hands back). This tutorial is the hands-on path through both.
+This tutorial puts two reference pages into practice, and it helps to have skimmed them first — [Workflows → Stages](/docs/hub/workflows/stages/) (how a microservice connects) and [Workflows → Ingest](/docs/hub/workflows/ingest/) (what it hands back). This tutorial is the hands-on path through both.
 
 ## Pipeline vs workflows
 
@@ -131,7 +131,7 @@ Two names do all the routing, and it's worth keeping them straight:
 - **The stage / operation id** — *who* the engine dispatches to and the key your result is filed under (`results.<id>`). In our example it's `detector`.
 - **The block type** — *what shape* your result is. A stage emits whichever block type fits its output: a `detection` block for boxes/tracks, a `marker` block for a timeline annotation. Our object detector emits a `detection` block.
 
-The platform already knows how to store these block types — a `detection` block becomes boxes/tracks keyed to the recording — so **your microservice needs no database of its own**: it hands the data back and the platform persists it. That's the *delegated* sink; see [Ingest service](/docs/hub/workflows/ingest-service/) for the full contract.
+The platform already knows how to store these block types — a `detection` block becomes boxes/tracks keyed to the recording — so **your microservice needs no database of its own**: it hands the data back and the platform persists it. That's the *delegated* sink; see [Ingest](/docs/hub/workflows/ingest/) for the full contract.
 
 A **block** is one self-describing piece of that result: a `type` naming its shape (`detection`, `marker`, …) and a `data` body in that shape. Your microservice returns them as a **block envelope** — a small JSON object with a `blocks` array — set on the run's `payload`:
 
@@ -143,7 +143,7 @@ A **block** is one self-describing piece of that result: a `type` naming its sha
 }
 ```
 
-A single envelope can carry several blocks (a detection plus a marker, say), and the platform stores each by its `type`. The [Ingest service](/docs/hub/workflows/ingest-service/#block-types) lists every block type and the `data` shape it expects.
+A single envelope can carry several blocks (a detection plus a marker, say), and the platform stores each by its `type`. The [Blocks](/docs/hub/workflows/ingest/blocks/) catalogue lists every block type and the `data` shape it expects.
 
 ## Build the stage
 
@@ -312,7 +312,7 @@ func runDetector(run *models.WorkflowRun) []api.DetectionTrackInput {
 }
 ```
 
-Boxes here are emitted **already normalised** to `[0,1]` (`coordinateSpace: "normalized"`), so no media dimensions are needed to interpret them. You can also send pixel `{x, y, w, h}` boxes and set `coordinateSpace: "pixel"` with the media dimensions — see the [detection run contract](/docs/hub/extend/detections/#the-detection-run).
+Boxes here are emitted **already normalised** to `[0,1]` (`coordinateSpace: "normalized"`), so no media dimensions are needed to interpret them. You can also send pixel `{x, y, w, h}` boxes and set `coordinateSpace: "pixel"` with the media dimensions — see the [detection run contract](/docs/hub/workflows/ingest/blocks/detection/#the-detection-run).
 
 ### Return the result as a block envelope
 
@@ -555,7 +555,7 @@ Confirm your `coordinateSpace` matches the box geometry — normalised `[0,1]` `
 
 <div class="tutorial-grid">
 {{< cards cols="3" >}}
-  {{< card link="/docs/hub/workflows/ingest-service/#block-types" icon="view-grid" title="Emit several block types" subtitle="A single envelope can carry more than one block — add a marker to annotate the timeline alongside a detection." >}}
+  {{< card link="/docs/hub/workflows/ingest/blocks/" icon="view-grid" title="Emit several block types" subtitle="A single envelope can carry more than one block — add a marker to annotate the timeline alongside a detection." >}}
   {{< card link="/docs/hub/workflows/stages/#own-collection" icon="database" title="Own your data instead" subtitle="Producing genuinely new data? Write your own collection with the self-persisting sink." >}}
   {{< card link="/docs/hub/workflows/stages/#conditional-routing" icon="share" title="Chain stages" subtitle="Have a downstream stage depend on your result so it only runs once your stage produced something." >}}
 {{< /cards >}}
@@ -566,7 +566,7 @@ Confirm your `coordinateSpace` matches the box geometry — normalised `[0,1]` `
 <div class="tutorial-grid">
 {{< cards cols="3" >}}
   {{< card link="/docs/hub/workflows/stages/" icon="puzzle" title="Workflows → Stages" subtitle="The full microservice contract: queue, envelope, registration." >}}
-  {{< card link="/docs/hub/workflows/ingest-service/" icon="inbox-in" title="Workflows → Ingest service" subtitle="What your microservice hands back and how the platform routes it." >}}
-  {{< card link="/docs/hub/extend/detections/" icon="eye" title="Extend → Detections" subtitle="The detection contract, in pipeline and over the API." >}}
+  {{< card link="/docs/hub/workflows/ingest/" icon="inbox-in" title="Workflows → Ingest" subtitle="What your microservice hands back and how the platform routes it." >}}
+  {{< card link="/docs/hub/workflows/ingest/blocks/detection/" icon="eye" title="Ingest → Detection" subtitle="The detection contract, in pipeline and over the API." >}}
 {{< /cards >}}
 </div>

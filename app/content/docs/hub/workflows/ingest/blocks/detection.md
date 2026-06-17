@@ -1,15 +1,17 @@
 ---
-title: "Detections"
-description: "Posting third-party detection tracks for a recording and storing them in the detections collection."
-lead: "Posting third-party detection tracks for a recording and storing them in the detections collection."
+title: "Detection"
+description: "The detection block contract: third-party detection tracks for a recording, stored in the detections collection."
+lead: "A detection run is a bundle of tracks for one recording. A stage emits it as a detection block; the ingest core validates, normalises and stores it in the detections collection."
 date: 2026-06-02T00:00:00+00:00
-lastmod: 2026-06-03T00:00:00+00:00
+lastmod: 2026-06-16T00:00:00+00:00
 draft: false
 images: []
+aliases:
+  - /docs/hub/extend/detections/
 menu:
   hub:
-    parent: "extend"
-weight: 310
+    parent: "blocks"
+weight: 10
 toc: true
 ---
 
@@ -24,12 +26,12 @@ The contract has two halves:
 
 ## How a detection is delivered
 
-A detection run is the `data` body of a **`detection` block** — one of the result types the [ingest service](../../workflows/ingest-service/) recognises. There is no detection-specific endpoint to code against: you deliver a detection the way you deliver any block result, and the ingest service validates it and writes the `DetectionRun` to the `detections` collection for you.
+A detection run is the `data` body of a **`detection` block** — one of the result types the [ingest core](/docs/hub/workflows/ingest/) recognises. There is no detection-specific endpoint to code against: you deliver a detection the way you deliver any block result, and the ingest core validates it and writes the `DetectionRun` to the `detections` collection for you.
 
-- **From a workflow stage.** Your microservice emits a `detection` block in its result envelope and the ingest service stores the run. This is the path for deployments you control — see [Workflows → Stages](../../workflows/stages/).
-- **Over the ingest API.** Deliver the same `detection` block over HTTP through the ingest endpoint, for producers that run anywhere — bring-your-own models, batch jobs, annotation imports and corrections. See [Ingest service](../../workflows/ingest-service/).
+- **From a workflow stage.** Your microservice emits a `detection` block in its result envelope and the ingest core stores the run. This is the transport for deployments you control — see [Stages](/docs/hub/workflows/stages/).
+- **Over the ingest API.** Deliver the same `detection` block over HTTP through the ingest endpoint, for producers that run anywhere — bring-your-own models, batch jobs, annotation imports and corrections. See [Ingest → Over the API](/docs/hub/workflows/ingest/#over-the-api-post-ingest).
 
-Either way the run's shape is identical — the contract below is what your producer builds, regardless of how the block reaches the Hub.
+Either way the run's shape is identical — the contract below is what your producer builds, regardless of which transport carries the block to the Hub.
 
 ## How it fits together
 
@@ -301,4 +303,4 @@ The following are intentionally **not** covered by this contract:
 
 ---
 
-Ready to integrate? Build the run above, then deliver it as a `detection` block — emitted from a [workflow stage](../../workflows/stages/) on deployments you control, or over the [ingest API](../../workflows/ingest-service/) from a producer running anywhere.
+Ready to integrate? Build the run above, then deliver it as a `detection` block — emitted from a [workflow stage](/docs/hub/workflows/stages/) on deployments you control, or over the [ingest API](/docs/hub/workflows/ingest/#over-the-api-post-ingest) from a producer running anywhere.
