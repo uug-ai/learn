@@ -138,7 +138,7 @@ The workflows engine wires the core to the run it already owns:
 
 ### Over the API (`POST /ingest`)
 
-The public endpoint is the same core behind an HTTP door. It takes a single `{operation, payload, mediaKey | analysisId}`, wraps it as a **one-block** envelope (`type = operation`, `data = payload`), resolves the target from `mediaKey`/`analysisId`, stamps the source as `api` (so trusted side-effects gate off), and maps the per-block report to an HTTP status — one block in, one block report out. The typed [`/detections`](../../extend/detections/api/) endpoint stays as-is alongside it for that specific contract.
+The public endpoint is the same core behind an HTTP door. It takes a single `{operation, payload, mediaKey | analysisId}`, wraps it as a **one-block** envelope (`type = operation`, `data = payload`), resolves the target from `mediaKey`/`analysisId`, stamps the source as `api` (so trusted side-effects gate off), and maps the per-block report to an HTTP status — one block in, one block report out.
 
 ## Where it lives
 
@@ -147,5 +147,4 @@ The core is `models/pkg/ingest`, a deliberately **infra-free** library: it depen
 ## See also
 
 - [Stages](stages/) — how your microservice connects, the `WorkflowRun` contract it codes against, and registering a stage.
-- [Detections → Pipeline](../../extend/detections/pipeline/) — the detection capability delivered as a workflow stage.
-- [Detections → API](../../extend/detections/api/) — the same detection contract over HTTP.
+- [Detections](../../extend/detections/) — the `detection` block's `data` contract: tracks, boxes, coordinate spaces and how a run is stored.

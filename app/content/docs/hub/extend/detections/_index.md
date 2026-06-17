@@ -22,14 +22,14 @@ The contract has two halves:
 - A recording already exists in the Hub, addressed by `mediaKey` (the recording **key** — `media.videoFile` / `analysis.key`, not the media `_id`) or `analysisId` (the analysis document `_id`) and (optionally) described by its media properties — width, height, fps, frame count.
 - The producer returns one run, carrying a `source`, a coordinate space, optional `media` and `categories`, and one or more `tracks` of boxes.
 
-## Methods
+## How a detection is delivered
 
-A detection run can reach the Hub through one of two transports. They deliver the **same `DetectionRun`** to the **same `detections` collection** — they differ only in *who triggers the work* and *where the producer runs*. (See the [Extend overview](../) for the general comparison.)
+A detection run is the `data` body of a **`detection` block** — one of the result types the [ingest service](../../workflows/ingest-service/) recognises. There is no detection-specific endpoint to code against: you deliver a detection the way you deliver any block result, and the ingest service validates it and writes the `DetectionRun` to the `detections` collection for you.
 
-- **[API push](api/) — *available now.*** Your service posts each run with a single authenticated `POST /detections`. Works on **every** deployment (cloud or self-hosted), needs no cluster access, and is the right starting point for bring-your-own models, batch jobs, annotation imports and corrections. **This is the documented method today** — start on the [API page](api/).
-- **[In-pipeline stage](pipeline/) — *advanced, deployment-gated.*** A worker that runs detection automatically as a stage of the internal analysis pipeline, queue-triggered on ingest / re-analysis. It writes the **same** `DetectionRun` to the **same** collection, so the data contract below is identical; only the delivery differs. See the [pipeline page](pipeline/) for the detection-specific bits and [Workflows → Stages](../../workflows/stages/) for the underlying mechanism.
+- **From a workflow stage.** Your microservice emits a `detection` block in its result envelope and the ingest service stores the run. This is the path for deployments you control — see [Workflows → Stages](../../workflows/stages/).
+- **Over the ingest API.** Deliver the same `detection` block over HTTP through the ingest endpoint, for producers that run anywhere — bring-your-own models, batch jobs, annotation imports and corrections. See [Ingest service](../../workflows/ingest-service/).
 
-Because the data model is shared, the code that *builds* your run is identical regardless of method — switching a producer from API push to an in-pipeline stage later changes only the **sink**, not the payload.
+Either way the run's shape is identical — the contract below is what your producer builds, regardless of how the block reaches the Hub.
 
 ## How it fits together
 
@@ -76,7 +76,7 @@ Each run is tagged with the `source` that produced it. The server never merges o
 
 ## The detection run
 
-Whichever method delivers it, a detection run has the **same shape**. This is the contract your producer builds against — identical whether the run is pushed over the API or emitted by a future in-pipeline stage. A [delivery method](#methods) only chooses how this run reaches the Hub; everything below describes the run itself.
+However it is delivered, a detection run has the **same shape**. This is the contract your producer builds against — identical whether the `detection` block is emitted by a workflow stage or delivered over the ingest API. The [delivery path](#how-a-detection-is-delivered) only chooses how this run reaches the Hub; everything below describes the run itself.
 
 A single detection run is the target identifier plus the run body. Each field is detailed in its own subsection underneath.
 
@@ -141,7 +141,7 @@ Provenance for the run. Three `kind`s are first-class:
 
 ### Media
 
-Describes the source media the boxes were authored against. Required when `coordinateSpace == "pixel"` so the server can normalise; optional otherwise, where (together with `fps`/`frameCount`) it drives the non-fatal consistency [warnings](api/#warnings) returned on delivery.
+Describes the source media the boxes were authored against. Required when `coordinateSpace == "pixel"` so the server can normalise; optional otherwise, where (together with `fps`/`frameCount`) it drives the non-fatal consistency [warnings](#validation-warnings) returned on delivery.
 
 ```json
 { "width": 1920, "height": 1080, "fps": 25, "frameCount": 7500, "rotation": 0 }
@@ -248,6 +248,18 @@ A **box** is one detection of the subject at one frame.
 - For normalized coordinates, every value satisfies `0 ≤ x, y, x+w, y+h ≤ 1` (with a 0.01 tolerance for float rounding). A box within that tolerance is **clamped** to `[0, 1]` on write; a box beyond it is rejected and reported back.
 - The server also accepts the legacy `{x1, y1, x2, y2}` corner form. On write it is converted as `x = x1, y = y1, w = x2 − x1, h = y2 − y1`.
 
+### Validation warnings
+
+Some producer mistakes are **non-fatal**: the run is still stored and the offending boxes are kept, but each is reported back alongside the stored run so the issue isn't silent.
+
+| Warning | Cause |
+|---|---|
+| `TIMESTAMP_FRAME_MISMATCH` | `timestampMs` disagrees with `frame * 1000 / fps` beyond one frame (needs `media.fps`). |
+| `FRAME_OUT_OF_RANGE` | A box `frame` is `≥ media.frameCount`. |
+| `DUPLICATE_FRAME` | A track carried more than one box for the same `frame`; the last one was kept. |
+
+A box that is genuinely **invalid** rather than merely suspect — out of frame beyond the clamp tolerance — is **rejected** and listed while the rest of the run is stored; a run is rejected whole only when **every** box is invalid.
+
 ## How a run is stored
 
 The run is stored in a dedicated **`detections` collection keyed by the recording** — **not** embedded on the analysis document — the same way no matter which method delivered it.
@@ -289,4 +301,4 @@ The following are intentionally **not** covered by this contract:
 
 ---
 
-Ready to integrate? See the **[API method](api/)** for how to deliver a run over HTTP — authentication, the `POST /detections` call, the synchronous responses, and a copy-pasteable quickstart.
+Ready to integrate? Build the run above, then deliver it as a `detection` block — emitted from a [workflow stage](../../workflows/stages/) on deployments you control, or over the [ingest API](../../workflows/ingest-service/) from a producer running anywhere.

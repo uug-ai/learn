@@ -53,7 +53,7 @@ This tutorial targets a **self-hosted Hub** that can run custom stages. Make sur
 {{< /tutorial-panel >}}
 
 {{< callout type="info" >}}
-**On a managed / cloud Hub?** You can't deploy a custom stage there, but you can deliver the *same* result over an authenticated API push instead — the [ingest service](/docs/hub/workflows/ingest-service/) accepts the same data over HTTP (for our object-detection example, that's [Extend → Detections → API](/docs/hub/extend/detections/api/)). The rest of this tutorial is for deployments you control.
+**On a managed / cloud Hub?** You can't deploy a custom stage there, but you can deliver the *same* result over HTTP instead — the [ingest service](/docs/hub/workflows/ingest-service/) accepts the same `detection` block over its API (the run shape is the [detection contract](/docs/hub/extend/detections/)). The rest of this tutorial is for deployments you control.
 {{< /callout >}}
 
 This tutorial puts two reference pages into practice, and it helps to have skimmed them first — [Workflows → Stages](/docs/hub/workflows/stages/) (how a microservice connects) and [Workflows → Ingest service](/docs/hub/workflows/ingest-service/) (what it hands back). This tutorial is the hands-on path through both.
