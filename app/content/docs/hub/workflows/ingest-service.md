@@ -13,7 +13,7 @@ weight: 20
 toc: true
 ---
 
-[Integrations](integrations/) covers how your worker *connects* — the queue it consumes, the `WorkflowRun` envelope it receives, and how to register the stage. This page is the other half: **what your worker hands back**, and what the platform does with it.
+A **stage** is a step in a workflow; you implement it as a **microservice**. [Integrations](integrations/) covers how your microservice *connects* — the queue it consumes, the `WorkflowRun` envelope it receives, and how to register the stage. This page is the other half: **what your microservice hands back**, and what the platform does with it.
 
 When a stage wants the platform to store its result — rather than running its own database — it returns a **block envelope**: a small, self-describing list of typed *blocks*. One shared **ingest core** (`models/pkg/ingest`) routes each block by its own type, runs that block type's ordered, idempotent actions, and writes it into the platform-owned collection. The same core runs whether the result arrived over the workflows queue (a pipeline stage) or the public API (`POST /ingest`) — only the trust level differs.
 
@@ -21,7 +21,7 @@ When a stage wants the platform to store its result — rather than running its 
 
 ## The block envelope
 
-A delegated-ingest worker returns its result as a `BlockEnvelope`, set on the `payload` field of the `WorkflowRun` it routes back (see [Integrations → Sending a result back](/docs/hub/workflows/integrations/#sending-a-result-back)):
+A delegated-ingest microservice returns its result as a `BlockEnvelope`, set on the `payload` field of the `WorkflowRun` it routes back (see [Integrations → Sending a result back](/docs/hub/workflows/integrations/#sending-a-result-back)):
 
 ```json
 {
@@ -53,10 +53,10 @@ A block's `type` names the **result shape**, not the stage that produced it. A s
 
 ## How the platform processes an envelope
 
-{{< rete caption="One worker result is a block envelope; the shared ingest core routes each block by its own type into the platform-owned collection — no separate service or network hop." alt="Block envelope routed by the ingest core" height="440" >}}
+{{< rete caption="A stage's result is a block envelope; the shared ingest core routes each block by its own type into the platform-owned collection — no separate service or network hop." alt="Block envelope routed by the ingest core" height="440" >}}
 {
   "groups": [
-    { "id": "src",  "label": "Stage worker",                      "x":   0, "y": 20, "w": 300, "h": 380 },
+    { "id": "src",  "label": "Stage",                             "x":   0, "y": 20, "w": 300, "h": 380 },
     { "id": "core", "label": "Shared ingest core (in-process)",   "x": 360, "y": 20, "w": 300, "h": 380 },
     { "id": "out",  "label": "Platform-owned collections",        "x": 720, "y": 20, "w": 330, "h": 380 }
   ],
@@ -116,11 +116,11 @@ That makes the failure classification safe:
 
 ## Delegated or self-persisting
 
-Returning a block envelope is the **delegated** path: the platform owns the write. It is the right choice when your result maps onto an existing block type and you would rather not run a database — your worker needs no database access at all.
+Returning a block envelope is the **delegated** path: the platform owns the write. It is the right choice when your result maps onto an existing block type and you would rather not run a database — your microservice needs no database access at all.
 
-The alternative is **self-persisting**: your worker writes its own collection and hands back only its routing values under `results[<operation>]`, so conditions and downstream stages can still read it. Then `payload` stays empty.
+The alternative is **self-persisting**: your microservice writes its own collection and hands back only its routing values under `results[<operation>]`, so conditions and downstream stages can still read it. Then `payload` stays empty.
 
-A worker picks exactly one — **never both**. See [Integrations → Sending a result back](/docs/hub/workflows/integrations/#sending-a-result-back) for where each sits in the result contract:
+A microservice picks exactly one — **never both**. See [Integrations → Sending a result back](/docs/hub/workflows/integrations/#sending-a-result-back) for where each sits in the result contract:
 
 - **Delegated / enrich in place** → return a block envelope *(this page)*.
 - **Self-persisting / own collection** → write your collection, return `results[operation]`.
@@ -146,6 +146,6 @@ The core is `models/pkg/ingest`, a deliberately **infra-free** library: it depen
 
 ## See also
 
-- [Integrations](integrations/) — how your worker connects, the `WorkflowRun` contract it codes against, and registering a stage.
+- [Integrations](integrations/) — how your microservice connects, the `WorkflowRun` contract it codes against, and registering a stage.
 - [Detections → Pipeline](../../extend/detections/pipeline/) — the detection capability delivered as a workflow stage.
 - [Detections → API](../../extend/detections/api/) — the same detection contract over HTTP.

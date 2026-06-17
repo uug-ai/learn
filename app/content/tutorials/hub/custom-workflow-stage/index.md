@@ -37,7 +37,7 @@ If you can express it as *"take a recording, do some work, return a result,"* it
 
 ## How it works
 
-This tutorial walks you through bringing a microservice of your own into the Hub as a [stage](/docs/hub/workflows/stages/) that the workflow triggers automatically. You'll wire it end-to-end: deploy a microservice, bind the microservice to a stage in a workflow using the Helm chart, do whatever work your stage does on each recording, and hand the result back — where the workflow carries the results of your stage to later stages and the **blocks** you emit are **persisted into the Hub**.
+A **stage** is a step in a workflow; you implement it as a **microservice**. This tutorial walks you through bringing a microservice of your own into the Hub as a [stage](/docs/hub/workflows/stages/) that the workflow triggers automatically. You'll wire it end-to-end: deploy a microservice, bind the microservice to a stage in a workflow using the Helm chart, do whatever work your stage does on each recording, and hand the result back — where the workflow carries the results of your stage to later stages and the **blocks** you emit are **persisted into the Hub**.
 
 The example microservice is written in Go, but a stage is **language-agnostic** — the only contract is the queue it reads and the JSON it returns, so the same steps apply in Python, Node.js or anything that can speak your broker.
 
@@ -119,7 +119,7 @@ A recording is classified by the built-in pipeline. On classification, the analy
 flowchart LR
     A[Agent recording] --> B[Analysis · classify]
     B -->|hands off classify result| C[Workflows engine]
-    C -->|dispatch on your queue| D[Your stage worker]
+    C -->|dispatch on your queue| D[Your stage]
     D -->|fetch clip| E[(Vault storage)]
     D -->|result block envelope to WORKFLOWS_QUEUE| C
     C -->|IngestBlocks| F[(platform collection)]
@@ -131,11 +131,23 @@ Two names do all the routing, and it's worth keeping them straight:
 - **The stage / operation id** — *who* the engine dispatches to and the key your result is filed under (`results.<id>`). In our example it's `detector`.
 - **The block type** — *what shape* your result is. A stage emits whichever block type fits its output: a `detection` block for boxes/tracks, a `marker` block for a timeline annotation. Our object detector emits a `detection` block.
 
-The platform already knows how to store these block types — a `detection` block becomes boxes/tracks keyed to the recording — so **your worker needs no database of its own**: it hands the data back and the platform persists it. That's the *delegated* sink; see [Ingest service](/docs/hub/workflows/ingest-service/) for the full contract.
+The platform already knows how to store these block types — a `detection` block becomes boxes/tracks keyed to the recording — so **your microservice needs no database of its own**: it hands the data back and the platform persists it. That's the *delegated* sink; see [Ingest service](/docs/hub/workflows/ingest-service/) for the full contract.
+
+A **block** is one self-describing piece of that result: a `type` naming its shape (`detection`, `marker`, …) and a `data` body in that shape. Your microservice returns them as a **block envelope** — a small JSON object with a `blocks` array — set on the run's `payload`:
+
+```json
+{
+  "blocks": [
+    { "type": "detection", "data": { "...": "your result, in that block's shape" } }
+  ]
+}
+```
+
+A single envelope can carry several blocks (a detection plus a marker, say), and the platform stores each by its `type`. The [Ingest service](/docs/hub/workflows/ingest-service/#block-types) lists every block type and the `data` shape it expects.
 
 ## Build the stage
 
-Eight steps, from an empty folder to detection boxes drawn on a recording. Steps 1–5 build the worker; 6–8 register, deploy and verify it.
+Eight steps, from an empty folder to detection boxes drawn on a recording. Steps 1–5 build the microservice; 6–8 register, deploy and verify it.
 
 {{% steps %}}
 
@@ -146,13 +158,13 @@ A stage is defined by four choices. Pick them now; everything else follows (the 
 | Choice | Example | Why it matters |
 |---|---|---|
 | **Operation id** | `detector` | Routing key, result key (`results.detector`), and the name you register. |
-| **Queue** | `hub-workflows-detections` | The one string that binds the engine to your worker. Any name your broker accepts. |
+| **Queue** | `hub-workflows-detections` | The one string that binds the engine to your microservice. Any name your broker accepts. |
 | **Block type** | `detection` | The result shape you emit. `detection` → boxes/tracks in the `detections` collection. |
-| **Sink** | delegated | Hand a block envelope back; the platform persists it. No database in your worker. |
+| **Sink** | delegated | Hand a block envelope back; the platform persists it. No database in your microservice. |
 
-### Scaffold the worker
+### Scaffold the microservice
 
-Create a new Go module for the worker:
+Create a new Go module for the microservice:
 
 ```bash
 mkdir detector && cd detector
@@ -162,7 +174,7 @@ go get github.com/uug-ai/queue@v1.3.6
 go get github.com/sirupsen/logrus@v1.9.4
 ```
 
-The worker reads its configuration from the **connection contract** — a fixed set of environment variables the chart injects into every stage worker. You don't invent these names; the chart provides them:
+The microservice reads its configuration from the **connection contract** — a fixed set of environment variables the chart injects into every microservice. You don't invent these names; the chart provides them:
 
 | Variable | Example | What it is |
 |---|---|---|
@@ -258,12 +270,12 @@ func envOr(name, fallback string) string {
 ```
 
 {{< callout type="info" >}}
-**Any language works.** The contract is just JSON: consume a `WorkflowRun` from your queue, return a `WorkflowRun` (with your result in `payload`) to `WORKFLOWS_QUEUE`. The [envelope reference](/docs/hub/workflows/integrations/#envelope) lists every field you receive.
+**Any language works.** The contract is just JSON: consume a `WorkflowRun` from your queue, and return one to `WORKFLOWS_QUEUE` with your result as a **block envelope** on `payload` (its shape is shown below). The [envelope reference](/docs/hub/workflows/integrations/#envelope) lists every field you receive.
 {{< /callout >}}
 
 ### Do the work
 
-This is the one step that's truly yours: whatever your stage actually does. Your worker is a stateless consumer — pull a run, fetch the media with the credentials on the run, compute, and return. The run tells you **which** recording to fetch (`key`) and **how** (`storage`).
+This is the one step that's truly yours: whatever your stage actually does. Your microservice is a stateless consumer — pull a run, fetch the media with the credentials on the run, compute, and return. The run tells you **which** recording to fetch (`key`) and **how** (`storage`).
 
 In our example the work is object detection, so the function below stands in for a model: download the clip referenced by `run.Key` using `run.Storage`, run inference, and map each result to a normalised box. Whatever your stage does, this is where it slots in.
 
@@ -306,7 +318,20 @@ Boxes here are emitted **already normalised** to `[0,1]` (`coordinateSpace: "nor
 
 Now hand the result back. You return the **same `WorkflowRun` you received** — echo its identity so the engine can locate and scope it — with `storage` cleared and your result wrapped in a self-describing **block envelope** on `payload`. Publish it to `WORKFLOWS_QUEUE`; the engine routes each block through the ingest core into the right platform collection and marks the operation resolved. In our example that's a single `detection` block landing in the `detections` collection.
 
-Add the handler to `detect.go`:
+Concretely, the `payload` you publish is that envelope with one `detection` block whose `data` is the detection result from Step 4:
+
+```json
+{
+  "blocks": [
+    {
+      "type": "detection",
+      "data": { "task": "box", "coordinateSpace": "normalized", "tracks": ["…"] }
+    }
+  ]
+}
+```
+
+In Go you don't hand-write that JSON — the `ingest` package builds and tags the envelope for you. Add the handler to `detect.go`:
 
 ```go
 import (
@@ -386,9 +411,9 @@ go mod tidy
 go build ./...
 ```
 
-That's the whole worker: **consume a run → do the work → return a block envelope.** Everything else — storing the result, keying it to the recording, surfacing it in the UI — is the platform's job.
+That's the whole microservice: **consume a run → do the work → return a block envelope.** Everything else — storing the result, keying it to the recording, surfacing it in the UI — is the platform's job.
 
-### Containerise the worker
+### Containerise the microservice
 
 A minimal multi-stage build:
 
@@ -437,13 +462,13 @@ kerberoshub:
               op: contains
               value: person
 
-  # ── the deployments: your worker ────────────────────────────
+  # ── the deployments: your microservice ────────────────────────────
   services:
     detector:                      # same name as the stage object
-      enabled: true                # deploy the worker pod
+      enabled: true                # deploy the microservice pod
       repository: ghcr.io/acme/detector
       tag: "v1.0.0"
-      queue: "hub-workflows-detections"  # the queue your worker consumes
+      queue: "hub-workflows-detections"  # the queue your microservice consumes
       replicas: 1
       pullPolicy: IfNotPresent
       logLevel: info
@@ -451,8 +476,8 @@ kerberoshub:
 
 A few things to get right here:
 
-- **Both `enabled` flags, plus the engine.** Routing with no worker queues messages nobody reads; a worker with no routing never receives any. Turn on `workflows.enabled`, `workflows.stages.detector.enabled` **and** `services.detector.enabled`.
-- **The queue must match.** The engine dispatches to `services.detector.queue`, and your worker consumes that exact value via `DETECTOR_QUEUE`. They are the one binding between the two.
+- **Both `enabled` flags, plus the engine.** Routing with no microservice queues messages nobody reads; a microservice with no routing never receives any. Turn on `workflows.enabled`, `workflows.stages.detector.enabled` **and** `services.detector.enabled`.
+- **The queue must match.** The engine dispatches to `services.detector.queue`, and your microservice consumes that exact value via `DETECTOR_QUEUE`. They are the one binding between the two.
 - **`dispatch: conditional` is optional.** Use `dispatch: always` to run on every recording. Here we gate on the classifier seeing a `person`, so the detector never runs on empty scenes. The engine validates every condition `path` at boot and refuses to start on an unknown one. See [Conditional routing](/docs/hub/workflows/integrations/#conditional-routing) for the full rule grammar.
 - **It's the engine switch, not the UI one.** `kerberoshub.workflows.enabled` toggles the engine. Don't confuse it with the unrelated `…features.workflows` front-end feature flag.
 
@@ -464,7 +489,7 @@ Apply the values and roll it out:
 helm upgrade hub kerberos/hub -n kerberos-hub -f values.yaml
 ```
 
-Confirm both the engine and your worker are running:
+Confirm both the engine and your microservice are running:
 
 ```bash
 kubectl -n kerberos-hub get pods | grep -E 'workflows|detector'
@@ -482,14 +507,14 @@ Trigger a recording that matches your rule (here: one where the classifier sees 
    kubectl -n kerberos-hub logs deploy/hub-workflows -f
    ```
 
-2. **Watch your worker.** It logs the dispatch it received and the result it returned:
+2. **Watch your microservice.** It logs the dispatch it received and the result it returned:
 
    ```bash
    kubectl -n kerberos-hub logs deploy/hub-detector -f
    # detector received dispatch  runId=… mediaKey=front-gate/2026/06/12/08-30-00.mp4
    ```
 
-3. **See the boxes in the Hub.** Open that recording in the Hub and edit the media — the detection boxes your worker produced are drawn over the frames. Under the hood they were stored as a `DetectionRun` in the `detections` collection, keyed to the recording. You can confirm directly:
+3. **See the boxes in the Hub.** Open that recording in the Hub and edit the media — the detection boxes your microservice produced are drawn over the frames. Under the hood they were stored as a `DetectionRun` in the `detections` collection, keyed to the recording. You can confirm directly:
 
    ```js
    // mongosh
@@ -506,8 +531,8 @@ You shipped a custom capability into the Hub without touching engine code. The s
 
 ## Troubleshooting
 
-{{% details title="Nothing reaches the worker" %}}
-Check all three switches are on (`workflows.enabled`, `workflows.stages.detector.enabled`, `services.detector.enabled`) and that `services.detector.queue` exactly equals the worker's `DETECTOR_QUEUE`. A conditional stage also never fires if its rule never matches — try `dispatch: always` to isolate routing from the condition.
+{{% details title="Nothing reaches the microservice" %}}
+Check all three switches are on (`workflows.enabled`, `workflows.stages.detector.enabled`, `services.detector.enabled`) and that `services.detector.queue` exactly equals the microservice's `DETECTOR_QUEUE`. A conditional stage also never fires if its rule never matches — try `dispatch: always` to isolate routing from the condition.
 {{% /details %}}
 
 {{% details title="The engine won't start after adding the stage" closed="true" %}}
@@ -540,8 +565,8 @@ Confirm your `coordinateSpace` matches the box geometry — normalised `[0,1]` `
 
 <div class="tutorial-grid">
 {{< cards cols="3" >}}
-  {{< card link="/docs/hub/workflows/integrations/" icon="puzzle" title="Workflows → Integrations" subtitle="The full worker contract: queue, envelope, registration." >}}
-  {{< card link="/docs/hub/workflows/ingest-service/" icon="inbox-in" title="Workflows → Ingest service" subtitle="What your worker hands back and how the platform routes it." >}}
+  {{< card link="/docs/hub/workflows/integrations/" icon="puzzle" title="Workflows → Integrations" subtitle="The full microservice contract: queue, envelope, registration." >}}
+  {{< card link="/docs/hub/workflows/ingest-service/" icon="inbox-in" title="Workflows → Ingest service" subtitle="What your microservice hands back and how the platform routes it." >}}
   {{< card link="/docs/hub/extend/detections/" icon="eye" title="Extend → Detections" subtitle="The detection contract, in pipeline and over the API." >}}
 {{< /cards >}}
 </div>
