@@ -23,22 +23,33 @@ filter by site and pop a stream out to fullscreen.
 The page is reachable from the main sidebar under **Live view** and
 serves the route `/livestream`.
 
-{{< figure src="hub-livestream-overview.png" alt="The Live view page showing every connected device in a grid." caption="The Live view page lists every connected device in a grid. Each tile streams its camera live in either SD (MQTT/JPEG) or HD (WebRTC) quality." class="stretch">}}
+{{< figure src="hub-livestream-overview.png" alt="The Live view page showing every connected device in a grid." caption="The Live view page lists every connected device in a grid. Each tile streams its camera live in either SD (MQTT/JPEG) or HD quality, where HD is delivered over WebRTC or HLS depending on how your Hub is configured." class="stretch">}}
 
 ## How the streams reach your browser
 
 The Hub never asks you to open ports on the network where your
-cameras live. Two transports are used to bring the video to the browser,
-selected on a per-tile basis with the Preview/Live toggle:
+cameras live. Every tile exposes the same Preview/Live toggle, and the
+mode you pick selects how the video reaches the browser:
 
 - **Preview — MQTT snapshots.** The agent encodes a low-resolution JPEG
   and publishes it over MQTT (TCP). The browser subscribes over secure
   WebSockets (WSS), so no port forwarding is required.
-- **Live — WebRTC.** The full-resolution video is sent over WebRTC. NAT
-  traversal is handled by the STUN/TURN infrastructure shipped with
-  the Hub, so again no inbound ports need to be opened.
+- **Live — WebRTC** *(default).* The full-resolution video is sent over
+  WebRTC. NAT traversal is handled by the STUN/TURN infrastructure
+  shipped with the Hub, so again no inbound ports need to be opened.
+  This is the lowest-latency option and the only one that supports
+  two-way talk.
+- **Live — HLS** *(firewall-friendly alternative).* The full-resolution
+  video is packaged as a rolling HLS playlist (fMP4/CMAF segments) that
+  the agent pushes to the Hub; the browser plays it back over plain
+  HTTPS. There is no peer-to-peer connection, no UDP and no STUN/TURN,
+  so it works through even the strictest proxies — at the cost of a few
+  seconds of extra latency compared with WebRTC.
 
-The two transports cohabit on the same tile — when you flip a tile from
+Whether the **Live** mode is backed by WebRTC or HLS is a deployment-wide
+choice, not a per-tile one: an administrator sets it once on the
+hub-frontend (see [Live over HLS](#live-over-hls) below). The Preview/Live
+toggle itself behaves identically either way — when you flip a tile from
 Preview to Live, only the underlying stream component changes; the rest
 of the UI (camera name, controls, badges) stays in place.
 
@@ -86,7 +97,78 @@ ICE candidates between the agent and the browser, after which the media
 flows **peer-to-peer** between them. When a direct peer connection
 cannot be established (symmetric NAT, restrictive firewalls), the media
 is automatically relayed through the Kerberos-hosted TURN servers. In
-both cases the camera network never needs an inbound port.
+both cases the camera network never needs an inbound port. When even a
+TURN relay is blocked — or you simply prefer a single HTTPS delivery
+path — the Live mode can be switched to HLS instead, described next.
+
+## Live over HLS
+
+For deployments where WebRTC is impractical — locked-down corporate
+proxies that block UDP, environments without reachable STUN/TURN, or
+simply a preference for a single HTTPS delivery path — the **Live** mode
+can be served over **HLS** instead of WebRTC. Playback is then plain
+HTTPS through the Hub: no peer-to-peer connection, no UDP and no TURN
+relay.
+
+HLS is enabled per deployment by setting the `featureLiveStreamMode`
+environment variable on the hub-frontend to `hls` (the default is
+`webrtc`). The change is transparent to the operator: the Preview/Live
+toggle, the badges and the grid all look and behave exactly the same —
+only the transport behind the **Live** tile differs.
+
+Under the hood the HLS path is still driven over MQTT, exactly like the
+Preview and WebRTC modes:
+
+1. While a Live tile is on screen it periodically publishes a
+   `request-hls-stream` keepalive to the agent. The agent only produces
+   and ships the live stream while at least one viewer is asking, so idle
+   cameras cost nothing.
+2. Once the agent's first segment has landed at the Hub it announces
+   `receive-hls-ready` over MQTT with a session id.
+3. The browser then loads the rolling playlist
+   (`/storage/live/{device}/{session}/index.m3u8`) into the player and
+   keeps pulling new fMP4/CMAF segments over HTTPS. Every playlist and
+   segment request carries the viewer's bearer token and is only served
+   to users who own the device.
+
+{{< rete caption="Live over HLS: the agent packages fMP4/CMAF segments and pushes them to the Hub API, which serves an authenticated rolling playlist to the browser over HTTPS. MQTT carries only the viewer keepalive and the ready announcement — never the media." alt="HLS live transport: the agent pushes segments to the Hub API, the browser pulls the playlist over HTTPS, and MQTT carries the keepalive and ready signalling" height="600" >}}
+{
+  "groups": [
+    { "id": "edge",    "label": "On-premise site", "x":    0, "y":  20, "w": 460, "h": 560 },
+    { "id": "cloud",   "label": "Hub",             "x":  560, "y":  20, "w": 320, "h": 560 },
+    { "id": "browser", "label": "Browser",         "x":  980, "y":  20, "w": 320, "h": 560 }
+  ],
+  "nodes": [
+    { "id": "cam",   "kind": "camera",   "x":  40, "y": 240, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "IP camera", "subtitle": "RTSP://" },
+    { "id": "agent", "kind": "agent",    "x": 240, "y": 235, "w": 200, "h": 150,
+      "header": "AGENT", "title": "Kerberos Agent", "subtitle": "Capture and package HLS",
+      "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "mqtt",  "kind": "mqtt",     "x": 600, "y":  70, "w": 240, "h": 130,
+      "header": "MQTT",  "title": "MQTT broker", "subtitle": "Keepalive + ready" },
+    { "id": "api",   "kind": "hub",      "x": 600, "y": 410, "w": 240, "h": 130,
+      "header": "HUB API", "title": "Segment store", "subtitle": "Serves the playlist" },
+    { "id": "live",  "kind": "pipeline", "x": 1020, "y": 245, "w": 240, "h": 130,
+      "header": "LIVE TILE", "title": "HLS <video>", "subtitle": "HTTPS playback" }
+  ],
+  "connections": [
+    { "from": "cam",   "to": "agent", "fromSide": "right",  "toSide": "left",   "label": "RTSP" },
+
+    { "from": "agent", "to": "mqtt",  "fromSide": "top",    "toSide": "left",   "label": "Ready" },
+    { "from": "mqtt",  "to": "live",  "fromSide": "bottom", "toSide": "top",    "label": "Keepalive + ready" },
+
+    { "from": "agent", "to": "api",   "fromSide": "bottom", "toSide": "left",   "label": "Push segments (HTTPS)" },
+    { "from": "api",   "to": "live",  "fromSide": "right",  "toSide": "bottom", "label": "Playlist + segments (HTTPS)" }
+  ]
+}
+{{< /rete >}}
+
+Because the media is segmented rather than streamed peer-to-peer, HLS
+adds a few seconds of latency compared with WebRTC. Two-way **talk** is
+not available in HLS mode (it relies on the WebRTC back-channel), and the
+live statistics shown when you hover the blinking dot are reduced to
+resolution, bitrate and codec. Everything else — mute, fullscreen, PTZ
+and the status badges — works identically.
 
 ## Filtering and searching
 
@@ -166,19 +248,23 @@ interacting with the tile so they don't obscure the picture.
 {{< figure src="hub-livestream-stream.png" alt="A Live view tile with the Preview/Live switcher, the talk button, the mute button and the fullscreen button visible." caption="Hover a tile to reveal the Preview/Live switcher (top), and the talk, mute and fullscreen controls (bottom). The blinking dot reports the health of the underlying stream." class="stretch">}}
 
 - **Preview / Live** — switches the tile between the MQTT snapshot
-  transport (Preview) and the WebRTC transport (Live). Live requires a
-  Gold subscription or higher; when your plan does not include Live the
-  button is shown disabled with a tooltip explaining the upgrade path.
-  The little blinking dot next to the switcher reports the health of the
-  running stream — hover it in Live mode to see the live WebRTC
-  statistics (resolution, FPS, bitrate, codec, RTT, jitter, packets
-  lost, …).
+  transport (Preview) and the real-time HD transport (Live). Depending on
+  how the Hub is configured, Live is delivered over WebRTC (default) or
+  HLS. Live requires a Gold subscription or higher; when your plan does
+  not include Live the button is shown disabled with a tooltip explaining
+  the upgrade path. The little blinking dot next to the switcher reports
+  the health of the running stream — hover it in Live mode to see the
+  live statistics: the full WebRTC set (resolution, FPS, bitrate, codec,
+  RTT, jitter, packets lost, …) on WebRTC deployments, or resolution,
+  bitrate and codec on HLS.
 - **Talk** — only shown when the agent reports a back-channel (ONVIF
-  audio output or a compatible camera) and the tile is in Live. Press
-  and hold to send your microphone audio to the camera's speaker. The
-  surrounding volume bar visualises the level you're sending.
+  audio output or a compatible camera) and the tile is in Live over
+  WebRTC. Press and hold to send your microphone audio to the camera's
+  speaker. The surrounding volume bar visualises the level you're
+  sending. Talk relies on the WebRTC back-channel, so it is unavailable
+  when the Hub is configured for HLS.
 - **Mute / Unmute** — only shown in Live. Toggles the audio track of
-  the incoming WebRTC stream.
+  the incoming stream.
 - **Fullscreen** — pops the tile out to a fullscreen overlay. Double
   clicking the tile is a shortcut for the same action. Press *Escape* or
   click the *Exit fullscreen* button to return to the grid.
@@ -230,8 +316,10 @@ gated by the subscription level:
 - **Below Gold** — only the Preview (MQTT) transport is available. The
   Live toggle is shown disabled with a tooltip linking to the
   subscription page.
-- **Gold or higher** — both Preview and Live transports are available,
-  along with two-way talk and the live WebRTC statistics.
+- **Gold or higher** — both Preview and Live transports are available.
+  On WebRTC deployments this also includes two-way talk and the full live
+  WebRTC statistics; when the Hub is configured for HLS, Live is
+  available at the same Gold tier but without two-way talk.
 
 The relevant subscription level for a given account is loaded once at
 sign-in and applied to every tile on the page.
@@ -251,6 +339,12 @@ If a tile stays black or never leaves the *Connecting* state:
    between the agent and the TURN server.
 4. Reload the page. The component will renegotiate every running
    stream, which often resolves transient MQTT or WebRTC glitches.
+
+On Hubs configured for HLS the Live path is plain HTTPS rather than
+WebRTC, so steps 2–3 do not apply. Instead, confirm that the browser can
+reach the Hub API over HTTPS (the live playlist is served from
+`/storage/live/...`) and that your session has not expired — an expired
+token makes the authenticated playlist and segment requests fail.
 
 For deeper diagnostics, the browser's developer tools expose the same
 console logs as the rest of the Hub app — every stream lifecycle event
