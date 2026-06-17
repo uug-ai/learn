@@ -53,7 +53,89 @@ toggle itself behaves identically either way — when you flip a tile from
 Preview to Live, only the underlying stream component changes; the rest
 of the UI (camera name, controls, badges) stays in place.
 
-{{< rete caption="Preview snapshots travel over MQTT/WSS; Live media is exchanged peer-to-peer over WebRTC (with TURN as fallback). SDP/ICE signalling is carried by the same MQTT broker." alt="Livestream transports: Preview via MQTT/WSS, Live via WebRTC with MQTT signalling and TURN fallback" height="600" >}}
+{{< rete caption="The building blocks behind Live view. The agent publishes to the MQTT broker, streams live media over WebRTC (with TURN as a relay fallback) or HLS, and the browser frontend plays back whichever transport the deployment is configured for." alt="Building-block overview of Live view: the agent feeds the MQTT broker, WebRTC, TURN and HLS, all consumed by the browser frontend" height="600" >}}
+{
+  "groups": [],
+  "nodes": [
+    { "id": "agent",    "kind": "agent",    "x":  40, "y": 255, "w": 200, "h": 120,
+      "header": "AGENT", "title": "Agent", "subtitle": "Capture & publish" },
+    { "id": "mqtt",     "kind": "mqtt",     "x": 460, "y":  40, "w": 200, "h": 100,
+      "header": "MQTT", "title": "MQTT broker", "subtitle": "Signalling" },
+    { "id": "webrtc",   "kind": "webrtc",   "x": 460, "y": 190, "w": 200, "h": 100,
+      "header": "WEBRTC", "title": "WebRTC", "subtitle": "P2P media" },
+    { "id": "turn",     "kind": "turn",     "x": 460, "y": 340, "w": 200, "h": 100,
+      "header": "TURN", "title": "STUN / TURN", "subtitle": "Relay fallback" },
+    { "id": "hls",      "kind": "hls",      "x": 460, "y": 490, "w": 200, "h": 100,
+      "header": "HLS", "title": "HLS", "subtitle": "HTTPS segments" },
+    { "id": "frontend", "kind": "frontend", "x": 880, "y": 255, "w": 200, "h": 120,
+      "header": "FRONTEND", "title": "Browser app", "subtitle": "Live view UI" }
+  ],
+  "connections": [
+    { "from": "agent",  "to": "mqtt",     "fromSide": "top",    "toSide": "left" },
+    { "from": "agent",  "to": "webrtc",   "fromSide": "right",  "toSide": "left" },
+    { "from": "agent",  "to": "hls",      "fromSide": "bottom", "toSide": "left" },
+    { "from": "webrtc", "to": "turn",     "fromSide": "bottom", "toSide": "top" },
+    { "from": "mqtt",   "to": "frontend", "fromSide": "right",  "toSide": "top" },
+    { "from": "webrtc", "to": "frontend", "fromSide": "right",  "toSide": "left" },
+    { "from": "hls",    "to": "frontend", "fromSide": "right",  "toSide": "bottom" }
+  ]
+}
+{{< /rete >}}
+
+All three paths share one rule: the camera network never needs an
+inbound port. The agent only ever makes outbound connections — to the
+MQTT broker, to its WebRTC peer (or the TURN relay) and to the Hub API —
+so Live view works behind NAT and restrictive firewalls. Each mechanism
+is broken down below.
+
+### Preview — MQTT snapshots
+
+Preview is the default, always-available mode and the lightest on
+bandwidth. The agent encodes a low-resolution JPEG of each camera and
+publishes it to the MQTT broker over an outbound TCP connection; the
+browser subscribes to the same topic over secure WebSockets (WSS) and
+swaps the image as new snapshots arrive. There is no media session to
+negotiate, no UDP and no peer connection — just a periodic still image —
+so Preview works on every plan and through virtually any firewall. It is
+also the mode the grid falls back to whenever Live is unavailable or your
+subscription does not include the HD transports.
+
+{{< rete caption="Preview: the agent encodes low-resolution JPEG snapshots and publishes them to the MQTT broker over TCP; the browser subscribes over secure WebSockets (WSS) and swaps the image as new frames arrive. No media session, no UDP and no peer connection." alt="Preview transport: the agent publishes JPEG snapshots to the MQTT broker over TCP and the browser subscribes over secure WebSockets" height="500" >}}
+{
+  "groups": [
+    { "id": "edge",    "label": "On-premise site", "x":    0, "y":  20, "w": 460, "h": 420 },
+    { "id": "cloud",   "label": "Hub",             "x":  560, "y":  20, "w": 320, "h": 420 },
+    { "id": "browser", "label": "Browser",         "x":  980, "y":  20, "w": 320, "h": 420 }
+  ],
+  "nodes": [
+    { "id": "cam",     "kind": "camera",   "x":  40, "y": 175, "w": 180, "h": 130,
+      "header": "CAMERA", "title": "IP camera", "subtitle": "RTSP://" },
+    { "id": "agent",   "kind": "agent",    "x": 240, "y": 180, "w": 200, "h": 130,
+      "header": "AGENT", "title": "Agent", "subtitle": "Encode JPEG snapshots" },
+    { "id": "mqtt",    "kind": "mqtt",     "x": 600, "y": 180, "w": 240, "h": 130,
+      "header": "MQTT",  "title": "MQTT broker", "subtitle": "Snapshot topic" },
+    { "id": "preview", "kind": "pipeline", "x": 1020, "y": 180, "w": 240, "h": 130,
+      "header": "PREVIEW TILE", "title": "JPEG <img>", "subtitle": "Low-res snapshots" }
+  ],
+  "connections": [
+    { "from": "cam",   "to": "agent",   "fromSide": "right", "toSide": "left", "label": "RTSP" },
+    { "from": "agent", "to": "mqtt",    "fromSide": "right", "toSide": "left", "label": "Publish JPEG (TCP)" },
+    { "from": "mqtt",  "to": "preview", "fromSide": "right", "toSide": "left", "label": "Subscribe (WSS)" }
+  ]
+}
+{{< /rete >}}
+
+### Live over WebRTC
+
+WebRTC is the default Live transport and the lowest-latency option. The
+agent and the browser use the MQTT broker as a signalling channel to
+exchange SDP offers and ICE candidates, after which the full-resolution
+media flows **peer-to-peer** between them. When a direct peer connection
+cannot be established (symmetric NAT, restrictive firewalls), the media
+is automatically relayed through the Kerberos-hosted TURN servers. WebRTC
+is also the only mode that carries a back-channel for two-way **talk**.
+
+{{< rete caption="Live over WebRTC: the agent and browser exchange SDP/ICE through the MQTT broker, then stream media peer-to-peer. A Kerberos-hosted TURN server relays the media only when a direct connection cannot be established." alt="WebRTC live transport: SDP/ICE signalling over MQTT, peer-to-peer media, and a TURN relay used only as a fallback" height="600" >}}
 {
   "groups": [
     { "id": "edge",    "label": "On-premise site", "x":    0, "y":  20, "w": 460, "h": 560 },
@@ -61,47 +143,32 @@ of the UI (camera name, controls, badges) stays in place.
     { "id": "browser", "label": "Browser",         "x":  980, "y":  20, "w": 320, "h": 560 }
   ],
   "nodes": [
-    { "id": "cam",     "kind": "camera",   "x":  40, "y": 240, "w": 180, "h": 130,
+    { "id": "cam",   "kind": "camera",   "x":  40, "y": 240, "w": 180, "h": 130,
       "header": "CAMERA", "title": "IP camera", "subtitle": "RTSP://" },
-    { "id": "agent",   "kind": "agent",    "x": 240, "y": 235, "w": 200, "h": 150,
-      "header": "AGENT", "title": "Kerberos Agent", "subtitle": "Capture and publish",
-      "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
-    { "id": "mqtt",    "kind": "mqtt",     "x": 600, "y":  70, "w": 240, "h": 130,
-      "header": "MQTT",  "title": "MQTT broker", "subtitle": "Snapshots + signalling" },
-    { "id": "turn",    "kind": "turn",     "x": 600, "y": 410, "w": 240, "h": 130,
+    { "id": "agent", "kind": "agent",    "x": 240, "y": 245, "w": 200, "h": 130,
+      "header": "AGENT", "title": "Agent", "subtitle": "Capture and publish" },
+    { "id": "mqtt",  "kind": "mqtt",     "x": 600, "y":  70, "w": 240, "h": 130,
+      "header": "MQTT",  "title": "MQTT broker", "subtitle": "SDP/ICE signalling" },
+    { "id": "turn",  "kind": "turn",     "x": 600, "y": 410, "w": 240, "h": 130,
       "header": "STUN / TURN", "title": "WebRTC relay", "subtitle": "Used only when direct fails" },
-    { "id": "preview", "kind": "pipeline", "x": 1020, "y":  70, "w": 240, "h": 130,
-      "header": "PREVIEW TILE", "title": "JPEG <img>", "subtitle": "Low-res snapshots" },
-    { "id": "live",    "kind": "pipeline", "x": 1020, "y": 245, "w": 240, "h": 130,
+    { "id": "live",  "kind": "pipeline", "x": 1020, "y": 245, "w": 240, "h": 130,
       "header": "LIVE TILE", "title": "WebRTC <video>", "subtitle": "Full-resolution media" }
   ],
   "connections": [
-    { "from": "cam",   "to": "agent",   "fromSide": "right",  "toSide": "left",   "label": "RTSP" },
+    { "from": "cam",   "to": "agent", "fromSide": "right",  "toSide": "left",   "label": "RTSP" },
 
-    { "from": "agent", "to": "mqtt",    "fromSide": "top",    "toSide": "left",   "label": "Snapshots + signalling" },
-    { "from": "mqtt",  "to": "preview", "fromSide": "right",  "toSide": "left",   "label": "WSS" },
-    { "from": "mqtt",  "to": "live",    "fromSide": "bottom", "toSide": "top",    "label": "Signalling" },
+    { "from": "agent", "to": "mqtt",  "fromSide": "top",    "toSide": "left",   "label": "SDP/ICE signalling" },
+    { "from": "mqtt",  "to": "live",  "fromSide": "bottom", "toSide": "top",    "label": "Signalling" },
 
-    { "from": "agent", "to": "live",    "fromSide": "right",  "toSide": "left",   "label": "Direct media (WebRTC P2P)" },
+    { "from": "agent", "to": "live",  "fromSide": "right",  "toSide": "left",   "label": "Direct media (WebRTC P2P)" },
 
-    { "from": "agent", "to": "turn",    "fromSide": "bottom", "toSide": "left",   "label": "Relay", "kind": "dashed" },
-    { "from": "turn",  "to": "live",    "fromSide": "right",  "toSide": "bottom", "label": "Relay", "kind": "dashed" }
+    { "from": "agent", "to": "turn",  "fromSide": "bottom", "toSide": "left",   "label": "Relay", "kind": "dashed" },
+    { "from": "turn",  "to": "live",  "fromSide": "right",  "toSide": "bottom", "label": "Relay", "kind": "dashed" }
   ]
 }
 {{< /rete >}}
 
-The Preview path only needs outbound TCP from the agent and a WebSocket
-from the browser, so it works through almost any firewall. The Live path
-uses the MQTT broker as a signalling channel to exchange SDP offers and
-ICE candidates between the agent and the browser, after which the media
-flows **peer-to-peer** between them. When a direct peer connection
-cannot be established (symmetric NAT, restrictive firewalls), the media
-is automatically relayed through the Kerberos-hosted TURN servers. In
-both cases the camera network never needs an inbound port. When even a
-TURN relay is blocked — or you simply prefer a single HTTPS delivery
-path — the Live mode can be switched to HLS instead, described next.
-
-## Live over HLS
+### Live over HLS
 
 For deployments where WebRTC is impractical — locked-down corporate
 proxies that block UDP, environments without reachable STUN/TURN, or
@@ -131,7 +198,7 @@ Preview and WebRTC modes:
    segment request carries the viewer's bearer token and is only served
    to users who own the device.
 
-{{< rete caption="Live over HLS: the agent packages fMP4/CMAF segments and pushes them to the Hub API, which serves an authenticated rolling playlist to the browser over HTTPS. MQTT carries only the viewer keepalive and the ready announcement — never the media." alt="HLS live transport: the agent pushes segments to the Hub API, the browser pulls the playlist over HTTPS, and MQTT carries the keepalive and ready signalling" height="600" >}}
+{{< rete caption="Live over HLS: the browser heartbeats a keepalive to the agent through the MQTT broker (request-hls-stream) and the agent announces readiness back the same way (receive-hls-ready). Only then does the agent push fMP4/CMAF segments to the Hub API, which serves the authenticated rolling playlist to the browser over HTTPS — MQTT never carries the media itself." alt="HLS live transport: the browser keepalives the agent through the MQTT broker and the agent announces readiness back through it, while media segments flow from the agent to the Hub API and on to the browser over HTTPS" height="600" >}}
 {
   "groups": [
     { "id": "edge",    "label": "On-premise site", "x":    0, "y":  20, "w": 460, "h": 560 },
@@ -141,11 +208,10 @@ Preview and WebRTC modes:
   "nodes": [
     { "id": "cam",   "kind": "camera",   "x":  40, "y": 240, "w": 180, "h": 130,
       "header": "CAMERA", "title": "IP camera", "subtitle": "RTSP://" },
-    { "id": "agent", "kind": "agent",    "x": 240, "y": 235, "w": 200, "h": 150,
-      "header": "AGENT", "title": "Kerberos Agent", "subtitle": "Capture and package HLS",
-      "badges": ["docker", "linux", "raspberrypi", "kubernetes"] },
+    { "id": "agent", "kind": "agent",    "x": 240, "y": 245, "w": 200, "h": 130,
+      "header": "AGENT", "title": "Agent", "subtitle": "Capture and package HLS" },
     { "id": "mqtt",  "kind": "mqtt",     "x": 600, "y":  70, "w": 240, "h": 130,
-      "header": "MQTT",  "title": "MQTT broker", "subtitle": "Keepalive + ready" },
+      "header": "MQTT",  "title": "MQTT broker", "subtitle": "Heartbeat relay" },
     { "id": "api",   "kind": "hub",      "x": 600, "y": 410, "w": 240, "h": 130,
       "header": "HUB API", "title": "Segment store", "subtitle": "Serves the playlist" },
     { "id": "live",  "kind": "pipeline", "x": 1020, "y": 245, "w": 240, "h": 130,
@@ -154,8 +220,10 @@ Preview and WebRTC modes:
   "connections": [
     { "from": "cam",   "to": "agent", "fromSide": "right",  "toSide": "left",   "label": "RTSP" },
 
-    { "from": "agent", "to": "mqtt",  "fromSide": "top",    "toSide": "left",   "label": "Ready" },
-    { "from": "mqtt",  "to": "live",  "fromSide": "bottom", "toSide": "top",    "label": "Keepalive + ready" },
+    { "from": "live",  "to": "mqtt",  "fromSide": "left",   "toSide": "right",  "label": "Keepalive" },
+    { "from": "mqtt",  "to": "agent", "fromSide": "bottom", "toSide": "right",  "label": "request-hls-stream" },
+    { "from": "agent", "to": "mqtt",  "fromSide": "top",    "toSide": "left",   "label": "receive-hls-ready" },
+    { "from": "mqtt",  "to": "live",  "fromSide": "top",    "toSide": "top",    "label": "Ready" },
 
     { "from": "agent", "to": "api",   "fromSide": "bottom", "toSide": "left",   "label": "Push segments (HTTPS)" },
     { "from": "api",   "to": "live",  "fromSide": "right",  "toSide": "bottom", "label": "Playlist + segments (HTTPS)" }
