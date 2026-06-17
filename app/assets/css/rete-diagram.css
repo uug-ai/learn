@@ -86,6 +86,7 @@ html.dark .rete-group__label,
     stroke: #c9ccd6;
     stroke-width: 4;
     stroke-linecap: round;
+    stroke-linejoin: round;
     /* Flowing-liquid effect: a dashed stroke whose offset animates so the
        dashes appear to drift from `from` to `to`. */
     stroke-dasharray: 10 10;
@@ -120,10 +121,18 @@ html.dark .rete-group__label,
     animation: none;
 }
 
-/* Inline label drawn on top of a connection's bezier midpoint. The text
-   sits on top of the (coloured) edge: black ink on a white halo in light
-   mode, white ink on a black halo in dark mode. `paint-order: stroke`
-   draws the halo first so the fill is never clipped. */
+/* Opt back into the flowing-liquid animation per-connection (`"animated": true`),
+   even on a labelled edge that would otherwise render static. Declared after
+   `--labelled` so it wins the cascade; the label keeps its halo and stays legible. */
+.rete-connection--animated {
+    stroke-dasharray: 10 10;
+    animation: rete-flow 1.2s linear infinite;
+}
+
+/* Inline label drawn on top of a connection's mid-point. The text sits on top
+   of the (coloured) edge: black ink on a white halo in light mode, white ink
+   on a black halo in dark mode. `paint-order: stroke` draws the halo first so
+   the fill is never clipped. */
 .rete-connection__label {
     fill: #1a1a1a;
     stroke: #ffffff;

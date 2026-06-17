@@ -1,27 +1,30 @@
 ---
-title: "Ingest service"
+title: "Ingest"
 description: "How a workflow stage hands a result back to the platform: a self-describing block envelope the shared ingest core routes — block by block — into platform-owned storage."
 lead: "Return one envelope of typed blocks; the ingest core routes each block by its own type and runs that block's ordered, idempotent actions — the same whether the result arrived over the queue or the API."
 date: 2026-06-04T00:00:00+00:00
 lastmod: 2026-06-16T00:00:00+00:00
 draft: false
 images: []
+aliases:
+  - /docs/hub/workflows/ingest-service/
 menu:
   hub:
     parent: "workflows"
+    identifier: "ingest"
 weight: 20
 toc: true
 ---
 
-[Integrations](integrations/) covers how your worker *connects* — the queue it consumes, the `WorkflowRun` envelope it receives, and how to register the stage. This page is the other half: **what your worker hands back**, and what the platform does with it.
+A **stage** is a step in a workflow; you implement it as a **microservice**. [Stages](../stages/) covers how your microservice *connects* — the queue it consumes, the `WorkflowRun` envelope it receives, and how to register the stage. This page is the other half: **what your microservice hands back**, and what the platform does with it.
 
 When a stage wants the platform to store its result — rather than running its own database — it returns a **block envelope**: a small, self-describing list of typed *blocks*. One shared **ingest core** (`models/pkg/ingest`) routes each block by its own type, runs that block type's ordered, idempotent actions, and writes it into the platform-owned collection. The same core runs whether the result arrived over the workflows queue (a pipeline stage) or the public API (`POST /ingest`) — only the trust level differs.
 
-> **"Service" is a package, not a process.** There is no extra microservice, deployment or network hop. The ingest core is a shared library compiled *into* the workflows engine and the hub-api binary; each calls `IngestBlocks(...)` in-process on its own request. "Service" here names a single, consistent code path for *receiving* a result, not a running component.
+> **Ingest is a code path, not a service.** There is no separate microservice, deployment or network hop. The ingest core is a shared library compiled *into* the workflows engine and the hub-api binary; each calls `IngestBlocks(...)` in-process on its own request. "Ingest" names a single, consistent code path for *receiving* a result, not a running component.
 
 ## The block envelope
 
-A delegated-ingest worker returns its result as a `BlockEnvelope`, set on the `payload` field of the `WorkflowRun` it routes back (see [Integrations → Sending a result back](/docs/hub/workflows/integrations/#sending-a-result-back)):
+A delegated-ingest microservice returns its result as a `BlockEnvelope`, set on the `payload` field of the `WorkflowRun` it routes back (see [Stages → Sending a result back](/docs/hub/workflows/stages/#sending-a-result-back)):
 
 ```json
 {
@@ -42,21 +45,16 @@ The envelope replaces the single typed body the old per-kind entry point took, s
 
 ## Block types
 
-The core ships a small, closed set of block types. A producer stamps each block's `type` with one of them:
+The core ships a small, closed set of block types — `detection` and `marker` today. A producer stamps each block's `type` with one of them, and that `type` names the **result shape**, not the stage that produced it: a stage that finds bounding boxes emits a `detection` block whatever it is detecting, and one envelope may carry several blocks of different types.
 
-| `type` | What it is | `data` shape | Stored as | Writable from |
-|--------|------------|--------------|-----------|---------------|
-| `detection` | A run of detection tracks/boxes (people, vehicles, faces, …). | `PostDetectionsRequest` | a `DetectionRun` in the `detections` collection, keyed by `(key, source.runId)` | API **and** pipeline |
-| `marker` | A single timeline annotation — a labelled point or span on the recording. | `Marker` | a `Marker` in the `markers` collection, keyed by `(organisation, device, name, startTimestamp)` | pipeline only |
-
-A block's `type` names the **result shape**, not the stage that produced it. A single stage can emit whichever block type fits its output — a stage that finds bounding boxes emits a `detection` block whatever it is detecting — and may emit several blocks of different types in one envelope. New result shapes arrive as new block types with their own handler, but most new stages simply **recombine the existing types**.
+The full catalogue — each type's `data` contract, where it is stored, and which transports may emit it — lives under **[Blocks](blocks/)**.
 
 ## How the platform processes an envelope
 
-{{< rete caption="One worker result is a block envelope; the shared ingest core routes each block by its own type into the platform-owned collection — no separate service or network hop." alt="Block envelope routed by the ingest core" height="440" >}}
+{{< rete caption="A stage's result is a block envelope; the shared ingest core routes each block by its own type into the platform-owned collection — no separate service or network hop." alt="Block envelope routed by the ingest core" height="440" >}}
 {
   "groups": [
-    { "id": "src",  "label": "Stage worker",                      "x":   0, "y": 20, "w": 300, "h": 380 },
+    { "id": "src",  "label": "Stage",                             "x":   0, "y": 20, "w": 300, "h": 380 },
     { "id": "core", "label": "Shared ingest core (in-process)",   "x": 360, "y": 20, "w": 300, "h": 380 },
     { "id": "out",  "label": "Platform-owned collections",        "x": 720, "y": 20, "w": 330, "h": 380 }
   ],
@@ -90,8 +88,8 @@ How a failure is classified decides whether the caller retries — see [Idempote
 
 Routing happens on two independent axes; keeping them separate is what keeps the core simple:
 
-- **Kind — the block `type`.** *What is this result?* `detection` vs `marker`. Different shapes, different collections, different action sequences. Routed by the handler registry on `type`.
-- **Task — a flavour within a kind.** *Which variant of this shape?* Inside `detection`, `box` and `pose` both report an axis-aligned box per frame, share one contract (`PostDetectionsRequest`) and one `detections` collection, so they route to the same handler. A result whose shape is genuinely different — a marker is a timeline annotation, not a box — is its **own block type**, not a task.
+- **Block `type` — what this result is.** *What is this result?* `detection` vs `marker`. Different shapes, different collections, different action sequences. Routed by the handler registry on `type`.
+- **Task — a flavour within a type.** *Which variant of this shape?* Inside `detection`, `box` and `pose` both report an axis-aligned box per frame, share one contract (`PostDetectionsRequest`) and one `detections` collection, so they route to the same handler. A result whose shape is genuinely different — a marker is a timeline annotation, not a box — is its **own block type**, not a task.
 
 ## Trust: the source allow-list
 
@@ -116,16 +114,16 @@ That makes the failure classification safe:
 
 ## Delegated or self-persisting
 
-Returning a block envelope is the **delegated** path: the platform owns the write. It is the right choice when your result maps onto an existing block type and you would rather not run a database — your worker needs no database access at all.
+Returning a block envelope is the **delegated** option: the platform owns the write. It is the right choice when your result maps onto an existing block type and you would rather not run a database — your microservice needs no database access at all.
 
-The alternative is **self-persisting**: your worker writes its own collection and hands back only its routing values under `results[<operation>]`, so conditions and downstream stages can still read it. Then `payload` stays empty.
+The alternative is **self-persisting**: your microservice writes its own collection and hands back only its routing values under `results[<operation>]`, so conditions and downstream stages can still read it. Then `payload` stays empty.
 
-A worker picks exactly one — **never both**. See [Integrations → Sending a result back](/docs/hub/workflows/integrations/#sending-a-result-back) for where each sits in the result contract:
+A microservice picks exactly one — **never both**. See [Stages → Sending a result back](/docs/hub/workflows/stages/#sending-a-result-back) for where each sits in the result contract:
 
 - **Delegated / enrich in place** → return a block envelope *(this page)*.
 - **Self-persisting / own collection** → write your collection, return `results[operation]`.
 
-## Two doors, one core
+## Two transports, one core
 
 The same package sits behind both transports; only the adapter around it differs.
 
@@ -134,11 +132,11 @@ The same package sits behind both transports; only the adapter around it differs
 The workflows engine wires the core to the run it already owns:
 
 - The **target** is the run's *own* recording — its `key`, organisation and device, plus the recording timestamp persisted when the run opened, so a derived artifact expires on the recording's retention clock rather than the post time. A `data` body that carries its own recording reference (e.g. a `PostDetectionsRequest` `mediaKey`) is **ignored** on the queue path; the run decides the target.
-- After a successful ingest the engine **mirrors the blocks into `results[<operation>]`, grouped by block type** (`results.<operation>.detections`, `…markers`, one array per type that occurred) so the operation resolves and any conditional stage waiting on it can fire. The block bodies are decoded, so a downstream condition can branch on what the stage produced — including element-wise with a `*` wildcard (`results.<operation>.detections.*.score`). See [Matching inside arrays](/docs/hub/workflows/integrations/#matching-inside-arrays).
+- After a successful ingest the engine **mirrors the blocks into `results[<operation>]`, grouped by block type** (`results.<operation>.detections`, `…markers`, one array per type that occurred) so the stage resolves and any conditional stage waiting on it can fire. The block bodies are decoded, so a downstream condition can branch on what the stage produced — including element-wise with a `*` wildcard (`results.<operation>.detections.*.score`). See [Matching inside arrays](/docs/hub/workflows/stages/#matching-inside-arrays).
 
 ### Over the API (`POST /ingest`)
 
-The public endpoint is the same core behind an HTTP door. It takes a single `{operation, payload, mediaKey | analysisId}`, wraps it as a **one-block** envelope (`type = operation`, `data = payload`), resolves the target from `mediaKey`/`analysisId`, stamps the source as `api` (so trusted side-effects gate off), and maps the per-block report to an HTTP status — one block in, one block report out. The typed [`/detections`](../../extend/detections/api/) endpoint stays as-is alongside it for that specific contract.
+The public endpoint is the same core behind an HTTP door. It takes a single `{operation, payload, mediaKey | analysisId}`, wraps it as a **one-block** envelope (`type = operation`, `data = payload`), resolves the target from `mediaKey`/`analysisId`, stamps the source as `api` (so trusted side-effects gate off), and maps the per-block report to an HTTP status — one block in, one block report out.
 
 ## Where it lives
 
@@ -146,6 +144,6 @@ The core is `models/pkg/ingest`, a deliberately **infra-free** library: it depen
 
 ## See also
 
-- [Integrations](integrations/) — how your worker connects, the `WorkflowRun` contract it codes against, and registering a stage.
-- [Detections → Pipeline](../../extend/detections/pipeline/) — the detection capability delivered as a workflow stage.
-- [Detections → API](../../extend/detections/api/) — the same detection contract over HTTP.
+- [Blocks](blocks/) — the catalogue of block types and the `data` contract behind each.
+- [Stages](../stages/) — how your microservice connects, the `WorkflowRun` contract it codes against, and registering a stage.
+- [Detection](blocks/detection/) — the `detection` block's `data` contract: tracks, boxes, coordinate spaces and how a run is stored.

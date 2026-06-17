@@ -86,7 +86,7 @@ Hub processes every recording through a pipeline of small, focused microservices
 }
 {{< /rete >}}
 
-Each microservice in the Hub pipeline owns a single responsibility. Together they form an event mesh that passes messages from one service to the next asynchronously, so any step can scale, fail or be replaced independently. The pipeline is also open: you can drop in your own microservices, written in whatever language fits the job, and slot them in next to the built-in ones — see [Workflows → Integrations](/docs/hub/workflows/integrations/) for how to plug your own service in as a workflow stage, and [Ingest service](/docs/hub/workflows/ingest-service/) for the shared layer that receives a result from either the API or the queue and runs the right actions for it.
+Each microservice in the Hub pipeline owns a single responsibility. Together they form an event mesh that passes messages from one service to the next asynchronously, so any step can scale, fail or be replaced independently. The pipeline is also open: you can drop in your own microservices, written in whatever language fits the job, and slot them in next to the built-in ones — see [Workflows → Stages](/docs/hub/workflows/stages/) for how to plug your own service in as a workflow stage, and [Ingest](/docs/hub/workflows/ingest/) for the shared layer that receives a result from either the API or the queue and runs the right actions for it.
 
 # How it works
 

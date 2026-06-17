@@ -26,6 +26,23 @@
   --shadow: rgba(20, 11, 59, 0.08);
 }
 
+/* Dark palette — activated via the `.dark` class Hextra sets on <html>.
+   Mirrors the UUG design site so the custom top bar / dropdowns adapt
+   to dark mode alongside Hextra's content styling. */
+.dark {
+  --primary-color: #6f5cff;
+  --primary-dark: #4b38e6;
+  --secondary-color: #ff4d85;
+  --brand-gradient: linear-gradient(90deg, #6f5cff 0%, #ff4d85 100%);
+  --text-primary: #f5f4ff;
+  --text-secondary: #a7a4bd;
+  --background: #0b0b12;
+  --surface: #14141e;
+  --surface-strong: #1c1c2a;
+  --border: #2a2a3a;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
 .hextra-max-page-width {
   max-width: 1200px;
   padding-top: 0.75rem;
@@ -288,6 +305,95 @@
   color: currentColor;
 }
 
+/* ==========================================================================
+   Light / dark theme toggle – animated sun-setting / moon-rising switch,
+   mirroring the UUG design site (design/src/components/ThemeToggle).
+   Markup: layouts/_partials/theme-toggle.html · wiring: custom/head-end.html
+   ========================================================================== */
+.learn-theme-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.learn-theme-toggle:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+/* The thumb already reads as a circular control, so drop the generic
+   top-bar hover background to avoid a double circle. */
+.learn-topbar-control > .learn-theme-toggle:hover {
+  background: transparent;
+}
+
+.learn-theme-toggle__thumb {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f8f8f8;
+  overflow: hidden;
+  transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s ease;
+}
+
+.learn-theme-toggle__sun,
+.learn-theme-toggle__moon {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light mode: sun visible, moon waiting below (ready to rise). */
+.learn-theme-toggle__sun {
+  color: #333;
+  opacity: 1;
+  transform: translateY(0) rotate(0deg);
+}
+
+.learn-theme-toggle__moon {
+  color: #fff;
+  opacity: 0;
+  transform: translateY(20px) rotate(-45deg);
+}
+
+.learn-theme-toggle:hover .learn-theme-toggle__thumb {
+  transform: scale(1.1);
+}
+
+.learn-theme-toggle:active .learn-theme-toggle__thumb {
+  transform: scale(0.95);
+}
+
+/* Dark mode: sun sets down, moon rises up. */
+.learn-theme-toggle.is-dark .learn-theme-toggle__thumb {
+  background: #2a2a2a;
+}
+
+.learn-theme-toggle.is-dark .learn-theme-toggle__sun {
+  opacity: 0;
+  transform: translateY(20px) rotate(45deg);
+}
+
+.learn-theme-toggle.is-dark .learn-theme-toggle__moon {
+  opacity: 1;
+  transform: translateY(0) rotate(0deg);
+}
+
 @media (min-width: 768px) {
   .learn-topbar-link,
   .learn-topbar-dropdown {
@@ -462,4 +568,556 @@ main article img {
 
 body.lightbox-open {
   overflow: hidden;
+}
+
+/* ==========================================================================
+   Tutorial design system — components that make a walkthrough feel like a
+   guided experience instead of a reference page. Used by the
+   `tutorial-meta` / `tutorial-panel` shortcodes and by Hextra's steps/cards.
+   ========================================================================== */
+
+/* --- Metadata band: time / level / stack / prerequisites pills ----------- */
+.tutorial-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1.75rem 0 2rem;
+}
+
+.tutorial-meta__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.95rem 0.4rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.dark .tutorial-meta__item {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tutorial-meta__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  background: rgba(39, 19, 255, 0.1);
+  color: var(--primary-color);
+  flex: none;
+}
+
+.dark .tutorial-meta__icon {
+  background: rgba(124, 110, 255, 0.16);
+  color: #b3a9ff;
+}
+
+.tutorial-meta__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.tutorial-meta__text {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.15;
+}
+
+.tutorial-meta__label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.dark .tutorial-meta__label {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.tutorial-meta__value {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dark .tutorial-meta__value {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* --- Highlight panel: "What you'll build", "Before you start", … --------- */
+.tutorial-panel {
+  position: relative;
+  margin: 2rem 0;
+  padding: 1.4rem 1.6rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.dark .tutorial-panel {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tutorial-panel--brand {
+  border-color: rgba(39, 19, 255, 0.18);
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(39, 19, 255, 0.08), transparent 60%),
+    linear-gradient(180deg, rgba(39, 19, 255, 0.045), rgba(255, 0, 89, 0.03));
+}
+
+.dark .tutorial-panel--brand {
+  border-color: rgba(86, 66, 255, 0.35);
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(86, 66, 255, 0.22), transparent 60%),
+    linear-gradient(180deg, rgba(39, 19, 255, 0.12), rgba(255, 0, 89, 0.05));
+}
+
+.tutorial-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+
+.tutorial-panel__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 11px;
+  background: rgba(39, 19, 255, 0.1);
+  color: var(--primary-color);
+  flex: none;
+}
+
+.dark .tutorial-panel__icon {
+  background: rgba(124, 110, 255, 0.18);
+  color: #b3a9ff;
+}
+
+.tutorial-panel--neutral .tutorial-panel__icon {
+  background: rgba(100, 102, 114, 0.14);
+  color: var(--text-secondary);
+}
+
+.dark .tutorial-panel--neutral .tutorial-panel__icon {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tutorial-panel--success .tutorial-panel__icon {
+  background: rgba(34, 197, 94, 0.14);
+  color: #16a34a;
+}
+
+.dark .tutorial-panel--success .tutorial-panel__icon {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.tutorial-panel__icon svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.tutorial-panel__title {
+  font-family: var(--font-family-heading);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.dark .tutorial-panel__title {
+  color: #fff;
+}
+
+.tutorial-panel__body {
+  color: var(--text-secondary);
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+
+.dark .tutorial-panel__body {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.tutorial-panel__body > :first-child {
+  margin-top: 0;
+}
+
+.tutorial-panel__body > :last-child {
+  margin-bottom: 0;
+}
+
+.tutorial-panel__body strong {
+  color: var(--text-primary);
+}
+
+.dark .tutorial-panel__body strong {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.tutorial-panel__body a {
+  color: var(--primary-color);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.dark .tutorial-panel__body a {
+  color: #9c8fff;
+}
+
+/* Lists inside a panel become a branded checklist. */
+.tutorial-panel__body ul {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.tutorial-panel__body ul li {
+  position: relative;
+  padding-left: 1.95rem;
+}
+
+.tutorial-panel__body ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.15rem;
+  width: 1.3rem;
+  height: 1.3rem;
+  background: var(--primary-color);
+  -webkit-mask: var(--tutorial-check) center / contain no-repeat;
+  mask: var(--tutorial-check) center / contain no-repeat;
+}
+
+.dark .tutorial-panel__body ul li::before {
+  background: #9c8fff;
+}
+
+.tutorial-panel--success .tutorial-panel__body ul li::before {
+  background: #16a34a;
+}
+
+.dark .tutorial-panel--success .tutorial-panel__body ul li::before {
+  background: #4ade80;
+}
+
+:root {
+  --tutorial-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'/%3E%3C/svg%3E");
+}
+
+/* --- Use-case / next-step card grids ------------------------------------- */
+.tutorial-grid {
+  margin: 1.25rem 0 0;
+}
+
+.tutorial-grid .hextra-card {
+  border-radius: 14px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.tutorial-grid .hextra-card:hover {
+  transform: translateY(-3px);
+}
+
+.tutorial-grid .hextra-card-icon {
+  font-family: var(--font-family-heading);
+  font-weight: 600;
+}
+
+.tutorial-grid .hextra-card-icon svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  color: var(--primary-color);
+}
+
+.dark .tutorial-grid .hextra-card-icon svg {
+  color: #9c8fff;
+}
+
+/* --- Brand the Hextra steps stepper -------------------------------------- */
+.hextra-steps {
+  counter-reset: step;
+  border-color: var(--border) !important;
+}
+
+.dark .hextra-steps {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.hextra-steps :where(h2, h3, h4, h5, h6):not(.no-step-marker)::before {
+  background: var(--primary-color) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 6px rgba(39, 19, 255, 0.18);
+}
+
+.hextra-steps :where(h3) {
+  font-family: var(--font-family-heading);
+  letter-spacing: -0.01em;
+}
+
+/* ==========================================================================
+   Collapsible "page overview" (right-hand table of contents). Lets the reader
+   tuck the TOC away and let the article use the full page width. The collapsed
+   state is toggled via a `toc-collapsed` class on <html> (persisted in
+   localStorage) — see `_partials/toc.html` and `custom/head-end.html`.
+   ========================================================================== */
+
+/* Collapse button that sits next to the "On this page" heading. Only tutorial
+   pages get a collapsible overview, so the button is hidden everywhere else
+   (otherwise a reader could hide a TOC with no way to bring it back). */
+.hextra-toc__collapse {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  flex: none;
+  border-radius: 7px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+body:has(main .tutorial-byline) .hextra-toc__collapse {
+  display: inline-flex;
+}
+
+.hextra-toc__collapse:hover {
+  color: var(--primary-color);
+  background: rgba(39, 19, 255, 0.08);
+  border-color: var(--border);
+}
+
+.hextra-toc__collapse svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.dark .hextra-toc__collapse {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.dark .hextra-toc__collapse:hover {
+  color: #b3a9ff;
+  background: rgba(124, 110, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Floating tab to bring the overview back — only shown while collapsed. */
+.hextra-toc-reopen {
+  position: fixed;
+  top: calc(var(--navbar-height, 4rem) + 1.25rem);
+  right: 0;
+  z-index: 30;
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border);
+  border-right: 0;
+  border-radius: 9px 0 0 9px;
+  background: var(--surface, #fff);
+  color: var(--text-secondary);
+  font-family: var(--font-family-heading, inherit);
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 6px 20px rgba(11, 11, 18, 0.08);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.hextra-toc-reopen:hover {
+  color: var(--primary-color);
+  transform: translateX(-2px);
+}
+
+.hextra-toc-reopen svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+}
+
+.dark .hextra-toc-reopen {
+  background: #16161f;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.dark .hextra-toc-reopen:hover {
+  color: #b3a9ff;
+}
+
+/* The collapsible overview is a tutorial-only feature: gate every collapsed
+   effect to tutorial pages (marked by a `.tutorial-byline`) so the rest of the
+   docs always keep their right-hand table of contents. */
+@media (min-width: 1280px) {
+  /* Tutorial pages always hide the left navigation rail and use the full page
+     width — independent of the overview toggle. */
+  body:has(main .tutorial-byline) .hextra-sidebar-container {
+    display: none !important;
+  }
+
+  body:has(main .tutorial-byline) .hextra-max-content-width {
+    max-width: none;
+  }
+
+  /* When the reader collapses the overview, hide the TOC column and surface the
+     floating reopen tab. */
+  html.toc-collapsed body:has(main .tutorial-byline) .hextra-toc {
+    display: none !important;
+  }
+
+  html.toc-collapsed body:has(main .tutorial-byline) .hextra-toc-reopen {
+    display: inline-flex;
+  }
+
+  /* Landing page: drop the empty left sidebar placeholder and the (TOC-less)
+     right column so the home content re-centres on the full page width instead
+     of being pinned to the left by two empty rails. */
+  html.is-home .hextra-sidebar-container,
+  html.is-home .hextra-toc {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   Tutorial title + editorial byline. The larger title and byline are scoped to
+   pages that carry a `tutorial-byline`, so the rest of the docs are untouched.
+   ========================================================================== */
+
+/* Make the tutorial title noticeably larger than a regular docs heading. */
+main:has(.tutorial-byline) h1 {
+  font-family: var(--font-family-heading);
+  font-size: clamp(2.4rem, 1.9rem + 2.2vw, 3.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+  text-align: left;
+}
+
+/* Byline sits right under the title. */
+.tutorial-byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1.4rem;
+  margin: 0.9rem 0 0.5rem;
+  padding-bottom: 1.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.dark .tutorial-byline {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.tutorial-byline__author {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.tutorial-byline__avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  object-fit: cover;
+  background: var(--surface-strong, #f1eef9);
+  border: 1px solid var(--border);
+  flex: none;
+}
+
+.dark .tutorial-byline__avatar {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tutorial-byline__author-text {
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.tutorial-byline__label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.dark .tutorial-byline__label {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.tutorial-byline__name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dark .tutorial-byline__name {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.tutorial-byline__author:hover .tutorial-byline__name {
+  color: var(--primary-color);
+}
+
+.dark .tutorial-byline__author:hover .tutorial-byline__name {
+  color: #b3a9ff;
+}
+
+.tutorial-byline__dates {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1.25rem;
+}
+
+.tutorial-byline__date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.dark .tutorial-byline__date {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.tutorial-byline__date svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--primary-color);
+  flex: none;
+}
+
+.dark .tutorial-byline__date svg {
+  color: #9c8fff;
+}
+
+.tutorial-byline__date .tutorial-byline__label {
+  margin-right: 0.1rem;
 }

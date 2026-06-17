@@ -53,6 +53,10 @@ menu:
       weight: 7
       params:
         type: search
+    - name: Theme
+      weight: 7.5
+      params:
+        type: theme-toggle
     - name: GitHub
       weight: 8
       url: "https://github.com/uug-ai/documentation"
@@ -73,6 +77,11 @@ params:
   footer:
     displayCopyright: false
     displayPoweredBy: false
+
+  theme:
+    # Theme switching lives in the top navbar (see the "Theme" menu entry).
+    # Disable Hextra's sidebar/footer toggles to avoid duplicate controls.
+    displayToggle: false
 
   editURL:
     enable: true

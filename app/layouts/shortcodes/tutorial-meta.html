@@ -1,0 +1,32 @@
+{{- /*
+  tutorial-meta — a compact band of metadata pills for a tutorial header.
+
+  Renders one pill per provided parameter, each with a brand-tinted icon, an
+  uppercase label and the value. Every parameter is optional; only the ones you
+  pass are rendered, in the order below.
+
+  Params:
+    time          e.g. "~25 min"            — estimated time to complete
+    level         e.g. "Intermediate"       — difficulty
+    stack         e.g. "Go · Helm · K8s"    — languages / tools used
+    prerequisites e.g. "Self-hosted Hub"    — what the reader needs
+
+  @example
+    {{< tutorial-meta time="~25 min" level="Intermediate" stack="Go · Helm · Kubernetes" prerequisites="Self-hosted Hub" >}}
+*/ -}}
+{{- $items := slice -}}
+{{- with .Get "time" }}{{ $items = $items | append (dict "icon" "clock" "label" "Time" "value" .) }}{{ end -}}
+{{- with .Get "level" }}{{ $items = $items | append (dict "icon" "academic-cap" "label" "Level" "value" .) }}{{ end -}}
+{{- with .Get "stack" }}{{ $items = $items | append (dict "icon" "code" "label" "Stack" "value" .) }}{{ end -}}
+{{- with .Get "prerequisites" }}{{ $items = $items | append (dict "icon" "clipboard-check" "label" "You need" "value" .) }}{{ end -}}
+<div class="tutorial-meta not-prose">
+  {{- range $items }}
+  <span class="tutorial-meta__item">
+    <span class="tutorial-meta__icon">{{ partial "utils/icon.html" (dict "name" .icon) }}</span>
+    <span class="tutorial-meta__text">
+      <span class="tutorial-meta__label">{{ .label }}</span>
+      <span class="tutorial-meta__value">{{ .value }}</span>
+    </span>
+  </span>
+  {{- end }}
+</div>
