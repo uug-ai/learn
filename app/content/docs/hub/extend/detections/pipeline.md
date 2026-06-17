@@ -15,7 +15,7 @@ toc: true
 
 The **in-pipeline stage** is the second transport for detections. Instead of your service posting runs over HTTP, a worker runs as a **stage of the analysis pipeline** and is triggered automatically as recordings are analysed. It produces the **same [`DetectionRun`](../#the-detection-run)** and stores it in the **same `detections` collection** as the [API push](../api/) — only the delivery differs.
 
-This page covers **only what is detection-specific**. Everything about *how* a stage works — the queue, the event envelope, acknowledgement, deployment, completion tracking — is the same for every stage and lives on **[Workflows → Integrations](../../../workflows/integrations/)**. Read that first; this page is the detection-shaped slice on top of it.
+This page covers **only what is detection-specific**. Everything about *how* a stage works — the queue, the event envelope, acknowledgement, deployment, completion tracking — is the same for every stage and lives on **[Workflows → Stages](../../../workflows/stages/)**. Read that first; this page is the detection-shaped slice on top of it.
 
 ## What's specific to detections
 
@@ -23,7 +23,7 @@ This page covers **only what is detection-specific**. Everything about *how* a s
 |---|---|
 | **Operation name** | `detection` → queue `kcloud-detection-queue.fifo` |
 | **Output contract** | a [`DetectionRun`](../#the-detection-run) — identical to the API body, minus the transport-only fields |
-| **Sink** | **own collection**: write the run to `detections`, keyed by the recording (the [own-collection sink](../../../workflows/integrations/#own-collection)) |
+| **Sink** | **own collection**: write the run to `detections`, keyed by the recording (the [own-collection sink](../../../workflows/stages/#own-collection)) |
 | **Immutability** | runs are stored verbatim and never edited — same guarantee as the API path |
 
 Because the sink is the `detections` collection — not a shared document — the orchestrator never interprets your run. Your stage **writes the run itself** and marks the operation resolved; no detection-specific handler is needed in the analyser.
@@ -36,9 +36,9 @@ The only difference from the [API page](../api/) is the **transport-only** field
 
 ## Gating which recordings run detection
 
-A detection stage rarely needs to process **every** recording. The decision of *whether this recording should run detection* is a [per-recording route](../../../workflows/integrations/#conditional-routing), made in the analysis router when an upstream operation resolves — for example, only running detection on recordings the classifier already flagged. Recordings that don't match are never enqueued to `kcloud-detection-queue.fifo`.
+A detection stage rarely needs to process **every** recording. The decision of *whether this recording should run detection* is a [per-recording route](../../../workflows/stages/#conditional-routing), made in the analysis router when an upstream operation resolves — for example, only running detection on recordings the classifier already flagged. Recordings that don't match are never enqueued to `kcloud-detection-queue.fifo`.
 
-Detection stages are **[asynchronous](../../../workflows/integrations/#completion-and-acknowledgement)** like every custom stage, so a recording that *doesn't* run detection never waits on it.
+Detection stages are **[asynchronous](../../../workflows/stages/#completion-and-acknowledgement)** like every custom stage, so a recording that *doesn't* run detection never waits on it.
 
 ## Choosing this vs the API
 

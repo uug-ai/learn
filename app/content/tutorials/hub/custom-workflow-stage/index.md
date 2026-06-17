@@ -270,7 +270,7 @@ func envOr(name, fallback string) string {
 ```
 
 {{< callout type="info" >}}
-**Any language works.** The contract is just JSON: consume a `WorkflowRun` from your queue, and return one to `WORKFLOWS_QUEUE` with your result as a **block envelope** on `payload` (its shape is shown below). The [envelope reference](/docs/hub/workflows/integrations/#envelope) lists every field you receive.
+**Any language works.** The contract is just JSON: consume a `WorkflowRun` from your queue, and return one to `WORKFLOWS_QUEUE` with your result as a **block envelope** on `payload` (its shape is shown below). The [envelope reference](/docs/hub/workflows/stages/#envelope) lists every field you receive.
 {{< /callout >}}
 
 ### Do the work
@@ -478,7 +478,7 @@ A few things to get right here:
 
 - **Both `enabled` flags, plus the engine.** Routing with no microservice queues messages nobody reads; a microservice with no routing never receives any. Turn on `workflows.enabled`, `workflows.stages.detector.enabled` **and** `services.detector.enabled`.
 - **The queue must match.** The engine dispatches to `services.detector.queue`, and your microservice consumes that exact value via `DETECTOR_QUEUE`. They are the one binding between the two.
-- **`dispatch: conditional` is optional.** Use `dispatch: always` to run on every recording. Here we gate on the classifier seeing a `person`, so the detector never runs on empty scenes. The engine validates every condition `path` at boot and refuses to start on an unknown one. See [Conditional routing](/docs/hub/workflows/integrations/#conditional-routing) for the full rule grammar.
+- **`dispatch: conditional` is optional.** Use `dispatch: always` to run on every recording. Here we gate on the classifier seeing a `person`, so the detector never runs on empty scenes. The engine validates every condition `path` at boot and refuses to start on an unknown one. See [Conditional routing](/docs/hub/workflows/stages/#conditional-routing) for the full rule grammar.
 - **It's the engine switch, not the UI one.** `kerberoshub.workflows.enabled` toggles the engine. Don't confuse it with the unrelated `…features.workflows` front-end feature flag.
 
 ### Deploy
@@ -556,8 +556,8 @@ Confirm your `coordinateSpace` matches the box geometry — normalised `[0,1]` `
 <div class="tutorial-grid">
 {{< cards cols="3" >}}
   {{< card link="/docs/hub/workflows/ingest-service/#block-types" icon="view-grid" title="Emit several block types" subtitle="A single envelope can carry more than one block — add a marker to annotate the timeline alongside a detection." >}}
-  {{< card link="/docs/hub/workflows/integrations/#own-collection" icon="database" title="Own your data instead" subtitle="Producing genuinely new data? Write your own collection with the self-persisting sink." >}}
-  {{< card link="/docs/hub/workflows/integrations/#conditional-routing" icon="share" title="Chain stages" subtitle="Have a downstream stage depend on your result so it only runs once your stage produced something." >}}
+  {{< card link="/docs/hub/workflows/stages/#own-collection" icon="database" title="Own your data instead" subtitle="Producing genuinely new data? Write your own collection with the self-persisting sink." >}}
+  {{< card link="/docs/hub/workflows/stages/#conditional-routing" icon="share" title="Chain stages" subtitle="Have a downstream stage depend on your result so it only runs once your stage produced something." >}}
 {{< /cards >}}
 </div>
 
@@ -565,7 +565,7 @@ Confirm your `coordinateSpace` matches the box geometry — normalised `[0,1]` `
 
 <div class="tutorial-grid">
 {{< cards cols="3" >}}
-  {{< card link="/docs/hub/workflows/integrations/" icon="puzzle" title="Workflows → Integrations" subtitle="The full microservice contract: queue, envelope, registration." >}}
+  {{< card link="/docs/hub/workflows/stages/" icon="puzzle" title="Workflows → Stages" subtitle="The full microservice contract: queue, envelope, registration." >}}
   {{< card link="/docs/hub/workflows/ingest-service/" icon="inbox-in" title="Workflows → Ingest service" subtitle="What your microservice hands back and how the platform routes it." >}}
   {{< card link="/docs/hub/extend/detections/" icon="eye" title="Extend → Detections" subtitle="The detection contract, in pipeline and over the API." >}}
 {{< /cards >}}

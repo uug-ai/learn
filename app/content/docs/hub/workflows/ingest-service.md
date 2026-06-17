@@ -13,7 +13,7 @@ weight: 20
 toc: true
 ---
 
-A **stage** is a step in a workflow; you implement it as a **microservice**. [Integrations](integrations/) covers how your microservice *connects* — the queue it consumes, the `WorkflowRun` envelope it receives, and how to register the stage. This page is the other half: **what your microservice hands back**, and what the platform does with it.
+A **stage** is a step in a workflow; you implement it as a **microservice**. [Stages](stages/) covers how your microservice *connects* — the queue it consumes, the `WorkflowRun` envelope it receives, and how to register the stage. This page is the other half: **what your microservice hands back**, and what the platform does with it.
 
 When a stage wants the platform to store its result — rather than running its own database — it returns a **block envelope**: a small, self-describing list of typed *blocks*. One shared **ingest core** (`models/pkg/ingest`) routes each block by its own type, runs that block type's ordered, idempotent actions, and writes it into the platform-owned collection. The same core runs whether the result arrived over the workflows queue (a pipeline stage) or the public API (`POST /ingest`) — only the trust level differs.
 
@@ -21,7 +21,7 @@ When a stage wants the platform to store its result — rather than running its 
 
 ## The block envelope
 
-A delegated-ingest microservice returns its result as a `BlockEnvelope`, set on the `payload` field of the `WorkflowRun` it routes back (see [Integrations → Sending a result back](/docs/hub/workflows/integrations/#sending-a-result-back)):
+A delegated-ingest microservice returns its result as a `BlockEnvelope`, set on the `payload` field of the `WorkflowRun` it routes back (see [Stages → Sending a result back](/docs/hub/workflows/stages/#sending-a-result-back)):
 
 ```json
 {
@@ -120,7 +120,7 @@ Returning a block envelope is the **delegated** path: the platform owns the writ
 
 The alternative is **self-persisting**: your microservice writes its own collection and hands back only its routing values under `results[<operation>]`, so conditions and downstream stages can still read it. Then `payload` stays empty.
 
-A microservice picks exactly one — **never both**. See [Integrations → Sending a result back](/docs/hub/workflows/integrations/#sending-a-result-back) for where each sits in the result contract:
+A microservice picks exactly one — **never both**. See [Stages → Sending a result back](/docs/hub/workflows/stages/#sending-a-result-back) for where each sits in the result contract:
 
 - **Delegated / enrich in place** → return a block envelope *(this page)*.
 - **Self-persisting / own collection** → write your collection, return `results[operation]`.
@@ -134,7 +134,7 @@ The same package sits behind both transports; only the adapter around it differs
 The workflows engine wires the core to the run it already owns:
 
 - The **target** is the run's *own* recording — its `key`, organisation and device, plus the recording timestamp persisted when the run opened, so a derived artifact expires on the recording's retention clock rather than the post time. A `data` body that carries its own recording reference (e.g. a `PostDetectionsRequest` `mediaKey`) is **ignored** on the queue path; the run decides the target.
-- After a successful ingest the engine **mirrors the blocks into `results[<operation>]`, grouped by block type** (`results.<operation>.detections`, `…markers`, one array per type that occurred) so the operation resolves and any conditional stage waiting on it can fire. The block bodies are decoded, so a downstream condition can branch on what the stage produced — including element-wise with a `*` wildcard (`results.<operation>.detections.*.score`). See [Matching inside arrays](/docs/hub/workflows/integrations/#matching-inside-arrays).
+- After a successful ingest the engine **mirrors the blocks into `results[<operation>]`, grouped by block type** (`results.<operation>.detections`, `…markers`, one array per type that occurred) so the operation resolves and any conditional stage waiting on it can fire. The block bodies are decoded, so a downstream condition can branch on what the stage produced — including element-wise with a `*` wildcard (`results.<operation>.detections.*.score`). See [Matching inside arrays](/docs/hub/workflows/stages/#matching-inside-arrays).
 
 ### Over the API (`POST /ingest`)
 
@@ -146,6 +146,6 @@ The core is `models/pkg/ingest`, a deliberately **infra-free** library: it depen
 
 ## See also
 
-- [Integrations](integrations/) — how your microservice connects, the `WorkflowRun` contract it codes against, and registering a stage.
+- [Stages](stages/) — how your microservice connects, the `WorkflowRun` contract it codes against, and registering a stage.
 - [Detections → Pipeline](../../extend/detections/pipeline/) — the detection capability delivered as a workflow stage.
 - [Detections → API](../../extend/detections/api/) — the same detection contract over HTTP.

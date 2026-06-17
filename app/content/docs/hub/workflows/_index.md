@@ -97,6 +97,6 @@ Workflows do not replace the Hub [Pipeline]({{< relref "/docs/hub/pipeline" >}})
 
 The blocks above are the **no-code** side of workflows. If you want a workflow to run *your own* service — a custom model, a speed estimator, any processing step, in any language — that is the **developer** side of the same system. A **stage** is a step in a workflow; you implement it as a **microservice**.
 
-See **[Integrations](integrations/)** for the contract your microservice codes against: the queue it consumes, the `WorkflowRun` envelope it receives, how it hands a result back, and how to register the stage from the Helm chart so the engine routes recordings to it.
+See **[Stages](stages/)** for the contract your microservice codes against: the queue it consumes, the `WorkflowRun` envelope it receives, how it hands a result back, and how to register the stage from the Helm chart so the engine routes recordings to it.
 
 Your microservice hands its result back as a **block envelope** — a small JSON list of typed *result blocks* (a detection, a marker, …), set on the run's `payload`. The **[Ingest service](ingest-service/)** is the shared layer on the platform side that receives it — from either the queue or the API — and runs the right actions for each block's type: validate it, store it, and trigger any follow-up side-effects.

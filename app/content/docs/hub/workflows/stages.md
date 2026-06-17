@@ -6,6 +6,8 @@ date: 2026-06-04T00:00:00+00:00
 lastmod: 2026-06-16T00:00:00+00:00
 draft: false
 images: []
+aliases:
+  - /docs/hub/workflows/integrations/
 menu:
   hub:
     parent: "workflows"
@@ -13,7 +15,7 @@ weight: 10
 toc: true
 ---
 
-[Workflows](/docs/hub/workflows/) let you reshape the Hub pipeline without code — wire a device through a few filters into a model on a visual canvas. **Integrations** are the developer side of that same system: instead of choosing from the built-in blocks, you bring *your own* microservice in as a workflow stage. The engine is **open** — every built-in stage (classification, thumbnails, sprites) is just a service that consumes a message off a queue, does one job, and hands the result back — and your service plugs in the same way.
+[Workflows](/docs/hub/workflows/) let you reshape the Hub pipeline without code — wire a device through a few filters into a model on a visual canvas. **Custom stages** are the developer side of that same system: instead of choosing from the built-in blocks, you bring *your own* microservice in as a workflow stage. The engine is **open** — every built-in stage (classification, thumbnails, sprites) is just a service that consumes a message off a queue, does one job, and hands the result back — and your service plugs in the same way.
 
 A **workflow stage** is a step in a workflow, implemented as a **microservice** the workflows engine triggers automatically for every recording: it **receives a run from a queue, does the work, and returns the result** — in whatever language suits the job, deployed and scaled on its own. Stages are **asynchronous**: they run alongside the built-in analysis and never block it.
 
