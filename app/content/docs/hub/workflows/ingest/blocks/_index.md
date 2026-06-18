@@ -1,6 +1,6 @@
 ---
 title: "Blocks"
-description: "The closed set of typed result blocks a stage can hand back — what each block's type means, the data shape it carries, and where the platform stores it."
+description: "The closed set of typed blocks a stage can hand back — what each block's type means, the data shape it carries, and where the platform stores it."
 lead: "A block is one self-describing unit of a result: a type that says what it is, and a data body in that type's shape. These are the block types the ingest core knows how to store."
 date: 2026-06-16T00:00:00+00:00
 lastmod: 2026-06-16T00:00:00+00:00
