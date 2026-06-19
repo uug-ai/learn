@@ -46,19 +46,19 @@ A stage has exactly two runtime dependencies: the **message broker** (to receive
   ],
   "nodes": [
     { "id": "throttler",    "kind": "pipeline-monitor",       "x": 360, "y":  40, "w": 240, "h": 110,
-      "header": "PIPELINE", "title": "Throttler", "subtitle": "hub-pipeline-throttler", "groupId": "hub" },
+      "header": "PIPELINE", "title": "Throttler", "subtitle": "kcloud-throttler-queue", "groupId": "hub" },
     { "id": "notification", "kind": "pipeline-notification",  "x": 700, "y":  40, "w": 240, "h": 110,
-      "header": "PIPELINE", "title": "Notification", "subtitle": "hub-pipeline-notification", "groupId": "hub" },
+      "header": "PIPELINE", "title": "Notification", "subtitle": "kcloud-notification-queue", "groupId": "hub" },
     { "id": "analysis",     "kind": "pipeline-analysis",      "x":  40, "y": 180, "w": 240, "h": 100,
-      "header": "PIPELINE", "title": "Analysis", "subtitle": "Built-ins · opens run", "groupId": "hub" },
+      "header": "PIPELINE", "title": "Analysis", "subtitle": "kcloud-classify-queue.fifo", "groupId": "hub" },
     { "id": "workflows",    "kind": "hub",                    "x": 360, "y": 320, "w": 240, "h": 110,
-      "header": "ORCHESTRATOR", "title": "Workflows", "subtitle": "Hub-Workflows", "groupId": "hub" },
+      "header": "ORCHESTRATOR", "title": "Workflows", "subtitle": "hub-workflows-queue", "groupId": "hub" },
     { "id": "pose",         "kind": "detection",              "x":  90, "y": 600, "w": 210, "h": 130,
-      "header": "STAGE", "title": "Pose detection", "subtitle": "your microservice", "groupId": "yours" },
+      "header": "STAGE", "title": "Pose detection", "subtitle": "hub-workflows-pose", "groupId": "yours" },
     { "id": "speed",        "kind": "detection",              "x": 385, "y": 600, "w": 210, "h": 130,
-      "header": "STAGE", "title": "Speed estimate", "subtitle": "workflows-speed", "groupId": "yours" },
+      "header": "STAGE", "title": "Speed estimate", "subtitle": "hub-workflows-speed", "groupId": "yours" },
     { "id": "llm",          "kind": "pipeline-llm",           "x": 680, "y": 600, "w": 210, "h": 130,
-      "header": "STAGE", "title": "LLM summary", "subtitle": "workflows-llm", "groupId": "yours" }
+      "header": "STAGE", "title": "LLM summary", "subtitle": "hub-workflows-llm", "groupId": "yours" }
   ],
   "connections": [
     { "from": "analysis",  "to": "throttler",    "fromSide": "right", "toSide": "left", "kind": "solid" },
@@ -106,7 +106,7 @@ kerberoshub:
       enabled: true                # deploy the microservice
       repository: ghcr.io/acme/speed
       tag: "v1.0.0"
-      queue: "workflows-speed"     # the queue your microservice consumes
+      queue: "hub-workflows-speed" # the queue your microservice consumes
       replicas: 1
       pullPolicy: IfNotPresent
       logLevel: info               # trace | debug | info | warn | error
@@ -243,7 +243,7 @@ The chart deploys your microservice from `kerberoshub.services.<name>` and injec
 | `QUEUE_SYSTEM` | `RABBITMQ` | The broker driver to connect with (the deployment's `queueProvider`). |
 | `RABBITMQ_HOST` | `rabbitmq.rabbitmq:5672` | Broker address — with `RABBITMQ_EXCHANGE`, `RABBITMQ_USERNAME`, `RABBITMQ_PASSWORD` completing the connection. |
 | `<NAME>_QUEUE` | `SPEED_QUEUE` | The queue you **consume** dispatched runs from. The variable name is your stage's key upper-cased (hyphens become underscores — `my-stage` → `MY_STAGE_QUEUE`); its value is `services.<name>.queue`. See [Queue naming](#queue-naming). |
-| `WORKFLOWS_QUEUE` | `kcloud-workflows-queue` | The engine queue you **publish the finished run** back to. See [Sending a result back](#sending-a-result-back). |
+| `WORKFLOWS_QUEUE` | `hub-workflows-queue` | The engine queue you **publish the finished run** back to. See [Sending a result back](#sending-a-result-back). |
 | `KERBEROS_STORAGE_URI` | `https://api.vault.example.com` | Global media-storage endpoint — with `KERBEROS_STORAGE_ACCESS_KEY` and `KERBEROS_STORAGE_SECRET`. Per-recording overrides also travel on each run's `storage`; prefer those when present. |
 | `LOG_LEVEL` | `info` | Microservice log verbosity (`services.<name>.logLevel`). |
 
@@ -262,10 +262,10 @@ Your microservice consumes from **one** queue, and **you choose its name**. The 
 kerberoshub:
   services:
     speed:
-      queue: "workflows-speed"  # ← anything you want; your microservice consumes this exact name
+      queue: "hub-workflows-speed" # ← anything you want; your microservice consumes this exact name
 ```
 
-The engine reads that **same** value from the stage registry and dispatches there, so the only rule is that the two agree — the queue is the one thing that binds the engine to your microservice. These examples use a consistent `workflows-<stage>` form (`workflows-speed`, `workflows-llm`), but the name is an arbitrary string your broker accepts (`vision.requests`, `team7-detector` work just as well) and does **not** have to follow the platform's `kcloud-…` convention — it only has to match on both sides.
+The engine reads that **same** value from the stage registry and dispatches there, so the only rule is that the two agree — the queue is the one thing that binds the engine to your microservice. These examples use a consistent `hub-workflows-<stage>` form (`hub-workflows-speed`, `hub-workflows-llm`), but the name is an arbitrary string your broker accepts (`vision.requests`, `team7-detector` work just as well) and does **not** have to follow the platform's `kcloud-…` convention — it only has to match on both sides.
 
 If you omit `queue`, the engine falls back to a derived default, `kcloud-<operation>-queue.fifo` — so the convention is just that fallback, not the source of truth. Queue names are literal strings: the default deployment runs RabbitMQ, so a `.fifo` suffix is only part of a name, not an SQS feature.
 
@@ -383,9 +383,9 @@ Your microservice is a stateless consumer: pull a run, fetch the media with the 
 
 ## Sending a result back
 
-You return the **same `WorkflowRun` you received** — echo `runId`, `key`, `traceId` and `user` so the engine can locate and scope the run — with `storage` cleared and your result in **exactly one** channel. Publish it back to the engine's queue (`WORKFLOWS_QUEUE`, default `kcloud-workflows-queue`); the engine marks the **stage** resolved and fires any conditional stage that was waiting on it.
+You return the **same `WorkflowRun` you received** — echo `runId`, `key`, `traceId` and `user` so the engine can locate and scope the run — with `storage` cleared and your result in **exactly one** channel. Publish it back to the engine's queue (`WORKFLOWS_QUEUE`, default `hub-workflows-queue`); the engine marks the **stage** resolved and fires any conditional stage that was waiting on it.
 
-There are **two sinks**. Default to letting the platform persist your result — hand it back and an ingest handler stores it, so your microservice needs no datastore of its own. A stage that produces genuinely *new* data can instead own its storage and write its own collection.
+There are **two sinks**. Default to letting the platform persist your result — hand it back and the **ingest core** stores it, so your microservice needs no datastore of its own. A stage that produces genuinely *new* data can instead own its storage and write its own collection.
 
 ### Enrich in place
 

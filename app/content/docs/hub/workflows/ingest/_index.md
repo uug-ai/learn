@@ -6,8 +6,6 @@ date: 2026-06-04T00:00:00+00:00
 lastmod: 2026-06-16T00:00:00+00:00
 draft: false
 images: []
-aliases:
-  - /docs/hub/workflows/ingest-service/
 menu:
   hub:
     parent: "workflows"

@@ -82,7 +82,7 @@ A **[workflow](/docs/hub/workflows/)** is a **branch off that flow**. At the ana
     { "id": "notify",   "kind": "pipeline-notification", "x": 720, "y":  60, "w": 220, "h": 100,
       "header": "PIPELINE", "title": "Notify", "subtitle": "kcloud-notification-queue", "groupId": "hub" },
     { "id": "engine",   "kind": "hub",                   "x":  40, "y": 390, "w": 220, "h": 100,
-      "header": "ENGINE", "title": "Workflows", "subtitle": "hub-workflows", "groupId": "yours" },
+      "header": "ENGINE", "title": "Workflows", "subtitle": "hub-workflows-queue", "groupId": "yours" },
     { "id": "stage",    "x": 420, "y": 390, "w": 210, "h": 100,
       "header": "STAGE", "title": "Your stage #1", "subtitle": "hub-workflows-stage1", "groupId": "yours" },
     { "id": "stage2",   "x": 700, "y": 390, "w": 210, "h": 100,
@@ -123,7 +123,7 @@ flowchart LR
     B -->|hands off classify result| C[Workflows engine]
     C -->|dispatch on your queue| D[Your stage]
     D -->|fetch clip| E[(Vault storage)]
-    D -->|result block envelope to WORKFLOWS_QUEUE| C
+    D -->|block envelope to WORKFLOWS_QUEUE| C
     C -->|IngestBlocks| F[(platform collection)]
     F --> G[Result shown on the recording]
 ```
@@ -160,7 +160,7 @@ A stage is defined by four choices. Pick them now; everything else follows (the 
 | Choice | Example | Why it matters |
 |---|---|---|
 | **Operation id** | `loitering` | Routing key, result key (`results.loitering`), and the name you register. |
-| **Queue** | `workflows-loitering` | The one string that binds the engine to your microservice. Any name your broker accepts. |
+| **Queue** | `hub-workflows-loitering` | The one string that binds the engine to your microservice. Any name your broker accepts. |
 | **Block type** | `marker` | The result shape you emit. `marker` → a timeline span in the `markers` collection. |
 | **Sink** | delegated | Hand a block envelope back; the platform persists it. No database in your microservice. |
 
@@ -186,8 +186,8 @@ The microservice reads its configuration from the **connection contract** — a 
 |---|---|---|
 | `QUEUE_SYSTEM` | `RABBITMQ` | The broker driver. |
 | `RABBITMQ_HOST` / `RABBITMQ_EXCHANGE` / `RABBITMQ_USERNAME` / `RABBITMQ_PASSWORD` | `rabbitmq.rabbitmq:5672` | Broker connection. |
-| `LOITERING_QUEUE` | `workflows-loitering` | The queue you **consume** runs from (your stage id, upper-cased, `+ _QUEUE`). |
-| `WORKFLOWS_QUEUE` | `kcloud-workflows-queue` | The engine queue you **return** the finished run to. |
+| `LOITERING_QUEUE` | `hub-workflows-loitering` | The queue you **consume** runs from (your stage id, upper-cased, `+ _QUEUE`). |
+| `WORKFLOWS_QUEUE` | `hub-workflows-queue` | The engine queue you **return** the finished run to. |
 | `KERBEROS_STORAGE_URI` / `KERBEROS_STORAGE_ACCESS_KEY` / `KERBEROS_STORAGE_SECRET` | `https://vault…` | Fallback media-storage endpoint (per-recording overrides also travel on each run). |
 | `LOG_LEVEL` | `info` | Log verbosity. |
 
@@ -216,18 +216,18 @@ func main() {
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{})
 
-	// The queue we consume dispatches from, and the engine queue we return to.
-	consumerQueue := envOr("LOITERING_QUEUE", "workflows-loitering")
-	workflowsQueue := envOr("WORKFLOWS_QUEUE", "kcloud-workflows-queue")
+	// The stage queue we consume from, and the engine queue we return to.
+	stageQueue := envOr("LOITERING_QUEUE", "hub-workflows-loitering")
+	workflowsQueue := envOr("WORKFLOWS_QUEUE", "hub-workflows-queue")
 
+	// A stage only consumes and dead-letters; it never forwards down a stage
+	// list, so it sets just its consume queue and a deadletter queue.
 	options := queue.NewRabbitOptions().
 		SetHost(os.Getenv("RABBITMQ_HOST")).
 		SetExchange(os.Getenv("RABBITMQ_EXCHANGE")).
 		SetUsername(os.Getenv("RABBITMQ_USERNAME")).
 		SetPassword(os.Getenv("RABBITMQ_PASSWORD")).
-		SetConsumerQueue(consumerQueue).
-		SetRouterQueue("kcloud-event-queue").
-		SetAnalysisQueue(consumerQueue).
+		SetWorkflowsStageQueue(stageQueue).
 		SetDeadletterQueue("dead-letter-queue").
 		Build()
 
@@ -238,7 +238,7 @@ func main() {
 	if err := q.Client.Connect(); err != nil {
 		logger.Fatalf("failed to connect to broker: %v", err)
 	}
-	logger.Infof("loitering started: consuming %q, returning results to %q", consumerQueue, workflowsQueue)
+	logger.Infof("loitering started: consuming %q, returning results to %q", stageQueue, workflowsQueue)
 
 	// The workflow subsystem exchanges models.WorkflowRun (not the pipeline's
 	// PipelineEvent), so decode the run ourselves. A body that isn't a
@@ -461,7 +461,7 @@ kerberoshub:
       enabled: true                # deploy the microservice pod
       repository: ghcr.io/uug-ai/hub-loitering
       tag: "v1.0.0"
-      queue: "workflows-loitering" # the queue your microservice consumes
+      queue: "hub-workflows-loitering" # the queue your microservice consumes
       replicas: 1
       pullPolicy: IfNotPresent
       logLevel: info
@@ -487,14 +487,14 @@ Confirm both the engine and your microservice are running:
 ```bash
 kubectl -n kerberos-hub get pods | grep -E 'workflows|loitering'
 kubectl -n kerberos-hub logs deploy/hub-loitering
-   # loitering started: consuming "workflows-loitering", returning results to "kcloud-workflows-queue"
+   # loitering started: consuming "hub-workflows-loitering", returning results to "hub-workflows-queue"
 ```
 
 ### Verify end-to-end
 
 Trigger a recording that matches your rule (here: one where the classifier sees a **person**) — either wait for a live event from a connected Agent, or re-analyse an existing recording from the Hub UI.
 
-1. **Watch the engine dispatch.** The workflows engine logs the run opening and dispatching the `loitering` stage to `workflows-loitering`:
+1. **Watch the engine dispatch.** The workflows engine logs the run opening and dispatching the `loitering` stage to `hub-workflows-loitering`:
 
    ```bash
    kubectl -n kerberos-hub logs deploy/hub-workflows -f

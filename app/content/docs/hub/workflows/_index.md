@@ -99,7 +99,7 @@ The nodes above are the **no-code** side of workflows. If you want a workflow to
 
 See **[Stages](stages/)** for the contract your microservice codes against: the queue it consumes, the `WorkflowRun` envelope it receives, how it hands a result back, and how to register the stage from the Helm chart so the engine routes recordings to it.
 
-Your microservice hands its result back as a **block envelope** — a small JSON list of typed *result blocks* (a detection, a marker, …), set on the run's `payload`. The **[Ingest](ingest/)** core is the shared layer on the platform side that receives it — from either the queue or the API — and runs the right actions for each block's type: validate it, store it, and trigger any follow-up side-effects.
+Your microservice hands its result back as a **block envelope** — a small JSON list of typed *blocks* (a detection, a marker, …), set on the run's `payload`. The **[Ingest](ingest/)** core is the shared layer on the platform side that receives it — from either the queue or the API — and runs the right actions for each block's type: validate it, store it, and trigger any follow-up side-effects.
 
 ## Glossary
 
@@ -122,9 +122,9 @@ A quick reference to the vocabulary used across Workflows. The terms split into 
 | **Operation** | A stage's unique *id*: the value the engine routes on, files its result under (`results.<operation>`) and that other stages gate on. Defaults to the stage name. See [Stages](stages/#registering-a-stage). |
 | **Microservice** | The *implementation* of a stage: a service that consumes a message, does one job and returns a result, in any language. |
 | **WorkflowRun** | The event a stage receives off the queue — the run it processes and hands a result back for. |
-| **Result block** | One typed unit of a result: a `type` (`detection`, `marker`, …) plus a `data` body in that type's shape. See [Blocks](ingest/blocks/). |
-| **Block envelope** | The ordered list of result blocks a microservice hands back, set on the run's `payload`. See [Ingest](ingest/). |
+| **Block** | One typed unit of a result: a `type` (`detection`, `marker`, …) plus a `data` body in that type's shape. See [Blocks](ingest/blocks/). |
+| **Block envelope** | The ordered list of blocks a microservice hands back, set on the run's `payload`. See [Ingest](ingest/). |
 | **Ingest core** | The shared platform layer that receives the envelope and runs each block type's ordered, idempotent actions — validate, store, side-effects. |
 | **Conditional routing** | Branching a workflow on an earlier stage's result, so a stage runs only when an upstream result matches. See [Conditional routing](stages/#conditional-routing). |
 
-Two layers, two words: on the **canvas** you wire **nodes**; behind a **stage** a microservice returns **result blocks**. They live in different parts of the system — *node* for the thing you drag, *result block* for a stage's typed output — so there's no overlap to trip over.
+Two layers, two words: on the **canvas** you wire **nodes**; behind a **stage** a microservice returns **blocks**. They live in different parts of the system — *node* for the thing you drag, *block* for a stage's typed output — so there's no overlap to trip over.
