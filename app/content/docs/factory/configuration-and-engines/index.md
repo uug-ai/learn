@@ -1,7 +1,7 @@
 ---
 title: "Configuration & engines"
-description: "How Factory stores its configuration and how it schedules your Kerberos Agents."
-lead: "How Factory stores its configuration and how it schedules your Kerberos Agents."
+description: "How Factory stores its configuration and how it schedules your Agents."
+lead: "How Factory stores its configuration and how it schedules your Agents."
 date: 2026-06-22T08:49:31+00:00
 lastmod: 2026-06-22T08:49:31+00:00
 draft: false
@@ -14,7 +14,7 @@ toc: true
 ---
 
 Factory is controlled by **two independent axes**. One decides *where the
-factory keeps its own configuration*, the other decides *how your Kerberos Agents
+factory keeps its own configuration*, the other decides *how your Agents
 are scheduled and run*. Because they are orthogonal, you can mix and match them:
 for example run the Kubernetes engine while keeping your configuration in MongoDB,
 or in a ConfigMap, or run a future Docker engine while keeping configuration as a
@@ -29,7 +29,7 @@ plain JSON file.
 
 The configuration axis decides where the factory reads and writes its own
 **global** and **template** configuration, and how that configuration is delivered
-to the Kerberos Agents it provisions.
+to the Agents it provisions.
 
 - **`json`** — configuration is stored in local JSON files (`config/global.json`
   and `config/template.json`) next to the factory. No MongoDB connection is used.
@@ -37,7 +37,7 @@ to the Kerberos Agents it provisions.
   Docker and host engines.
 
 - **`configmap`** — the factory still keeps a local JSON copy as the source of
-  truth, but every Kerberos Agent receives its configuration through a Kubernetes
+  truth, but every Agent receives its configuration through a Kubernetes
   **ConfigMap** that is mounted as `AGENT_*` environment variables. No MongoDB
   connection is used. This is the recommended option for a clean, Kubernetes-native
   deployment.
@@ -87,7 +87,7 @@ makes it possible to migrate gradually.
 
 ## Engine (`FACTORY_ENGINE`)
 
-The engine axis decides how Kerberos Agents are actually scheduled and run.
+The engine axis decides how Agents are actually scheduled and run.
 
 - **`kubernetes`** *(implemented)* — agents are Kubernetes **Deployments**
   (each with a matching **Service**). Configuration is delivered through ConfigMaps

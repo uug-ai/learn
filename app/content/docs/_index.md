@@ -33,11 +33,11 @@ Within the portfolio of [Kerberos.io](/prologue/how/) you leverage more or less 
 
 {{< figure src="overview.svg" alt="The Kerberos.io solution stack" caption="The Kerberos.io solution stack" class="stretch">}}
 
-The backbone of the Kerberos.io ecosystem is the [Kerberos Agent](/agent/first-things-first/). This [Kerberos Agent](/agent/first-things-first/), installed [through various possibilities](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent), is deployed to a compute - VM, baremetal, Kubernetes cluster or other - of choice and connected to a camera stream you control.
+The backbone of the Kerberos.io ecosystem is the [Agent](/agent/first-things-first/). This [Agent](/agent/first-things-first/), installed [through various possibilities](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent), is deployed to a compute - VM, baremetal, Kubernetes cluster or other - of choice and connected to a camera stream you control.
 
-{{< figure src="introduction-kerberos-io.svg" alt="A Kerberos Agent is monitoring a single camera stream." caption="A Kerberos Agent is monitoring a single camera stream." class="stretch">}}
+{{< figure src="introduction-kerberos-io.svg" alt="An Agent is monitoring a single camera stream." caption="An Agent is monitoring a single camera stream." class="stretch">}}
 
-With [Kerberos.io](/prologue/how/) you start small, with just one or more [Kerberos Agents](/agent/first-things-first/), and grow over time while introducing more and more components like [Kerberos Factory](/factory/first-things-first/), [Kerberos Vault](/vault/first-things-first/) and [Kerberos Hub](/hub/first-things-first/); which we refer to as the [Kerberos Enterprise Suite](/enterprise/first-things-first/). Each solution is shipped through the concept of containers and can be leveraged by using Docker, Docker compose, Kubernetes, OpenShift, Terraform, Ansible, and many more.
+With [Kerberos.io](/prologue/how/) you start small, with just one or more [Agents](/agent/first-things-first/), and grow over time while introducing more and more components like [Factory](/factory/first-things-first/), [Kerberos Vault](/vault/first-things-first/) and [Kerberos Hub](/hub/first-things-first/); which we refer to as the [Kerberos Enterprise Suite](/enterprise/first-things-first/). Each solution is shipped through the concept of containers and can be leveraged by using Docker, Docker compose, Kubernetes, OpenShift, Terraform, Ansible, and many more.
 
 {{< figure src="./introduction-enterprise.svg" alt="A scalable video platform for an ever-growing video landscape." caption="A scalable video platform for an ever-growing video landscape." class="stretch">}}
 

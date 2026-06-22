@@ -14,9 +14,9 @@ Kerberos Enterprise Suite is a consequence of supporting enterprises and custome
 
 [![An end-to-end scenario with Kerberos.io Enterprise Suite](youtube-end-to-end.png)](https://www.youtube.com/watch?v=OnmN99dq4tk "An end-to-end scenario with Kerberos.io Enterprise Suite")
 
-As a result to the developments of the Kerberos Agent, previously called Kerberos Open Source, the Kerberos Enterprise Suite is here to enable more flexibility through concepts such as Bring Your Own Cloud, Bring Your Own Storage and Bring Your Own Technology.
+As a result to the developments of the Agent, previously called Kerberos Open Source, the Kerberos Enterprise Suite is here to enable more flexibility through concepts such as Bring Your Own Cloud, Bring Your Own Storage and Bring Your Own Technology.
 
-Kerberos Enterprise Suite is taking the Kerberos Agent to another level, by building additional tools on top such as [Kerberos Vault](/vault/first-things-first) and [Kerberos Hub](/vault/first-things-first). It scales your Kerberos Agents through the concept of [Kerberos Factory](/factory/first-things-first) which helps to deploy your Kerberos Agents in bulk.
+Kerberos Enterprise Suite is taking the Agent to another level, by building additional tools on top such as [Kerberos Vault](/vault/first-things-first) and [Kerberos Hub](/vault/first-things-first). It scales your Agents through the concept of [Factory](/factory/first-things-first) which helps to deploy your Agents in bulk.
 
 ## Kubernetes: flexible and scale
 
@@ -28,7 +28,7 @@ Kubernetes sits at the center of the Kerberos Enterprise Suite. Every solution w
 
 ### Bring your own cloud
 
-By using Kubernetes as a basis for [Kerberos Factory](/factory/first-things-first), [Kerberos Vault](/vault/first-things-first) and [Kerberos Hub](/vault/first-things-first), all solutions can be deployed where your Kubernetes cluster can be deployed. This means you can deploy at the edge, in a private or public cloud. As the solutions are modular build, you can also have hybrid deployments. For example processing at the edge and visualisation in a cloud environment, or storage at the edge and limited storage in a cloud environment.
+By using Kubernetes as a basis for [Factory](/factory/first-things-first), [Kerberos Vault](/vault/first-things-first) and [Kerberos Hub](/vault/first-things-first), all solutions can be deployed where your Kubernetes cluster can be deployed. This means you can deploy at the edge, in a private or public cloud. As the solutions are modular build, you can also have hybrid deployments. For example processing at the edge and visualisation in a cloud environment, or storage at the edge and limited storage in a cloud environment.
 
 ### Bring your own storage
 
@@ -44,19 +44,19 @@ Next to that, all solutions within the Kerberos Enterprise Suite ships Swagger A
 
 The Kerberos Enterprise Suite is a collection of modular solutions that can be deployed wherever you want. It contains three crucial parts.
 
-- Kerberos Agents and Kerberos Factory
+- Agents and Factory
 - Kerberos Vault
 - Kerberos Hub
 
-### Kerberos Agents and Kerberos Factory
+### Agents and Factory
 
-An agent is deployed for each video stream. An agent is responsible for a specific video stream: recording, livestreaming and alerting. Kerberos Factory is used to scale and deploy the Kerberos Agents in your Kubernetes clusters by providing a UI.
+An agent is deployed for each video stream. An agent is responsible for a specific video stream: recording, livestreaming and alerting. Factory is used to scale and deploy the Agents in your Kubernetes clusters by providing a UI.
 
-{{< figure src="kerberos-enterprise-suite.svg" alt="Kerberos Enterprise Suite contains Kerberos Agent, Kerberos Factory, Kerberos Vault and Kerberos Hub." caption="Kerberos Enterprise Suite contains Kerberos Agent, Kerberos Factory, Kerberos Vault and Kerberos Hub." class="stretch">}}
+{{< figure src="kerberos-enterprise-suite.svg" alt="Kerberos Enterprise Suite contains Agent, Factory, Kerberos Vault and Kerberos Hub." caption="Kerberos Enterprise Suite contains Agent, Factory, Kerberos Vault and Kerberos Hub." class="stretch">}}
 
 ### Kerberos Vault
 
-Kerberos Agents are persisting their recordings at a central place, which we call Kerberos Vault. Within Kerberos Vault you set up multiple edge or cloud storage providers, to persist your data at the edge or in the cloud.
+Agents are persisting their recordings at a central place, which we call Kerberos Vault. Within Kerberos Vault you set up multiple edge or cloud storage providers, to persist your data at the edge or in the cloud.
 
 {{< figure src="vault-edge-cloud-storage.svg" alt="Bring your own storage using Vault" caption="Bring your own storage using Kerberos Vault" class="stretch">}}
 
@@ -66,7 +66,7 @@ Events and messages [are sent through integrations](/vault/integrations/) to ini
 
 ### Kerberos Hub
 
-[Kerberos Hub](/vault/first-things-first) is a scale UI that consolidates the entire Kerberos ecosystem. It shows livestreams/alerts from your Kerberos Agents and recordings stored in Kerberos Vault through a single pane of glass.
+[Kerberos Hub](/vault/first-things-first) is a scale UI that consolidates the entire Kerberos ecosystem. It shows livestreams/alerts from your Agents and recordings stored in Kerberos Vault through a single pane of glass.
 
 [Kerberos Hub](/vault/first-things-first) is build out of modular and scalable microservices which you can install and scale independently, wherever you want.
 

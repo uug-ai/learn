@@ -15,7 +15,7 @@ toc: true
 
 One of the key differentiators, is the ability to extend and integrate. Next to uploading and persisting recordings on your preferred storage providers, Kerberos Vault can trigger events and be configured through APIs.
 
-Each time a Kerberos Agent sends a recording to Kerberos Vault, it is persisted on a storage provider, and an event is triggered through one of the following integrations.
+Each time an Agent sends a recording to Kerberos Vault, it is persisted on a storage provider, and an event is triggered through one of the following integrations.
 
 - [Apache Kafka](https://kafka.apache.org/)
 - [Amazon Web Services SQS](https://aws.amazon.com/sqs/)
@@ -108,19 +108,19 @@ The Kerberos Hub integration allows you to visualise your recordings, stored in 
 
 #### Kerberos Hub username
 
-When creating a Kerberos Hub account and linking it to your own Kerberos Vault, you have to make sure the Kerberos Hub username is matching the Kerberos Agent destination directory. If this not matching, your recordings will not be shown in the Kerberos Hub interface.
+When creating a Kerberos Hub account and linking it to your own Kerberos Vault, you have to make sure the Kerberos Hub username is matching the Agent destination directory. If this not matching, your recordings will not be shown in the Kerberos Hub interface.
 
-Once you logged in, or created an account, you will see your Kerberos Hub username at the left top of the navigation. You have to make sure this username, equals the directory field of the Kerberos Agent (or Kerberos Factory settings).
+Once you logged in, or created an account, you will see your Kerberos Hub username at the left top of the navigation. You have to make sure this username, equals the directory field of the Agent (or Factory settings).
 
 ![Kerberos Hub Account](./hub-integration-account-1.png)
 
-Make sure the `directory` field of your Kerberos Agents or Kerberos Factory is configured with the Kerberos Hub username.
+Make sure the `directory` field of your Agents or Factory is configured with the Kerberos Hub username.
 
-![Kerberos Agent directory](./hub-integration-account-2.png)
+![Agent directory](./hub-integration-account-2.png)
 
 #### Kerberos Vault credentials
 
-Once you have added the integration to Kerberos Vault, and made sure the Kerberos Hub account name matches the Kerberos Agent directory field, you should see some recordings landing into your Kerberos Hub account. However to view your recordings in Kerberos Hub, you'll need to add your Kerberos Vault credentials to your Kerberos Hub account (or installation).
+Once you have added the integration to Kerberos Vault, and made sure the Kerberos Hub account name matches the Agent directory field, you should see some recordings landing into your Kerberos Hub account. However to view your recordings in Kerberos Hub, you'll need to add your Kerberos Vault credentials to your Kerberos Hub account (or installation).
 
 As you are the owner of the Kerberos Vault, you'll need to make Kerberos Hub (SAAS or self-hosted) aware of where your Kerberos Vault is located (DNS name) and the Kerberos Vault account you have used.
 

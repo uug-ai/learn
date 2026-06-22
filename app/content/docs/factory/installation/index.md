@@ -13,7 +13,7 @@ weight: 302
 toc: true
 ---
 
-Factory is shipped as a container image and is required to be installed inside a Kubernetes cluster. Factory integrates with the Kubernetes API server to automatically provision Kerberos Agents on its behalf. This means that Factory is out-of-scope if you are planning to use a `docker` or `docker compose` setup.
+Factory is shipped as a container image and is required to be installed inside a Kubernetes cluster. Factory integrates with the Kubernetes API server to automatically provision Agents on its behalf. This means that Factory is out-of-scope if you are planning to use a `docker` or `docker compose` setup.
 
 You can run Factory wherever you can run a Kubernetes cluster, so it can run at the edge, or in the cloud. Although you might except that Kubernetes at the edge or Kubernetes in the cloud is the same installation, you will notice that there are a few differences.
 
@@ -95,7 +95,7 @@ Installing Factory in a managed Kubernetes cluster (Azure, GCP, AWS) is straight
 
 ## Self-hosted Kubernetes
 
-No need to install Factory on a Kubernetes Service Provider, it can be installed on your own Kubernetes cluster in your private cloud, or at the edge. The closer you bring Kerberos Vault to your video streams, and Kerberos Agents, the more benefits you will experience (low latency, low bandwidth, etc).
+No need to install Factory on a Kubernetes Service Provider, it can be installed on your own Kubernetes cluster in your private cloud, or at the edge. The closer you bring Kerberos Vault to your video streams, and Agents, the more benefits you will experience (low latency, low bandwidth, etc).
 
 In contradiction to the Kubernetes Service Provider, there will be more work required. Setting up a Kubernetes Cluster, configure a load balancer, create persistent bolumes and claims.
 

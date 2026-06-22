@@ -39,7 +39,7 @@ Installing Kerberos Vault on a Kubernetes Service Provider (Azure, GCP, AWS) is 
 
 ## Self-hosted Kubernetes
 
-No need to install Kerberos Vault on a Kubernetes Service Provider, it can be installed on your own Kubernetes cluster in your private cloud, or at the edge. The closer you bring Kerberos Vault to your video streams, and Kerberos Agents, the more benefits you will experience (low latency, low bandwidth, etc). 
+No need to install Kerberos Vault on a Kubernetes Service Provider, it can be installed on your own Kubernetes cluster in your private cloud, or at the edge. The closer you bring Kerberos Vault to your video streams, and Agents, the more benefits you will experience (low latency, low bandwidth, etc). 
 
 In contrast to the Kubernetes Service Provider, there will be more work required. Setting up a Kubernetes Cluster, configuring a load balancer, and creating persistent volumes and claims.
 

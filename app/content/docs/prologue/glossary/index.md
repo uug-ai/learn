@@ -19,17 +19,17 @@ While working in the Kerberos Ecosystem, specific words and sentences become to 
 
 Chaining or forwarding refers to [connecting two Kerberos Vaults](/vault/forwarding/). A source Kerberos Vault is connected to a remote Kerberos Vault, and setup in a specific mode: continuous or on-demand forwarding.
 
-### Kerberos Agent
+### Agent
 
-A [Kerberos Agent](/agent/first-things-first/) is a collection of binaries, shipped in the form of container. It executes specific tasks related to the camera processing, monitoring, configuration and reviewing.
+A [Agent](/agent/first-things-first/) is a collection of binaries, shipped in the form of container. It executes specific tasks related to the camera processing, monitoring, configuration and reviewing.
 
-### Kerberos Factory
+### Factory
 
-Kerberos Agents are scaled [through various deployments](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent): `docker`, `kubernetes`, `terraform`, etc. The main goal of [Kerberos Factory](/factory/first-things-first/) is to serve as a non-technical user interface that allows business users to deploy and manage [Kerberos Agents](/agent/first-things-first/) without entering into the complexity of Kubernetes resources.
+Agents are scaled [through various deployments](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent): `docker`, `kubernetes`, `terraform`, etc. The main goal of [Factory](/factory/first-things-first/) is to serve as a non-technical user interface that allows business users to deploy and manage [Agents](/agent/first-things-first/) without entering into the complexity of Kubernetes resources.
 
 ### Kerberos Vault
 
-[Kerberos Vault](/vault/first-things-first/) is an interface between [Kerberos Agents](/agent/first-things-first/) and a storage system like Minio, S3, Google Storage, Storj and others. It helps decoupling [Kerberos Agents](/agent/first-things-first/) from a storage system, and allows you to change a storage system on the fly without reconfiguring your [Kerberos Agents](/agent/first-things-first/). Next to that it allows to build integrations and extensions through messaging (Kafka, SQS, etc) and a Swagger API.
+[Kerberos Vault](/vault/first-things-first/) is an interface between [Agents](/agent/first-things-first/) and a storage system like Minio, S3, Google Storage, Storj and others. It helps decoupling [Agents](/agent/first-things-first/) from a storage system, and allows you to change a storage system on the fly without reconfiguring your [Agents](/agent/first-things-first/). Next to that it allows to build integrations and extensions through messaging (Kafka, SQS, etc) and a Swagger API.
 
 ### Kerberos Hub
 

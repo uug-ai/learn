@@ -13,11 +13,11 @@ weight: 300
 toc: true
 ---
 
-It all starts with your Kerberos Agents. You might set up one or more agents at several locations, sites, rooms, offices, etc. Each Kerberos Agent will monitor a particular video stream and persist recordings on a local disk; taking into account the specific conditions such as region of interest, time window, etc.
+It all starts with your Agents. You might set up one or more agents at several locations, sites, rooms, offices, etc. Each Agent will monitor a particular video stream and persist recordings on a local disk; taking into account the specific conditions such as region of interest, time window, etc.
 
 [![Bring Your Own Storage and extend/integrate your video landscape with Kerberos Vault](youtube-vault-kerberosio.png)](https://www.youtube.com/watch?v=QuRHTziIc30 "Bring Your Own Storage and extend/integrate your video landscape with Kerberos Vault")
 
-While growing your video landscape, and adding more and more Kerberos Agents, it will become interesting, and probably also required to have a central place of storage. That central place might be at the edge, in the cloud, or both depending on the uses.
+While growing your video landscape, and adding more and more Agents, it will become interesting, and probably also required to have a central place of storage. That central place might be at the edge, in the cloud, or both depending on the uses.
 
 {{< figure src="vault-edge-cloud-storage.svg" alt="Bring your own storage using Vault" caption="Bring your own storage using Kerberos Vault" class="stretch">}}
 
@@ -31,7 +31,7 @@ Despite the flexible storage capabilities, Kerberos Vault is also an open platfo
 
 ## Storage Providers
 
-When deploying Kerberos Agents you have the possibility to Bring Your Own Storage; at the edge or in the cloud. By configuring Kerberos Vault you persist your recordings in your preferred storage providers. Following providers are supported:
+When deploying Agents you have the possibility to Bring Your Own Storage; at the edge or in the cloud. By configuring Kerberos Vault you persist your recordings in your preferred storage providers. Following providers are supported:
 
 - [Google Cloud Platform Storage](https://cloud.google.com/storage)
 - [Amazon Web Services S3](https://aws.amazon.com/s3/)
@@ -39,7 +39,7 @@ When deploying Kerberos Agents you have the possibility to Bring Your Own Storag
 - [Minio](https://min.io/)
 - [Ceph](https://ceph.io/)
 
-When installing Kerberos Vault in a cloud environment, following architecture may apply. Your Kerberos Agents are running at the edge, but uploading to Kerberos Vault in a cloud environment.
+When installing Kerberos Vault in a cloud environment, following architecture may apply. Your Agents are running at the edge, but uploading to Kerberos Vault in a cloud environment.
 
 {{< figure src="vault-cloud-storage.svg" alt="Bring your own storage using Kerberos Vault" caption="Bring your own storage using Kerberos Vault" class="stretch">}}
 
@@ -51,7 +51,7 @@ On the other hand you could also have Kerberos Vault running at the edge, next t
 
 One of the key differentiators, is the ability to extend and integrate. Next to uploading and persisting recordings on your preferred storage providers, Kerberos Vault can trigger events and be configured through APIs.
 
-Each time a Kerberos Agent sends a recording to Kerberos Vault, it is persisted on a storage provider, and an event is triggered through one of the following integrations.
+Each time an Agent sends a recording to Kerberos Vault, it is persisted on a storage provider, and an event is triggered through one of the following integrations.
 
 - [Apache Kafka](https://kafka.apache.org/)
 - [Amazon Web Services SQS](https://aws.amazon.com/sqs/)
@@ -66,9 +66,9 @@ service, etc. Find more information about events and integrations on [the integr
 
 ## Machine learning and Computer Vision
 
-Kerberos Vault allows scaling machine learning and computer vision algorithms through the concept of queueing, decoupling of Kerberos Agents to recordings and the NVidia Kubernetes Operator.
+Kerberos Vault allows scaling machine learning and computer vision algorithms through the concept of queueing, decoupling of Agents to recordings and the NVidia Kubernetes Operator.
 
-Kerberos Agents send recordings to Kerberos Vault. Every time a recording is stored, the Kafka integration is producing an event in a Kafka topic. A machine learning or computer vision consumer is reading from a Kafka topic, downloads the relevant recording from Kerberos Vault, and starts a prediction or execution of an algorithm on one or more GPUs.
+Agents send recordings to Kerberos Vault. Every time a recording is stored, the Kafka integration is producing an event in a Kafka topic. A machine learning or computer vision consumer is reading from a Kafka topic, downloads the relevant recording from Kerberos Vault, and starts a prediction or execution of an algorithm on one or more GPUs.
 
 By combining the intelligence of making recordings in small chunks, and distributing them across multiple GPUs, we allow you to scale your machine learning or computer vision independent of the number of video streams. Learn more about developing your own [machine learning model or computer vision algorithm](/vault/machine-learning/).
 

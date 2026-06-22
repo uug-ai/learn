@@ -46,7 +46,7 @@ As explained before, for each provider, the appropriate security settings has to
 
 ## Integrations
 
-Events or messages are generated each time a recording was uploaded to Kerberos Vault, and are sent to one or more integrations. Those integrations are configured through the Kerberos Vault application. Each time a Kerberos Agent sends a recording to Kerberos Vault, it is persisted on a storage provider, and an event is triggered through one of the following integrations. 
+Events or messages are generated each time a recording was uploaded to Kerberos Vault, and are sent to one or more integrations. Those integrations are configured through the Kerberos Vault application. Each time an Agent sends a recording to Kerberos Vault, it is persisted on a storage provider, and an event is triggered through one of the following integrations. 
 
 - [Apache Kafka](https://kafka.apache.org/)
 - [Amazon Web Services SQS](https://aws.amazon.com/sqs/)
@@ -55,7 +55,7 @@ Events or messages are generated each time a recording was uploaded to Kerberos 
 
 {{< figure src="integrations.gif" alt="Kerberos Vault can be configured to send events to message brokers to create real-time apps of ML models." caption="Kerberos Vault can be configured to send events to message brokers to create real-time apps of ML models." class="stretch">}}
 
-The idea of an integration is that you can build your own applications and define custom business logic. Kerberos Agents and Kerberos Vault will make sure you have a scalable and high available backend, so you can focus on the business case and bring your own technologies (Python, Golang, etc). Examples of integrations are, but of course not limited too.
+The idea of an integration is that you can build your own applications and define custom business logic. Agents and Kerberos Vault will make sure you have a scalable and high available backend, so you can focus on the business case and bring your own technologies (Python, Golang, etc). Examples of integrations are, but of course not limited too.
 
 - Metadata storage in MongoDB,
 - Notifications,
@@ -69,7 +69,7 @@ Find more information about events and integrations on [the integrations page](/
 
 Having setup `Providers` and `Integrations`, you need a secure way to interact with them through the creation of an account. 
 
-By creating an account you will receive credentials that give access to the Kerberos Vault's providers, integrations and APIs. Accounts credentials are being used by a Kerberos Agent to send recordings, and are used through API calls to download or forward recordings.
+By creating an account you will receive credentials that give access to the Kerberos Vault's providers, integrations and APIs. Accounts credentials are being used by an Agent to send recordings, and are used through API calls to download or forward recordings.
 
 Next to credentials, there are a couple of other fields which are specified on account level.
 

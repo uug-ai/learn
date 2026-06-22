@@ -23,15 +23,15 @@ Before we can start installing the different deployments in our cluster, we need
 
 Kerberos Vault is the storage component of the Kerberos Enterprise Suite. It is used to store your recordings at a central place, on the storage system you prefer. Next to that it can be used for extension and integration capabilities. Learn more about [Kerberos Vault here](/vault).
 
-To use Kerberos Vault, you will need to have one or more Kerberos Agents installed. Independent of that one can also use the Kerberos Vault API `/swagger/index.html` to send recordings from a custom build VMS. Nothing stops you from developing a custom agent.
+To use Kerberos Vault, you will need to have one or more Agents installed. Independent of that one can also use the Kerberos Vault API `/swagger/index.html` to send recordings from a custom build VMS. Nothing stops you from developing a custom agent.
 
 ## Installation
 
-Kerberos Vault requires some initial components to be installed. If you run Kerberos Vault in the same cluster as where you have a Kerberos Factory installed, there is not much to do.
+Kerberos Vault requires some initial components to be installed. If you run Kerberos Vault in the same cluster as where you have a Factory installed, there is not much to do.
 
 {{< figure src="vault-edge-storage.svg" alt="Store your recordings at the edge with Kerberos Vault" caption="Store your recordings at the edge with Kerberos Vault" class="stretch">}}
 
-If you plan to run Kerberos Vault in a different cluster (which is perfectly possible), you will need to make sure you complete the initial setup of [Kerberos Factory Edge](/enterprise/installation-edge) installation. To be more specific you will need the following components running:
+If you plan to run Kerberos Vault in a different cluster (which is perfectly possible), you will need to make sure you complete the initial setup of [Factory Edge](/enterprise/installation-edge) installation. To be more specific you will need the following components running:
 
 - Helm
 - Calico
@@ -72,7 +72,7 @@ Update the domain names to your own domain, and add these to your DNS server or 
                 port:
                   number: 8081
 
-If you are using Ingress Nginx, do not forgot to comment `Traefik` and uncomment `Ingress Nginx`. Also note the extra argument `proxy-body-size`, which is required for overcoming the default 1MB body size limit; if you do not enable this, you might experience `413` errors in your Kerberos Agents.
+If you are using Ingress Nginx, do not forgot to comment `Traefik` and uncomment `Ingress Nginx`. Also note the extra argument `proxy-body-size`, which is required for overcoming the default 1MB body size limit; if you do not enable this, you might experience `413` errors in your Agents.
 
     apiVersion: extensions/v1beta1
     kind: Ingress
@@ -83,7 +83,7 @@ If you are using Ingress Nginx, do not forgot to comment `Traefik` and uncomment
         kubernetes.io/ingress.class: nginx
         nginx.ingress.kubernetes.io/proxy-body-size: 200m
 
-Kerberos Vault requires a MongoDB instance to be running, it uses it to store media, configurations, etc. To specify those credentials a configmap is created and injected into the Kerberos Factory deployment.
+Kerberos Vault requires a MongoDB instance to be running, it uses it to store media, configurations, etc. To specify those credentials a configmap is created and injected into the Factory deployment.
 
 Modify the MongoDB credentials in the configmap `./vault/yaml/mongodb.config.yaml`, and make sure they match the credentials of your MongoDB instance.
 

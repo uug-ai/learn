@@ -25,7 +25,7 @@ First clone the configurations from the GitHub repository [kerberos-io/factory](
 
     git clone https://github.com/kerberos-io/factory
 
-A best practice is to create a separate namespace for your Factory and Kerberos Agent deployments.
+A best practice is to create a separate namespace for your Factory and Agent deployments.
 
     kubectl create namespace kerberos-factory
 
