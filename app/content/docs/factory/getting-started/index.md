@@ -1,7 +1,7 @@
 ---
 title: "Getting Started"
-description: "What to expect from Kerberos Factory"
-lead: "What to expect from Kerberos Factory"
+description: "What to expect from Factory"
+lead: "What to expect from Factory"
 date: 2020-10-06T08:49:31+00:00
 lastmod: 2020-10-06T08:49:31+00:00
 draft: false
@@ -13,7 +13,7 @@ weight: 301
 toc: true
 ---
 
-Once you've installed Kerberos Factory, you will have the web application running inside your cluster. This web application allows you to administrate and automate the creation of your Kerberos Agents through the concept of [Kubernetes deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) and pods.
+Once you've installed Factory, you will have the web application running inside your cluster. This web application allows you to administrate and automate the creation of your Kerberos Agents through the concept of [Kubernetes deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) and pods.
 
 Important to note is that this web application is relying [on the official Golang Kubernetes API](https://github.com/kubernetes/client-go), so that means from an administration point of view, you could simply use the well known `kubectl` command instead. The web application adds some functionalities on top of the Kubernetes API, which are specific to a Kerberos Agent; for example region of interests, livestreaming settings, etc.
 
@@ -21,7 +21,7 @@ Important to note is that this web application is relying [on the official Golan
 
 Once you open a browser, and navigate to the web application (see installation for the url), you will land on the login page.
 
-{{< figure src="login.gif" alt="Login into the Kerberos Factory interface." caption="Login into the Kerberos Factory interface." class="stretch">}}
+{{< figure src="login.gif" alt="Login into the Factory interface." caption="Login into the Factory interface." class="stretch">}}
 
 The default username password, specified in the [`deployment.yaml`](https://github.com/kerberos-io/enterprise/blob/master/yaml/factory/deployment.yaml#L54) is:
 
@@ -32,9 +32,9 @@ The default username password, specified in the [`deployment.yaml`](https://gith
 
 ## Overview
 
-On the overview page you will find an intuitive overview of the different pages and functionalities. As Kerberos Factory is running on top of a Kubernetes cluster, Kerberos Agents are deployed as Kubernetes deployments.
+On the overview page you will find an intuitive overview of the different pages and functionalities. As Factory is running on top of a Kubernetes cluster, Kerberos Agents are deployed as Kubernetes deployments.
 
-Kerberos Factory allows you to inspect and configure your Kerberos Agents, but also provide an overview of the Kubernetes nodes and pods.
+Factory allows you to inspect and configure your Kerberos Agents, but also provide an overview of the Kubernetes nodes and pods.
 
 {{< figure src="overview.gif" alt="Review your Docker or Kubernetes agents." caption="Review your Docker or Kubernetes agents." class="stretch">}}
 
@@ -89,7 +89,7 @@ Following settings can be changed:
 - Linking to [Kerberos Hub Saas](/hub/first-things-first) or [Kerberos Vault](/vault/first-things-first)
 
 {{< callout type="info" >}}
-Before the configuration screen opens, Kerberos Factory runs a quick **reachability check** (a ping) against the agent. If an agent is temporarily unreachable you get a fast, friendly message instead of a long hang, and any unsaved changes are confirmed before you close the screen.
+Before the configuration screen opens, Factory runs a quick **reachability check** (a ping) against the agent. If an agent is temporarily unreachable you get a fast, friendly message instead of a long hang, and any unsaved changes are confirmed before you close the screen.
 {{< /callout >}}
 
 ### Global configuration
@@ -129,7 +129,7 @@ When creating a Kerberos Agent, Kubernetes will create a Kubernetes deployment a
 
 ## ConfigMaps
 
-When you run Kerberos Factory with a Kubernetes-native configuration store (`configmap` or `secret`), the agent configuration lives in Kubernetes ConfigMaps and Secrets. The ConfigMaps page lets you inspect those objects, and **export** and **import** them:
+When you run Factory with a Kubernetes-native configuration store (`configmap` or `secret`), the agent configuration lives in Kubernetes ConfigMaps and Secrets. The ConfigMaps page lets you inspect those objects, and **export** and **import** them:
 
 - **Export** your ConfigMaps to keep a backup or to move a configuration between clusters.
 - **Import** previously exported ConfigMaps to restore or replicate a setup.
@@ -142,7 +142,7 @@ This page is most useful when the factory uses the `configmap` or `secret` confi
 
 ## Storage and video management
 
-Kerberos Factory allows you to scale your video landscape horizontally, using the concept of Kubernetes, and brings a strong backbone for stability and performance. It allows you to avoid reinventing the wheel, and get stuck in the numerous challenges of developing a scalable video platform.
+Factory allows you to scale your video landscape horizontally, using the concept of Kubernetes, and brings a strong backbone for stability and performance. It allows you to avoid reinventing the wheel, and get stuck in the numerous challenges of developing a scalable video platform.
 
 Kerberos Agents store their recordings locally for a short period. This means that long-term storage is not included in the solution. On top of that it also does not have a visual component, which allows you te review dashboards or recordings. To overcome these two challenges, long-term storage with extensibility/integration capabilities and visualisation features, following solutions were developed [Kerberos Vault](/storage/introduction) and [Kerberos Hub](/cloud).
 

@@ -1,7 +1,7 @@
 ---
 title: "Configuration & engines"
-description: "How Kerberos Factory stores its configuration and how it schedules your Kerberos Agents."
-lead: "How Kerberos Factory stores its configuration and how it schedules your Kerberos Agents."
+description: "How Factory stores its configuration and how it schedules your Kerberos Agents."
+lead: "How Factory stores its configuration and how it schedules your Kerberos Agents."
 date: 2026-06-22T08:49:31+00:00
 lastmod: 2026-06-22T08:49:31+00:00
 draft: false
@@ -13,7 +13,7 @@ weight: 303
 toc: true
 ---
 
-Kerberos Factory is controlled by **two independent axes**. One decides *where the
+Factory is controlled by **two independent axes**. One decides *where the
 factory keeps its own configuration*, the other decides *how your Kerberos Agents
 are scheduled and run*. Because they are orthogonal, you can mix and match them:
 for example run the Kubernetes engine while keeping your configuration in MongoDB,
@@ -111,7 +111,7 @@ engine-agnostic, so it will be reused unchanged by the future engines.
 
 ## Deprecated: `FACTORY_ENVIRONMENT`
 
-Earlier versions of Kerberos Factory used a single `FACTORY_ENVIRONMENT` variable.
+Earlier versions of Factory used a single `FACTORY_ENVIRONMENT` variable.
 It is **deprecated** and replaced by the two variables above, but it is still
 honoured as a fallback when the new variables are not set:
 

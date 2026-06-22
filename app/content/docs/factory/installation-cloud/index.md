@@ -19,13 +19,13 @@ If not already the case, start by creating a Kubernetes cluster. This can be don
 
 ## Installation
 
-Before setting up Kerberos Factory, the first thing that we need to do is enabling RBAC permissions (Role Based Access Control). This needs to be enabled to query specific endpoints from the Kubernetes API. By default, these endpoints are blocked, so we need to unlock them.
+Before setting up Factory, the first thing that we need to do is enabling RBAC permissions (Role Based Access Control). This needs to be enabled to query specific endpoints from the Kubernetes API. By default, these endpoints are blocked, so we need to unlock them.
 
 First clone the configurations from the GitHub repository [kerberos-io/factory]( https://github.com/kerberos-io/factory).
 
     git clone https://github.com/kerberos-io/factory
 
-A best practice is to create a separate namespace for your Kerberos Factory and Kerberos Agent deployments.
+A best practice is to create a separate namespace for your Factory and Kerberos Agent deployments.
 
     kubectl create namespace kerberos-factory
 
@@ -37,7 +37,7 @@ This will make several APIs inside your Kubernetes cluster available. We need th
 
 ### Helm
 
-Next we will install a couple of dependencies which are required for Kerberos Factory. [**Helm**](https://helm.sh/) is a package manager for Kubernetes, it helps you to set up services more easily (this could be a MQTT broker, a database, etc).
+Next we will install a couple of dependencies which are required for Factory. [**Helm**](https://helm.sh/) is a package manager for Kubernetes, it helps you to set up services more easily (this could be a MQTT broker, a database, etc).
 Instead of writing yaml files for every service we need, we use so-called Charts (libraries), that you can reuse and configure the, with the appropriate settings.
 
 Use one of the preferred OS package managers to install the Helm client:
@@ -82,7 +82,7 @@ If you don't like `Traefik` but you prefer `Ingress Nginx`, that works as well.
 
 ### MongoDB
 
-When using Kerberos Factory, it will generate configurations for every video stream deployed. These configuration files are persisted in a MongoDB database. As used before, we are using `helm` to install MongoDB in our Kubernetes cluster.
+When using Factory, it will generate configurations for every video stream deployed. These configuration files are persisted in a MongoDB database. As used before, we are using `helm` to install MongoDB in our Kubernetes cluster.
 
 Have a look into the `./factory/yaml/mongodb/values.yaml` file, you will find plenty of configurations for the MongoDB helm chart. To change the username and password of the MongoDB instance, go ahead and [find the attribute where](https://github.com/kerberos-io/factory/blob/master/yaml/mongodb/values.yaml#L75) you can change the root password.
 
@@ -95,13 +95,13 @@ Once installed successfully, we should verify if the password has been set corre
     export MONGODB_ROOT_PASSWORD=$(kubectl get secret -n mongodb mongodb -o jsonpath="{.data.mongodb-root-password}" | base64 --decode)
     echo $MONGODB_ROOT_PASSWORD
 
-### Kerberos Factory
+### Factory
 
-The last step is to install the Kerberos Factory application. Kerberos Factory is responsible for installing and creating the kubernetes deployments inside your Kubernetes cluster.
+The last step is to install the Factory application. Factory is responsible for installing and creating the kubernetes deployments inside your Kubernetes cluster.
 
 #### Config Map
 
-Kerberos Factory requires a MongoDB instance to be running, it uses it to store configuration files and other metrics. To specify those credentials a configmap is created and injected into the Kerberos Factory deployment.
+Factory requires a MongoDB instance to be running, it uses it to store configuration files and other metrics. To specify those credentials a configmap is created and injected into the Factory deployment.
 
 Modify the MongoDB credentials in the configmap `./factory/yaml/mongodb.config.yaml`, and make sure they match the credentials of your MongoDB instance.
 
@@ -116,7 +116,7 @@ Create the config map.
 
 #### Deployment
 
-Before installing Kerberos Factory, open the `./factory/yaml/deployment.yaml` configuration file. At the of the bottom file you will find two endpoints, similar to the Ingres file below. Update the hostnames to your own preferred domain, and add these to your DNS server or `/etc/hosts` file (pointing to the same IP as the Traefik/Ingress-nginx EXTERNAL-IP).
+Before installing Factory, open the `./factory/yaml/deployment.yaml` configuration file. At the of the bottom file you will find two endpoints, similar to the Ingres file below. Update the hostnames to your own preferred domain, and add these to your DNS server or `/etc/hosts` file (pointing to the same IP as the Traefik/Ingress-nginx EXTERNAL-IP).
 
         spec:
           rules:
@@ -145,7 +145,7 @@ If you are using Ingress Nginx, do not forgot to comment `Traefik` and uncomment
         #kubernetes.io/ingress.class: traefik
         kubernetes.io/ingress.class: nginx
 
-Once you have corrected the DNS names (or internal /etc/hosts file), install the Kerberos Factory web app inside your cluster.
+Once you have corrected the DNS names (or internal /etc/hosts file), install the Factory web app inside your cluster.
 
     kubectl apply -n kerberos-factory -f ./factory/yaml/factory/deployment.yaml
 
@@ -175,4 +175,4 @@ It should look like this.
 
 Once everything is configured correctly your cluster and DNS, you should be able to set up the Factory application. By navigating to the domain `factory.domain.com` in your browser you will see the login page showing up.
 
-{{< figure src="login.png" alt="Once successfully installed Kerberos Factory, it will show you the login page." caption="Once successfully installed Kerberos Factory, it will show you the login page." class="stretch">}}
+{{< figure src="login.png" alt="Once successfully installed Factory, it will show you the login page." caption="Once successfully installed Factory, it will show you the login page." class="stretch">}}

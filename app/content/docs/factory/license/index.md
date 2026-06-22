@@ -13,7 +13,7 @@ weight: 306
 toc: true
 ---
 
-Kerberos Factory is a closed source solution that is made available free of charge. The solution and its source code is maintained by the Kerberos.io development team, and made available through binaries through a Docker container. Kerberos Factory, and its related binaries, can be used under the MIT license.
+Factory is a closed source solution that is made available free of charge. The solution and its source code is maintained by the Kerberos.io development team, and made available through binaries through a Docker container. Factory, and its related binaries, can be used under the MIT license.
 
 ## The MIT License (MIT)
 
