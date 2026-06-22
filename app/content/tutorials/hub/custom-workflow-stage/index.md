@@ -344,7 +344,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	ingest "github.com/uug-ai/models/pkg/ingest"
+	ingest "github.com/uug-ai/ingest/pkg/ingest"
 	queue "github.com/uug-ai/queue/pkg/queue"
 )
 

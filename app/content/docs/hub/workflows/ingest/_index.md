@@ -16,7 +16,7 @@ toc: true
 
 A **stage** is a step in a workflow; you implement it as a **microservice**. [Stages](../stages/) covers how your microservice *connects* — the queue it consumes, the `WorkflowRun` envelope it receives, and how to register the stage. This page is the other half: **what your microservice hands back**, and what the platform does with it.
 
-When a stage wants the platform to store its result — rather than running its own database — it returns a **block envelope**: a small, self-describing list of typed *blocks*. One shared **ingest core** (`models/pkg/ingest`) routes each block by its own type, runs that block type's ordered, idempotent actions, and writes it into the platform-owned collection. The same core runs whether the result arrived over the workflows queue (a pipeline stage) or the public API (`POST /ingest`) — only the trust level differs.
+When a stage wants the platform to store its result — rather than running its own database — it returns a **block envelope**: a small, self-describing list of typed *blocks*. One shared **ingest core** (`ingest/pkg/ingest`) routes each block by its own type, runs that block type's ordered, idempotent actions, and writes it into the platform-owned collection. The same core runs whether the result arrived over the workflows queue (a pipeline stage) or the public API (`POST /ingest`) — only the trust level differs.
 
 > **Ingest is a code path, not a service.** There is no separate microservice, deployment or network hop. The ingest core is a shared library compiled *into* the workflows engine and the hub-api binary; each calls `IngestBlocks(...)` in-process on its own request. "Ingest" names a single, consistent code path for *receiving* a result, not a running component.
 
@@ -138,7 +138,7 @@ The public endpoint is the same core behind an HTTP door. It takes a single `{op
 
 ## Where it lives
 
-The core is `models/pkg/ingest`, a deliberately **infra-free** library: it depends only on the model types and on the **sink interfaces** it declares (`DetectionStore`, `MarkerStore`, `RegionPromoter`). Each app supplies the concrete Mongo implementation when it builds the `Scope` it passes in, so the routing has one implementation while persistence stays in each app's repository layer. Adding a block type is a new handler plus its ordered actions — the dispatcher never grows a case.
+The core is `ingest/pkg/ingest`, a deliberately **infra-free** library: it depends only on the model types and on the **sink interfaces** it declares (`DetectionStore`, `MarkerStore`, `RegionPromoter`). Each app supplies the concrete Mongo implementation when it builds the `Scope` it passes in, so the routing has one implementation while persistence stays in each app's repository layer. Adding a block type is a new handler plus its ordered actions — the dispatcher never grows a case.
 
 ## See also
 
