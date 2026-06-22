@@ -13,7 +13,7 @@ weight: 101
 toc: true
 ---
 
-Machine learning or computer vision at scale is one of the key motivations of the entire Kerberos.io software stack. All services going from Kerberos Agents, Kerberos Vault to Kerberos Hub are designed in such a way that you can scale them independently of each other. 
+Machine learning or computer vision at scale is one of the key motivations of the entire Kerberos.io software stack. All services going from Agents, Kerberos Vault to Kerberos Hub are designed in such a way that you can scale them independently of each other. 
 
 The design principle of Kerberos.io allows to decouple videos streams from any CPU or GPU workloads, through the creation of video chunks, queueing, event messaging and/or real-time processing. This is perfect for GPU workloads such as machine learning or other AI services.
 
@@ -35,11 +35,11 @@ Previously challenges is where we at Kerberos.io bring value through
 
 ## Video chunks
 
-Kerberos Agents are responsible for recording video streams into small chunks, mp4s, of which you can configure the length of the recording; pre and post recording. The main motivation of doing this is that small chunks of videos are easier to process and distribute across different workloads. Therefore, video chunks are the building blocks and basis of the scale Kerberos brings. 
+Agents are responsible for recording video streams into small chunks, mp4s, of which you can configure the length of the recording; pre and post recording. The main motivation of doing this is that small chunks of videos are easier to process and distribute across different workloads. Therefore, video chunks are the building blocks and basis of the scale Kerberos brings. 
 
 ## Queueing and events
 
-Video chunks prepared by one or more Kerberos Agents are sent to Kerberos Vault where they are persisted in one or more storage providers. The key thing is that they stored through a central application, Kerberos Vault, which has the ability to trigger integrations such as a Kafka broker.
+Video chunks prepared by one or more Agents are sent to Kerberos Vault where they are persisted in one or more storage providers. The key thing is that they stored through a central application, Kerberos Vault, which has the ability to trigger integrations such as a Kafka broker.
 
 ## Consuming and interfere 
 
@@ -85,7 +85,7 @@ So having above example let us get a bit more concrete on how this is functionin
 
 ## Scale and expand
 
-As illustrated in previous example, it should become clear that by chunking videos, distributing them over a flexible pool of GPUs, allows to provide a scalable and flexible way. Video streams are decouples from GPUs, and each of them can be scaled independently. Video chunks created by one or more Kerberos Agents are distributed over a pool of GPUs without knowing upfront which GPU will process which video chunk from which Kerberos Agent.
+As illustrated in previous example, it should become clear that by chunking videos, distributing them over a flexible pool of GPUs, allows to provide a scalable and flexible way. Video streams are decouples from GPUs, and each of them can be scaled independently. Video chunks created by one or more Agents are distributed over a pool of GPUs without knowing upfront which GPU will process which video chunk from which Agent.
 
 {{< figure src="gpu-to-cpu.svg" alt="GPUs and CPUs are decoupled. Any recording, independent of any video stream, will be distributed to the GPU pool." caption="GPUs and CPUs are decoupled. Any recording, independent of any video stream, will be distributed to the GPU pool." class="stretch">}}
 

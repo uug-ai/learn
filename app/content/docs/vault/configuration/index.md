@@ -47,10 +47,10 @@ You should now have a working storage provider that helps you to persist your re
 
 By creating an account you create a secure way of leveraging those capabilities by use authentication credentials; an access key and secret key. 
 
-Once those credentials and relevant account has been created and enabled you can link it to your Kerberos Agents to start forwarding their recordings into your Kerberos Vault installation. On the other hand those credentials can also be leveraged when connecting to Kerberos Hub, so it can read and request recordings from your Kerberos Vault; and underlying storage providers.
+Once those credentials and relevant account has been created and enabled you can link it to your Agents to start forwarding their recordings into your Kerberos Vault installation. On the other hand those credentials can also be leveraged when connecting to Kerberos Hub, so it can read and request recordings from your Kerberos Vault; and underlying storage providers.
 
 Go ahead and [have a look at the accounts page](/vault/accounts), there we explain how to add and configure specific accounts.
 
 ## You're ready
 
-If completed previous configurations, you are now ready to configure your Kerberos Agents with our without Kerberos Factory. Learn more here.
+If completed previous configurations, you are now ready to configure your Agents with our without Factory. Learn more here.

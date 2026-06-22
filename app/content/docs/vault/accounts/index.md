@@ -15,7 +15,7 @@ toc: true
 
 Having setup `Providers` and `Integrations`, you need a secure way to interact with them through the creation of an account.
 
-By creating an account you will receive credentials that give access to the Kerberos Vault's providers, integrations and APIs. Account credentials are being used by a Kerberos Agent to send recordings, and/or through custom code by API calls to download and/or forward recordings.
+By creating an account you will receive credentials that give access to the Kerberos Vault's providers, integrations and APIs. Account credentials are being used by an Agent to send recordings, and/or through custom code by API calls to download and/or forward recordings.
 
 ## Prerequisites
 
@@ -31,7 +31,7 @@ When selecting the `+ Add Account` button, a modal will open that allows you to 
 
 {{< figure src="add-account.gif" alt="Create a secure account." caption="Create a secure account" class="stretch">}}
 
-Once you've provided all the required fields and enabled the account, you should be able to use it and link your Kerberos Agents to your Kerberos Vault.
+Once you've provided all the required fields and enabled the account, you should be able to use it and link your Agents to your Kerberos Vault.
 
 ### Account settings
 
@@ -46,13 +46,13 @@ There are a couple of interesting configurations you can enable on account level
 
 #### Directory
 
-By defining a `directory` you force an account, and all its producing Kerberos Agents, to store all recordings in a specific subdirectory on the selected storage provider. 
+By defining a `directory` you force an account, and all its producing Agents, to store all recordings in a specific subdirectory on the selected storage provider. 
 
-By defining the `asteriks` (*) value, you will provide more flexibility and deligate the subdirectory to the connected Kerberos Agents. This means that different Kerberos Agents can store in different subdirectories, although they are connected to the same `account`.
+By defining the `asteriks` (*) value, you will provide more flexibility and deligate the subdirectory to the connected Agents. This means that different Agents can store in different subdirectories, although they are connected to the same `account`.
 
 #### Credentials
 
-These credentials are shared with Kerberos Agents, Kerberos Vaults (chained/forwarding) and/or Kerberos Hub. It's the authentication information needed to push recordings or retrieve recordings from Kerberos Vault.
+These credentials are shared with Agents, Kerberos Vaults (chained/forwarding) and/or Kerberos Hub. It's the authentication information needed to push recordings or retrieve recordings from Kerberos Vault.
 
 #### Cloud analysis
 

@@ -13,7 +13,7 @@ weight: 301
 toc: true
 ---
 
-Kerberos Agent is an open source solution that is made available free of charge. The solution and its source code is maintained by the Kerberos.io development team and open source community, and made available through source code, and binaries through a Docker container. Kerberos Agent, and its related binaries, can be used under the MIT license.
+Agent is an open source solution that is made available free of charge. The solution and its source code is maintained by the Kerberos.io development team and open source community, and made available through source code, and binaries through a Docker container. Agent, and its related binaries, can be used under the MIT license.
 
 ## The MIT License (MIT)
 

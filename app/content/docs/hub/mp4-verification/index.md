@@ -1,7 +1,7 @@
 ---
 title: "MP4 Verification"
-description: "Cryptographically verify the authenticity and integrity of recordings produced by Kerberos Agent."
-lead: "Every MP4 produced by Kerberos Agent is signed with a fingerprint so you can prove it has not been tampered with — useful for auditing, evidence handling, and chain-of-custody workflows."
+description: "Cryptographically verify the authenticity and integrity of recordings produced by Agent."
+lead: "Every MP4 produced by Agent is signed with a fingerprint so you can prove it has not been tampered with — useful for auditing, evidence handling, and chain-of-custody workflows."
 date: 2026-05-15T00:00:00+00:00
 lastmod: 2026-05-15T00:00:00+00:00
 draft: false
@@ -13,9 +13,9 @@ weight: 308
 toc: true
 ---
 
-Video evidence is only useful if you can trust that it has not been altered between the moment it was recorded and the moment it is reviewed. Kerberos Hub addresses this with a built-in **fingerprint and signature** mechanism: every fragmented MP4 written by Kerberos Agent is signed with a private key at the moment it is closed, and the resulting signature is embedded directly inside the file. Anyone with the matching public key can later verify — entirely offline — that the recording is authentic and bit-perfect.
+Video evidence is only useful if you can trust that it has not been altered between the moment it was recorded and the moment it is reviewed. Kerberos Hub addresses this with a built-in **fingerprint and signature** mechanism: every fragmented MP4 written by Agent is signed with a private key at the moment it is closed, and the resulting signature is embedded directly inside the file. Anyone with the matching public key can later verify — entirely offline — that the recording is authentic and bit-perfect.
 
-> **Note:** MP4 verification is available for recordings produced by Kerberos Agent. Recordings produced by other software, or files that have been re-encoded, transcoded, or trimmed by an external tool, will not pass verification because their internal structure no longer matches the signed fingerprint.
+> **Note:** MP4 verification is available for recordings produced by Agent. Recordings produced by other software, or files that have been re-encoded, transcoded, or trimmed by an external tool, will not pass verification because their internal structure no longer matches the signed fingerprint.
 
 ## How a recording is fingerprinted
 

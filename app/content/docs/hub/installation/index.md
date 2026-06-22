@@ -13,9 +13,9 @@ weight: 302
 toc: true
 ---
 
-Kerberos Hub is the single pane of glass for your Kerberos Agents. It comes with a best of breed open source technology stack, a modular design and out-of-the-box scalability. Kerberos Hub allows building and maintaining an ever-growing video streaming and analytics landscape.
+Kerberos Hub is the single pane of glass for your Agents. It comes with a best of breed open source technology stack, a modular design and out-of-the-box scalability. Kerberos Hub allows building and maintaining an ever-growing video streaming and analytics landscape.
 
-No matter how many Kerberos Agents you have running in the field Kerberos Hub will manage it.
+No matter how many Agents you have running in the field Kerberos Hub will manage it.
 
 ## Helm and Kubernetes
 

@@ -13,9 +13,9 @@ weight: 306
 toc: true
 ---
 
-When adding and deploying your Kerberos Agents you have [the option to enable ONVIF](/factory/getting-started/#adding-a-new-deployment) integration. Once enabled and connected properly to your camera using ONVIF, you can leverage specific functions and features of the camera, such as as PTZ, Streaming Profiles, etc. Which features are available depends on the camera you are using, and [which ONVIF profiles](https://www.onvif.org/profiles) are supported.
+When adding and deploying your Agents you have [the option to enable ONVIF](/factory/getting-started/#adding-a-new-deployment) integration. Once enabled and connected properly to your camera using ONVIF, you can leverage specific functions and features of the camera, such as as PTZ, Streaming Profiles, etc. Which features are available depends on the camera you are using, and [which ONVIF profiles](https://www.onvif.org/profiles) are supported.
 
-When connecting your Kerberos Agents to Kerberos Hub, you can start leveraging those capabilities. This means that certain ONVIF actions are forwarded from Kerberos Hub to the (edge deployed) Kerberos Agents. The forwarding is happening through the MQTT bidirectional connection you have setup. In other words this setup allows you to control your cameras from the internet without needing any port forwarding or special network sessions.
+When connecting your Agents to Kerberos Hub, you can start leveraging those capabilities. This means that certain ONVIF actions are forwarded from Kerberos Hub to the (edge deployed) Agents. The forwarding is happening through the MQTT bidirectional connection you have setup. In other words this setup allows you to control your cameras from the internet without needing any port forwarding or special network sessions.
 
 ![MQTT Kerberos Hub architecture](mqtt-kerberos-hub.svg)
 
