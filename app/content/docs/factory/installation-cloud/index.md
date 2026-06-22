@@ -9,7 +9,7 @@ images: []
 menu:
   factory:
     parent: "factory"
-weight: 303
+weight: 304
 toc: true
 ---
 

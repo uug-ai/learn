@@ -38,16 +38,17 @@ Kerberos Factory allows you to inspect and configure your Kerberos Agents, but a
 
 {{< figure src="overview.gif" alt="Review your Docker or Kubernetes agents." caption="Review your Docker or Kubernetes agents." class="stretch">}}
 
-On the left menu you will find pages are available:
+On the left menu you will find the following pages:
 
 - Settings: the global settings which are inherited by Kerberos Agents.
 - Camera: a list of all the Kerberos Agents running in your cluster.
 - Nodes: a list of all the nodes in your cluster.
 - Pods: all the pods running in your cluster.
+- ConfigMaps: inspect, export and import the Kubernetes ConfigMaps that hold your agent configuration (when running a Kubernetes-native config store).
 
 ## Nodes
 
-The nodes section lists all the available nodes inside your Kubernetes cluster. It shows a limited amount of information such as the version, the number of Docker images installed on the node, and some basic hardware information.
+The nodes section lists all the available nodes inside your Kubernetes cluster. It shows a limited amount of information such as the version, the number of Docker images installed on the node, and some basic hardware information. Live CPU and memory usage is streamed for each node, so you can spot a node that is under pressure at a glance.
 
 {{< figure src="nodes.gif" alt="Get an entire list of nodes which are connected to your Kubernetes cluster." caption="Get an entire list of nodes which are connected to your Kubernetes cluster." class="stretch">}}
 
@@ -87,11 +88,17 @@ Following settings can be changed:
 - Continuous recording
 - Linking to [Kerberos Hub Saas](/hub/first-things-first) or [Kerberos Vault](/vault/first-things-first)
 
+{{< callout type="info" >}}
+Before the configuration screen opens, Kerberos Factory runs a quick **reachability check** (a ping) against the agent. If an agent is temporarily unreachable you get a fast, friendly message instead of a long hang, and any unsaved changes are confirmed before you close the screen.
+{{< /callout >}}
+
 ### Global configuration
 
 Configuration can be specified in a Kerberos Agent, this means that you update the configuration of a specific Kubernetes deployment. However, this can also be specified at a higher level. This higher level is what we call the global configuration.
 
 By specifying configurations at a higher level, any Kerberos Agents will inherit from that configuration. This is improving the overall maintenance and management of your Kerberos Agents.
+
+The global configuration is stored by the factory itself. Depending on how the factory is set up this is a MongoDB database, a local JSON file, or a Kubernetes ConfigMap/Secret — see [Configuration & engines](/factory/configuration-and-engines) for the details.
 
 {{< figure src="global-settings.gif" alt="You can specify the configurations on a global level, so all Kerberos Agents will inherit from that." caption="You can specify the configurations on a global level, so all Kerberos Agents will inherit from that." class="stretch">}}
 
@@ -103,11 +110,35 @@ At any moment you can reboot one of your Kerberos Agents. When pressing the rebo
 
 {{< figure src="upgrade-kerberos-agent.gif" alt="You can specify the configurations on a global level, so all agents will inherit from that." caption="You can specify the configurations on a global level, so all agents will inherit from that." class="stretch">}}
 
+### Live logs and in-browser terminal
+
+Every Kerberos Agent runs as a pod, and you can follow what it is doing without leaving the browser. From the cameras list you can:
+
+- **Stream live logs** — open the console to tail the agent's logs in real time, which is the quickest way to confirm a camera is connecting and recording.
+- **Open an in-browser terminal** — start an interactive shell straight into the running pod to inspect the container, check files or run troubleshooting commands, without needing `kubectl exec` or SSH access to the node.
+
+{{< callout type="info" >}}
+Logs and the terminal are streamed over a WebSocket connection to the Kubernetes API, so they are only available while the agent's pod is running.
+{{< /callout >}}
+
 ## Pods
 
-When creating a Kerberos Agent, Kubernetes will create a Kubernetes deployment and schedule a pod. The pod will be managed by your deployment, and deployed as a container to one of your available nodes. Once a pod dies/ crashes, or whatever unexpected scenario, the deployment will make sure it is deployed again to a different (or the same) node. This makes sure the Kerberos Agent is in a healthy state at all times.
+When creating a Kerberos Agent, Kubernetes will create a Kubernetes deployment and schedule a pod. The pod will be managed by your deployment, and deployed as a container to one of your available nodes. Once a pod dies/ crashes, or whatever unexpected scenario, the deployment will make sure it is deployed again to a different (or the same) node. This makes sure the Kerberos Agent is in a healthy state at all times. The pods page streams live CPU and memory usage per pod, and lets you delete a pod to force its deployment to reschedule it.
 
 {{< figure src="pods.gif" alt="When creating a deployment, a Kubernetes pod has created and assigned to a node." caption="When creating a deployment, a Kubernetes pod has created and assigned to a node." class="stretch">}}
+
+## ConfigMaps
+
+When you run Kerberos Factory with a Kubernetes-native configuration store (`configmap` or `secret`), the agent configuration lives in Kubernetes ConfigMaps and Secrets. The ConfigMaps page lets you inspect those objects, and **export** and **import** them:
+
+- **Export** your ConfigMaps to keep a backup or to move a configuration between clusters.
+- **Import** previously exported ConfigMaps to restore or replicate a setup.
+
+System-managed ConfigMaps (such as `kube-root-ca.crt`) are skipped during import, so a round-trip cannot overwrite cluster-managed data.
+
+{{< callout type="info" >}}
+This page is most useful when the factory uses the `configmap` or `secret` configuration. See [Configuration & engines](/factory/configuration-and-engines) to learn how the configuration is stored and delivered to your agents.
+{{< /callout >}}
 
 ## Storage and video management
 
@@ -123,7 +154,6 @@ On the other hand it's an open platform, as it allows you build extensions and i
 
 {{< figure src="vault-cloud-storage.svg" alt="Kerberos Vault allows you to centralise your recordings and build integrations." caption="Kerberos Vault allows you to centralise your recordings and build integrations." class="stretch">}}
 
-To connect one or more Kerberos Agents to your Kerberos Vault instance, you should open the configuration option and navigate to the `cloud` tab. After selected you need to fill-in the credentials from your Kerberos Vault account.
 To connect one or more Kerberos Agents to your Kerberos Vault instance, you should open the configuration option and navigate to the `cloud` tab. After selected you need to fill-in the credentials from your Kerberos Vault account.
 
 - Kerberos Vault URI: this is the API endpoint of your Kerberos Vault instance. Usually this is in the following format: `http(s)://yourdomain.com/api`. Where `yourdomain.com` should match your Kerberos Vault endpoint. If you are deploying Kerberos Vault at the edge, in the same cluster, you can use the internal DNS name, as following `http://vault.kerberos-vault/api`. Where `vault` is the `service name` and `kerberos-vault` is the `namespace`.

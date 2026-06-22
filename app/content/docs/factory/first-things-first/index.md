@@ -35,3 +35,9 @@ Kerberos Factory allows you to scan the local network and create Kerberos Agents
 ### Global settings
 
 Instead of tuning all your Kerberos Agent, Kerberos Factory allows you to set up global settings which are inherited by all your Kerberos Agents.
+
+### Configuration storage and engines
+
+Kerberos Factory is flexible in *where it keeps its configuration* and *how it runs your agents*. You can store the factory's configuration in MongoDB, in plain JSON files, or in Kubernetes ConfigMaps and Secrets — the last two let your agents receive their configuration as environment variables, with no database required. Today agents are scheduled on Kubernetes, with a Docker and a host engine on the roadmap.
+
+Learn more on the [Configuration & engines](/factory/configuration-and-engines) page.
