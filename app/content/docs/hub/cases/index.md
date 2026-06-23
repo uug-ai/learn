@@ -506,10 +506,11 @@ To create a new share:
    of the selection is stored on the share itself, so later changes to
    the case selection do not retroactively affect already-issued links.
 4. Click **Send invite**. Hub generates a unique share link
-   (`/share/<token>`) and a one-time **verification code**, and emails
-   both to the recipient. After clicking the link, the recipient must
-   enter that code to open the case. The new share is added to the
-   *Existing shares* list below.
+   (`/share/<token>`) and emails it to the recipient. After opening the
+   link, the recipient requests a one-time **verification code** from the
+   share page itself; Hub then sends that code in a separate email, and
+   entering it opens the case. The new share is added to the *Existing
+   shares* list below.
 
 The *Existing shares* section lists every active invitation with the
 recipient's email and the expiry date. Clicking the trash icon on a row
@@ -524,8 +525,9 @@ snapshot.
 
 > **Note:** Shared links only grant access to the case itself (recordings,
 > attachments, description). They do not give the recipient access to the
-> rest of your Hub account, and they require both the link and the
-> verification code from the invite email to open the case.
+> rest of your Hub account, and they require both the link and a
+> verification code — which the recipient requests from the share page and
+> receives in a separate email — to open the case.
 
 ## Configuration
 
