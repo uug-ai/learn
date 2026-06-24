@@ -168,30 +168,53 @@ To activate and inject your email templates, make sure to uncomment the `volumes
                 persistentVolumeClaim:
                 claimName: custom-layout-claim
 
-Within en email template you can use variables, which are indicated through `{{variable}}`. Each variable will be automatically replaced by the required value. Following variables can be used in your email template.
+Within an email template you can use variables, which are indicated through `{{variable}}`. Each variable is automatically replaced by its value when the email is sent.
 
-- `{{user}}`: user that triggered the message
-- `{{title}}`: title of the message (used by the `share` and `welcome` templates)
-- `{{body}}`: body text of the message (used by the `share` and `welcome` templates). For a recording share this is the note the sender typed.
-- `{{url}}`: link to the shared media or case (used by the `share` and `share_case` templates)
-- `{{firstname}}`: first name of the case-share recipient (used by the `share_case` template)
-- `{{lastname}}`: last name of the case-share recipient (used by the `share_case` template)
-- `{{expiry}}`: human-readable lifetime of the share link or verification code (used by the `share_case` and `share_case_otp` templates)
-- `{{code}}`: the one-time verification code the recipient enters to open a shared case (used by the `share_case_otp` template)
+**Not every variable is available in every template.** Each email is sent with its own set of data, so a variable only resolves in the templates that actually provide it — anywhere else it is simply stripped out (replaced with an empty string). Use the table below to see which variables you can rely on in each template:
+
+| Template | When it is sent | Variables you can use |
+| --- | --- | --- |
+| `welcome` | A new account is created | `{{user}}`, `{{link}}` |
+| `activate` | Account / e-mail activation | `{{user}}`, `{{link}}` |
+| `forgot` | Password reset request | `{{user}}`, `{{password}}`, `{{ipaddress}}`, `{{link}}` |
+| `newip` | Sign-in from a new IP address | `{{user}}`, `{{ipaddress}}`, `{{link}}` |
+| `assign_task` | A task is assigned to a user | `{{user}}`, `{{assignee}}`, `{{task_name}}`, `{{link}}` |
+| `device` | A device changes state | `{{user}}`, `{{text}}`, `{{link}}` |
+| `disable` | A device/account is disabled (e.g. quota reached) | `{{user}}`, `{{text}}`, `{{dataUsage}}`, `{{link}}` |
+| `highupload` | A high upload / usage warning | `{{user}}`, `{{link}}` |
+| `share` | A recording is shared | `{{user}}`, `{{title}}`, `{{body}}`, `{{url}}` |
+| `share_case` | Someone is invited to a shared case | `{{user}}`, `{{firstname}}`, `{{lastname}}`, `{{url}}`, `{{expiry}}` |
+| `share_case_otp` | A one-time verification code for a shared case | `{{code}}`, `{{expiry}}` |
+| `detection` | An event / detection alert | the full event variable set (see *Event / detection variables* below) |
+
+> **Note:** The `detection` (event alert) email is the only one populated from a complete event, so it can use the full set of event variables listed below. All other (transactional) emails only resolve the variables shown in their row — adding any other variable to them will leave it blank.
+
+**Variable reference**
+
+Account & sharing variables:
+
+- `{{user}}`: name of the user that triggered or sent the message
+- `{{firstname}}` / `{{lastname}}`: first / last name of the case-share recipient
+- `{{title}}`: title (subject) of the message
+- `{{body}}`: body text of the message — for a recording share this is the note the sender typed
+- `{{url}}`: link to the shared media or case
+- `{{expiry}}`: human-readable lifetime of the share link or verification code
+- `{{code}}`: the one-time verification code the recipient enters to open a shared case
+- `{{password}}`: generated / reset password
+- `{{ipaddress}}`: IP address related to the sign-in or reset request
+- `{{assignee}}` / `{{task_name}}`: the assignee and name of an assigned task
+- `{{link}}`: link to the relevant page (media, activation, reset, …)
+
+Event / detection variables (available in the `detection` template):
+
 - `{{text}}`: text of the message
-- `{{link}}`: link to the media (recording)
-- `{{thumbnail}}`: image (either a base64 or a url).
-- `{{classifications}}`: list of classifications detected in the recording.
+- `{{medialink}}`: link to the media page on the Hub
+- `{{thumbnail}}`: event thumbnail (embedded image, base64 or URL)
+- `{{classifications}}`: list of classifications detected in the recording
 - `{{timezone}}`: timezone of the account generating the event
-- `{{date}}`: date of the media
-- `{{time}}`: time of the media
-- `{{datetime}}`: datetime of the media
-- `{{eventdate}}`: date of the notification
-- `{{eventtime}}`: time of the notification
-- `{{eventdatetime}}`: datetime of the notification
-- `{{devicename}}`: device generating the event
-- `{{deviceid}}`: device generating the event
-- `{{sites}}`: the list of sites the device is part of
-- `{{groups}}`: the list of groups the device is part of
+- `{{date}}` / `{{time}}` / `{{datetime}}`: date / time / datetime of the media
+- `{{eventdate}}` / `{{eventtime}}` / `{{eventdatetime}}`: date / time / datetime of the notification
+- `{{devicename}}` / `{{deviceid}}`: device generating the event
+- `{{sites}}` / `{{groups}}`: the sites / groups the device is part of
 - `{{numberOfMedia}}`: number of media attached to the message
 - `{{dataUsage}}`: data usage of the message
