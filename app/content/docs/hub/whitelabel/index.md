@@ -125,11 +125,13 @@ Within Kerberos Hub we use a couple of different [email templates](https://githu
 
 Two of these templates cover the **case sharing** flow: `share_case` is the invitation email that contains the time-limited share link, and `share_case_otp` is the follow-up email that delivers the one-time verification code the recipient requests from the share page. Both ship with a Kerberos-branded default and can be overridden like any other template.
 
-Email templates are injected into the container just like the custom stylesheet, logo and icons. The only difference is that they are not stored in the `custom` directory, but are stored in the `templates` directory. An example of the [email templates can be found here](https://github.com/kerberos-io/helm-charts/tree/main/charts/hub/custom-layout/templates).
+Email templates are injected just like the custom stylesheet, logo and icons, through a Persistent Volume. The differences are that the files live in a `templates` directory (instead of `custom`), and that the volume is shared with the back-end services that actually send the emails rather than with the front-end.
 
-To make this work you need an additional `volumeMount` and a matching PVC. The `volumeMount` is pointed at `/mail`, and the application reads your templates from `/mail/templates` — so place your `.html`/`.txt` files inside a `templates/` folder in the volume. Once you've done that your own email templates appear.
+Start from the [default templates](https://github.com/kerberos-io/helm-charts/tree/main/charts/hub/custom-layout/templates) and edit the ones you want to change. Each email has both an `.html` (designed) and a `.txt` (plain-text) version — keep both, and don't rename them: the file name has to match the template-name value from the table below (for example `welcome.html` and `welcome.txt`).
 
-To activate and inject your email templates, make sure to uncomment the `volumes` and `volumeMounts` in the `values.yaml` inside the `kerberoshub.api`, `kerberospipeline.notify` and `kerberospipeline.notifyTest`.
+Upload your files into a Persistent Volume inside a `templates/` folder and [create a Persistent Volume Claim (PVC)](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/custom-layout-claim.yaml) — you can reuse the same `custom-layout-claim` as the other customizations. The application reads templates from `/mail/templates`, so the `volumeMount` is pointed at `/mail` and your files must live under a `templates/` folder in the volume.
+
+Then add (or uncomment) the `volumes` and `volumeMounts` in the Helm chart `values.yaml` for the three services that send emails — `kerberoshub.api`, `kerberospipeline.notify` and `kerberospipeline.notifyTest`:
 
     kerberoshub:
         api:
@@ -167,6 +169,8 @@ To activate and inject your email templates, make sure to uncomment the `volumes
               - name: custom-email-templates
                 persistentVolumeClaim:
                   claimName: custom-layout-claim
+
+Once set, commit your changes by doing an `helm install` or `helm upgrade`. Your own email templates will now be used; any template you don't provide automatically keeps the built-in Kerberos default.
 
 **Template names and subjects**
 
