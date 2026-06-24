@@ -123,7 +123,7 @@ As Kerberos Hub can be white-labeled, you can bring your own email templates and
 
 Within Kerberos Hub we use a couple of different [email templates](https://github.com/kerberos-io/helm-charts/tree/main/charts/hub/custom-layout/templates), which are used in different scenarios (as described above). For each template there is a `.txt` and `.html` which respectively provides the email in a text-only mode and for the latter a designed email that the email client is able to render.
 
-Two of these templates cover the **case sharing** flow: `share_case` is the invitation email that contains the time-limited share link, and `share_case_otp` is the follow-up email that delivers the one-time verification code the recipient requests from the share page. Both ship with a Kerberos-branded default and can be overridden like any other template.
+These templates cover the full range of Kerberos Hub notifications — account lifecycle (welcome, activation, password reset), sharing (recording and case sharing), task assignment, and event and device alerts. Each one ships with a Kerberos-branded default and can be overridden in the same way; the complete list of template names and the values they map to is in the tables further down.
 
 Email templates are injected just like the custom stylesheet, logo and icons, through a Persistent Volume. The differences are that the files live in a `templates` directory (instead of `custom`), and that the volume is shared with the back-end services that actually send the emails rather than with the front-end.
 
