@@ -115,19 +115,19 @@ You can combine this with the `volumeMounts` and `volumes` used for the custom s
 
 ## Custom email templates
 
-Within the Kerberos Hub application different events and notifications are send; for example below email. Notifications are send upon different events such as account creation, forgot password, event detection (object found in a region or crossing a counting line), etc.
+Within the Kerberos Hub application different events and notifications are sent; for example the email shown below. Notifications are sent on different events such as account creation, forgot-password requests, event detection (an object found in a region or crossing a counting line), and more.
 
 ![Email example](./email-example.png).
 
-As Kerberos Hub can be whitelabeled, you can bring your own email templates and styled them similar to the Kerberos Hub interface. By doing so you will have an uniqiue styling for the entire Kerberos Hub application.
+As Kerberos Hub can be white-labeled, you can bring your own email templates and style them to match the Kerberos Hub interface. By doing so you get a unique, consistent styling across the entire Kerberos Hub application.
 
 Within Kerberos Hub we use a couple of different [email templates](https://github.com/kerberos-io/helm-charts/tree/main/charts/hub/custom-layout/templates), which are used in different scenarios (as described above). For each template there is a `.txt` and `.html` which respectively provides the email in a text-only mode and for the latter a designed email that the email client is able to render.
 
-Two of these templates cover the **case sharing** flow: `share_case` is the invitation email that contains the time-limited share link, and `share_case_otp` is the follow-up email that delivers the one-time verification code the recipient requests from the share page. Both ship with a Kerberos-branded default and can be overridden like any other template. The subject lines for these emails are not part of the template — they are configured through the `caseShareTitle` and `caseShareOtpTitle` values, so you can reword them without touching the template files.
+Two of these templates cover the **case sharing** flow: `share_case` is the invitation email that contains the time-limited share link, and `share_case_otp` is the follow-up email that delivers the one-time verification code the recipient requests from the share page. Both ship with a Kerberos-branded default and can be overridden like any other template.
 
 Email templates are injected into the container just like the custom stylesheet, logo and icons. The only difference is that they are not stored in the `custom` directory, but are stored in the `templates` directory. An example of the [email templates can be found here](https://github.com/kerberos-io/helm-charts/tree/main/charts/hub/custom-layout/templates).
 
-To make this work an additional `volumeMount` has to be created and relevant PVC. The `volumeMount` needs to be pointed to `/mail/templates`. Once you've done that you will see your own email templates appear.
+To make this work you need an additional `volumeMount` and a matching PVC. The `volumeMount` is pointed at `/mail`, and the application reads your templates from `/mail/templates` — so place your `.html`/`.txt` files inside a `templates/` folder in the volume. Once you've done that your own email templates appear.
 
 To activate and inject your email templates, make sure to uncomment the `volumes` and `volumeMounts` in the `values.yaml` inside the `kerberoshub.api`, `kerberospipeline.notify` and `kerberospipeline.notifyTest`.
 
@@ -151,22 +151,43 @@ To activate and inject your email templates, make sure to uncomment the `volumes
             ...
             # E-mail templates
             volumeMounts:
-            - name: custom-email-templates
+              - name: custom-email-templates
                 mountPath: /mail
             volumes:
-            - name: custom-email-templates
+              - name: custom-email-templates
                 persistentVolumeClaim:
-                claimName: custom-layout-claim
+                  claimName: custom-layout-claim
         notifyTest:
             ...
             # E-mail templates
             volumeMounts:
-            - name: custom-email-templates
+              - name: custom-email-templates
                 mountPath: /mail
             volumes:
-            - name: custom-email-templates
+              - name: custom-email-templates
                 persistentVolumeClaim:
-                claimName: custom-layout-claim
+                  claimName: custom-layout-claim
+
+**Template names and subjects**
+
+Aside from the in-template `{{variables}}`, each email type has two values in the chart's `email.templates` block (`values.yaml`) that you may need to keep in sync when white-labeling:
+
+- The **template name** (for example `welcome: "welcome"`) is the file name — without extension — that the application looks for in `/mail/templates`. When you override a template, name your files exactly after this value (for example `welcome.html` and `welcome.txt`). If the file name and this value don't match, the application falls back to the built-in Kerberos default.
+- The **subject line** (for example `welcomeTitle: "..."`) is set separately from the template body, so you can reword a subject without touching the `.html`/`.txt` files.
+
+| Email | Template-name value | Subject value | Default file name |
+| --- | --- | --- | --- |
+| Welcome | `welcome` | `welcomeTitle` | `welcome` |
+| Account activation | `activate` | `activateTitle` | `activate` |
+| Password reset | `forgot` | `forgotTitle` | `forgot` |
+| Recording share | `share` | `shareTitle` | `share` |
+| Case share invite | `caseShare` | `caseShareTitle` | `share_case` |
+| Case share verification code | `caseShareOtp` | `caseShareOtpTitle` | `share_case_otp` |
+| Task assignment | `assignTask` | `assignTaskTitle` | `assign_task` |
+| Event / detection alert | `detection` | `alertTitle` | `detection` |
+| Device status change | `device` | `deviceTitle` | `device` |
+
+**Template variables**
 
 Within an email template you can use variables, which are indicated through `{{variable}}`. Each variable is automatically replaced by its value when the email is sent.
 
