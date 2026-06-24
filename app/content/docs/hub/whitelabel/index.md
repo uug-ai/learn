@@ -23,7 +23,7 @@ Next to styling Kerberos Hub yourself, we can also rebrand the application for y
 
 ## Overriding the Kerberos Hub styling
 
-The recommended approach to add your custom styling is to inject a custom stylesheet file `.css` in the Kerberos Hub Front-end container. Let's start by creating a `.css` file, and include all the relevant CSS elements which you would like to modify. This could look like [this](https://github.com/kerberos-io/hub/blob/master/custom-layout/style.css).
+The recommended approach to add your custom styling is to inject a custom stylesheet file `.css` in the Kerberos Hub Front-end container. Let's start by creating a `.css` file, and include all the relevant CSS elements which you would like to modify. This could look like [this](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/style.css).
 
     .app .sidebar.closed {
       background: red !important;
@@ -35,9 +35,9 @@ Once you are happy with your styling, you can proceed with the injection in the 
 
 Injection is done through the concept of Persistent Volumes (PV). A PV is mapped in a front-end container, and is overriding the local directory of the front-end container with your changes made in the PV. If you are not familiar with a PV, [you might need to learn about it first](<https://kubernetes.io/docs/concepts/storage/persistent-volumes/#:~:text=A%20PersistentVolume%20(PV)%20is%20a,node%20is%20a%20cluster%20resource.>).
 
-Once you created a PV and uploaded your stylesheet, you should [create a Persistent Volume Claim (PVC)](https://github.com/kerberos-io/hub/blob/master/custom-layout/custom-layout-claim.yaml), so you can share it with the Kerberos Hub front-end container.
+Once you created a PV and uploaded your stylesheet, you should [create a Persistent Volume Claim (PVC)](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/custom-layout-claim.yaml), so you can share it with the Kerberos Hub front-end container.
 
-To share the PVC, you need to make a few changes in the Kerberos Hub Helm chart `values.yaml`. [Uncomment](https://github.com/kerberos-io/hub/blob/master/values.yaml#L210-L224) the `volumeMounts` and `volumes` properties. Change the PVC accordingly and keep the `mountPath` unchanged.
+To share the PVC, you need to make a few changes in the Kerberos Hub Helm chart `values.yaml`. [Uncomment](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/values.yaml) the `volumeMounts` and `volumes` properties. Change the PVC accordingly and keep the `mountPath` unchanged.
 
 If all set, commit your changes by doing an `helm install` or `helm upgrade`.
 
@@ -49,7 +49,7 @@ To inject your logo, upload it into the same PV as you used for the custom styli
 
 ## Custom icons
 
-If you do not like the icons we are using, you can also modify those by injecting your own SVG icon library. An example of the icon library can be found here: [icon.js](https://github.com/kerberos-io/hub/blob/master/custom-layout/icons.js).
+If you do not like the icons we are using, you can also modify those by injecting your own SVG icon library. An example of the icon library can be found here: [icon.js](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/icons.js).
 
 All icons are sorted in alphabetic order, and each icon has a generic naming convention and relevant SVG element.
 
@@ -74,7 +74,7 @@ Make sure you are using SVG icons, we do not support other formats at the moment
 
 ## Custom favicons
 
-Favicons are injected into the container just like the custom stylesheet, logo and icons. The only difference is that they are not stored in the `custom` directory, but are stored in the `favicons` directory. An example of the [favicons content can be found here](https://github.com/kerberos-io/hub/tree/master/custom-layout/favicons).
+Favicons are injected into the container just like the custom stylesheet, logo and icons. The only difference is that they are not stored in the `custom` directory, but are stored in the `favicons` directory. An example of the [favicons content can be found here](https://github.com/kerberos-io/helm-charts/tree/main/charts/hub/custom-layout/favicons).
 
 To make this work an additional `volumeMount` has to be created and relevant PVC. Once you've done that you will see your own favicons appear.
 
@@ -121,9 +121,11 @@ Within the Kerberos Hub application different events and notifications are send;
 
 As Kerberos Hub can be whitelabeled, you can bring your own email templates and styled them similar to the Kerberos Hub interface. By doing so you will have an uniqiue styling for the entire Kerberos Hub application.
 
-Within Kerberos Hub we use a couple of different [email templates](https://github.com/kerberos-io/hub/tree/master/custom-layout/templates), which are used in different scenarios (as described above). For each template there is a `.txt` and `.html` which respectively provides the email in a text-only mode and for the latter a designed email that the email client is able to render.
+Within Kerberos Hub we use a couple of different [email templates](https://github.com/kerberos-io/helm-charts/tree/main/charts/hub/custom-layout/templates), which are used in different scenarios (as described above). For each template there is a `.txt` and `.html` which respectively provides the email in a text-only mode and for the latter a designed email that the email client is able to render.
 
-Email templates are injected into the container just like the custom stylesheet, logo and icons. The only difference is that they are not stored in the `custom` directory, but are stored in the `templates` directory. An example of the [email templates can be found here](https://github.com/kerberos-io/hub/tree/master/custom-layout/templates).
+Two of these templates cover the **case sharing** flow: `share_case` is the invitation email that contains the time-limited share link, and `share_case_otp` is the follow-up email that delivers the one-time verification code the recipient requests from the share page. Both ship with a Kerberos-branded default and can be overridden like any other template. The subject lines for these emails are not part of the template — they are configured through the `caseShareTitle` and `caseShareOtpTitle` values, so you can reword them without touching the template files.
+
+Email templates are injected into the container just like the custom stylesheet, logo and icons. The only difference is that they are not stored in the `custom` directory, but are stored in the `templates` directory. An example of the [email templates can be found here](https://github.com/kerberos-io/helm-charts/tree/main/charts/hub/custom-layout/templates).
 
 To make this work an additional `volumeMount` has to be created and relevant PVC. The `volumeMount` needs to be pointed to `/mail/templates`. Once you've done that you will see your own email templates appear.
 
@@ -169,6 +171,13 @@ To activate and inject your email templates, make sure to uncomment the `volumes
 Within en email template you can use variables, which are indicated through `{{variable}}`. Each variable will be automatically replaced by the required value. Following variables can be used in your email template.
 
 - `{{user}}`: user that triggered the message
+- `{{title}}`: title of the message (used by the `share` and `welcome` templates)
+- `{{body}}`: body text of the message (used by the `share` and `welcome` templates). For a recording share this is the note the sender typed.
+- `{{url}}`: link to the shared media or case (used by the `share` and `share_case` templates)
+- `{{firstname}}`: first name of the case-share recipient (used by the `share_case` template)
+- `{{lastname}}`: last name of the case-share recipient (used by the `share_case` template)
+- `{{expiry}}`: human-readable lifetime of the share link or verification code (used by the `share_case` and `share_case_otp` templates)
+- `{{code}}`: the one-time verification code the recipient enters to open a shared case (used by the `share_case_otp` template)
 - `{{text}}`: text of the message
 - `{{link}}`: link to the media (recording)
 - `{{thumbnail}}`: image (either a base64 or a url).
