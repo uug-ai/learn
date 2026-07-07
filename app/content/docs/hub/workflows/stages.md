@@ -78,7 +78,7 @@ You add a stage entirely in the chart's `values.yaml` — no engine code changes
 - the **workflow stage object** (`kerberoshub.workflows.stages.<name>`) — declares the stage and how the engine routes to it;
 - the **service deployment** (`kerberoshub.services.<name>`) — deploys your microservice.
 
-Each half has its own `enabled`, so turn **both** on (plus the engine): routing with no microservice queues messages nobody reads, and a microservice with no routing never receives any.
+Each half has its own `enabled`, so turn **both** on (plus the engine): routing with no microservice means the engine dispatches to a queue nothing has declared, so those messages are returned unroutable and dead-lettered (see [Queue naming](#queue-naming)), and a microservice with no routing never receives any.
 
 The two sections divide by concern. `kerberoshub.workflows` is the engine's **behaviour** — its `enabled` switch and the `stages` routing registry. `kerberoshub.services` holds the **deployments** of the whole workflows subsystem in one uniform shape: the engine itself (`services.workflows`, a chart default you don't normally touch) and one microservice per stage (`services.<name>`). So adding a stage is always the same two edits — a routing entry under `workflows.stages`, and your microservice under `services`.
 
@@ -269,6 +269,8 @@ The engine reads that **same** value from the stage registry and dispatches ther
 
 If you omit `queue`, the engine falls back to a derived default, `kcloud-<operation>-queue.fifo` — so the convention is just that fallback, not the source of truth. Queue names are literal strings: the default deployment runs RabbitMQ, so a `.fifo` suffix is only part of a name, not an SQS feature.
 
+> **Who creates the queue.** The queue is declared by the **consumer** — your microservice — when it connects to the broker at pod startup, not on the first message and not by the engine. The engine only *publishes* to the name; it never creates it. This has a startup-ordering consequence: if the stage worker is **not running** (never deployed, or not yet started), its queue does not exist, so the engine's dispatches are **returned as unroutable and dead-lettered** rather than buffered until a consumer appears. Deploy the microservice so its queue exists; once it has connected once, the durable queue persists across restarts and holds messages while the worker is briefly down.
+
 ### The workflow run
 
 Your microservice does **not** receive the pipeline's internal `PipelineEvent`. The engine dispatches a single, self-contained **`models.WorkflowRun`** as JSON: the run's identity, the read-only context your microservice needs, and the credentials to fetch the media. Model your microservice's input type on this — every field below is present on the inbound dispatch, and nothing else is:
@@ -407,7 +409,7 @@ Whichever [sink](#sending-a-result-back) you use, your microservice routes the r
 
 ## Failure modes & gotchas
 
-- **Routing without a microservice (or vice-versa).** The two `enabled` flags are independent: routing (`workflows.stages.<name>.enabled`) with no microservice queues messages no one consumes; a microservice (`services.<name>.enabled`) with no routing never receives any. Keep them enabled together — they share the stage name, so they always address the same queue.
+- **Routing without a microservice (or vice-versa).** The two `enabled` flags are independent: routing (`workflows.stages.<name>.enabled`) with no microservice dispatches to a queue nothing has declared — the consumer creates the queue, so with no consumer the engine's messages are returned unroutable and dead-lettered rather than buffered (see [Queue naming](#queue-naming)); a microservice (`services.<name>.enabled`) with no routing never receives any. Keep them enabled together — they share the stage name, so they always address the same queue.
 - **No completion ack.** A microservice that writes its result but never echoes back to the workflows engine (`WORKFLOWS_QUEUE`) leaves the **stage** absent from `resolvedoperations`. Harmless to the run (stages are async), but it breaks provenance and lets a re-run repeat the work. Always ack.
 - **Re-decode cost.** A stage that re-fetches and re-decodes the video pays that cost per recording; reuse data already in the envelope or the database where you can.
 - **Non-idempotent writes.** Redelivery will duplicate output unless you upsert on a stable key.

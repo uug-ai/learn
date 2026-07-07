@@ -101,6 +101,8 @@ See **[Stages](stages/)** for the contract your microservice codes against: the 
 
 Your microservice hands its result back as a **block envelope** — a small JSON list of typed *blocks* (a detection, a marker, …), set on the run's `payload`. The **[Ingest](ingest/)** core is the shared layer on the platform side that receives it — from either the queue or the API — and runs the right actions for each block's type: validate it, store it, and trigger any follow-up side-effects.
 
+A workflow does not have to wait for a recording to flow through the pipeline: **[Triggers](triggers/)** specs how a workflow is *activated* — automatically by analysis on every matching recording, or **manually** on demand from a surface such as a [case](../cases/), where a user runs a chosen workflow over the media they selected.
+
 When something doesn't behave, **[Observability](observability/)** documents the structured log lines and distributed trace the workflows engine emits for every run — so a deployer can see why a recording did or did not reach a stage, and send us logs precise enough to act on.
 
 ## Glossary

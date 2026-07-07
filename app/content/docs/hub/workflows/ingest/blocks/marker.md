@@ -25,7 +25,7 @@ Markers are what the timeline and search surfaces read to let an operator jump s
 
 A marker is the `data` body of a **`marker` block**. A workflow stage returns it inside its [block envelope](../../#the-block-envelope); the shared [ingest core](../../) validates it and writes it to the `markers` collection.
 
-Unlike [`detection`](../detection/), the `marker` block type is **pipeline-only** — it can be emitted by an in-cluster [workflow stage](../../../stages/) over the queue, but **not** posted over the public ingest API. Because it arrives only over the trusted pipeline transport, the **organisation and device are taken from the run**, not from the body; your `data` supplies the annotation itself — its `name`, its timing, and its descriptive fields.
+Like [`detection`](../detection/), a `marker` block is delivered through the shared [ingest core](../../) — a [workflow stage](../../../stages/) emits it inside a block envelope and the core routes it the same way as any other block type. The **organisation and device are taken from the run**, not from the body; your `data` supplies the annotation itself — its `name`, its timing, and its descriptive fields.
 
 ```json
 {
@@ -66,7 +66,39 @@ These fields are required, and together they form the marker's identity.
 | `endTimestamp` | int64 (seconds) | When the span ends. |
 | `duration` | int64 (seconds) | Length of the span (`endTimestamp − startTimestamp`). |
 
-On the pipeline transport the platform supplies the **organisation** and **device** from the run, so you don't set `organisationId` or `deviceId` yourself — the stored marker is keyed by `(organisation, device, name, startTimestamp)`.
+The platform supplies the **organisation** and **device** from the run, so you don't set `organisationId` or `deviceId` yourself — the stored marker is keyed by `(organisation, device, name, startTimestamp)`.
+
+### Recording link (`mediaKeys`)
+
+A marker is stored against a **device**, but it is also attached to the specific
+**recording(s)** it belongs to. That link is what drives the timeline: the
+recordings a marker is attached to surface its name, tags and events directly,
+without a join.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `mediaKeys` | string[] | Optional. Recording **keys** (`media.videoFile`) this marker attaches to — the stable recording string, not the media document `_id`. |
+
+The core resolves which recording(s) a marker attaches to in priority order:
+
+1. **`mediaKeys` you provide** — the marker is pinned to exactly those
+   recordings, scoped to its device and organisation, with **no timestamp
+   guard**. This is authoritative: a stage that knows precisely which recording
+   its result came from should set this, because the key is immune to timing or
+   fps drift.
+2. **The run's own recording** — when you leave `mediaKeys` empty, the core
+   pins the marker to the recording the result was ingested against (the run's
+   key), so the link stays authoritative without you naming it.
+3. **Timestamp overlap** — with no recording reference at all, the core falls
+   back to attaching the marker to recordings on the device whose time span
+   overlaps the marker's window.
+
+```json
+"mediaKeys": ["1752482068_..._1920_1080_10000.mp4"]
+```
+
+Leave `mediaKeys` empty to accept the default (the run's recording, or timestamp
+overlap); set it only to override which recordings the marker attaches to.
 
 ### Descriptive fields
 
@@ -107,5 +139,5 @@ Delivery is **at-least-once**, so the write is an **idempotent upsert** keyed by
 
 - [Blocks](../) — the full catalogue of block types and how a block envelope is shaped.
 - [Detection](../detection/) — the other built-in block type: geometric tracks rather than timeline labels.
-- [Ingest](../../) — how the core routes a block envelope and the trust model behind the pipeline-only rule.
+- [Ingest](../../) — how the core routes a block envelope.
 - [Stages](../../../stages/) — how a microservice connects and hands a result back.
