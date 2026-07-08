@@ -102,27 +102,36 @@ A vehicle whose plate cannot be localized or confidently read is labelled **`unr
 
 ## Register it as a stage
 
-Which runs reach this worker is the engine's job, not the worker's. Add the stage to `PIPELINE_STAGE_REGISTRY` so a run is dispatched here once `classify` has labelled a car:
+Which runs reach this worker is the engine's job, not the worker's. Put the stage in a workflow definition (`WORKFLOW_DEFINITIONS`) so a run is dispatched here once `classify` has labelled a car:
 
 ```json
 [
   {
-    "operation": "anpr",
-    "dispatch": "conditional",
-    "queue": "hub-anpr-queue",
-    "needs": [
-      { "operation": "classify",
-        "condition": { "path": "inputs.classify.details.*.classified", "op": "eq", "value": "car" } }
+    "name": "anpr-workflow",
+    "enabled": true,
+    "source": "config",
+    "triggers": [{ "type": "automatic" }],
+    "stages": [
+      {
+        "operation": "anpr",
+        "dispatch": "conditional",
+        "needs": [
+          { "operation": "classify",
+            "condition": { "path": "inputs.classify.details.*.classified", "op": "eq", "value": "car" } }
+        ]
+      }
     ]
   }
 ]
 ```
 
+The stage's queue is not set here — the engine takes it from the matching `services.anpr.queue` deployment, so dispatch and consume can't drift.
+
 Match `inputs.classify.details.*.classified`, **not** `inputs.classify.properties`: the `.details.*.classified` fan-out is the per-object class this worker actually reads (a run only reaches ANPR when a detected object was classified `car`). `inputs.classify.properties` is a separate, frequently-empty summary list, so gating on it silently drops many car recordings.
 
-`dispatch` is the closed enum `always` | `conditional` (a stage with `needs` must be `conditional`), and a condition `path` is absolute from the run root — `inputs.classify.details.*.classified`, not a bare `details`. The `*` fans out across the `details` array; the engine validates both `dispatch` and `path` at boot and refuses to start on an invalid registry.
+`dispatch` is the closed enum `always` | `conditional` (a stage with `needs` must be `conditional`), and a condition `path` is absolute from the run root — `inputs.classify.details.*.classified`, not a bare `details`. The `*` fans out across the `details` array; the engine validates both `dispatch` and `path` at boot and refuses to start on an invalid definition.
 
-In a Hub Helm deployment this is generated for you: enable `kerberoshub.workflows.stages.anpr` (routing) and `kerberoshub.services.anpr` (the worker deployment) in the `charts/hub` values.
+In a Hub Helm deployment this is generated for you: add an `anpr` stage to a workflow under `kerberoshub.workflows.definitions` and deploy the worker with `kerberoshub.services.anpr` in the `charts/hub` values.
 
 ### Routing and reading are two separate knobs
 

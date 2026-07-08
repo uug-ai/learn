@@ -21,7 +21,7 @@ A **workflow stage** is a step in a workflow, implemented as a **microservice** 
 
 This page is the **contract your microservice codes against** — the queue it listens on, the message it receives, how it returns a result, and how the engine tracks it to completion. It is **capability-agnostic**: it never assumes *what* your stage does, so the same mechanism serves a speech-to-text service, a custom detector, or any other step. For a concrete capability built on it, see the [block types](/docs/hub/workflows/ingest/blocks/) a stage can produce.
 
-> **Status — rolling out.** The queue, the `WorkflowRun` it dispatches and the completion mechanics here are already how the pipeline works internally. The config-driven **stage registration** (the `kerberoshub.workflows.stages` values section — see [Registering a stage](#registering-a-stage)) is the addition that lets a *custom* stage join without changing engine code — dispatched by the standalone **workflows engine** (`hub-workflows`), which runs alongside the **analysis service** and consumes the classify results it tees over. It is landing now for self-hosted deployments.
+> **Status — rolling out.** The queue, the `WorkflowRun` it dispatches and the completion mechanics here are already how the pipeline works internally. The config-driven **stage registration** (the `kerberoshub.workflows.definitions` values section — see [Registering a stage](#registering-a-stage)) is the addition that lets a *custom* stage join without changing engine code — dispatched by the standalone **workflows engine** (`hub-workflows`), which runs alongside the **analysis service** and consumes the classify results it tees over. It is landing now for self-hosted deployments.
 >
 > This page covers how a microservice *delivers* a result. For the complementary *receiving* side — one shared core that takes a result from either the API or the queue and routes each block to the right actions by its type — see [Ingest](/docs/hub/workflows/ingest/).
 
@@ -73,61 +73,55 @@ A stage has exactly two runtime dependencies: the **message broker** (to receive
 
 ## Registering a stage
 
-You add a stage entirely in the chart's `values.yaml` — no engine code changes. A stage is **two halves that share one name** under `kerberoshub`, and both only take effect when the workflows engine is on (`kerberoshub.workflows.enabled: true`):
+A stage lives **inside a workflow definition** and pairs with a **worker deployment** — both declared in the chart's `values.yaml`, no engine code changes. The definition itself (`kerberoshub.workflows.definitions.<workflow>`), its full field reference and running several workflows are covered in [Defining a workflow in configuration](/docs/hub/workflows/#defining-a-workflow-in-configuration). This page is about a stage's own two parts:
 
-- the **workflow stage object** (`kerberoshub.workflows.stages.<name>`) — declares the stage and how the engine routes to it;
-- the **service deployment** (`kerberoshub.services.<name>`) — deploys your microservice.
+- the **stage entry** — an item in a definition's `stages` list, declaring the stage's `operation` and how the engine routes to it;
+- the **worker deployment** (`kerberoshub.services.<operation>`) — the microservice that consumes the stage's queue.
 
-Each half has its own `enabled`, so turn **both** on (plus the engine): routing with no microservice means the engine dispatches to a queue nothing has declared, so those messages are returned unroutable and dead-lettered (see [Queue naming](#queue-naming)), and a microservice with no routing never receives any.
-
-The two sections divide by concern. `kerberoshub.workflows` is the engine's **behaviour** — its `enabled` switch and the `stages` routing registry. `kerberoshub.services` holds the **deployments** of the whole workflows subsystem in one uniform shape: the engine itself (`services.workflows`, a chart default you don't normally touch) and one microservice per stage (`services.<name>`). So adding a stage is always the same two edits — a routing entry under `workflows.stages`, and your microservice under `services`.
+The stage's queue is **not** set on the stage — it is taken from the matching `services.<operation>.queue`, so the engine dispatches and the worker consumes the same name with no drift. Deploy the worker (`services.<operation>.enabled`) for every `operation` a workflow references; otherwise the engine dispatches to a queue nothing has declared and those messages are returned unroutable and dead-lettered (see [Queue naming](#queue-naming)).
 
 ```yaml
-# values.yaml
+# values.yaml — a stage is one entry in a workflow definition + its worker
 kerberoshub:
   workflows:
-    enabled: true                  # master switch: the workflows engine
+    enabled: true                    # master switch: the workflows engine
+    definitions:
+      speed-workflow:                # the workflow this stage belongs to
+        enabled: true
+        stages:
+          - operation: speed         # ← the stage entry
+            dispatch: conditional    # always | conditional
+            needsMode: any           # any | all (conditional, multiple needs)
+            needs:
+              - operation: classify
+                condition: { path: inputs.classify.details.*.classified, op: eq, value: car }
 
-    # ── the workflow stage object: declare + route ──────────────
-    stages:
-      speed:                       # stage name (and default operation id)
-        enabled: true              # route to this stage
-        dispatch: conditional      # always | conditional
-        # conditional only — see Conditional routing:
-        needsMode: any             # any | all
-        needs:
-          - operation: classify
-            condition: { path: inputs.classify.properties, op: contains, value: car }
-
-  # ── the deployments: the engine (chart default) + your microservice ─
   services:
-    # workflows: …                # the engine itself — a chart default; you don't set this here
-    speed:                         # same name as the stage object
-      enabled: true                # deploy the microservice
+    speed:                           # ← the worker, keyed by the stage's operation id
+      enabled: true                  # deploy the worker
       repository: ghcr.io/acme/speed
       tag: "v1.0.0"
-      queue: "hub-workflows-speed" # the queue your microservice consumes
+      queue: "hub-workflows-speed"   # the queue the engine dispatches to and the worker consumes
       replicas: 1
       pullPolicy: IfNotPresent
-      logLevel: info               # trace | debug | info | warn | error
+      logLevel: info                 # trace | debug | info | warn | error
       resources: {}
 ```
 
-**Workflow stage object — `kerberoshub.workflows.stages.<name>`**
+**Stage entry — an item in a definition's `stages` list**
 
 | Field | Required | Value | What you use it for |
 |---|---|---|---|
-| `enabled` | yes | bool | Route to the stage. Off = the engine doesn't know it exists. |
-| `operation` | no | string | The stage's **operation id** — the key your result is filed under (`results.<operation>`) and that other stages depend on. Defaults to the stage name; set it only to differ from the key. |
-| `dispatch` | no | `always` \| `conditional` | `always` (default) runs on every recording; `conditional` runs only when the recording matches — see [Conditional routing](#conditional-routing). |
+| `operation` | yes | string | The stage's **operation id** — the routing key, the key your result is filed under (`results.<operation>`), the completion key, and the `services.<operation>` whose worker + queue it binds to. Unique within the workflow. |
+| `dispatch` | no | `always` \| `conditional` | `always` (default) runs on every run of this workflow; `conditional` runs only when the run matches — see [Conditional routing](#conditional-routing). |
 | `needs` | conditional only | list | The match rule — see [Conditional routing](#conditional-routing). |
 | `needsMode` | no | `any` \| `all` | How multiple `needs` combine — `any` (default) or `all`. |
 
-> **Stage vs. operation.** On this page, **stage** is the step and **operation** is just its *id* — the `operation` field above, which **defaults to the stage name**. See the [glossary](/docs/hub/workflows/#glossary) for the full vocabulary.
+> **Stage vs. operation.** On this page, **stage** is the step and **operation** is its *id* — the `operation` field above, which is also the key everything else (result, queue, worker, completion) is bound by. See the [glossary](/docs/hub/workflows/#glossary) for the full vocabulary.
 
-**Service deployment — `kerberoshub.services.<name>`**
+**Worker deployment — `kerberoshub.services.<operation>`**
 
-A normal microservice Deployment, keyed to the same name as the stage object. (The workflows engine itself is deployed from this same section as `services.workflows` — the one `services` entry with no matching stage, and a chart default you don't normally touch.)
+A normal microservice Deployment, keyed to the stage's **operation id**. (The workflows engine itself is deployed from this same section as `services.workflows` — the one `services` entry that is not a stage worker, and a chart default you don't normally touch.)
 
 | Field | Required | Value | What you use it for |
 |---|---|---|---|
@@ -139,11 +133,10 @@ A normal microservice Deployment, keyed to the same name as the stage object. (T
 | `pullPolicy` | no | `IfNotPresent` \| `Always` \| … | Image pull policy. |
 | `logLevel` | no | `trace`…`error` | Microservice log verbosity. |
 | `resources` | no | object | Standard pod requests/limits. |
+| `env` | no | map | Extra environment passed **verbatim** to the worker (per-stage tuning); can't override the fixed contract env the chart injects. |
 | `topologySpreadConstraints`, `volumes`, `volumeMounts` | no | list | Standard optional Deployment extras. |
 
-> **It's the engine switch, not the front-end one.** `kerberoshub.workflows.enabled` toggles the **workflows engine** that dispatches stages. Don't confuse it with the unrelated `kerberoshub.…features.workflows.enabled` front-end feature flag.
-
-**Minimal stage.** The smallest live stage is `enabled: true` on both halves, the image + `queue` on the deployment, and `dispatch: always`. Everything else is additive — you can switch to conditional routing later without touching the rest.
+**Minimal stage.** The smallest live stage is one `stages` entry (`operation` + `dispatch: always`) inside an `enabled` workflow definition, plus its worker under `services.<operation>` (`enabled: true`, image + `queue`). Everything else is additive — you can switch to conditional routing later without touching the rest.
 
 ## Conditional routing
 
@@ -153,15 +146,14 @@ The rule is a list of **`needs`** combined by **`needsMode`**:
 
 ```yaml
 stages:
-  speed:
-    enabled: true
+  - operation: speed
     dispatch: conditional
     needsMode: any                 # any (default) | all
     needs:
       - operation: classify        # GATE — wait until this op is on the run
         condition:                 # PREDICATE — tested once the gate is ready
-          path: inputs.classify.properties
-          op: contains
+          path: inputs.classify.details.*.classified
+          op: eq
           value: car
 ```
 
@@ -174,7 +166,7 @@ stages:
 needsMode: all
 needs:
   - operation: classify
-    condition: { path: inputs.classify.properties, op: contains, value: car }
+    condition: { path: inputs.classify.details.*.classified, op: eq, value: car }
   - operation:                     # no gate — checked the moment the run opens
     condition: { path: device.deviceKey, op: eq, value: device02 }
 ```
@@ -187,7 +179,7 @@ A condition is `{ path, op, value }`.
 
 | Root | Example | Notes |
 |---|---|---|
-| `inputs.<op>.<field>` | `inputs.classify.properties` | An upstream result. `classify` is always present (the trigger); its fields are `properties`, `objectCount`, `details` (`details` is an array — not reachable). |
+| `inputs.<op>.<field>` | `inputs.classify.details.*.classified` | An upstream result. `classify` is always present (the trigger); its fields are `properties` (array), `objectCount` (int), and `details` (array — fan out with `*`, e.g. `inputs.classify.details.*.classified`). |
 | `results.<op>.<field>` | `results.speed.kmh` | A finished stage's output. Fields of your own custom operations are accepted as-is; array fields can be matched element-wise with `*` (see [Matching inside arrays](#matching-inside-arrays)). |
 | `device.<field>` | `device.deviceKey` | One of `deviceKey`, `deviceName`, `provider`, `storageSolution`. |
 | `user.<field>` | `user.organisationId` | One of `id`, `organisationId`. |
@@ -230,7 +222,7 @@ condition: { path: results.detector.detections.*.score, op: gt, value: 0.8 }
 
 That is what makes per-element numbers work: each fanned-out value is a single `score`, so `gt` / `lt` compare it directly. `ne` is the inverse — it holds only when **no** element equals `value` (`…detections.*.label, op: ne, value: car` ⇒ *not one box is a car*). Nested lists compose: `results.detector.detections.*.boxes.*.x` reaches every box of every detection.
 
-Two limits to keep in mind. **`*` is the only index** — there is no numeric `[0]`, and a plain step onto an array (without `*`) matches nothing, so gate on the array itself with `contains` / `exists` or fan out with `*`. And separate needs **don't correlate**: `…*.label eq car` and `…*.score gt 0.8` can be satisfied by **different** elements — there is no "the same object has both" across two conditions. Built-in `classify` fields stay non-traversable (`inputs.classify.details` is validated as a leaf); `*` applies to your **own** operation's result arrays.
+Two limits to keep in mind. **`*` is the only index** — there is no numeric `[0]`, and a plain step onto an array (without `*`) matches nothing, so gate on the array itself with `contains` / `exists` or fan out with `*`. And separate needs **don't correlate**: `…*.label eq car` and `…*.score gt 0.8` can be satisfied by **different** elements — there is no "the same object has both" across two conditions. Built-in `classify` exposes `details` as a fan-out array (`inputs.classify.details.*.classified`) and `properties` as a flat list; `objectCount` stays a scalar. `*` applies to those and to your **own** operation's result arrays.
 
 The engine validates every condition path at boot and refuses to start on an unknown one — a typo fails fast instead of silently never firing.
 
@@ -250,7 +242,7 @@ The chart deploys your microservice from `kerberoshub.services.<name>` and injec
 Two things to note:
 
 - **No datastore by default.** The microservice contract is broker + queues + media storage; the chart injects no database connection. A delegated stage hands its result back over `WORKFLOWS_QUEUE` for the platform to persist, while a stage that writes its [own collection](#sending-a-result-back) brings its own datastore access.
-- **Deploying outside the chart.** To run the microservice yourself, leave `services.<name>.enabled` off (so the chart deploys no pod) but keep the stage under `workflows.stages` so the engine still routes to it; then wire these same variables into your own deployment. The consume and return queue names are the only hard requirement.
+- **Deploying outside the chart.** To run the microservice yourself, leave `services.<operation>.enabled` off (so the chart deploys no pod) but keep the `services.<operation>` entry — its `queue` is what the engine dispatches to — and keep the stage in a `workflows.definitions` workflow so the engine still routes to it; then wire these same variables into your own deployment. The consume and return queue names are the only hard requirement.
 
 ## The message you receive
 
@@ -265,7 +257,7 @@ kerberoshub:
       queue: "hub-workflows-speed" # ← anything you want; your microservice consumes this exact name
 ```
 
-The engine reads that **same** value from the stage registry and dispatches there, so the only rule is that the two agree — the queue is the one thing that binds the engine to your microservice. These examples use a consistent `hub-workflows-<stage>` form (`hub-workflows-speed`, `hub-workflows-llm`), but the name is an arbitrary string your broker accepts (`vision.requests`, `team7-detector` work just as well) and does **not** have to follow the platform's `kcloud-…` convention — it only has to match on both sides.
+The engine reads that **same** value from the matching `services.<operation>` entry and dispatches there, so the only rule is that the two agree — the queue is the one thing that binds the engine to your microservice. These examples use a consistent `hub-workflows-<stage>` form (`hub-workflows-speed`, `hub-workflows-llm`), but the name is an arbitrary string your broker accepts (`vision.requests`, `team7-detector` work just as well) and does **not** have to follow the platform's `kcloud-…` convention — it only has to match on both sides.
 
 If you omit `queue`, the engine falls back to a derived default, `kcloud-<operation>-queue.fifo` — so the convention is just that fallback, not the source of truth. Queue names are literal strings: the default deployment runs RabbitMQ, so a `.fifo` suffix is only part of a name, not an SQS feature.
 
@@ -273,7 +265,7 @@ If you omit `queue`, the engine falls back to a derived default, `kcloud-<operat
 
 ### The workflow run
 
-Your microservice does **not** receive the pipeline's internal `PipelineEvent`. The engine dispatches a single, self-contained **`models.WorkflowRun`** as JSON: the run's identity, the read-only context your microservice needs, and the credentials to fetch the media. Model your microservice's input type on this — every field below is present on the inbound dispatch, and nothing else is:
+Your microservice does **not** receive the pipeline's internal `PipelineEvent`. The engine dispatches a single, self-contained **`models.WorkflowRun`** as JSON: the run's identity, the read-only context your microservice needs, and the credentials to fetch the media. Model your microservice's input type on this — every field below is present on the inbound dispatch:
 
 ```json
 {
@@ -325,7 +317,7 @@ Your microservice does **not** receive the pipeline's internal `PipelineEvent`. 
 | `results` | object | **Accumulated upstream stage outputs**, keyed by operation (e.g. `results.detection`). Empty if your stage runs first. Read-only inbound; on return, `results.<operation>` carries your result — filled by the engine from your `payload` (delegated) or set by you (own collection). |
 | `storage` | object | The **credentials to fetch the media** — see below. Present **only** on the inbound dispatch; clear it before returning the run. |
 
-> `payload`, `workflowId` and `workflowName` are **not** sent inbound. `payload` is the channel *you* fill on the way back (delegated-ingest stages only); `workflowId` / `workflowName` are engine-internal.
+> `payload` is **not** sent inbound — it is the channel *you* fill on the way back (delegated-ingest stages only). The dispatch also carries `workflowId` / `workflowName` identifying which workflow the run belongs to (several workflows can run over one recording, each opening its own run); a worker doesn't act on them and echoes only `runId` on the way back.
 
 **`user` — account context**
 
@@ -357,7 +349,7 @@ Your microservice does **not** receive the pipeline's internal `PipelineEvent`. 
 |---|---|---|
 | `inputs.classify.properties` | string[] | Flat list of the detected class strings, e.g. `["car","person"]`. Gate on it with `contains` / `in` / `exists`. |
 | `inputs.classify.objectCount` | int | Number of detected objects. Gate on it numerically (`gt` / `gte` / `lt` / `lte` / `eq`). |
-| `inputs.classify.details` | object[] | Per-object detail — each entry carries `classified` (the class), `distance`, `isStatic` and trajectory/frame geometry. It is an **array**, so a condition `path` can't index into it: read it in microservice code, but gate on `properties` / `objectCount`. |
+| `inputs.classify.details` | object[] | Per-object detail — each entry carries `classified` (the class), `distance`, `isStatic` and trajectory/frame geometry. It is an **array**, so a condition `path` reaches into it with a `*` fan-out: gate on `inputs.classify.details.*.classified` (the per-object class), which is more reliable than the flat `properties` summary. |
 
 **`storage` — media-fetch credentials**
 
@@ -373,7 +365,7 @@ The credentials your microservice uses to fetch the recording. The base trio is 
 | `storage.vaultOverrideSecret` | string | Override secret. |
 | `storage.vaultOverrideProvider` | string | Override provider. |
 
-`inputs` and `results` are your **read-only upstream context** — the same bags the condition matcher evaluates `needs` against. The engine routes purely by `operation` and the registry; it never inspects your output to decide where the run goes.
+`inputs` and `results` are your **read-only upstream context** — the same bags the condition matcher evaluates `needs` against. The engine routes purely by `operation` and the workflow definition; it never inspects your output to decide where the run goes.
 
 ### Acknowledgement
 
@@ -409,7 +401,7 @@ Whichever [sink](#sending-a-result-back) you use, your microservice routes the r
 
 ## Failure modes & gotchas
 
-- **Routing without a microservice (or vice-versa).** The two `enabled` flags are independent: routing (`workflows.stages.<name>.enabled`) with no microservice dispatches to a queue nothing has declared — the consumer creates the queue, so with no consumer the engine's messages are returned unroutable and dead-lettered rather than buffered (see [Queue naming](#queue-naming)); a microservice (`services.<name>.enabled`) with no routing never receives any. Keep them enabled together — they share the stage name, so they always address the same queue.
+- **Routing without a worker (or vice-versa).** A stage entry routes to its `operation`, and the worker is deployed from `services.<operation>` — they bind through that one name. A stage whose `operation` has no deployed worker dispatches to a queue nothing has declared — the consumer creates the queue, so with no consumer the engine's messages are returned unroutable and dead-lettered rather than buffered (see [Queue naming](#queue-naming)); a worker with no stage referencing its operation never receives any. Keep them in sync — they always address the same queue via `services.<operation>.queue`.
 - **No completion ack.** A microservice that writes its result but never echoes back to the workflows engine (`WORKFLOWS_QUEUE`) leaves the **stage** absent from `resolvedoperations`. Harmless to the run (stages are async), but it breaks provenance and lets a re-run repeat the work. Always ack.
 - **Re-decode cost.** A stage that re-fetches and re-decodes the video pays that cost per recording; reuse data already in the envelope or the database where you can.
 - **Non-idempotent writes.** Redelivery will duplicate output unless you upsert on a stable key.
@@ -417,7 +409,7 @@ Whichever [sink](#sending-a-result-back) you use, your microservice routes the r
 ## Checklist
 
 - [ ] Pick a unique **operation id** — it's the routing key, the result key (`results.<id>`) and the completion key (the queue is whatever you set in `services.<id>.queue`)
-- [ ] Add **routing** under `kerberoshub.workflows.stages.<id>` (`enabled: true`, `dispatch: always`) and **deployment** under `kerberoshub.services.<id>` (`enabled: true`, image + `queue`)
+- [ ] Add the stage to a workflow under `kerberoshub.workflows.definitions.<workflow>.stages` (`operation`, `dispatch: always`) and its **worker** under `kerberoshub.services.<operation>` (`enabled: true`, image + `queue`)
 - [ ] Make sure the **workflows engine** is enabled (`kerberoshub.workflows.enabled`)
 - [ ] Consume the dispatched **`WorkflowRun`**, resolve the recording from `key`, fetch media with the credentials in `storage`
 - [ ] Read upstream context from `inputs` / `results` instead of re-fetching it

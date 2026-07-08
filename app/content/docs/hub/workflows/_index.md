@@ -105,6 +105,96 @@ A workflow does not have to wait for a recording to flow through the pipeline: *
 
 When something doesn't behave, **[Observability](observability/)** documents the structured log lines and distributed trace the workflows engine emits for every run — so a deployer can see why a recording did or did not reach a stage, and send us logs precise enough to act on.
 
+## Defining a workflow in configuration
+
+Everything above is authored **in the editor** — a personal, per-user workflow (`source: user`). A deployment can also ship workflows as **configuration**: `source: config` workflows defined in the Helm chart under `kerberoshub.workflows.definitions`. These are deployment-global, ops-managed and read-only in the API — the *same workflow object* (a name, an enabled toggle, triggers and a set of stages), expressed as chart values instead of canvas nodes.
+
+`definitions` is the engine's **single routing source** (rendered to the `WORKFLOW_DEFINITIONS` env), a **map keyed by workflow name**. Each workflow is one key: an `enabled` toggle, its `triggers` and its `stages`. Every stage pairs with a **worker deployment** under `kerberoshub.services.<operation>` — the microservice that consumes the stage's queue (taken from `services.<operation>.queue`, never set on the stage). Those per-stage fields and the worker itself are the subject of [Stages](stages/#registering-a-stage). Because it's a map, one deployment can also define **several** workflows at once — each opens its own run over a recording and dispatches only its own stages — but a single workflow is the common case.
+
+> **It's the engine switch, not the front-end one.** The workflows engine is off by default; set `kerberoshub.workflows.enabled: true` to run it. Don't confuse it with the unrelated `kerberoshub.…features.workflows.enabled` front-end feature flag.
+
+**Workflow definition — `kerberoshub.workflows.definitions.<workflow>`**
+
+| Field | Required | Value | What it does |
+|---|---|---|---|
+| `enabled` | yes | bool | Include this workflow. Off = the engine doesn't run it. |
+| `triggers` | no | list | How a run **opens** — omit for one bare automatic trigger (every recording), or narrow by device/schedule. See [Triggers](triggers/). |
+| `stages` | yes | list | The workflow's stage entries — each an `operation` plus its dispatch rule. The per-stage fields and the worker that runs them live in [Stages](stages/#registering-a-stage). |
+
+(The chart renders each definition's `source` as `config` — a Helm-seeded, deployment-global, ops-managed workflow that is read-only in the API; you don't set it.)
+
+### Example
+
+A workflow and its worker in `values.yaml`, annotated with **every** value they accept — nothing here is required beyond a stage's `operation` inside an `enabled` workflow, so treat the rest as a lookup. `services.workflows` is the odd one out: it is the engine, so it has **no `enabled`** (the `workflows.enabled` master switch already gates it) and its `queue` is the engine's *inbound* queue — the one analysis tees runs onto — not a stage queue. Every other `services.<operation>` is a stage worker with its own `enabled` and its own queue. Defining **more** workflows is simply another `definitions` key: each opens its own independent run over a recording — one recording, one run per workflow.
+
+```yaml
+# values.yaml — every value a config workflow + its worker accept
+kerberoshub:
+  workflows:
+    enabled: true
+    definitions:
+      full-workflow:                     # map key = workflow name (its identity)
+        enabled: true                    # false ⇒ the whole workflow is skipped
+
+        # triggers — how a run OPENS (passed through verbatim). Omit the whole
+        # block for one bare automatic trigger (opens for every recording).
+        triggers:
+          - type: automatic              # automatic | manual
+            devices:                     # limit to these cameras (omit = all)
+              - { key: front-gate, name: "Front gate" }
+            weeklySchedule:              # only within these windows (omit = always)
+              - day: 1                   # 0=Sun … 6=Sat
+                enabled: true
+                timezone: "Europe/Brussels"
+                segments:
+                  - { start: 32400, end: 61200 }   # seconds since midnight (09:00–17:00)
+          - type: manual                 # user-launched from a surface
+            surfaces: [case, media]      # where the manual button appears: case | media
+
+        # stages — the executable steps. Routing only; the queue is NOT set here.
+        stages:
+          - operation: speed             # unique within the workflow
+            dispatch: conditional        # always (default) | conditional
+            needsMode: all               # any (default) | all — how needs combine
+            needs:                        # conditional stages only
+              - operation: classify      # gate: wait until this op is on the run ("" = ungated)
+                condition:               # omit ⇒ fire on the gate's presence alone
+                  path: inputs.classify.details.*.classified   # absolute run path; * fans out arrays
+                  op: eq                 # eq | ne | gt | gte | lt | lte | contains | in | exists
+                  value: car             # operand (ignored for `exists`)
+
+  services:
+    # the engine (orchestrator) — no `enabled`; runs whenever workflows.enabled is true
+    workflows:
+      repository: ghcr.io/uug-ai/hub-workflows
+      tag: "v1.0.0"
+      queue: "hub-workflows-queue"       # the engine's OWN inbound queue (WORKFLOWS_QUEUE)
+      replicas: 1
+      logLevel: info
+      resources:
+        requests: { cpu: 10m, memory: 10Mi }
+
+    # the stage worker — keyed by the stage's operation id
+    speed:
+      enabled: true                      # deploy the pod
+      repository: ghcr.io/acme/speed
+      tag: "v1.0.0"
+      pullPolicy: IfNotPresent           # IfNotPresent | Always | Never
+      queue: "hub-workflows-speed"       # engine dispatches here; worker consumes here
+      replicas: 2
+      logLevel: info                     # trace | debug | info | warn | error
+      resources:
+        requests: { cpu: 100m, memory: 128Mi }
+        limits:   { cpu: "1",  memory: 512Mi }
+      env:                               # extra env, verbatim (per-stage tuning)
+        SPEED_THRESHOLD: "50"
+      topologySpreadConstraints: []      # standard optional Deployment extras
+      volumes: []
+      volumeMounts: []
+```
+
+The stage's own fields (`operation`, `dispatch`, `needs`, `needsMode`) and the worker's deployment fields are documented in **[Stages](stages/#registering-a-stage)**; how a run *opens* from `triggers` is **[Triggers](triggers/)**.
+
 ## Glossary
 
 A quick reference to the vocabulary used across Workflows. The terms split into what you wire on the **canvas** (no-code) and what runs **behind a custom stage** (developer).

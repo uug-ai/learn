@@ -104,8 +104,9 @@ Manual (and repeated) runs rest on two capabilities, and both now exist on
 
 - **Run a specific workflow.** A run carries the **`workflowId`** of the
   workflow whose stages it executes, rather than every globally-registered
-  stage. The field is in place; the engine still runs the flat stage registry
-  today and will read `workflowId` once it executes authored graphs.
+  stage. The engine reads the authored workflow definitions and fans one
+  recording out into a run per matching workflow, stamping each run's
+  `workflowId` so it dispatches only that workflow's stages.
 - **Give each run its own identity.** Each run carries a **`runId`** — the hex
   of its run-document id, projected onto the wire automatically (a producer only
   ever stamps the id) and echoed back by every stage — so the engine ties a
@@ -137,7 +138,7 @@ document). These are the fields a reader can expect to see on the wire:
 |-------|---------|
 | `operation` | The message's role: `"event"` for the analysis hand-off that opens a run, or the stage id for a dispatch/result hop. |
 | `runId` | The run's wire identity — the hex of its document id. Empty on the analysis hand-off (keyed by `key` until the engine opens it), set on every hop after. |
-| `workflowId` / `workflowName` | Which authored workflow the run executes (forward-looking; empty while the engine runs the flat stage registry). |
+| `workflowId` / `workflowName` | Which workflow the run executes. Empty on the analysis hand-off (one recording tees a single `event`); the engine assigns them as it fans that event out into a run per matching workflow definition. |
 | `origin` | How the run was opened: `automatic` (pipeline-teed) or `manual` (user-launched). |
 | `sourceRef` | What a manual run was launched from — e.g. the case id — so siblings from one action group together. Empty for automatic runs. |
 | `key` | The media key the run is about — its natural identity, copied from the recording at hand-off. |
