@@ -105,6 +105,46 @@ A workflow does not have to wait for a recording to flow through the pipeline: *
 
 When something doesn't behave, **[Observability](observability/)** documents the structured log lines and distributed trace the workflows engine emits for every run — so a deployer can see why a recording did or did not reach a stage, and send us logs precise enough to act on.
 
+## What you can gate on
+
+A workflow definition decides *what runs* at two points, and — since both now share **one** matching engine — they use the exact same condition vocabulary:
+
+- **The trigger gate** decides whether a recording **opens a run** at all. See **[Triggers](triggers/)**.
+- **The stage gate** decides whether an individual **stage fires** within a run. See **[Stages → Conditional routing](stages/#conditional-routing)**.
+
+A condition is always the same triple — a **`path`** (a dot-separated lookup, with `*` to fan out across array elements), an **`op`**, and a **`value`**:
+
+| Operator | Tests |
+| --- | --- |
+| `exists` | the path resolves to a value |
+| `eq` / `ne` | equal / not-equal to `value` |
+| `contains` | a string contains the substring, or an array contains the element |
+| `in` | the value is one of a list in `value` |
+| `matches` | the value matches an [RE2](https://github.com/google/re2/wiki/Syntax) regular expression (partial by default — anchor with `^…$`; `(?i)` for case-insensitive; also matches any string element of an array) |
+| `gt` / `gte` / `lt` / `lte` | numeric comparison |
+
+The two gates differ only in **what fields are in scope**, because the trigger runs *before* a recording is processed while a stage runs *after* upstream steps have produced results:
+
+| Scope | Trigger gate | Stage gate |
+| --- | --- | --- |
+| `device.deviceKey`, `device.deviceName`, `device.provider`, `device.storageSolution` | ✅ | ✅ |
+| `device.siteIds` — the sites the recording's device is linked to (an **array**; match with `contains` / `in` / `exists` / `matches`) | ✅ | ✅ |
+| `user.organisationId` | ✅ | ✅ |
+| Weekly schedule (day + time, in the author's timezone) | ✅ (a dedicated field, not a `path`) | — |
+| `inputs.<operation>.…` — outputs of upstream/seed operations (e.g. `inputs.classify.details.*.classified`) | — | ✅ |
+| `results.<operation>.…` — results accrued so far in the run | — | ✅ |
+| A **gate operation** — the stage waits until that operation's result is present | — | ✅ |
+
+How conditions **combine** is the one deliberate difference: a trigger ANDs all of its conditions (plus the weekly schedule); a stage combines its `needs` with `needsMode` (`any` / `all`) on top of the gate-operation readiness. Credentials and `user.storage` are never matchable in either gate. Every path and every `matches` pattern is **validated when the definition loads**, so a bad path or an uncompilable regex fails fast at startup rather than silently never matching.
+
+A few examples:
+
+- **Only lobby cameras, weekday mornings** (trigger): `device.deviceName matches ^lobby-` plus a weekly schedule for Mon–Fri 08:00–12:00.
+- **Only a set of cameras** (trigger): `device.deviceKey in [cam-1, cam-2]` (the editor's device picker writes this for you).
+- **Only cameras in a given site** (trigger or stage): `device.siteIds contains site-42`.
+- **Post-process only cars on one camera** (stage): `inputs.classify.details.*.classified eq car` **and** `device.deviceKey eq cam-1`, with `needsMode: all`.
+- **Only well-formed plates** (stage): `results.anpr.plate matches ^[A-Z]{3}[0-9]{3}$`.
+
 ## Defining a workflow in configuration
 
 Everything above is authored **in the editor** — a personal, per-user workflow (`source: user`). A deployment can also ship workflows as **configuration**: `source: config` workflows defined in the Helm chart under `kerberoshub.workflows.definitions`. These are deployment-global, ops-managed and read-only in the API — the *same workflow object* (a name, an enabled toggle, triggers and a set of stages), expressed as chart values instead of canvas nodes.
@@ -140,8 +180,10 @@ kerberoshub:
         # block for one bare automatic trigger (opens for every recording).
         triggers:
           - type: automatic              # automatic | manual
-            devices:                     # limit to these cameras (omit = all)
-              - { key: front-gate, name: "Front gate" }
+            conditions:                  # (path, op, value) scoping, all ANDed (omit = every recording)
+              - { path: device.deviceKey,  op: in,       value: [front-gate] } # a fixed set of cameras
+              - { path: device.siteIds,    op: contains, value: site-42 }      # array gate: device's linked sites
+              - { path: device.deviceName, op: matches,  value: "^lobby-" }    # RE2 name pattern
             weeklySchedule:              # only within these windows (omit = always)
               - day: 1                   # 0=Sun … 6=Sat
                 enabled: true
@@ -160,7 +202,7 @@ kerberoshub:
               - operation: classify      # gate: wait until this op is on the run ("" = ungated)
                 condition:               # omit ⇒ fire on the gate's presence alone
                   path: inputs.classify.details.*.classified   # absolute run path; * fans out arrays
-                  op: eq                 # eq | ne | gt | gte | lt | lte | contains | in | exists
+                  op: eq                 # eq | ne | gt | gte | lt | lte | contains | in | matches | exists
                   value: car             # operand (ignored for `exists`)
 
   services:
@@ -194,6 +236,41 @@ kerberoshub:
 ```
 
 The stage's own fields (`operation`, `dispatch`, `needs`, `needsMode`) and the worker's deployment fields are documented in **[Stages](stages/#registering-a-stage)**; how a run *opens* from `triggers` is **[Triggers](triggers/)**.
+
+## Deploying and operating
+
+The two authoring surfaces above — the editor (`source: user`) and the chart (`source: config`) — produce the *same* workflow object, but a deployer/integrator should know how each is stored, discovered and dispatched at runtime, because they differ in reach and in how a change takes effect.
+
+| | **Config workflows** (`source: config`) | **User workflows** (`source: user`) |
+|---|---|---|
+| **Authored in** | The Helm chart, rendered into the engine's `WORKFLOW_DEFINITIONS`. | The Hub editor / API, per user. |
+| **Stored in** | Deployment configuration (env). | The `workflows` MongoDB collection. |
+| **Scope** | Deployment-global — every organisation. | Private to the owning organisation. |
+| **Read by the engine** | **Once at boot** from the env. | **Fresh per recording** from the database. |
+| **A change takes effect** | On the next engine rollout/restart. | On the **next recording** — no restart. |
+
+Both tiers converge on the same engine, queues and stage workers. A recording is matched against **both** sets, so a caller sees the deployment's global workflows *and* their own.
+
+### How the engine resolves them
+
+Both automatic and manual activation resolve config **and** user workflows:
+
+- **Automatic** — for each finished recording the engine matches the boot-loaded config workflows *and* reads that organisation's `enabled` workflows from the database, opening a run for every one whose [automatic trigger](triggers/) matches. Config wins if a config and a user workflow ever resolve to the same id; if the database read fails the hand-off still fans out to the config workflows rather than being dropped.
+- **Manual** — a [Run action](triggers/#manual-trigger-on-a-case) names one `workflowId`; `hub-api` resolves it (a config workflow, else the caller's own org-scoped one), compiles its stages and seeds the run. An unknown or unowned id is a `404`.
+
+A user workflow carries its compiled stages **on the run**, so any engine replica can route its stage results back without re-reading the definition. Each run is scoped to one organisation (the master-account id), so one tenant's workflows never fire on another's recordings — a read backed by an automatically-created index on `{ organisation_id, enabled }`.
+
+### What a deployment must provide
+
+1. **Turn the engine on.** It is off by default: set `kerberoshub.workflows.enabled: true` (the engine switch, *not* the unrelated `kerberoshub.…features.workflows.enabled` front-end flag).
+2. **Deploy a worker for every stage operation.** A workflow references a stage by its `operation`; the service is a separate `kerberoshub.services.<operation>` deployment. Crucially, **a user can only wire operations whose workers you have already deployed** — the catalog of stage operations is deployment-defined.
+3. **Line up the queue name.** The engine dispatches a stage to the queue set on it, defaulting to `kcloud-<operation>-queue.fifo` when none is set. A **user** workflow compiled from the graph has no explicit queue, so its stages use that default — make sure the worker for any operation a user workflow can reach consumes `kcloud-<operation>-queue.fifo`.
+
+### Good to know
+
+- **No cache on user workflows.** They are read once per finished recording (an indexed per-organisation query), so an operator or user edit is picked up on the next recording with no invalidation step; config edits need an engine rollout.
+- **Custom-only ingest operations.** The allow-list that lets a stage's *result* be persisted is built from the **config** workflows only. An operation that appears in **no** config workflow and hands its output back for the platform to persist would have that output dropped — declare such an operation in a config workflow too. Self-persisting workers, and any operation already declared in config, are unaffected.
+- **Trigger validation is asymmetric.** A config trigger with an invalid condition fails fast (the engine refuses to start); a user trigger is not validated at save time yet, so a malformed automatic trigger is simply skipped and silently never matches.
 
 ## Glossary
 

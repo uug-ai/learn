@@ -181,7 +181,7 @@ A condition is `{ path, op, value }`.
 |---|---|---|
 | `inputs.<op>.<field>` | `inputs.classify.details.*.classified` | An upstream result. `classify` is always present (the trigger); its fields are `properties` (array), `objectCount` (int), and `details` (array — fan out with `*`, e.g. `inputs.classify.details.*.classified`). |
 | `results.<op>.<field>` | `results.speed.kmh` | A finished stage's output. Fields of your own custom operations are accepted as-is; array fields can be matched element-wise with `*` (see [Matching inside arrays](#matching-inside-arrays)). |
-| `device.<field>` | `device.deviceKey` | One of `deviceKey`, `deviceName`, `provider`, `storageSolution`. |
+| `device.<field>` | `device.deviceKey` | One of `deviceKey`, `deviceName`, `provider`, `storageSolution` (scalars), or `siteIds` — an **array** of the device's linked site ids, matched with `contains` / `in` / `exists` / `matches` (not traversed with `*`). |
 | `user.<field>` | `user.organisationId` | One of `id`, `organisationId`. |
 | scalar | `key`, `operation`, `runId`, `traceId` | Top-level identity values (not traversable). |
 
@@ -196,9 +196,12 @@ Credentials (`storage`, `user.storage`) are deliberately **not** matchable.
 | `ne` | scalar | the value differs, or the `path` is absent. |
 | `contains` | scalar | the value is an **array containing** `value`, **or** a **string containing** `value`. |
 | `in` | list | the value **is one of** the entries in `value`. |
+| `matches` | string | the value is a **string matching** the [RE2](https://github.com/google/re2/wiki/Syntax) regular expression `value` — a **partial** (unanchored) match, so anchor with `^…`/`…$` for a full match. Like `contains`, it also matches when the value is an **array with any string element** matching. Numbers, maps and non-string elements never match. |
 | `gt` / `gte` / `lt` / `lte` | number | the value is numerically `>` / `>=` / `<` / `<=` `value`. |
 
 > `contains` and `in` are mirror images: use `contains` when the run holds a **list** and you test for a member (`inputs.classify.properties contains car`); use `in` when the run holds a **single value** and you test it against a set (`device.deviceKey in [device01, device02]`).
+
+> `matches` is for **partial / pattern** text matching where `contains` (fixed substring) and `eq` (whole value) aren't enough — e.g. `results.anpr.plate matches ^[A-Z]{3}[0-9]{3}$` (plate shape), `device.deviceName matches ^lobby-` (name prefix), or a case-insensitive `(?i)garage`. The pattern is validated when the registry loads, so a bad regex fails fast.
 
 ### Matching inside arrays
 
@@ -213,7 +216,7 @@ Say your `detector` stage returns a list of boxes:
 ] } }
 ```
 
-A `*` matches **across** the list — the predicate holds when **any** element satisfies a positive operator (`exists` / `eq` / `contains` / `in` / `gt` / `gte` / `lt` / `lte`):
+A `*` matches **across** the list — the predicate holds when **any** element satisfies a positive operator (`exists` / `eq` / `contains` / `in` / `matches` / `gt` / `gte` / `lt` / `lte`):
 
 ```yaml
 # fire when the stage found ANY box scoring above 0.8
@@ -225,6 +228,25 @@ That is what makes per-element numbers work: each fanned-out value is a single `
 Two limits to keep in mind. **`*` is the only index** — there is no numeric `[0]`, and a plain step onto an array (without `*`) matches nothing, so gate on the array itself with `contains` / `exists` or fan out with `*`. And separate needs **don't correlate**: `…*.label eq car` and `…*.score gt 0.8` can be satisfied by **different** elements — there is no "the same object has both" across two conditions. Built-in `classify` exposes `details` as a fan-out array (`inputs.classify.details.*.classified`) and `properties` as a flat list; `objectCount` stays a scalar. `*` applies to those and to your **own** operation's result arrays.
 
 The engine validates every condition path at boot and refuses to start on an unknown one — a typo fails fast instead of silently never firing.
+
+### Partial & pattern matching
+
+`eq` tests a whole value and `contains` tests a fixed substring; when neither is enough — you want a **shape**, a **prefix/suffix**, or a **case-insensitive** test — reach for **`matches`**, an [RE2](https://github.com/google/re2/wiki/Syntax) regular-expression test. It is a **partial** (unanchored) match: the pattern only has to be found *somewhere* in the value, so anchor it with `^…$` when you mean the whole string.
+
+```yaml
+# fire only for plates shaped LLL-DDD (three letters, three digits)
+needs:
+  - operation: anpr
+    condition: { path: results.anpr.plate, op: matches, value: "^[A-Z]{3}[0-9]{3}$" }
+```
+
+A few things to know:
+
+- **Partial by default.** `device.deviceName matches lobby` fires for `lobby-front`, `east-lobby` and `lobby`. Anchor it — `^lobby-` (prefix), `-cam$` (suffix), `^lobby-front$` (exact) — to narrow it.
+- **Case-insensitive** with the inline `(?i)` flag: `device.deviceName matches (?i)garage` fires for `Garage`, `GARAGE`, `garage`.
+- **Works on arrays too.** Like `contains`, a bare array field matches when **any string element** matches — `inputs.classify.properties matches ^car$` — or fan out explicitly with `*`: `inputs.classify.details.*.classified matches ^(car|truck)$`.
+- **Strings only.** Numbers, booleans, maps and non-string array elements never match — use `eq` / `gt` / `contains` for those.
+- **Validated at boot.** An invalid regular expression (or a non-string `value`) fails the registry fast, just like a bad path — it never silently no-ops at runtime.
 
 ## How your microservice connects
 
@@ -340,6 +362,7 @@ Your microservice does **not** receive the pipeline's internal `PipelineEvent`. 
 | `device.deviceName` | string | Human-readable device name (for logs/labels). |
 | `device.provider` | string | Where the media is **served** from (the media `VideoProvider`). |
 | `device.storageSolution` | string | Where the media is **stored** (the media `StorageSolution`). |
+| `device.siteIds` | string[] | The sites the recording's device is linked to. Gate on it with `contains` / `in` / `exists` / `matches` (e.g. `device.siteIds contains site-42`). |
 
 **`inputs.classify` — the trigger result**
 

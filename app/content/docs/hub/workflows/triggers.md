@@ -13,12 +13,13 @@ weight: 20
 toc: true
 ---
 
-{{< callout type="warning" >}}
-This page describes on-demand (manual) workflow triggers. The **data model** —
-the trigger list, a run's `origin`/`sourceRef` and its per-run `runId` — has
-landed in `models`; the **launch path** that drives it (the engine, `hub-api`
-and the frontend) is still being built, so parts below describe the design those
-are being built towards.
+{{< callout type="info" >}}
+Both activation modes described here are live: automatic triggers fan out over
+finished recordings, and manual triggers launch on demand from a case or media
+surface. They resolve **both** deployment-wide config workflows and an
+organisation's own stored workflows — see
+[Deploying and operating](../#deploying-and-operating) for how the engine discovers
+and dispatches each tier.
 {{< /callout >}}
 
 ## Two ways a workflow activates
@@ -61,11 +62,17 @@ that expose it.
 type WorkflowTrigger struct {
     Type WorkflowTriggerType // "automatic" | "manual"
 
-    // automatic: which devices, and when — reusing the alert/videowall
-    // device picker and weekly-schedule shapes (each entry carries its own
-    // day, time segments and IANA timezone; weekday 0 = Sunday).
-    Devices        []DeviceKey
+    // automatic: when the trigger is live — the same weekly-schedule shape the
+    // alert/videowall schedules use (each entry carries its own day, time
+    // segments and IANA timezone; weekday 0 = Sunday).
     WeeklySchedule []*WeeklySchedule
+
+    // automatic: device/envelope scoping expressed with the same (path, op,
+    // value) predicates a stage uses — a device-key set (`device.deviceKey in
+    // […]`), a device-name regex, a site gate, … all ANDed together. The
+    // editor's device picker is just a friendly way to author the
+    // `device.deviceKey in […]` condition.
+    Conditions []StageCondition
 
     // manual: which surfaces show the "Run" control ("case", "media", …)
     Surfaces []WorkflowTriggerSurface
@@ -87,9 +94,96 @@ for manual ones — the `Surfaces` that expose it, so both modes coexist on one
 workflow. The original single `Trigger` is retained as a deprecated field for
 backwards compatibility and folded into `Triggers` by `NormalizeTriggers`, so
 new code only ever reads and writes the list. Automatic scoping reuses the same
-`DeviceKey` selection and `WeeklySchedule` shapes as the alert/videowall
-schedules, so the same device pickers, weekly-schedule editor and weekday/
-timezone conventions apply.
+`WeeklySchedule` shape as the alert/videowall schedules — so the same
+weekly-schedule editor and weekday/timezone conventions apply — and the editor's
+device picker simply authors a `device.deviceKey in […]` condition.
+
+### Scoping devices with conditions
+
+Device selection is expressed with **[conditions](../stages/)** — the exact same
+`(path, op, value)` predicates a stage's `needs` use, evaluated by one shared
+operator engine, so trigger and stage matching stay consistent. Pin a fixed set
+of cameras with `device.deviceKey` `in` `[keys…]`; the editor's device picker
+writes exactly this condition for you.
+
+A pre-existing **`devices:`** shorthand (a bare list of device keys) is still
+accepted for backwards compatibility — it compiles to exactly that
+`device.deviceKey in […]` condition and ANDs with any `conditions:` — but new
+definitions should prefer `conditions:` for the full vocabulary below.
+
+Because it's the full condition vocabulary (`eq`, `in`, `matches`, `contains`,
+…), you're not limited to a static key list — match every camera whose **name**
+follows a pattern with `matches` (a partial, unanchored RE2 regular expression),
+or gate on any other envelope field:
+
+```yaml
+triggers:
+  - type: automatic
+    conditions:
+      # A fixed set of cameras.
+      - path: device.deviceKey
+        op: in
+        value: [cam-1, cam-2]
+      # …and only the "lobby-*" ones among them, whatever their key.
+      - path: device.deviceName
+        op: matches
+        value: "^lobby-"
+```
+
+The conditions match against the recording's **pre-run envelope** — the
+credential-free `device.*` and `user.*` scalars known the moment a recording
+arrives (the same roots a stage condition reads, minus the `inputs`/`results` a
+run only accrues once it opens). Besides `device.deviceKey` / `device.deviceName`
+/ `device.provider` / `device.storageSolution` and `user.organisationId`, the
+envelope exposes **`device.siteIds`** — the list of sites the recording's device
+is linked to — so you can scope a workflow to a whole site with
+`device.siteIds contains site-42` (it's an array, so match it with `contains` /
+`in` / `exists` / `matches`). Every condition must hold (**AND**), so you can
+require both a specific key set *and* a name pattern. A trigger with no
+conditions stays eligible for every recording. A trigger condition with an
+invalid regex or an unknown/credential-bearing path is **rejected when the
+definitions load**, so a mis-authored trigger fails fast rather than silently
+matching nothing — the same fail-fast guarantee stage conditions get.
+
+### Authoring triggers in configuration (Helm)
+
+A **`source: config`** workflow declares its triggers as chart values under
+`kerberoshub.workflows.definitions.<name>.triggers` — the same list the model
+carries, passed through verbatim into the engine's `WORKFLOW_DEFINITIONS`. Omit
+the block entirely for one bare automatic trigger (opens for every recording);
+otherwise each list entry is one trigger with the fields for its `type`:
+
+```yaml
+kerberoshub:
+  workflows:
+    enabled: true                        # the engine master switch
+    definitions:
+      lobby-anpr:                        # map key = workflow name
+        enabled: true
+        triggers:
+          - type: automatic              # automatic | manual
+            conditions:                  # (path, op, value) predicates, all ANDed (omit = every recording)
+              - { path: device.deviceKey,  op: in,       value: [cam-1] }    # a fixed set of cameras
+              - { path: device.siteIds,    op: contains, value: site-42 }    # array gate: linked sites
+              - { path: device.deviceName, op: matches,  value: "^lobby-" }  # RE2 name pattern
+            weeklySchedule:              # recurring windows (omit = any time)
+              - day: 1                   # 0=Sun … 6=Sat
+                enabled: true
+                timezone: "Europe/Brussels"
+                segments:
+                  - { start: 32400, end: 61200 }   # seconds since midnight (09:00–17:00)
+          - type: manual                 # user-launched from a surface
+            surfaces: [case, media]      # where the Run control appears: case | media
+        stages:
+          - operation: anpr              # its worker lives under services.anpr
+            dispatch: always
+```
+
+The `name`/`source` fields and each stage's `queue` are filled in by the chart —
+you never set them. Every stage `operation` still needs a deployed worker under
+`kerberoshub.services.<operation>`; see [Stages](../stages/#registering-a-stage).
+For the full workflow-definition shape (stages, `needs`, `needsMode`) see
+[Defining a workflow in configuration](../#defining-a-workflow-in-configuration).
 
 **Definition vs. run.** The trigger type lives on the `Workflow` — authoring
 metadata ("this can be run manually from a case"). How a *specific* run was opened
