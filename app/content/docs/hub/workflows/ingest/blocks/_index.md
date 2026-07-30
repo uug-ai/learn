@@ -31,6 +31,7 @@ The core ships a small, closed set. A producer stamps each block's `type` with o
 |--------|------------|--------------|-----------|---------------|
 | [`detection`](detection/) | A run of detection tracks/boxes (people, vehicles, faces, …). | `PostDetectionsRequest` | a `DetectionRun` in the `detections` collection, keyed by `(key, source.runId)` | API **and** pipeline |
 | [`marker`](marker/) | A single timeline annotation — a labelled point or span on the recording. | `Marker` | a `Marker` in the `markers` collection, keyed by `(organisation, device, name, startTimestamp)` | pipeline only |
+| [`media-patch`](media-patch/) | A partial update to one existing recording (description, star, tags). | `{ mediaId, …fields }` | an org-scoped `$set` on the `media` document identified by `mediaId` | pipeline only |
 
 A block's `type` names the **result shape**, not the stage that produced it. A stage that finds bounding boxes emits a `detection` block whatever it is detecting, and one envelope may carry several blocks of different types.
 
@@ -51,3 +52,4 @@ A block type's `data` contract is defined once in `@uug-ai/models` and is the **
 
 - **[Detection](detection/)** — a run of detection tracks (a box per frame, per tracked object) for a recording, delivered as a `detection` block and stored in the `detections` collection. Emittable from a workflow stage **or** the ingest API.
 - **[Marker](marker/)** — a labelled point or span on a recording's timeline (a licence-plate read, a point-of-sale transaction, an alert window), delivered as a `marker` block and stored in the `markers` collection. Emittable from a workflow stage only.
+- **[Media patch](media-patch/)** — a partial update to an existing recording (a description, a star, extra tags), delivered as a `media-patch` block and applied in place to the `media` document. Emittable from a workflow stage only.
