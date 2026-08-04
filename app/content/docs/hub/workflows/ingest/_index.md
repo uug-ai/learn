@@ -76,8 +76,8 @@ The full catalogue — each type's `data` contract, where it is stored, and whic
 
 Every envelope flows through one entry point, `IngestBlocks`, which is deliberately **all-or-nothing at the front door**:
 
-1. **Pre-pass — validate the whole envelope first.** Before *any* write, the core checks the block count is within the cap (64 per envelope) and that **every** block's `type` is both registered and permitted from this source. An unknown or forbidden block rejects the **entire** envelope, so a bad block never leaves a half-written result behind.
-2. **Decode and apply each block in order.** For each block, its handler decodes the `data` once into a typed, validated value, then runs that block type's **ordered actions** against it. The first action is always the mandatory persistence — the keyed upsert; any later actions are optional side-effects.
+1. **Pre-pass — validate the whole envelope first.** Before *any* write, the core checks the block count is within the cap (64 per envelope), verifies that **every** block's `type` is registered and permitted from this source, and decodes each body through its kind-specific validator. An unknown, forbidden, or malformed block rejects the **entire** envelope before side effects begin.
+2. **Apply the decoded blocks in order.** Once every body has decoded successfully, the core runs each block type's **ordered actions** against its typed value. The first action is always the mandatory persistence — the keyed upsert; any later actions are optional side-effects. Writes are idempotent but are not one cross-collection transaction, so a later sink failure may follow an earlier successful write and trigger a safe redelivery.
 3. **Report per block.** Each block yields a small report — its run id, a one-line summary, any warnings — which the caller logs.
 
 How a failure is classified decides whether the caller retries — see [Idempotency & retry](#idempotency--retry).
