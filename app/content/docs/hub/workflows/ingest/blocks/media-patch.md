@@ -3,7 +3,7 @@ title: "Media patch"
 description: "The media-patch block contract: a partial update to a single media document — a description, a star, extra tags — delivered by a workflow stage and applied in place to the media collection."
 lead: "A media-patch enriches an existing recording. A stage hands back the media id plus the fields to change; the ingest core validates them against a fixed allow-list and applies an organisation-scoped update to the media document."
 date: 2026-07-30T00:00:00+00:00
-lastmod: 2026-07-30T00:00:00+00:00
+lastmod: 2026-08-04T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -47,7 +47,7 @@ The `data` body is **flat**: a reserved `mediaId` names the recording to update,
 |-------|------|-------|
 | `mediaId` | string | **Required.** The media document's `_id` (a 24-character hex ObjectID). It selects the recording to update; it is never itself written. |
 
-The **organisation is taken from the run**, not from the body. The update is scoped to that organisation, so a stage can only patch a recording its own organisation owns — a `mediaId` that resolves to a recording in another organisation (or to no recording at all) is a **no-op**, not an error.
+The **organisation is taken from the persisted workflow run**, not from the block body or the stage worker's returned user projection. The update is always scoped to that non-empty organisation, so a stage cannot re-scope its result. A `mediaId` that resolves to a recording in another organisation (or to no recording at all) is rejected as a permanent, non-retryable ingest failure and is not mirrored into workflow results.
 
 ### Fields to patch (allow-list)
 
@@ -63,6 +63,8 @@ Every key other than `mediaId` is a field to set. Only the fields below are patc
 
 At least one field is required — a block with only a `mediaId` and nothing to set is rejected. A block may set at most 32 fields.
 
+Values are validated before any block in the envelope is written. `null` and values of the wrong JSON type are rejected; clear a description with `""` and clear a name array with `[]`.
+
 ## Write semantics (idempotent `$set`)
 
 Delivery is **at-least-once**, so the write is an idempotent `$set`: it sets the named fields to the named values on the target media document. Re-emitting the same patch sets the same values again — a harmless no-op — so a redelivery never corrupts the recording. A patch **replaces** each field it names; it does not merge into arrays. To change a field, send its new full value.
@@ -73,7 +75,7 @@ A media-patch is **pipeline only** — it is emitted by a [workflow stage](../..
 
 ## Out of scope
 
-- **Creating a recording.** A media-patch only updates a document that already exists; a `mediaId` that matches nothing is a no-op. Ingest a recording through its own upload path first.
+- **Creating a recording.** A media-patch only updates a document that already exists; a `mediaId` that matches nothing is rejected and not advertised as persisted. Ingest a recording through its own upload path first.
 - **Identity & RBAC fields** (`id`, `organisationId`, `deviceId`, `siteId`, `groupId`) are never patchable.
 - **System fields** — `audit`, `atRuntimeMetadata` and other platform-managed fields are not exposed to a patch.
 
