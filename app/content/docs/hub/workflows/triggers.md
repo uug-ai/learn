@@ -241,7 +241,8 @@ document). These are the fields a reader can expect to see on the wire:
 | `inputs` | The immutable start context, keyed by upstream operation (e.g. `classify` → the classification result). Set once at open. |
 | `results` | Accumulated stage outputs, keyed by operation — each worker writes its result here on the way back. |
 | `payload` | A delegated-ingest worker's block envelope (detection + marker blocks) for the platform to persist. Worker → engine only. |
-| `storage` / `signedUrl` | Credentials / a signed URL to fetch the media, set only on the engine → worker dispatch hop. Never persisted. |
+| `storage` | The Kerberos Vault block (endpoint + credentials, plus any per-recording override) a worker fetches the media with, by `key`. Set on every engine → worker dispatch hop. Never persisted. This is the **authoritative** media-access path. |
+| `signedUrl` | A short-lived, pre-signed URL for the recording — a **convenience** so a worker can fetch over plain HTTP without re-signing. Carried on the dispatch hop of **both** automatic runs (from the analysis pipeline) and manual runs (minted by the launching surface). May be absent or expired, so a worker falls back to `storage` + `key`. Never persisted. |
 
 Credential-bearing fields (`storage`, `signedUrl`) and the curated projections
 are wire-only and never land in run state; the run's stored progress (start/end,

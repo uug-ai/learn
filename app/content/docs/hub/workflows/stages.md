@@ -294,6 +294,7 @@ Your microservice does **not** receive the pipeline's internal `PipelineEvent`. 
   "operation": "speed",
   "runId": "665f1b2c3d4e5f6071829304",
   "key": "front-gate/2026/06/12/08-30-00.mp4",
+  "signedUrl": "https://vault.example.com/kerberos-storage/front-gate/2026/06/12/08-30-00.mp4?X-Amz-Signature=…",
   "traceId": "8f3a1c2b4d5e6f70",
   "user": {
     "organisationId": "64f0a1b2c3d4e5f600112233",
@@ -332,6 +333,7 @@ Your microservice does **not** receive the pipeline's internal `PipelineEvent`. 
 | `operation` | string | Your stage's **operation id** (the name you registered, e.g. `speed`). It is also the key you file your result under on the way back (`results.<operation>`). |
 | `runId` | string | The run's unique id. Use it as your **idempotency key** — a redelivery carries the same `runId`. |
 | `key` | string | The **recording reference** (media key) the run is about. Resolve *which* recording to fetch from this. |
+| `signedUrl` | string | A short-lived, pre-signed URL to fetch the recording directly over HTTP — a **convenience** so you don't have to re-sign from `storage`. **May be absent or expired**; fall back to `storage` + `key` (see [Fetching the media](#fetching-the-media)). Present only on the inbound dispatch; clear it before returning the run. |
 | `traceId` | string | Distributed-trace id; propagate it on your logs/spans so the run stays traceable end-to-end. |
 | `user` | object | Curated, secret-free **account context** — see below. |
 | `device` | object | The recording's **device context** — see below. |
@@ -388,6 +390,15 @@ The credentials your microservice uses to fetch the recording. The base trio is 
 | `storage.vaultOverrideSecret` | string | Override secret. |
 | `storage.vaultOverrideProvider` | string | Override provider. |
 
+#### Fetching the media
+
+A dispatch gives you **two ways** to reach the recording, in order of preference:
+
+1. **`signedUrl`** — when present, `GET` it directly; it needs no credentials. It is short-lived, so on a replayed or backlogged run it may have **expired** (the storage backend answers `403`).
+2. **`storage` + `key`** — the **authoritative** path. Re-sign a fresh URL for the recording from the storage credentials and download that. It always works, and is the fallback whenever `signedUrl` is absent or rejected.
+
+To re-sign, `POST {storage.uri}/storage/bulk` with the `X-Kerberos-Storage-AccessKey` and `X-Kerberos-Storage-SecretAccessKey` headers and a `[{ "filename": "<key>", "provider": "<provider>" }]` body; the response is `{ "data": "<json map of filename → url>" }` — read your `key`'s entry and `GET` it. Prefer the `vaultOverride*` credentials and `vaultOverrideProvider` when set, otherwise the base trio and `device.provider`. The first-party stages (object tracking, export, redaction) all fetch exactly this way: prefer the signed URL, re-sign from `storage` on absence or expiry.
+
 `inputs` and `results` are your **read-only upstream context** — the same bags the condition matcher evaluates `needs` against. The engine routes purely by `operation` and the workflow definition; it never inspects your output to decide where the run goes.
 
 ### Acknowledgement
@@ -396,7 +407,7 @@ The broker delivers at least once. Acknowledge a message only **after** the work
 
 ## Doing the work
 
-Your microservice is a stateless consumer: pull a run, fetch the media with the credentials in `storage`, compute, route the result back. It can be written in any language that can speak the broker and the `WorkflowRun` JSON — the only contract is the queue it reads and the run it returns. Reuse the context already on the run (`inputs` / `results`) rather than re-fetching it. Keep it single-purpose; if you need a second capability, add a second stage.
+Your microservice is a stateless consumer: pull a run, fetch the media (prefer `signedUrl`, else re-sign from `storage` — see [Fetching the media](#fetching-the-media)), compute, route the result back. It can be written in any language that can speak the broker and the `WorkflowRun` JSON — the only contract is the queue it reads and the run it returns. Reuse the context already on the run (`inputs` / `results`) rather than re-fetching it. Keep it single-purpose; if you need a second capability, add a second stage.
 
 ## Sending a result back
 
@@ -434,7 +445,7 @@ Whichever [sink](#sending-a-result-back) you use, your microservice routes the r
 - [ ] Pick a unique **operation id** — it's the routing key, the result key (`results.<id>`) and the completion key (the queue is whatever you set in `services.<id>.queue`)
 - [ ] Add the stage to a workflow under `kerberoshub.workflows.definitions.<workflow>.stages` (`operation`, `dispatch: always`) and its **worker** under `kerberoshub.services.<operation>` (`enabled: true`, image + `queue`)
 - [ ] Make sure the **workflows engine** is enabled (`kerberoshub.workflows.enabled`)
-- [ ] Consume the dispatched **`WorkflowRun`**, resolve the recording from `key`, fetch media with the credentials in `storage`
+- [ ] Consume the dispatched **`WorkflowRun`**, resolve the recording from `key`, fetch media — prefer `signedUrl`, fall back to re-signing from `storage` (see [Fetching the media](#fetching-the-media))
 - [ ] Read upstream context from `inputs` / `results` instead of re-fetching it
 - [ ] Pick a **sink** — enrich in place (set `payload`, the default) or your own collection (set `results.<id>`)
 - [ ] **Idempotent** writes (upsert by `key` + `runId`)
