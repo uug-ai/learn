@@ -19,7 +19,9 @@ finished recordings, and manual triggers launch on demand from a case or media
 surface. They resolve **both** deployment-wide config workflows and an
 organisation's own stored workflows — see
 [Deploying and operating](../#deploying-and-operating) for how the engine discovers
-and dispatches each tier.
+and dispatches each tier. Current deployments define their workflows through
+Helm; stored organisation workflows are supported but are not yet the established
+deployment path.
 {{< /callout >}}
 
 ## Two ways a workflow activates
@@ -259,7 +261,7 @@ user.
 ```mermaid
 flowchart TD
     C["Case<br/>selected media: k1, k2, k3"]
-    C -->|"POST /tasks/{id}/workflows<br/>{ workflowId, mediaKeys }"| API["hub-api"]
+    C -->|"POST /tasks/{id}/workflows<br/>{ workflowId, mediaIds }"| API["hub-api"]
     API -->|"seed key = k1"| Q[["workflows queue"]]
     API -->|"seed key = k2"| Q
     API -->|"seed key = k3"| Q
@@ -340,12 +342,13 @@ Workflows have two layers:
 | Layer | What it is | Owned by |
 |-------|-----------|----------|
 | **Stage catalog** | The available stages (`WorkflowStage`: image, queue, resources) — each maps to a deployed worker. | Ops (Helm) |
-| **Workflow definitions** | Which stages run, wired and triggered how (`Workflow`). | Users (frontend), plus optional built-ins seeded at deploy |
+| **Workflow definitions** | Which stages run, wired and triggered how (`Workflow`). | Ops (Helm), plus organisation-scoped definitions from the frontend/API |
 
 A workflow is a graph over the deployed stage catalog — users compose existing
-stages, they don't add new worker images. A built-in such as a `cases-workflow`
-that runs pose detection is just a `Workflow` document seeded at deploy time, so
-ops-provided and user-authored workflows run through the same path.
+stages, they don't add new worker images. Ops-provided workflows are config
+definitions rendered into `WORKFLOW_DEFINITIONS`; they are not seeded into the
+database. Config and stored organisation workflows still converge on the same
+engine, queues and workers at runtime.
 
 ## Glossary
 
