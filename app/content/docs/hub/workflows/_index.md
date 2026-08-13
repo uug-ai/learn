@@ -13,7 +13,11 @@ weight: 304.5
 toc: true
 ---
 
-The [Pipeline]({{< relref "/docs/hub/pipeline" >}}) section describes the fixed chain of microservices that every recording flows through by default. **Workflows** build on top of that pipeline and let each user *customise* how their own events are routed, filtered and processed — without changing a single line of code or touching the platform configuration.
+The [Pipeline]({{< relref "/docs/hub/pipeline" >}}) section describes the fixed chain of microservices that every recording flows through by default. **Workflows** build on top of that pipeline and let an organisation *customise* how its events are routed, filtered and processed — without changing a single line of code or touching the platform configuration.
+
+{{< callout type="info" >}}
+**Current deployment path.** Production deployments currently define workflows through Helm and `WORKFLOW_DEFINITIONS`. Database-backed `source: user` workflows and their API/editor path are implemented, but are not yet the established deployment path.
+{{< /callout >}}
 
 Where the pipeline is the same for everyone, a workflow is yours: pick the cameras you care about, decide which AI model should look at the frames, when it should be active and how often it should run.
 
@@ -52,11 +56,11 @@ Edges connect an *output port* of one node to an *input port* of another. They d
 
 ### Workflow status
 
-A workflow can be **enabled** or **disabled** with a single switch in the list view. Disabled workflows are kept on the user's account but no longer dispatch events through the pipeline — handy for seasonal automations or while iterating on a design.
+A workflow can be **enabled** or **disabled** with a single switch in the list view. Disabled workflows remain available to the owning organisation but no longer dispatch events through the pipeline — handy for seasonal automations or while iterating on a design.
 
 ## The Workflows page
 
-The **Workflows** page in Hub (`/workflows`) gives every user a personal collection of automations.
+The **Workflows** page in Hub (`/workflows`) gives users an organisation-scoped collection of automations.
 
 The page shows a searchable list of *My Workflows* with — for each entry — its enabled state, name, description and a summary of how many nodes and connections it contains. From there you can:
 
@@ -91,7 +95,7 @@ A few starting points to give an idea of what's possible:
 
 ## Relationship with the fixed pipeline
 
-Workflows do not replace the Hub [Pipeline]({{< relref "/docs/hub/pipeline" >}}); they steer it. The pipeline microservices (sequence, analysis, throttler, notification, classifier, …) keep doing their job for every recording. What a workflow does is to declare, per user and per device, *which* of those services should run, *when* they should run and *with which* configuration — turning a one-size-fits-all pipeline into something each user can tailor to their own use-case.
+Workflows do not replace the Hub [Pipeline]({{< relref "/docs/hub/pipeline" >}}); they steer it. The pipeline microservices (sequence, analysis, throttler, notification, classifier, …) keep doing their job for every recording. What a workflow does is to declare, per organisation and per device, *which* of those services should run, *when* they should run and *with which* configuration — turning a one-size-fits-all pipeline into something each organisation can tailor to its own use-case.
 
 ## Bring your own processing
 
@@ -135,7 +139,7 @@ The two gates differ only in **what fields are in scope**, because the trigger r
 | `results.<operation>.…` — results accrued so far in the run | — | ✅ |
 | A **gate operation** — the stage waits until that operation's result is present | — | ✅ |
 
-How conditions **combine** is the one deliberate difference: a trigger ANDs all of its conditions (plus the weekly schedule); a stage combines its `needs` with `needsMode` (`any` / `all`) on top of the gate-operation readiness. Credentials and `user.storage` are never matchable in either gate. Every path and every `matches` pattern is **validated when the definition loads**, so a bad path or an uncompilable regex fails fast at startup rather than silently never matching.
+How conditions **combine** is the one deliberate difference: a trigger ANDs all of its conditions (plus the weekly schedule); a stage combines its `needs` with `needsMode` (`any` / `all`) on top of the gate-operation readiness. Credentials and `user.storage` are never matchable in either gate. Config definitions are **validated when the engine loads them**, so a bad path or an uncompilable regex fails fast at startup. A malformed stored user workflow is skipped when matching; save-time validation for that tier is not available yet.
 
 A few examples:
 
@@ -147,9 +151,9 @@ A few examples:
 
 ## Defining a workflow in configuration
 
-Everything above is authored **in the editor** — a personal, per-user workflow (`source: user`). A deployment can also ship workflows as **configuration**: `source: config` workflows defined in the Helm chart under `kerberoshub.workflows.definitions`. These are deployment-global, ops-managed and read-only in the API — the *same workflow object* (a name, an enabled toggle, triggers and a set of stages), expressed as chart values instead of canvas nodes.
+Everything above can be authored **in the editor** as an organisation-scoped workflow (`source: user`). A deployment can also ship workflows as **configuration**: `source: config` workflows defined in the Helm chart under `kerberoshub.workflows.definitions`. These are deployment-global, ops-managed and read-only in the API — the *same workflow object* (a name, an enabled toggle, triggers and a set of stages), expressed as chart values instead of canvas nodes.
 
-`definitions` is the engine's **single routing source** (rendered to the `WORKFLOW_DEFINITIONS` env), a **map keyed by workflow name**. Each workflow is one key: an `enabled` toggle, its `triggers` and its `stages`. Every stage pairs with a **worker deployment** under `kerberoshub.services.<operation>` — the microservice that consumes the stage's queue (taken from `services.<operation>.queue`, never set on the stage). Those per-stage fields and the worker itself are the subject of [Stages](stages/#registering-a-stage). Because it's a map, one deployment can also define **several** workflows at once — each opens its own run over a recording and dispatches only its own stages — but a single workflow is the common case.
+`definitions` is the engine's **configuration routing source** (rendered to the `WORKFLOW_DEFINITIONS` env), a **map keyed by workflow name**. Each workflow is one key: an `enabled` toggle, its `triggers` and its `stages`. Every stage pairs with a **worker deployment** under `kerberoshub.services.<operation>` — the microservice that consumes the stage's queue (taken from `services.<operation>.queue`, never set on the stage). Those per-stage fields and the worker itself are the subject of [Stages](stages/#registering-a-stage). Because it's a map, one deployment can also define **several** workflows at once — each opens its own run over a recording and dispatches only its own stages — but a single workflow is the common case.
 
 > **It's the engine switch, not the front-end one.** The workflows engine is off by default; set `kerberoshub.workflows.enabled: true` to run it. Don't confuse it with the unrelated `kerberoshub.…features.workflows.enabled` front-end feature flag.
 
@@ -161,7 +165,7 @@ Everything above is authored **in the editor** — a personal, per-user workflow
 | `triggers` | no | list | How a run **opens** — omit for one bare automatic trigger (every recording), or narrow by device/schedule. See [Triggers](triggers/). |
 | `stages` | yes | list | The workflow's stage entries — each an `operation` plus its dispatch rule. The per-stage fields and the worker that runs them live in [Stages](stages/#registering-a-stage). |
 
-(The chart renders each definition's `source` as `config` — a Helm-seeded, deployment-global, ops-managed workflow that is read-only in the API; you don't set it.)
+(The chart renders each definition's `source` as `config` — a Helm-defined, deployment-global, ops-managed workflow that is read-only in the API; you don't set it.)
 
 ### Example
 
@@ -239,17 +243,19 @@ The stage's own fields (`operation`, `dispatch`, `needs`, `needsMode`) and the w
 
 ## Deploying and operating
 
-The two authoring surfaces above — the editor (`source: user`) and the chart (`source: config`) — produce the *same* workflow object, but a deployer/integrator should know how each is stored, discovered and dispatched at runtime, because they differ in reach and in how a change takes effect.
+The two implemented authoring surfaces above — the editor/API (`source: user`) and the chart (`source: config`) — produce the *same* workflow object, but a deployer/integrator should know how each is stored, discovered and dispatched at runtime, because they differ in reach and in how a change takes effect. Helm-defined config workflows are the path used by current deployments; the stored tier describes the available database-backed capability.
 
 | | **Config workflows** (`source: config`) | **User workflows** (`source: user`) |
 |---|---|---|
-| **Authored in** | The Helm chart, rendered into the engine's `WORKFLOW_DEFINITIONS`. | The Hub editor / API, per user. |
+| **Authored in** | The Helm chart, rendered into the engine's `WORKFLOW_DEFINITIONS`. | The Hub editor / API, scoped to the user's organisation. |
 | **Stored in** | Deployment configuration (env). | The `workflows` MongoDB collection. |
 | **Scope** | Deployment-global — every organisation. | Private to the owning organisation. |
 | **Read by the engine** | **Once at boot** from the env. | **Fresh per recording** from the database. |
 | **A change takes effect** | On the next engine rollout/restart. | On the **next recording** — no restart. |
 
-Both tiers converge on the same engine, queues and stage workers. A recording is matched against **both** sets, so a caller sees the deployment's global workflows *and* their own.
+Both tiers converge on the same engine, queues and stage workers. When stored workflows exist, a recording is matched against **both** sets, so an organisation receives the deployment's global workflows and its own stored workflows.
+
+For API clients and stored definitions, workflow ownership and timestamps use the canonical camelCase fields `userId`, `organisationId`, `createdAt` and `updatedAt`; user workflows may also carry nested `audit` metadata. Legacy snake_case names are accepted only as transitional input/read compatibility and are not emitted in responses or new writes.
 
 ### How the engine resolves them
 
@@ -258,7 +264,7 @@ Both automatic and manual activation resolve config **and** user workflows:
 - **Automatic** — for each finished recording the engine matches the boot-loaded config workflows *and* reads that organisation's `enabled` workflows from the database, opening a run for every one whose [automatic trigger](triggers/) matches. Config wins if a config and a user workflow ever resolve to the same id; if the database read fails the hand-off still fans out to the config workflows rather than being dropped.
 - **Manual** — a [Run action](triggers/#manual-trigger-on-a-case) names one `workflowId`; `hub-api` resolves it (a config workflow, else the caller's own org-scoped one), compiles its stages and seeds the run. An unknown or unowned id is a `404`.
 
-A user workflow carries its compiled stages **on the run**, so any engine replica can route its stage results back without re-reading the definition. Each run is scoped to one organisation (the master-account id), so one tenant's workflows never fire on another's recordings — a read backed by an automatically-created index on `{ organisation_id, enabled }`.
+A user workflow carries its compiled stages **on the run**, so any engine replica can route its stage results back without re-reading the definition. Each run is scoped to the active organisation id, so one tenant's workflows never fire on another's recordings — a read backed by an automatically-created index on `{ organisationId, enabled }`.
 
 ### What a deployment must provide
 
@@ -280,7 +286,7 @@ A quick reference to the vocabulary used across Workflows. The terms split into 
 
 | Term | Meaning |
 |------|---------|
-| **Workflow** | A directed graph that customises how one device's events are routed, filtered and processed — enabled or disabled per user. |
+| **Workflow** | A directed graph that customises how one device's events are routed, filtered and processed — enabled or disabled within its owning organisation. |
 | **Node** | A building element you drag onto the canvas: a *Device*, *ML Model*, *Throttle* or *Active window*. See [Nodes](#nodes). |
 | **Port** | A typed input/output connection point on a node. |
 | **Edge** | A connection from one node's output port to another's input port — it defines how events flow. |
