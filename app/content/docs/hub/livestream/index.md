@@ -183,6 +183,12 @@ environment variable on the hub-frontend to `hls` (the default is
 toggle, the badges and the grid all look and behave exactly the same —
 only the transport behind the **Live** tile differs.
 
+By default both transports are offered: a per-stream dropdown lets a
+viewer switch between WebRTC and HLS at runtime. To remove HLS entirely —
+hiding the option from the UI and forcing every Live tile onto WebRTC —
+set `featureHlsEnabled` to `false` (the default is `true`). This overrides
+`featureLiveStreamMode`, so a stale `hls` default can never bring HLS back.
+
 Under the hood the HLS path is still driven over MQTT, exactly like the
 Preview and WebRTC modes:
 
