@@ -5,6 +5,8 @@ weight: 4
 toc: true
 ---
 
+{{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
+
 {{< tutorial-header alt="Abstract direct and relayed network paths representing WebRTC with TURN fallback" >}}
 
 WebRTC gives Kerberos Hub its most interactive live path: low-latency H.264 video, camera audio and the two-way talk backchannel. It prefers a direct Agent-to-browser connection, but NAT and enterprise firewalls often make a TURN relay the only reliable path.

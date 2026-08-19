@@ -5,6 +5,8 @@ weight: 2
 toc: true
 ---
 
+{{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
+
 {{< tutorial-header alt="Abstract luminous paths representing three live-video transports" >}}
 
 Live video has no single best transport. The right choice depends on what you are optimizing: the shortest delay, the largest audience, the strictest corporate network, or interactive audio.
