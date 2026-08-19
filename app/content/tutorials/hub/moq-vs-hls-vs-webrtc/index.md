@@ -5,6 +5,8 @@ weight: 2
 toc: true
 ---
 
+{{< tutorial-header alt="Abstract luminous paths representing three live-video transports" >}}
+
 Live video has no single best transport. The right choice depends on what you are optimizing: the shortest delay, the largest audience, the strictest corporate network, or interactive audio.
 
 This tutorial compares **Media over QUIC (MoQ)**, **HTTP Live Streaming (HLS)** and **WebRTC** as they are used by Kerberos Hub. You will turn product requirements into a transport choice, then validate that choice on the network where it will run.
@@ -321,6 +323,10 @@ AGENT_LIVE_MOQ_BROADCAST_PREFIX=devices
 ```
 
 The Agent and frontend must use the same relay and broadcast prefix. Production relays should issue short-lived, subscriber-scoped credentials; do not treat an anonymous relay endpoint as an authorization boundary.
+
+To run the relay yourself, follow [Deploy a MoQ relay on Kubernetes](/tutorials/hub/deploy-moq-relay-kubernetes/). It covers TLS, the UDP LoadBalancer, Hub values, Agent variables and end-to-end verification.
+
+For the other production paths, follow [Set up WebRTC live view with TURN](/tutorials/hub/setup-webrtc-turn/) or [Set up HLS live view](/tutorials/hub/setup-hls-live-view/). Both guides cover Hub values, Agent requirements, firewall rules, diagnostics and a complete fallback-path test.
 
 For the complete Hub live-view flow and troubleshooting steps, continue with [Live view](/docs/hub/livestream/).
 

@@ -10,7 +10,7 @@ Step-by-step walkthroughs to get hands-on with the Kerberos.io ecosystem. Each t
 
 - [Agent](agent/) — install and run an Agent on your machine of choice.
 - [Vault](vault/) — deploy and configure Vault for storage and forwarding *(coming soon)*.
-- [Hub](hub/) — build a custom workflow stage or choose the right live-video transport for your deployment.
+- [Hub](hub/) — build a custom workflow stage, compare live-video transports, and configure MoQ, WebRTC/TURN or HLS live view.
 
 ## Structure
 
