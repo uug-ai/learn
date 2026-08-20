@@ -1,8 +1,13 @@
 ---
 title: 'Install Agent'
 description: 'Run your first Agent on Docker, Docker Compose, Kubernetes, Snap or as a static binary.'
+date: '2026-05-15'
 weight: 1
 toc: true
+product: 'Agent'
+level: 'Beginner'
+duration: '15 min'
+tags: ['Installation', 'Docker', 'Kubernetes']
 ---
 
 This tutorial walks you through installing an [Agent](https://github.com/kerberos-io/agent) — one container (or binary) per camera — and reaching its web UI for the first time.

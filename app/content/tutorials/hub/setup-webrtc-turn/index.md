@@ -1,8 +1,13 @@
 ---
 title: 'Set up WebRTC live view with TURN'
 description: 'Configure STUN and TURN for reliable Kerberos Hub WebRTC live video, then verify direct and relayed ICE paths.'
+date: '2026-08-19'
 weight: 4
 toc: true
+product: 'Hub'
+level: 'Intermediate'
+duration: '30 min'
+tags: ['WebRTC', 'TURN', 'Networking']
 ---
 
 {{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}

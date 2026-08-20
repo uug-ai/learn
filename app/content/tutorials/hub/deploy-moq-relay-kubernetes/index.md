@@ -1,8 +1,13 @@
 ---
 title: 'Deploy a MoQ relay on Kubernetes'
 description: 'Run a TLS-enabled Media over QUIC relay behind a Kubernetes UDP LoadBalancer, then connect Kerberos Hub and Agent to it.'
+date: '2026-08-19'
 weight: 3
 toc: true
+product: 'Hub'
+level: 'Intermediate'
+duration: '30 min'
+tags: ['MoQ', 'Kubernetes', 'Networking']
 ---
 
 {{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}

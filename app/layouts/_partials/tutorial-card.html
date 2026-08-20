@@ -1,0 +1,46 @@
+{{- $page := .page -}}
+{{- $variant := .variant | default "catalog" -}}
+{{- $image := $page.Resources.GetMatch "header-art.*" -}}
+{{- if not $image -}}
+  {{- $image = $page.Resources.GetMatch "tutorial-header.*" -}}
+{{- end -}}
+{{- $searchText := printf "%s %s %s %s %s" $page.Title $page.Description $page.Params.product $page.Params.level (delimit $page.Params.tags " ") | lower -}}
+
+<article
+  class="tutorial-card tutorial-card--{{ $variant }}"
+  data-tutorial-card
+  data-product="{{ $page.Params.product | lower }}"
+  data-level="{{ $page.Params.level | lower }}"
+  data-tags="{{ delimit $page.Params.tags "|" | lower }}"
+  data-search="{{ $searchText }}"
+>
+  <a class="tutorial-card__media" href="{{ $page.RelPermalink }}" aria-label="Open tutorial: {{ $page.Title }}">
+    {{- with $image }}
+      {{- $thumbnail := . -}}
+      {{- if ne .MediaType.SubType "png" -}}
+        {{- $thumbnail = .Resize "800x webp q82" -}}
+      {{- end -}}
+      <img src="{{ $thumbnail.RelPermalink }}" width="{{ $thumbnail.Width }}" height="{{ $thumbnail.Height }}" alt="" loading="lazy" />
+    {{- else }}
+      <span class="tutorial-card__fallback" aria-hidden="true"><span>{{ $page.Params.product }}</span></span>
+    {{- end }}
+    <span class="tutorial-card__product">{{ $page.Params.product }}</span>
+  </a>
+  <div class="tutorial-card__body">
+    <div class="tutorial-card__meta">
+      <span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        {{ $page.Params.duration }}
+      </span>
+      <span>{{ $page.Params.level }}</span>
+    </div>
+    <h3><a href="{{ $page.RelPermalink }}">{{ $page.Title }}</a></h3>
+    <p>{{ $page.Description }}</p>
+    <div class="tutorial-card__footer">
+      <div class="tutorial-card__tags" aria-label="Topics">
+        {{- range first 3 $page.Params.tags }}<span>{{ . }}</span>{{ end -}}
+      </div>
+      <time datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date.Format "Jan 2, 2006" }}</time>
+    </div>
+  </div>
+</article>

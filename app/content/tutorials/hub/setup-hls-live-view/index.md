@@ -1,8 +1,13 @@
 ---
 title: 'Set up HLS live view'
 description: 'Configure firewall-friendly HLS and low-latency HLS live video between Kerberos Agents, Hub API and operator browsers.'
+date: '2026-08-19'
 weight: 5
 toc: true
+product: 'Hub'
+level: 'Beginner'
+duration: '20 min'
+tags: ['HLS', 'Live video', 'Networking']
 ---
 
 {{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
