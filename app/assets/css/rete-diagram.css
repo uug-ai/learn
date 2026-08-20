@@ -195,6 +195,7 @@ html.dark .rete-node,
 .rete-node--turn    { --rete-node-color: #1d4ed8; } /* blue   */
 .rete-node--mqtt    { --rete-node-color: #0f766e; } /* cyan   */
 .rete-node--webrtc  { --rete-node-color: #7c3aed; } /* violet */
+.rete-node--moq     { --rete-node-color: #0369a1; } /* sky    */
 .rete-node--hls     { --rete-node-color: #ea580c; } /* orange */
 .rete-node--frontend { --rete-node-color: #334155; } /* slate  */
 .rete-node--pipeline-monitor       { --rete-node-color: #be185d; } /* pink   */

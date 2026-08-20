@@ -32,6 +32,7 @@ const PALETTE_SECTIONS = [
             { kind: 'hub',     header: 'HUB',     title: 'Hub',     subtitle: 'Monitor and analyse', w: 240, h: 150,
               badges: ['kubernetes'] },
             { kind: 'factory', header: 'FACTORY', title: 'Factory', subtitle: 'Orchestrate',        w: 240, h: 150 },
+                        { kind: 'frontend', header: 'FRONTEND', title: 'Browser', subtitle: 'Operator live view', w: 220, h: 130 },
         ],
     },
     {
@@ -40,6 +41,9 @@ const PALETTE_SECTIONS = [
             { kind: 'amqp', header: 'AMQP', title: 'AMQP', subtitle: 'Message broker',     w: 220, h: 130 },
             { kind: 'turn', header: 'TURN', title: 'TURN', subtitle: 'WebRTC relay',        w: 220, h: 130 },
             { kind: 'mqtt', header: 'MQTT', title: 'MQTT', subtitle: 'Pub/sub broker',      w: 220, h: 130 },
+            { kind: 'webrtc', header: 'WEBRTC', title: 'WebRTC', subtitle: 'Interactive media', w: 220, h: 130 },
+            { kind: 'moq', header: 'MOQ', title: 'MoQ relay', subtitle: 'Media over QUIC', w: 220, h: 130 },
+            { kind: 'hls', header: 'HLS', title: 'HLS', subtitle: 'HTTPS segments', w: 220, h: 130 },
         ],
     },
     {
@@ -68,8 +72,8 @@ const PALETTE = PALETTE_SECTIONS.flatMap(s => s.items);
 
 const KIND_LABELS = {
     camera: 'Camera', agent: 'Agent', vault: 'Vault', storage: 'Object Storage',
-    hub: 'Hub', factory: 'Factory',
-    amqp: 'AMQP', turn: 'TURN', mqtt: 'MQTT',
+    hub: 'Hub', factory: 'Factory', frontend: 'Frontend',
+    amqp: 'AMQP', turn: 'TURN', mqtt: 'MQTT', webrtc: 'WebRTC', moq: 'MoQ', hls: 'HLS',
     'pipeline-monitor':       'Monitor',
     'pipeline-sequence':      'Sequence',
     'pipeline-analysis':      'Analysis',
@@ -876,7 +880,7 @@ class Designer {
 
     renderNodeInspector(n) {
         if (!n) return;
-        const kinds = ['camera', 'agent', 'vault', 'storage', 'hub', 'factory', 'default'];
+        const kinds = ['camera', 'agent', 'vault', 'storage', 'hub', 'factory', 'frontend', 'amqp', 'turn', 'mqtt', 'webrtc', 'moq', 'hls', 'default'];
         const otherGroups = state.groups;
         const parent = n.groupId ? groupById(n.groupId) : null;
         const parentLabel = parent ? (parent.label || parent.id) : '—';

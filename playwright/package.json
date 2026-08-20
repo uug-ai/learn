@@ -7,6 +7,7 @@
     "install:browsers": "playwright install chromium",
     "test": "playwright test",
     "new": "node scripts/new-hub-page.mjs",
+    "tutorial-headers": "node scripts/generate-tutorial-headers.mjs",
     "headed": "node scripts/run-headed.mjs",
     "cases": "playwright test tests/cases.spec.ts",
     "cases:headed": "node scripts/run-headed.mjs tests/cases.spec.ts",
