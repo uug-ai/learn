@@ -4,6 +4,12 @@ import { fileURLToPath } from 'node:url';
 
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const tutorialsDirectory = path.resolve(scriptDirectory, '../../app/content/tutorials/hub');
+const kubernetesLogoUrl = 'https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo.svg';
+const kubernetesLogoResponse = await fetch(kubernetesLogoUrl);
+if (!kubernetesLogoResponse.ok) {
+  throw new Error(`Unable to download the Kubernetes logo: ${kubernetesLogoResponse.status}`);
+}
+const kubernetesLogoDataUri = `data:image/svg+xml;base64,${Buffer.from(await kubernetesLogoResponse.text()).toString('base64')}`;
 
 const headers = [
   { slug: 'custom-workflow-stage', motif: 'workflow' },
@@ -212,7 +218,7 @@ for (const header of headers) {
       context.restore();
     }
 
-    if (options.motif !== 'hls') {
+    if (!['hls', 'comparison', 'webrtc'].includes(options.motif)) {
       drawCamera(58, 135, 1.05);
     }
 
@@ -244,50 +250,232 @@ for (const header of headers) {
       });
       drawBrowser(845, 65, 290, 230);
     } else if (options.motif === 'comparison') {
-      drawBrowser(845, 65, 290, 230);
-      const paths = [
-        { y: 128, color: colors.cyan, dash: [] },
-        { y: 181, color: colors.lime, dash: [16, 12] },
-        { y: 234, color: colors.coral, dash: [3, 10] },
-      ];
-      paths.forEach((stream, index) => {
-        strokeGlow(stream.color, 4, () => {
-          context.beginPath();
-          context.moveTo(235, 178);
-          context.bezierCurveTo(410, 178 + (index - 1) * 75, 650, stream.y, 845, stream.y);
-        }, stream.dash);
+      const blue = '#6478ff';
+      const protocolCenters = [190, 590, 1000];
+
+      context.save();
+      protocolCenters.forEach((centerX, index) => {
+        const glow = context.createRadialGradient(centerX, 180, 0, centerX, 180, 220);
+        glow.addColorStop(0, index === 1 ? 'rgba(184, 243, 107, 0.1)' : 'rgba(67, 231, 239, 0.12)');
+        glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        context.fillStyle = glow;
+        context.fillRect(centerX - 230, 0, 460, height);
       });
-      drawRelay(590, 235, 31);
+      context.restore();
+
+      // MoQ: three live QUIC paths converging beneath the wordmark.
+      [0, 1, 2].forEach((index) => {
+        strokeGlow(index === 1 ? blue : colors.cyan, index === 1 ? 3 : 2, () => {
+          context.beginPath();
+          context.moveTo(72, 277 + index * 10);
+          context.bezierCurveTo(120, 245 - index * 6, 230, 245 + index * 8, 306, 276 + index * 6);
+        }, index === 2 ? [5, 8] : []);
+      });
+
+      // HLS: a segmented timeline with one highlighted playhead.
+      [0, 1, 2, 3, 4].forEach((index) => {
+        context.fillStyle = index === 2 ? colors.lime : 'rgba(232, 251, 255, 0.24)';
+        roundedPath(485 + index * 45, 274, index === 2 ? 34 : 29, 7, 4);
+        context.fill();
+      });
+      context.fillStyle = colors.white;
+      context.beginPath();
+      context.moveTo(594, 245);
+      context.lineTo(610, 254);
+      context.lineTo(594, 263);
+      context.closePath();
+      context.fill();
+
+      // WebRTC: two peers orbit a shared real-time connection.
+      context.save();
+      context.translate(1000, 279);
+      context.strokeStyle = 'rgba(100, 120, 255, 0.72)';
+      context.lineWidth = 2;
+      context.beginPath();
+      context.ellipse(0, 0, 112, 23, 0, 0, Math.PI * 2);
+      context.stroke();
+      context.fillStyle = colors.cyan;
+      context.shadowColor = colors.cyan;
+      context.shadowBlur = 10;
+      [-88, 88].forEach((pointX) => {
+        context.beginPath();
+        context.arc(pointX, 0, 7, 0, Math.PI * 2);
+        context.fill();
+      });
+      context.restore();
+
+      const drawLabel = (text, x, font, fillStyle) => {
+        context.save();
+        context.font = font;
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillStyle = fillStyle;
+        context.shadowColor = fillStyle;
+        context.shadowBlur = 12;
+        context.fillText(text, x, 172);
+        context.restore();
+      };
+
+      drawLabel('MoQ', protocolCenters[0], '750 88px sans-serif', colors.cyan);
+      drawLabel('HLS', protocolCenters[1], '750 88px sans-serif', colors.white);
+      drawLabel('WebRTC', protocolCenters[2], '750 88px sans-serif', colors.white);
+
+      const drawVersus = (x) => {
+        context.save();
+        context.translate(x, 177);
+        context.font = 'italic 500 27px Georgia, serif';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillStyle = 'rgba(166, 180, 255, 0.9)';
+        context.fillText('vs', 0, 1);
+        context.restore();
+      };
+
+      drawVersus(382);
+      drawVersus(790);
+
+      context.save();
+      context.font = '600 12px sans-serif';
+      context.textAlign = 'center';
+      context.fillStyle = 'rgba(232, 251, 255, 0.55)';
+      context.fillText('QUIC · PUBLISH / SUBSCRIBE', protocolCenters[0], 82);
+      context.fillText('HTTPS · SEGMENTED DELIVERY', protocolCenters[1], 82);
+      context.fillText('ICE · REAL-TIME PEERS', protocolCenters[2], 82);
+      context.restore();
     } else if (options.motif === 'relay') {
-      drawRelay(565, 180, 68);
+      const kubernetesBlue = '#326ce5';
+
+      context.fillStyle = 'rgba(8, 25, 38, 0.78)';
+      context.strokeStyle = 'rgba(80, 132, 235, 0.82)';
+      context.lineWidth = 2;
+      roundedPath(310, 35, 620, 290, 22);
+      context.fill();
+      context.stroke();
+
+      const kubernetesLogo = new Image();
+      kubernetesLogo.src = options.kubernetesLogoDataUri;
+      await kubernetesLogo.decode();
+      context.drawImage(kubernetesLogo, 329, 43, 54, 54);
+
+      context.fillStyle = colors.white;
+      context.font = '700 13px sans-serif';
+      context.fillText('KUBERNETES CLUSTER', 390, 77);
+
+      context.fillStyle = 'rgba(50, 108, 229, 0.16)';
+      context.strokeStyle = kubernetesBlue;
+      context.lineWidth = 2;
+      roundedPath(350, 135, 160, 86, 14);
+      context.fill();
+      context.stroke();
+      context.fillStyle = 'rgba(232, 251, 255, 0.55)';
+      context.font = '700 9px sans-serif';
+      context.fillText('LOADBALANCER', 372, 164);
+      context.fillStyle = colors.white;
+      context.font = '700 15px monospace';
+      context.fillText('UDP :443', 372, 194);
+
+      const podPositions = [[585, 82], [750, 82], [668, 208]];
+      podPositions.forEach(([podX, podY], index) => {
+        context.fillStyle = 'rgba(7, 28, 40, 0.94)';
+        context.strokeStyle = 'rgba(67, 231, 239, 0.76)';
+        context.lineWidth = 2;
+        roundedPath(podX, podY, 142, 86, 14);
+        context.fill();
+        context.stroke();
+        context.fillStyle = kubernetesBlue;
+        context.beginPath();
+        context.arc(podX + 20, podY + 21, 7, 0, Math.PI * 2);
+        context.fill();
+        context.fillStyle = 'rgba(232, 251, 255, 0.48)';
+        context.font = '700 8px sans-serif';
+        context.fillText(`POD 0${index + 1}`, podX + 34, podY + 25);
+        context.fillStyle = colors.white;
+        context.font = '700 13px sans-serif';
+        context.fillText('MoQ RELAY', podX + 19, podY + 57);
+      });
+
       strokeGlow(colors.cyan, 5, () => {
         context.beginPath();
         context.moveTo(235, 180);
-        context.lineTo(495, 180);
+        context.lineTo(350, 180);
       });
-      [[875, 52], [920, 137], [875, 222]].forEach(([browserX, browserY], index) => {
-        strokeGlow(index === 1 ? colors.lime : colors.cyan, 3, () => {
+      podPositions.forEach(([podX, podY]) => {
+        strokeGlow(colors.cyan, 2, () => {
           context.beginPath();
-          context.moveTo(633, 180);
-          context.bezierCurveTo(735, 180, 770, browserY + 43, browserX, browserY + 43);
+          context.moveTo(510, 180);
+          context.bezierCurveTo(548, 180, podX - 42, podY + 43, podX, podY + 43);
         });
-        drawSmallBrowser(browserX, browserY, index === 1 ? 215 : 190, 86);
+      });
+      [[980, 90], [980, 205]].forEach(([browserX, browserY], index) => {
+        strokeGlow(index === 0 ? colors.cyan : kubernetesBlue, 3, () => {
+          context.beginPath();
+          context.moveTo(892, index === 0 ? 125 : 251);
+          context.lineTo(browserX, browserY + 43);
+        });
+        drawSmallBrowser(browserX, browserY, 175, 86);
       });
     } else if (options.motif === 'webrtc') {
-      drawBrowser(845, 65, 290, 230);
-      strokeGlow(colors.cyan, 6, () => {
+      const blue = '#79a2ff';
+      const drawArchitectureCard = (x, y, cardWidth, cardHeight, color, eyebrow, title, subtitle) => {
+        context.fillStyle = 'rgba(7, 30, 42, 0.94)';
+        context.strokeStyle = color;
+        context.lineWidth = 2;
+        roundedPath(x, y, cardWidth, cardHeight, 15);
+        context.fill();
+        context.stroke();
+        context.fillStyle = 'rgba(232, 251, 255, 0.55)';
+        context.font = '700 8px sans-serif';
+        context.fillText(eyebrow, x + 18, y + 26);
+        context.fillStyle = colors.white;
+        context.font = '700 15px sans-serif';
+        context.fillText(title, x + 18, y + 52);
+        context.fillStyle = 'rgba(232, 251, 255, 0.68)';
+        context.font = '500 9px sans-serif';
+        context.fillText(subtitle, x + 18, y + 72);
+      };
+
+      strokeGlow(colors.cyan, 3, () => {
         context.beginPath();
-        context.moveTo(235, 164);
-        context.bezierCurveTo(430, 72, 665, 74, 845, 145);
+        context.moveTo(405, 119);
+        context.bezierCurveTo(555, 17, 810, 17, 970, 119);
       });
-      drawRelay(555, 267, 42);
-      strokeGlow(colors.coral, 4, () => {
+      strokeGlow(blue, 2, () => {
         context.beginPath();
-        context.moveTo(235, 198);
-        context.bezierCurveTo(350, 286, 440, 286, 513, 267);
-        context.moveTo(597, 267);
-        context.bezierCurveTo(700, 286, 770, 245, 845, 220);
-      }, [10, 9]);
+        context.moveTo(405, 170);
+        context.lineTo(500, 150);
+        context.moveTo(760, 150);
+        context.lineTo(970, 170);
+      }, [6, 6]);
+      strokeGlow(colors.lime, 2, () => {
+        context.beginPath();
+        context.moveTo(405, 228);
+        context.bezierCurveTo(465, 228, 490, 282, 550, 282);
+        context.moveTo(760, 282);
+        context.bezierCurveTo(850, 282, 895, 228, 970, 228);
+      });
+
+      drawArchitectureCard(35, 122, 145, 116, 'rgba(143, 167, 178, 0.9)', 'CAMERA', 'IP camera', 'RTSP · H.264');
+      context.fillStyle = colors.cyan;
+      context.beginPath();
+      context.arc(145, 202, 12, 0, Math.PI * 2);
+      context.fill();
+      strokeGlow(colors.cyan, 3, () => {
+        context.beginPath();
+        context.moveTo(180, 180);
+        context.lineTo(215, 180);
+      });
+
+      drawArchitectureCard(215, 102, 190, 156, colors.cyan, 'EDGE', 'Kerberos Agent', 'WebRTC peer · media');
+      drawArchitectureCard(500, 90, 260, 120, blue, 'KERBEROS HUB', 'Signalling plane', 'MQTT · SDP + ICE');
+      drawArchitectureCard(550, 240, 210, 86, colors.lime, 'TURN SERVER', 'coturn', 'STUN · relay fallback');
+      drawArchitectureCard(970, 98, 195, 160, 'rgba(143, 167, 178, 0.9)', 'HUB FRONTEND', 'Live viewer', 'Video + talk');
+
+      context.fillStyle = 'rgba(232, 251, 255, 0.64)';
+      context.font = '700 8px sans-serif';
+      context.textAlign = 'center';
+      context.fillText('DIRECT WEBRTC MEDIA', 686, 37);
+      context.fillText('RELAY FALLBACK', 862, 301);
+      context.textAlign = 'start';
     } else {
       context.save();
       context.font = '900 220px sans-serif';
@@ -318,7 +506,7 @@ for (const header of headers) {
     vignette.addColorStop(1, 'rgba(0, 0, 0, 0.18)');
     context.fillStyle = vignette;
     context.fillRect(0, 0, width, height);
-  }, { motif: header.motif });
+  }, { motif: header.motif, kubernetesLogoDataUri });
 
   await page.locator('canvas').screenshot({
     path: path.join(tutorialDirectory, 'header-art.jpg'),

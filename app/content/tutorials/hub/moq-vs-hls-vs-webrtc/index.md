@@ -1,8 +1,13 @@
 ---
 title: 'Choose a live-stream transport: MoQ vs HLS vs WebRTC'
 description: 'Compare Media over QUIC, HLS and WebRTC for live video, then choose the right transport for your latency, scale, network and browser constraints.'
+date: '2026-08-19'
 weight: 2
 toc: true
+product: 'Hub'
+level: 'Beginner'
+duration: '15 min'
+tags: ['Live video', 'Networking', 'Architecture']
 ---
 
 {{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}

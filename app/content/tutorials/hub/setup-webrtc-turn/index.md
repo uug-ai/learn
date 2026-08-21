@@ -1,13 +1,18 @@
 ---
 title: 'Set up WebRTC live view with TURN'
 description: 'Configure STUN and TURN for reliable Kerberos Hub WebRTC live video, then verify direct and relayed ICE paths.'
+date: '2026-08-19'
 weight: 4
 toc: true
+product: 'Hub'
+level: 'Intermediate'
+duration: '30 min'
+tags: ['WebRTC', 'TURN', 'Networking']
 ---
 
 {{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
 
-{{< tutorial-header alt="Abstract direct and relayed network paths representing WebRTC with TURN fallback" >}}
+{{< tutorial-header alt="WebRTC architecture showing an IP camera, Kerberos Agent, Hub signalling, coturn relay fallback and Hub live viewer" >}}
 
 WebRTC gives Kerberos Hub its most interactive live path: low-latency H.264 video, camera audio and the two-way talk backchannel. It prefers a direct Agent-to-browser connection, but NAT and enterprise firewalls often make a TURN relay the only reliable path.
 

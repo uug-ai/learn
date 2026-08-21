@@ -758,6 +758,10 @@ html.dark .designer__field textarea,
 
 .designer .rete-group-layer { pointer-events: auto; }
 
+/* Let empty canvas space in the node layer fall through to groups beneath it. */
+.designer .rete-node-layer { pointer-events: none; }
+.designer .rete-node { pointer-events: auto; }
+
 /* Connection-deletion affordance: subtle hover on edges. */
 .designer .rete-connection {
     pointer-events: stroke;

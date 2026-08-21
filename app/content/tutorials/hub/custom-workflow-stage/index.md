@@ -1,8 +1,13 @@
 ---
 title: 'Set up your own workflow stage'
 description: 'Bring your own microservice into the Hub as a workflow stage — register it in the Helm chart, receive recordings, do the work, and ingest results back. A loitering / dwell-time stage serves as the worked example.'
+date: '2026-06-16'
 weight: 1
 toc: true
+product: 'Hub'
+level: 'Intermediate'
+duration: '25 min'
+tags: ['Workflows', 'Go', 'Kubernetes']
 ---
 
 {{< tutorial-byline author="Kilian Boute" github="kilianboute" created="Jun 16, 2026" updated="Jun 16, 2026" >}}

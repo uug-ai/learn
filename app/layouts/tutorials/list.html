@@ -1,0 +1,132 @@
+{{ define "main" }}
+  {{- with resources.Get "css/tutorials.css" -}}
+    {{- $css := . | minify | fingerprint -}}
+    <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
+  {{- end -}}
+
+  {{- $tutorials := sort .RegularPagesRecursive "Date" "desc" -}}
+  {{- $products := slice -}}
+  {{- $levels := slice -}}
+  {{- $tags := slice -}}
+  {{- range $tutorials -}}
+    {{- $products = $products | append .Params.product -}}
+    {{- $levels = $levels | append .Params.level -}}
+    {{- range .Params.tags -}}
+      {{- $tags = $tags | append . -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $products = sort (uniq $products) -}}
+  {{- $levels = sort (uniq $levels) -}}
+  {{- $tags = sort (uniq $tags) -}}
+  <div class="hx:mx-auto hx:flex hextra-max-page-width">
+    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true) }}
+    <article class="hx:w-full hx:min-w-0">
+      <main id="content" class="hx:w-full hx:min-w-0">
+  <div class="tutorial-catalog" data-tutorial-catalog>
+    <header class="tutorial-catalog__intro">
+      <div class="tutorial-catalog__intro-copy">
+        <span class="tutorial-catalog__eyebrow">Learn by doing</span>
+        <h1>{{ .Title }}</h1>
+        <div class="tutorial-catalog__lead">{{ .Content }}</div>
+      </div>
+      <dl class="tutorial-catalog__stats" aria-label="Tutorial library summary">
+        <div>
+          <dt>{{ len $tutorials }}</dt>
+          <dd>Tutorials</dd>
+        </div>
+        <div>
+          <dt>{{ len $products }}</dt>
+          <dd>Products</dd>
+        </div>
+        <div>
+          <dt>{{ len $tags }}</dt>
+          <dd>Topics</dd>
+        </div>
+      </dl>
+    </header>
+
+    <section class="tutorial-latest" aria-labelledby="tutorial-latest-title">
+      <div class="tutorial-section-heading">
+        <div>
+          <span class="tutorial-section-heading__eyebrow">Recently published</span>
+          <h2 id="tutorial-latest-title">Latest tutorials</h2>
+        </div>
+        <a href="#all-tutorials">View all</a>
+      </div>
+      <div class="tutorial-latest__layout">
+        {{- range $index, $tutorial := first 3 $tutorials }}
+          {{- if eq $index 0 }}
+            <div class="tutorial-latest__feature">
+              {{- partial "tutorial-card.html" (dict "page" $tutorial "variant" "featured") -}}
+            </div>
+          {{- else }}
+            {{- if eq $index 1 }}<div class="tutorial-latest__rail">{{ end -}}
+              {{- partial "tutorial-card.html" (dict "page" $tutorial "variant" "recent") -}}
+            {{- if eq $index 2 }}</div>{{ end -}}
+          {{- end }}
+        {{- end }}
+      </div>
+    </section>
+
+    <section class="tutorial-browser" id="all-tutorials" aria-labelledby="all-tutorials-title">
+      <div class="tutorial-section-heading">
+        <div>
+          <span class="tutorial-section-heading__eyebrow">Explore the library</span>
+          <h2 id="all-tutorials-title">All tutorials</h2>
+        </div>
+        <p class="tutorial-browser__count" aria-live="polite"><strong data-visible-count>{{ len $tutorials }}</strong> tutorials</p>
+      </div>
+
+      <div class="tutorial-browser__tools">
+        <label class="tutorial-search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <span class="hx:sr-only">Search tutorials</span>
+          <input type="search" placeholder="Search tutorials" autocomplete="off" data-tutorial-search />
+          <kbd>/</kbd>
+        </label>
+
+        <div class="tutorial-filter-groups">
+          <fieldset class="tutorial-filter-group" data-filter-group="product">
+            <legend>Product</legend>
+            <div class="tutorial-filter-group__options">
+              <button type="button" class="is-active" data-filter-value="all" aria-pressed="true">All</button>
+              {{- range $products }}
+                <button type="button" data-filter-value="{{ . | lower }}" aria-pressed="false">{{ . }}</button>
+              {{- end }}
+            </div>
+          </fieldset>
+          <fieldset class="tutorial-filter-group" data-filter-group="level">
+            <legend>Level</legend>
+            <div class="tutorial-filter-group__options">
+              <button type="button" class="is-active" data-filter-value="all" aria-pressed="true">All</button>
+              {{- range $levels }}
+                <button type="button" data-filter-value="{{ . | lower }}" aria-pressed="false">{{ . }}</button>
+              {{- end }}
+            </div>
+          </fieldset>
+        </div>
+
+      </div>
+
+      <div class="tutorial-browser__grid" data-tutorial-grid>
+        {{- range $tutorials }}
+          {{- partial "tutorial-card.html" (dict "page" . "variant" "catalog") -}}
+        {{- end }}
+      </div>
+      <div class="tutorial-browser__empty" data-tutorial-empty hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        <h3>No tutorials found</h3>
+        <p>Try a different search or reset the active filters.</p>
+        <button type="button" data-reset-filters>Reset filters</button>
+      </div>
+    </section>
+  </div>
+      </main>
+    </article>
+  </div>
+
+  {{- with resources.Get "js/tutorials.js" -}}
+    {{- $js := . | minify | fingerprint -}}
+    <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+  {{- end -}}
+{{ end }}
