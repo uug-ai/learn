@@ -1548,6 +1548,9 @@ ${css}
         this.viewport.addEventListener('mousedown', e => {
             if (e.button !== 0) return;
             if (e.target.closest('.designer__resize, .designer__anchor, .rete-connection, .rete-connection-hit, .rete-group__label')) return;
+            // Direct group hits must reach the group's drag handler. This
+            // fallback is only for a node overlapping the group perimeter.
+            if (e.target.closest('.rete-group')) return;
             // Convert client coords to canvas-units.
             const rect = this.canvas.getBoundingClientRect();
             const cx = (e.clientX - rect.left - this.tx) / this.scale;

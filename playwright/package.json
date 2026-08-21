@@ -8,6 +8,10 @@
     "test": "playwright test",
     "new": "node scripts/new-hub-page.mjs",
     "tutorial-headers": "node scripts/generate-tutorial-headers.mjs",
+    "tutorial-header:comparison": "node scripts/generate-transport-comparison-header.mjs",
+    "tutorial-header:moq-relay": "node scripts/generate-moq-relay-kubernetes-header.mjs",
+    "tutorial-header:camera-agent": "node scripts/generate-camera-agent-header.mjs",
+    "tutorial-header:webrtc-turn": "node scripts/generate-webrtc-turn-header.mjs",
     "headed": "node scripts/run-headed.mjs",
     "cases": "playwright test tests/cases.spec.ts",
     "cases:headed": "node scripts/run-headed.mjs tests/cases.spec.ts",
@@ -23,6 +27,7 @@
     "@playwright/test": "^1.47.0",
     "@types/node": "^20.11.0",
     "dotenv": "^16.4.5",
+    "sharp": "^0.35.3",
     "typescript": "^5.4.0"
   }
 }
