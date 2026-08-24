@@ -17,6 +17,9 @@ By default, recordings are persisted for a limited amount of time. Within Hub yo
 
 Cases are the mechanism in Hub to keep important recordings beyond that window. Creating a case copies its recordings from the current storage provider to a dedicated archive provider in Vault, which has its own (typically longer or non-expiring) retention period — for example, 3 years or more.
 
+> [!NOTE] Feature flags
+> Case navigation requires `kerberoshub.frontend.features.case.enabled`. Video redaction additionally requires `videoEdits.enabled` and `faceRedaction.enabled`; `faceRedaction.classifierTracksEnabled` controls only whether legacy classifier tracks appear as a starting point. See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#video-editing-and-face-redaction).
+
 > **Note:** The current archiving feature is designed for individual recordings only. It is not suitable for bulk exports or archiving large volumes of data (e.g. terabytes). We are aware of this limitation and are actively working on a solution to support large-scale archiving and export in a future release.
 
 ## Introduction 

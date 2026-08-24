@@ -157,6 +157,9 @@ Everything above can be authored **in the editor** as an organisation-scoped wor
 
 > **It's the engine switch, not the front-end one.** The workflows engine is off by default; set `kerberoshub.workflows.enabled: true` to run it. Don't confuse it with the unrelated `kerberoshub.…features.workflows.enabled` front-end feature flag.
 
+> [!NOTE] Feature flags
+> Set `kerberoshub.frontend.features.workflows.enabled: "true"` to expose the workflow UI and `kerberoshub.workflows.enabled: true` to run the engine. Neither switch replaces the other. See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#backend-and-deployment-switches).
+
 **Workflow definition — `kerberoshub.workflows.definitions.<workflow>`**
 
 | Field | Required | Value | What it does |
