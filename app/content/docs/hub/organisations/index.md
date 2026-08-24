@@ -17,6 +17,9 @@ An organisation is the ownership and access boundary being introduced for shared
 
 A user can own or belong to more than one organisation. The **current organisation** selects the context used by organisation-aware requests. During the rollout, the current selection, ownership, and active memberships determine which organisations a user can select, while the existing account role and resource permissions remain authoritative for what that user can do.
 
+> [!NOTE] Feature flags
+> Organisation and project controls are opt-in and hierarchical. The organisation umbrella can override both families; otherwise their group and child flags apply independently. See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#organisations-and-projects) before enabling switching, creation, or settings.
+
 ## Core concepts
 
 | Concept | Current rollout |
