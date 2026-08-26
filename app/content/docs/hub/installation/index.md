@@ -53,7 +53,7 @@ Configure the Google Cloud project that owns the browser API key:
 2. Enable [Maps JavaScript API](https://console.cloud.google.com/apis/library/maps-backend.googleapis.com).
 3. Enable [Places API (New)](https://console.cloud.google.com/apis/library/places.googleapis.com).
 4. Open [APIs & Services → Credentials](https://console.cloud.google.com/apis/credentials) and select the key used by Hub.
-5. Under **Application restrictions**, select **Websites** and add every Hub origin as an HTTP referrer, for example `https://hub.example.com/*`. For local development, add the exact origin shown in the browser address bar, such as `http://localhost:4200/*`. Remote development environments may forward the frontend to another local port, such as `http://localhost:4201/*`; that forwarded origin must be allowed separately.
+5. Under **Application restrictions**, select **Websites** and add every Hub origin as an HTTP referrer, for example `https://hub.example.com/*`. Add `http://localhost:4200/*` only to a development key when local development needs autocomplete.
 6. Under **API restrictions**, select **Restrict key** and allow both **Maps JavaScript API** and **Places API (New)**.
 7. Save the key and allow several minutes for the changes to propagate.
 
