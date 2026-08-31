@@ -3,7 +3,7 @@ title: "Installation"
 description: "Installing Kerberos Hub wherever you want."
 lead: "Installing Kerberos Hub wherever you want."
 date: 2020-10-06T08:49:31+00:00
-lastmod: 2026-08-25T00:00:00+00:00
+lastmod: 2026-08-26T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -42,10 +42,9 @@ When successfully installed the Kerberos Hub Helm chart, it is time to configure
 
 ### Google Places address autocomplete
 
-Kerberos Hub uses Google Places to suggest addresses when users configure sites,
-groups, profiles, and devices. The frontend uses `PlaceAutocompleteElement`,
-which requires **Places API (New)**. A key configured only for the legacy Places
-API does not enable autocomplete.
+Kerberos Hub uses the Places API (New) Data API to suggest addresses while
+keeping the Hub address input and dropdown interface. A key configured only for
+the legacy Places API does not enable autocomplete.
 
 Configure the Google Cloud project that owns the browser API key:
 
@@ -53,7 +52,7 @@ Configure the Google Cloud project that owns the browser API key:
 2. Enable [Maps JavaScript API](https://console.cloud.google.com/apis/library/maps-backend.googleapis.com).
 3. Enable [Places API (New)](https://console.cloud.google.com/apis/library/places.googleapis.com).
 4. Open [APIs & Services → Credentials](https://console.cloud.google.com/apis/credentials) and select the key used by Hub.
-5. Under **Application restrictions**, select **Websites** and add every Hub origin as an HTTP referrer, for example `https://hub.example.com/*`. Add `http://localhost:4200/*` only to a development key when local development needs autocomplete.
+5. Under **Application restrictions**, select **Websites** and add every Hub origin as an HTTP referrer, for example `https://hub.example.com/*`. For local development, add the exact origin shown in the browser address bar, such as `http://localhost:4200/*`. Remote development environments may forward the frontend to another local port, such as `http://localhost:4201/*`; that forwarded origin must be allowed separately.
 6. Under **API restrictions**, select **Restrict key** and allow both **Maps JavaScript API** and **Places API (New)**.
 7. Save the key and allow several minutes for the changes to propagate.
 
@@ -80,7 +79,8 @@ browser API key is visible to users of the application, it must still be
 protected with website and API restrictions. Do not use an unrestricted key.
 
 To verify the setup, open a Hub address field and start typing. Place suggestions
-should appear after the first focus. If the field remains a normal text input,
+should appear without replacing or resizing the input. If no suggestions appear,
 inspect the browser console for `ApiNotActivatedMapError`,
-`RefererNotAllowedMapError`, or request-denied messages. These indicate a missing
-API, an incorrect website restriction, or a key from a different Cloud project.
+`RefererNotAllowedMapError`, `RpcError`, or request-denied messages. These
+indicate a missing API, an incorrect website restriction, or a key from a
+different Cloud project.
