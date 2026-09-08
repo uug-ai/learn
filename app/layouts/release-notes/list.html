@@ -50,12 +50,14 @@
                         <span class="hx:sr-only" aria-live="polite"></span>
                       </button>
                     </header>
-                    <div class="release-note__content content">
-                      {{- $anchorPrefix := printf "release-%s-" .File.ContentBaseName -}}
-                      {{- $content := replaceRE `id="` (printf `id="%s` $anchorPrefix) .Content -}}
-                      {{- $content = replaceRE `href="#` (printf `href="#%s` $anchorPrefix) $content -}}
-                      {{ $content | safeHTML }}
+                    <div class="release-note__summary">
+                      {{- $summary := index (split .RawContent "<!--more-->") 0 -}}
+                      {{ $summary | markdownify }}
                     </div>
+                    <a class="release-note__details" href="{{ .RelPermalink }}">
+                      View full details
+                      {{ partial "utils/icon.html" (dict "name" "chevron-right" "attributes" "aria-hidden=\"true\"") }}
+                    </a>
                   </section>
                 {{- end }}
                 {{- if gt $paginator.TotalPages 1 }}
