@@ -45,7 +45,10 @@ menu:
         description: Latest news, announcements and deep-dives from the team.
     - name: Release notes
       pageRef: /release-notes
-      weight: 5
+      parent: knowledge-base
+      weight: 4
+      params:
+        description: Public updates from each production release.
     - name: Support
       pageRef: /support
       weight: 6
