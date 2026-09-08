@@ -4,7 +4,8 @@ date: {{ .Date }}
 draft: true
 ---
 
-Add the customer-facing release notes here. Omit generated pull request lists.
+Add a concise, outcome-focused summary here without starting with "This release".
+Omit generated pull request lists.
 
 <!--more-->
 
