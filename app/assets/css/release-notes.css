@@ -178,6 +178,11 @@
   line-height: 1.75;
 }
 
+.release-note__content h2 {
+  font-size: 1.3rem;
+  line-height: 1.35;
+}
+
 .release-note__content > :first-child {
   margin-top: 0;
 }
