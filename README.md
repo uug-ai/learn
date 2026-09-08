@@ -118,6 +118,22 @@ content/
 │   └── reference/
 ```
 
+### Adding release notes
+
+Create one Markdown page per GitOps release, using the release tag as the file
+name:
+
+```bash
+cd app
+hugo new --kind release-notes release-notes/2026-09-04.md
+```
+
+Set the release date in the generated front matter, replace the placeholder
+with the customer-facing release body, and set `draft: false`. Omit any
+generated pull request list that appears before the release summary. The
+`/release-notes/` page sorts releases newest first, paginates them in groups of
+ten, and builds each page's version navigation from those releases.
+
 ## Configuration
 
 The main configuration file is `app/hugo.toml`. Customize it to match your project:
