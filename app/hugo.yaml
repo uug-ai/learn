@@ -43,6 +43,9 @@ menu:
       weight: 3
       params:
         description: Latest news, announcements and deep-dives from the team.
+    - name: Release notes
+      pageRef: /release-notes
+      weight: 5
     - name: Support
       pageRef: /support
       weight: 6

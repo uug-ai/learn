@@ -1,0 +1,81 @@
+{{ define "main" }}
+  {{- with resources.Get "css/release-notes.css" -}}
+    {{- $css := . | minify | fingerprint -}}
+    <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
+  {{- end -}}
+
+  {{- $releases := .RegularPages.ByDate.Reverse -}}
+  {{- $pagerSize := .Params.pagerSize | default 10 -}}
+  {{- $paginator := .Paginate $releases $pagerSize -}}
+  {{- $pageReleases := $paginator.Pages -}}
+  {{- $latestRelease := index $releases 0 -}}
+  <div class="hx:mx-auto hx:flex hextra-max-page-width">
+    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true) }}
+    <article class="hx:w-full hx:min-w-0">
+      <main id="content" class="hx:w-full hx:min-w-0">
+        <div class="release-notes">
+          <header class="release-notes__header">
+            <p class="release-notes__eyebrow">Product updates</p>
+            <h1>{{ .Title }}</h1>
+            <div class="release-notes__lead">{{ .Content }}</div>
+          </header>
+
+          {{- if $releases }}
+            <div class="release-notes__layout">
+              <nav class="release-notes__versions" aria-label="Release versions">
+                <h2>Releases</h2>
+                <ol>
+                  {{- range $pageReleases }}
+                    <li>
+                      <a href="#release-{{ .File.ContentBaseName }}" data-release-link="release-{{ .File.ContentBaseName }}">
+                        <strong>{{ .Title }}</strong>
+                      </a>
+                    </li>
+                  {{- end }}
+                </ol>
+              </nav>
+
+              <div class="release-notes__entries">
+                {{- range $pageReleases }}
+                  <section class="release-note" id="release-{{ .File.ContentBaseName }}" aria-labelledby="release-title-{{ .File.ContentBaseName }}">
+                    <header class="release-note__header">
+                      <div class="release-note__title">
+                        <h2 id="release-title-{{ .File.ContentBaseName }}">{{ .Title }}</h2>
+                        {{- if eq .RelPermalink $latestRelease.RelPermalink }}
+                          <span class="release-note__latest">Latest</span>
+                        {{- end }}
+                      </div>
+                      <button class="release-note__copy" type="button" data-copy-release="release-{{ .File.ContentBaseName }}" aria-label="Copy link to release {{ .Title }}" title="Copy link to release">
+                        {{ partial "utils/icon.html" (dict "name" "link" "attributes" "aria-hidden=\"true\"") }}
+                        <span class="hx:sr-only" aria-live="polite"></span>
+                      </button>
+                    </header>
+                    <div class="release-note__content content">
+                      {{- $anchorPrefix := printf "release-%s-" .File.ContentBaseName -}}
+                      {{- $content := replaceRE `id="` (printf `id="%s` $anchorPrefix) .Content -}}
+                      {{- $content = replaceRE `href="#` (printf `href="#%s` $anchorPrefix) $content -}}
+                      {{ $content | safeHTML }}
+                    </div>
+                  </section>
+                {{- end }}
+                {{- if gt $paginator.TotalPages 1 }}
+                  {{ partial "components/blog-pager.html" $paginator }}
+                {{- end }}
+              </div>
+            </div>
+          {{- else }}
+            <div class="release-notes__empty">
+              <h2>Release notes are on the way</h2>
+              <p>Published releases will appear here as they become available.</p>
+            </div>
+          {{- end }}
+        </div>
+      </main>
+    </article>
+  </div>
+
+  {{- with resources.Get "js/release-notes.js" -}}
+    {{- $js := . | minify | fingerprint -}}
+    <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+  {{- end -}}
+{{ end }}
