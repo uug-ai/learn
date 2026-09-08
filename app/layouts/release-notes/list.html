@@ -51,8 +51,7 @@
                       </button>
                     </header>
                     <div class="release-note__summary">
-                      {{- $summary := index (split .RawContent "<!--more-->") 0 -}}
-                      {{ $summary | markdownify }}
+                      {{ .Params.summary | markdownify }}
                     </div>
                     <a class="release-note__details" href="{{ .RelPermalink }}">
                       View full details

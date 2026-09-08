@@ -186,6 +186,21 @@
   margin-bottom: 0;
 }
 
+.release-note-detail__summary {
+  margin-bottom: 2rem;
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.release-note-detail__summary > :first-child {
+  margin-top: 0;
+}
+
+.release-note-detail__summary > :last-child {
+  margin-bottom: 0;
+}
+
 .release-note__details {
   display: inline-flex;
   align-items: center;
