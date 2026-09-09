@@ -15,13 +15,21 @@
   {{- end -}}
 
   <div class="hx:mx-auto hx:flex hextra-max-page-width">
-    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" true) }}
-    {{ partial "toc.html" (dict "Params" (dict "toc" false)) }}
+    {{- if $releasePages }}
+      {{ partial "sidebar.html" (dict "context" . "disableSidebar" true) }}
+    {{- else }}
+      {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" true) }}
+      {{ partial "toc.html" (dict "Params" (dict "toc" false)) }}
+    {{- end }}
     <article class="hx:w-full hx:break-words hx:flex hx:min-h-[calc(100vh-var(--navbar-height))] hx:min-w-0 hx:justify-center hx:pb-8 hx:pr-[calc(env(safe-area-inset-right)-1.5rem)]">
-      <main id="content" class="hx:w-full hx:min-w-0 hx:max-w-4xl hx:px-6 hx:pt-4 hx:md:px-12">
+      <main id="content" class="hx:w-full hx:min-w-0 {{ if $releasePages }}hx:max-w-6xl{{ else }}hx:max-w-4xl{{ end }} hx:px-6 hx:pt-4 hx:md:px-12">
         {{- if $releasePages }}
           <div class="release-notes release-notes--term">
             <header class="release-notes__header">
+              <a class="release-notes__back" href="{{ relLangURL "release-notes" }}">
+                {{ partial "utils/icon.html" (dict "name" "arrow-left" "attributes" "aria-hidden=\"true\"") }}
+                All release notes
+              </a>
               <p class="release-notes__eyebrow">Release topic</p>
               <h1>{{ .Title }}</h1>
               <p class="release-notes__lead">Releases related to {{ .Title | lower }}.</p>

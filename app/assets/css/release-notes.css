@@ -10,6 +10,27 @@
   padding-top: 2rem;
 }
 
+.release-notes__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.75rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.release-notes__back:hover,
+.release-notes__back:focus-visible {
+  color: var(--primary-color);
+}
+
+.release-notes__back svg {
+  width: 1rem;
+  height: 1rem;
+}
+
 .release-notes__header {
   max-width: 760px;
   padding-bottom: 2.5rem;
