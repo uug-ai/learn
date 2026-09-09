@@ -128,9 +128,11 @@ cd app
 hugo new --kind release-notes release-notes/2026-09-04.md
 ```
 
-Set the release date in the generated front matter, replace the placeholder
-with the customer-facing release body, and set `draft: false`. Omit any
-generated pull request list that appears before the release summary. The
+Set the release date, concise summary, and customer-facing topic `tags` in the
+generated front matter, replace the placeholder with the public release body,
+and set `draft: false`. Omit generated pull request lists and internal-only
+details. Tags are shown on release overview/detail pages, link to filtered Hugo
+taxonomy pages, and are included as page-level terms in global search. The
 `/release-notes/` page sorts releases newest first, paginates them in groups of
 ten, and builds each page's version navigation from those releases.
 

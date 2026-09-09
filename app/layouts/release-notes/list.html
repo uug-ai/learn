@@ -53,6 +53,7 @@
                     <div class="release-note__summary">
                       {{ .Params.summary | markdownify }}
                     </div>
+                    {{ partial "release-note-tags.html" . }}
                     <a class="release-note__details" href="{{ .RelPermalink }}">
                       View full details
                       {{ partial "utils/icon.html" (dict "name" "chevron-right" "attributes" "aria-hidden=\"true\"") }}

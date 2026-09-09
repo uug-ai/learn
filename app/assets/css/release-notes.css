@@ -201,6 +201,34 @@
   margin-bottom: 0;
 }
 
+.release-note__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+
+.release-note__tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.release-note__tag:hover,
+.release-note__tag:focus-visible {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
 .release-note__details {
   display: inline-flex;
   align-items: center;
