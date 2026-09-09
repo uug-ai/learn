@@ -1,0 +1,27 @@
+{{- $page := .page -}}
+{{- $latestRelease := .latestRelease -}}
+{{- $copyLink := .copyLink | default false -}}
+<section class="release-note" id="release-{{ $page.File.ContentBaseName }}" aria-labelledby="release-title-{{ $page.File.ContentBaseName }}">
+  <header class="release-note__header">
+    <div class="release-note__title">
+      <h2 id="release-title-{{ $page.File.ContentBaseName }}">{{ $page.Title }}</h2>
+      {{- if and $latestRelease (eq $page.RelPermalink $latestRelease.RelPermalink) }}
+        <span class="release-note__latest">Latest</span>
+      {{- end }}
+    </div>
+    {{- if $copyLink }}
+      <button class="release-note__copy" type="button" data-copy-release="release-{{ $page.File.ContentBaseName }}" aria-label="Copy link to release {{ $page.Title }}" title="Copy link to release">
+        {{ partial "utils/icon.html" (dict "name" "link" "attributes" "aria-hidden=\"true\"") }}
+        <span class="hx:sr-only" aria-live="polite"></span>
+      </button>
+    {{- end }}
+  </header>
+  <div class="release-note__summary">
+    {{ $page.Params.summary | markdownify }}
+  </div>
+  {{ partial "release-note-tags.html" $page }}
+  <a class="release-note__details" href="{{ $page.RelPermalink }}">
+    View full details
+    {{ partial "utils/icon.html" (dict "name" "chevron-right" "attributes" "aria-hidden=\"true\"") }}
+  </a>
+</section>
