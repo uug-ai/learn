@@ -1,0 +1,12 @@
+{{- with .Params.tags }}
+  <div class="release-note__tags" aria-label="Release topics">
+    {{- range . }}
+      {{- $label := . -}}
+      {{- with site.GetPage (printf "/tags/%s" ($label | urlize)) }}
+        <a class="release-note__tag" href="{{ .RelPermalink }}">{{ $label }}</a>
+      {{- else }}
+        <span class="release-note__tag">{{ $label }}</span>
+      {{- end }}
+    {{- end }}
+  </div>
+{{- end }}

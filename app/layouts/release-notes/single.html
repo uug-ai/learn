@@ -20,6 +20,7 @@
           {{- with .Params.summary }}
             <div class="release-note-detail__summary">{{ . | markdownify }}</div>
           {{- end }}
+          {{ partial "release-note-tags.html" . }}
           {{ .Content }}
         </div>
         {{ partial "components/last-updated.html" . }}
