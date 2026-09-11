@@ -86,6 +86,7 @@ A single detection run is the target identifier plus the run body. Each field is
 {
   "mediaKey":         "camera-1_1700000000_...",  // recording key; or use analysisId
   "analysisId":      "65a1b2c3d4e5f60001234567", // alternative target
+  "name":            "Front entrance faces",     // optional user-facing run label
   "task":            "detection",                // optional discriminator
   "schemaVersion":   "1.0",
   "source":          { /* see Source */ },
@@ -100,6 +101,7 @@ A single detection run is the target identifier plus the run body. Each field is
 |---|---|---|---|
 | `mediaKey` | string | conditional | The recording **key** — the stable string stored as `media.videoFile` and `analysis.key` (**not** the media document's `_id`). Resolved against `analysis.key`. Provide this **or** `analysisId`. Missing both is a rejected run (`400 detections_target_missing` over the API). |
 | `analysisId` | string | conditional | Targets the recording via its analysis document `_id` (an ObjectID hex). Ignored when `mediaKey` is set. |
+| `name` | string | no | User-facing label for the run. The face-redaction selector displays this value when it is non-empty; otherwise it displays `source.runId`. Selection and persistence identity always remain `source.runId`. |
 | `task` | string (≤ 64) | no | Forward-compatibility discriminator for the run kind. Defaults to `"detection"`. |
 | `schemaVersion` | string (semver) | yes | Currently `"1.0"`. A major mismatch is rejected; minor mismatches succeed with a warning. |
 | `source` | object | yes | See [Source](#source). |
@@ -133,7 +135,7 @@ Provenance for the run. Three `kind`s are first-class:
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `kind` | enum | yes | `pipeline` \| `model` \| `import`. |
-| `name` | string (≤ 64) | yes | Identifies the producer. Used as the layer label in the editor. |
+| `name` | string (≤ 64) | yes | Identifies the producer. This is distinct from the optional top-level `name` displayed for the run in the face-redaction selector. |
 | `version` | string (≤ 32) | yes | Free-form (semver, git SHA, etc.). |
 | `runId` | string (≤ 40) | recommended | ULID/UUID. The natural key the upsert matches on. Server generates one if absent, but supplying a stable `runId` is what makes re-deliveries idempotent. |
 | `inputWidth` / `inputHeight` | int > 0 | no | Model input resolution. Reproducibility hint. |
