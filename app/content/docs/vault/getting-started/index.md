@@ -15,7 +15,7 @@ toc: true
 
 Once you've installed Kerberos Vault, you should have access to the Kerberos Vault application. The application allows you to administrate Kerberos Vault, and more specifically create storage providers, integrations and accounts, through a single interface. Isn't that great.
 
-Having a UI in place, it is important to note that Kerberos Vault also ships numerous APIs, that allow you to automate the configurations. The APIs are exposed as, Swagger documentation, and can be used for configuration of Kerberos Vault but also [integration](/vault/integration) and development of custom applications or business logic.
+Having a UI in place, it is important to note that Kerberos Vault also ships numerous APIs, that allow you to automate the configurations. The APIs are exposed as, Swagger documentation, and can be used for configuration of Kerberos Vault but also [integration]({{< ref "/docs/vault/integrations" >}}) and development of custom applications or business logic.
 
 ## Login page
 
@@ -40,7 +40,7 @@ Providers are the persistence layers, where you will store your recording in the
 - [Minio](https://min.io/)
 - [Ceph](https://ceph.io/)
 
-As explained before, for each provider, the appropriate security settings has to be filled in. For example for AWS you need to define the access and secret key, for GCP you need to define a service account. Find more information about storage providers [on the providers page](/vault/providers).
+As explained before, for each provider, the appropriate security settings has to be filled in. For example for AWS you need to define the access and secret key, for GCP you need to define a service account. Find more information about storage providers [on the providers page](/docs/vault/providers).
 
 {{< figure src="provider.gif" alt="One or more providers can be configured to centralise your storage." caption="One or more providers can be configured to centralise your storage." class="stretch">}}
 
@@ -50,7 +50,7 @@ Events or messages are generated each time a recording was uploaded to Kerberos 
 
 - [Apache Kafka](https://kafka.apache.org/)
 - [Amazon Web Services SQS](https://aws.amazon.com/sqs/)
-- [Kerberos Hub](/hub/first-things-first/)
+- [Kerberos Hub](/docs/hub/first-things-first/)
 - Kerberos Vault (remote forwarding)
 
 {{< figure src="integrations.gif" alt="Kerberos Vault can be configured to send events to message brokers to create real-time apps of ML models." caption="Kerberos Vault can be configured to send events to message brokers to create real-time apps of ML models." class="stretch">}}
@@ -63,7 +63,7 @@ The idea of an integration is that you can build your own applications and defin
 - Counting algorithms,
 - and much more.
 
-Find more information about events and integrations on [the integrations page](/vault/integrations).
+Find more information about events and integrations on [the integrations page](/docs/vault/integrations).
 
 ## Accounts
 
@@ -83,7 +83,7 @@ Next to credentials, there are a couple of other fields which are specified on a
 
 {{< figure src="account.gif" alt="One or more accounts can be created to secure your storage access." caption="One or more accounts can be created to secure your storage access." class="stretch">}}
 
-Find more information about accounts on [the accounts page](/vault/accounts).
+Find more information about accounts on [the accounts page](/docs/vault/accounts).
 
 ## Media
 
@@ -99,4 +99,4 @@ Storing recordings in a `Provider` is one thing, making sure you manage the stor
 - due to security or compliance,
 - reducing costs, etc.
 
-To make this possible Kerberos Vault comes with a configurable recycle deployment, which you can run next to your Kerberos Vault deployment. [Learn more about recycling here](/vault/recycle).
+To make this possible Kerberos Vault comes with a configurable recycle deployment, which you can run next to your Kerberos Vault deployment.

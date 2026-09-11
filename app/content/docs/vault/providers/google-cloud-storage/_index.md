@@ -33,7 +33,7 @@ Google Cloud Storage is ideal for:
 Before configuring Google Cloud Storage as a provider:
 
 1. [A Google Cloud Platform account](https://console.cloud.google.com/)
-2. [A Kerberos Vault installation](/vault/installation) in a Kubernetes cluster
+2. [A Kerberos Vault installation](/docs/vault/installation) in a Kubernetes cluster
 3. A GCP project with billing enabled
 4. Appropriate IAM permissions to create buckets and service accounts
 

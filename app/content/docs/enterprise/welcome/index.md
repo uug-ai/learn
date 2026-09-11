@@ -114,7 +114,7 @@ Once we have above information we can start by setting up our Kerberos Vault, cr
 
 ### Storage Provider 
 
-Before starting you should have made a decision where you want to have your recordings stored. At the moment of writing we are supporting all S3 compliant providers such as: S3, Minio, Storj, Ceph, etc and Google Cloud Storage as well. To get a better understanding of how to setup and configure your storage provider [have a look at our providers page in the Kerberos Vault section](/vault/providers).
+Before starting you should have made a decision where you want to have your recordings stored. At the moment of writing we are supporting all S3 compliant providers such as: S3, Minio, Storj, Ceph, etc and Google Cloud Storage as well. To get a better understanding of how to setup and configure your storage provider [have a look at our providers page in the Kerberos Vault section](/docs/vault/providers).
 
 ![Storage provider](./storage-provider.png)
 
@@ -126,7 +126,7 @@ Once you have your storage provider setup, we can create our integration, using 
 
 #### a. Kafka integration (self-hosted or private)
 
-The most efficient is to integrate directly with Kafka, using the credentials we gather in previous section. On the integrations page of Kerberos Vault [you will find more information of how to configure](/vault/integrations/#kafka) and setup the Kafka integration. Make sure that you validate the connection.
+The most efficient is to integrate directly with Kafka, using the credentials we gather in previous section. On the integrations page of Kerberos Vault [you will find more information of how to configure](/docs/vault/integrations/#kafka) and setup the Kafka integration. Make sure that you validate the connection.
 
 Once testing the Kafka integration, you should see a message published in your Kafka broker. You can validate either by using Offset Explorer or Prometheus when having metrics enabled in the Helm chart.
 
@@ -134,7 +134,7 @@ Once testing the Kafka integration, you should see a message published in your K
 
 If you have purchase a Kerberos Hub SAAS subscription or you don't like to use the Kafka integration you can leverage the Kerberos Hub integration. Under the hood it will still use Kafka to distribute to the different microservices. The advantage of the Kerberos Hub integration is that it will hide the Kafka configuration for you, or in the case of the Hub SAAS subscription not available to you at all.
 
-You will find more information about [the Kerberos Hub integration here](/vault/integrations/#kerberos-hub).
+You will find more information about [the Kerberos Hub integration here](/docs/vault/integrations/#kerberos-hub).
 
 ### Account creation
 

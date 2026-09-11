@@ -29,13 +29,13 @@ serves the route `/analytics`.
 ## How it works
 
 Analytics is not a separate ingestion path: it is a read-only view on
-top of the data the [Hub pipeline](/hub/pipeline/) already produces.
+top of the data the [Hub pipeline](/docs/hub/pipeline/) already produces.
 
-- **Recordings** are uploaded to the [Vault](/vault/) by the agent and
+- **Recordings** are uploaded to the [Vault](/docs/vault/) by the agent and
   registered in the Hub database by `hub-api`.
 - **Counts and region detections** are produced by the
   [`hub-pipeline-analysis`](https://github.com/uug-ai/hub-pipeline-analysis)
-  service when an [alert](/hub/alerts/) of type `counting_line`,
+  service when an [alert]({{< ref "/docs/hub/configuration" >}}#alerts) of type `counting_line`,
   `counting_region` or `multi` matches an object track on a recording.
 - The Analytics page aggregates those rows for the selected day, sites
   and devices, and asks `hub-api` for hourly buckets to feed the
@@ -43,7 +43,7 @@ top of the data the [Hub pipeline](/hub/pipeline/) already produces.
   filters only re-queries the existing data.
 
 The set of KPIs and the hourly buckets you see on this page therefore
-exactly mirror what your [alerts](/hub/alerts/) have produced and what
+exactly mirror what your [alerts]({{< ref "/docs/hub/configuration" >}}#alerts) have produced and what
 your devices have uploaded. If a KPI stays at zero, the most common
 cause is either *"no alert is configured for this device"* or *"no
 recording was uploaded for the selected day"*.
@@ -93,7 +93,7 @@ the alert type:
   in the region.
 
 When no alert is configured (or none fired), the track is replaced by
-a placeholder that links straight to the [Alerts](/hub/alerts/) page
+a placeholder that links straight to the [Alerts]({{< ref "/docs/hub/configuration" >}}#alerts) section
 so you can configure one.
 
 ### Hourly charts
@@ -115,7 +115,7 @@ Two tables below the charts list the individual events behind the
 totals: every counted object (with date, hour, device, alert and a
 direction arrow) and every region detection (with the same columns plus
 the dwell duration). Clicking a row navigates to the underlying
-[recording](/hub/recordings/) so you can replay the moment that
+[recording](/docs/hub/recordings/) so you can replay the moment that
 triggered the count.
 
 ### Recordings per hour
@@ -131,7 +131,7 @@ volume of footage your agents actually pushed up.
 Analytics is a read-only view. Any user with access to the parent site
 can open the page; the result set is automatically scoped to the
 devices that user is allowed to see (same scoping as the [Live
-view](/hub/livestream/) and [Recordings](/hub/recordings/) pages).
+view](/docs/hub/livestream/) and [Recordings](/docs/hub/recordings/) pages).
 
 The **Manage alerts** button in the breadcrumb only navigates — it
 does not grant access. Editing alerts still requires the
@@ -159,7 +159,7 @@ If `hubPipelineAnalysis` is disabled in the deployment, the
 ## Troubleshooting
 
 - **Every KPI is zero.** Check that at least one
-  [alert](/hub/alerts/) is enabled for the selected site / device and
+  [alert]({{< ref "/docs/hub/configuration" >}}#alerts) is enabled for the selected site / device and
   that recordings were uploaded that day. The KPI strip never
   back-fills counts retroactively.
 - **The date picker only lists a single day.** The picker is fed by
@@ -173,4 +173,4 @@ If `hubPipelineAnalysis` is disabled in the deployment, the
 - **A count row is missing from the table but the KPI counts it.**
   The tables are paginated server-side; the KPI counts everything,
   the table only shows the first page. Narrow the filters or use the
-  [Recordings](/hub/recordings/) page to find the specific event.
+  [Recordings](/docs/hub/recordings/) page to find the specific event.

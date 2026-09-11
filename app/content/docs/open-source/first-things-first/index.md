@@ -16,7 +16,7 @@ Kerberos Enterprise Suite is a consequence of supporting enterprises and custome
 
 As a result to the developments of the Agent, previously called Kerberos Open Source, the Kerberos Enterprise Suite is here to enable more flexibility through concepts such as Bring Your Own Cloud, Bring Your Own Storage and Bring Your Own Technology.
 
-Kerberos Enterprise Suite is taking the Agent to another level, by building additional tools on top such as [Kerberos Vault](/vault/first-things-first) and [Kerberos Hub](/vault/first-things-first). It scales your Agents through the concept of [Factory](/factory/first-things-first) which helps to deploy your Agents in bulk.
+Kerberos Enterprise Suite is taking the Agent to another level, by building additional tools on top such as [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/vault/first-things-first). It scales your Agents through the concept of [Factory](/docs/factory/first-things-first) which helps to deploy your Agents in bulk.
 
 ## Kubernetes: flexible and scale
 
@@ -28,11 +28,11 @@ Kubernetes sits at the center of the Kerberos Enterprise Suite. Every solution w
 
 ### Bring your own cloud
 
-By using Kubernetes as a basis for [Factory](/factory/first-things-first), [Kerberos Vault](/vault/first-things-first) and [Kerberos Hub](/vault/first-things-first), all solutions can be deployed where your Kubernetes cluster can be deployed. This means you can deploy at the edge, in a private or public cloud. As the solutions are modular build, you can also have hybrid deployments. For example processing at the edge and visualisation in a cloud environment, or storage at the edge and limited storage in a cloud environment.
+By using Kubernetes as a basis for [Factory](/docs/factory/first-things-first), [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/vault/first-things-first), all solutions can be deployed where your Kubernetes cluster can be deployed. This means you can deploy at the edge, in a private or public cloud. As the solutions are modular build, you can also have hybrid deployments. For example processing at the edge and visualisation in a cloud environment, or storage at the edge and limited storage in a cloud environment.
 
 ### Bring your own storage
 
-One thing you don't want, is to store your most precious data on someone else storage. We believe you should be the one and only owner of your data, and therefore we have build [Kerberos Vault](/vault/first-things-first), in such a way that you bring you own storage. Bringing your own storage is great, but actually you want to bring multiple storage providers, for example edge storage and cloud storage. The concept of keeping a vast amount of storage at the edge, and [forward only the most important data](/vault/forwarding/) to a cloud environment, is a core feature of [Kerberos Vault](/vault/first-things-first).
+One thing you don't want, is to store your most precious data on someone else storage. We believe you should be the one and only owner of your data, and therefore we have build [Kerberos Vault](/docs/vault/first-things-first), in such a way that you bring you own storage. Bringing your own storage is great, but actually you want to bring multiple storage providers, for example edge storage and cloud storage. The concept of keeping a vast amount of storage at the edge, and [forward only the most important data](/docs/vault/forwarding/) to a cloud environment, is a core feature of [Kerberos Vault](/docs/vault/first-things-first).
 
 ### Bring your own technology
 
@@ -60,14 +60,14 @@ Agents are persisting their recordings at a central place, which we call Kerbero
 
 {{< figure src="vault-edge-cloud-storage.svg" alt="Bring your own storage using Vault" caption="Bring your own storage using Kerberos Vault" class="stretch">}}
 
-Events and messages [are sent through integrations](/vault/integrations/) to initiate custom processes and applications; for example [a machine learning model](/vault/machine-learning/). Edge and cloud storage are combined and can be enabled in forwarding mode, so only a subset of recordings is persisted in cloud storage.
+Events and messages [are sent through integrations](/docs/vault/integrations/) to initiate custom processes and applications; for example [a machine learning model](/docs/vault/machine-learning/). Edge and cloud storage are combined and can be enabled in forwarding mode, so only a subset of recordings is persisted in cloud storage.
 
 {{< figure src="vault-forwarding-chaining.svg" alt="Synchronise recordings between multiple Kerberos Vaults." caption="Synchronise recordings between multiple Kerberos Vaults." class="stretch">}}
 
 ### Kerberos Hub
 
-[Kerberos Hub](/vault/first-things-first) is a scale UI that consolidates the entire Kerberos ecosystem. It shows livestreams/alerts from your Agents and recordings stored in Kerberos Vault through a single pane of glass.
+[Kerberos Hub](/docs/vault/first-things-first) is a scale UI that consolidates the entire Kerberos ecosystem. It shows livestreams/alerts from your Agents and recordings stored in Kerberos Vault through a single pane of glass.
 
-[Kerberos Hub](/vault/first-things-first) is build out of modular and scalable microservices which you can install and scale independently, wherever you want.
+[Kerberos Hub](/docs/vault/first-things-first) is build out of modular and scalable microservices which you can install and scale independently, wherever you want.
 
 {{< figure src="hub-with-vault.svg" alt="Kerberos Vault connected to Kerberos Hub." caption="Kerberos Vault connected to Kerberos Hub." class="stretch">}}

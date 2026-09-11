@@ -17,7 +17,7 @@ You might wonder what is inside the Kerberos Hub solution? We'll provide you a c
 
 ## Bring your own storage
 
-Kerberos Hub integrates with [Kerberos Vault](/vault/first-things-first), and makes your recordings available through a secure web interface. When using the Kerberos Hub Saas offering, your Agents will connect to our Kerberos Vault Saas environment. This means that your recordings will be stored on your storage providers or on our if you are using the Saas version.
+Kerberos Hub integrates with [Kerberos Vault](/docs/vault/first-things-first), and makes your recordings available through a secure web interface. When using the Kerberos Hub Saas offering, your Agents will connect to our Kerberos Vault Saas environment. This means that your recordings will be stored on your storage providers or on our if you are using the Saas version.
 
 {{< figure src="hub-with-vault.svg" alt="Kerberos Vault connected to Kerberos Hub." caption="Kerberos Vault connected to Kerberos Hub." class="stretch">}}
 
@@ -27,7 +27,7 @@ Kerberos Hub uses APIs and authentication to request recordings from the Kerbero
 
 ## Consolidated overview
 
-The [Kerberos Hub pipeline](/hub/pipeline) groups recordings, coming from one or more Agents, into time sequences. The idea is to simplify the search for a specific event. Fewer recordings are shown at once, and when necessary you drill down to a level deeper to receive more details. 
+The [Kerberos Hub pipeline](/docs/hub/pipeline) groups recordings, coming from one or more Agents, into time sequences. The idea is to simplify the search for a specific event. Fewer recordings are shown at once, and when necessary you drill down to a level deeper to receive more details.
 
 {{< figure src="hub-media.gif" alt="The media page gives you an overview of all your recordings." caption="The media page gives you an overview of all your recordings." class="stretch">}}
 
@@ -51,7 +51,7 @@ Machine learning is a crucial part of the Kerberos Enterprise Suite. From Kerber
 
 An out-of-the-box machine learning model that we apply is the YOLOv3 classification, which is part of the Kerberos Hub pipeline; read more about it at the [Github repo](https://github.com/kerberos-io/hub-objecttracker). All recordings being uploaded to Kerberos Vault will be interfered by the model, and have a prediction and metadata as a result. That information is stored into the Kerberos Hub application, and is used for features such as advanced search and notifications.
 
-Next to classifying and predicting objects, the model is also tracing the classified objects. By doing this we can label the recording with the object of interest. More information about the analytical capabilities of Kerberos Hub can be [found on the analytics page](/hub/analytics).
+Next to classifying and predicting objects, the model is also tracing the classified objects. By doing this we can label the recording with the object of interest. More information about the analytical capabilities of Kerberos Hub can be [found on the analytics page](/docs/hub/analytics).
 
 {{< figure src="hub-ml.gif" alt="The media page gives you an overview of all your recordings." caption="The media page gives you an overview of all your recordings." class="stretch">}}
 

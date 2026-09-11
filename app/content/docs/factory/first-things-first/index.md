@@ -40,4 +40,4 @@ Instead of tuning all your Agent, Factory allows you to set up global settings w
 
 Factory is flexible in *where it keeps its configuration* and *how it runs your agents*. You can store the factory's configuration in MongoDB, in plain JSON files, or in Kubernetes ConfigMaps and Secrets — the last two let your agents receive their configuration as environment variables, with no database required. Today agents are scheduled on Kubernetes, with a Docker and a host engine on the roadmap.
 
-Learn more on the [Configuration & engines](/factory/configuration-and-engines) page.
+Learn more on the [Configuration & engines](/docs/factory/configuration-and-engines) page.

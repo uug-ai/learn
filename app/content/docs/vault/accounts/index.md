@@ -19,7 +19,7 @@ By creating an account you will receive credentials that give access to the Kerb
 
 ## Prerequisites
 
-Before you can configure a provider, make sure [you have installed a Kerberos Vault](/vault/installation) inside a Kubernetes cluster.
+Before you can configure a provider, make sure [you have installed a Kerberos Vault](/docs/vault/installation) inside a Kubernetes cluster.
 
 ## Configuration of an account
 
@@ -56,12 +56,12 @@ These credentials are shared with Agents, Kerberos Vaults (chained/forwarding) a
 
 #### Cloud analysis
 
-When connecting Kerberos Vault to Kerberos Hub through the integration, an event is forwarded [to the Kerberos Hub pipeline](/hub/pipeline). By enabling or disabling the cloud analysis you will enable or disable any cloud computing done on the Kerberos Hub.
+When connecting Kerberos Vault to Kerberos Hub through the integration, an event is forwarded [to the Kerberos Hub pipeline](/docs/hub/pipeline). By enabling or disabling the cloud analysis you will enable or disable any cloud computing done on the Kerberos Hub.
 
 This is required if you only want to store recordings and avoid any analysis in the cloud, and thus reduce bandwidth from Kerberos Vault to the Kerberos Hub microservices.
 
 #### Edge analysis
 
-When connecting Kerberos Vault to Kerberos Hub through the integration, an event is forwarded [to the Kerberos Hub pipeline](/hub/pipeline). By enabling or disabling the edge analysis you will enable or disable edge computing in Kerberos Vault.
+When connecting Kerberos Vault to Kerberos Hub through the integration, an event is forwarded [to the Kerberos Hub pipeline](/docs/hub/pipeline). By enabling or disabling the edge analysis you will enable or disable edge computing in Kerberos Vault.
 
-This is useful when you want to compute specific analysis at the edge and forward the relevant results [to the Kerberos Hub pipeline](/hub/pipeline). This avoids bandwidth consumption but increases computing power at the edge.
+This is useful when you want to compute specific analysis at the edge and forward the relevant results [to the Kerberos Hub pipeline](/docs/hub/pipeline). This avoids bandwidth consumption but increases computing power at the edge.

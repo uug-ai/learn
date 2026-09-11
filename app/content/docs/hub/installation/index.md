@@ -38,7 +38,7 @@ To install Kerberos Hub, we will redirect you to the official Github repository,
 
 ## Configuration
 
-When successfully installed the Kerberos Hub Helm chart, it is time to configure the solution to your needs. Learn more about [the configuration here](/hub/configuration).
+When successfully installed the Kerberos Hub Helm chart, it is time to configure the solution to your needs. Learn more about [the configuration here](/docs/hub/configuration).
 
 ### Google Places address autocomplete
 

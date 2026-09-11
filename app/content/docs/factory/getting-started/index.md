@@ -86,7 +86,7 @@ Following settings can be changed:
 - Time based conditions,
 - Pre- and post recording
 - Continuous recording
-- Linking to [Kerberos Hub Saas](/hub/first-things-first) or [Kerberos Vault](/vault/first-things-first)
+- Linking to [Kerberos Hub Saas](/docs/hub/first-things-first) or [Kerberos Vault](/docs/vault/first-things-first)
 
 {{< callout type="info" >}}
 Before the configuration screen opens, Factory runs a quick **reachability check** (a ping) against the agent. If an agent is temporarily unreachable you get a fast, friendly message instead of a long hang, and any unsaved changes are confirmed before you close the screen.
@@ -98,7 +98,7 @@ Configuration can be specified in an Agent, this means that you update the confi
 
 By specifying configurations at a higher level, any Agents will inherit from that configuration. This is improving the overall maintenance and management of your Agents.
 
-The global configuration is stored by the factory itself. Depending on how the factory is set up this is a MongoDB database, a local JSON file, or a Kubernetes ConfigMap/Secret — see [Configuration & engines](/factory/configuration-and-engines) for the details.
+The global configuration is stored by the factory itself. Depending on how the factory is set up this is a MongoDB database, a local JSON file, or a Kubernetes ConfigMap/Secret — see [Configuration & engines](/docs/factory/configuration-and-engines) for the details.
 
 {{< figure src="global-settings.gif" alt="You can specify the configurations on a global level, so all Agents will inherit from that." caption="You can specify the configurations on a global level, so all Agents will inherit from that." class="stretch">}}
 
@@ -137,18 +137,18 @@ When you run Factory with a Kubernetes-native configuration store (`configmap` o
 System-managed ConfigMaps (such as `kube-root-ca.crt`) are skipped during import, so a round-trip cannot overwrite cluster-managed data.
 
 {{< callout type="info" >}}
-This page is most useful when the factory uses the `configmap` or `secret` configuration. See [Configuration & engines](/factory/configuration-and-engines) to learn how the configuration is stored and delivered to your agents.
+This page is most useful when the factory uses the `configmap` or `secret` configuration. See [Configuration & engines](/docs/factory/configuration-and-engines) to learn how the configuration is stored and delivered to your agents.
 {{< /callout >}}
 
 ## Storage and video management
 
 Factory allows you to scale your video landscape horizontally, using the concept of Kubernetes, and brings a strong backbone for stability and performance. It allows you to avoid reinventing the wheel, and get stuck in the numerous challenges of developing a scalable video platform.
 
-Agents store their recordings locally for a short period. This means that long-term storage is not included in the solution. On top of that it also does not have a visual component, which allows you te review dashboards or recordings. To overcome these two challenges, long-term storage with extensibility/integration capabilities and visualisation features, following solutions were developed [Kerberos Vault](/storage/introduction) and [Kerberos Hub](/cloud).
+Agents store their recordings locally for a short period. This means that long-term storage is not included in the solution. On top of that it also does not have a visual component, which allows you te review dashboards or recordings. To overcome these two challenges, long-term storage with extensibility/integration capabilities and visualisation features, following solutions were developed [Kerberos Vault]({{< ref "/docs/vault/first-things-first" >}}) and [Kerberos Hub]({{< ref "/docs/hub/first-things-first" >}}).
 
 ### Kerberos Vault
 
-[Kerberos Vault](/vault/first-things-first) is a solution which makes it possible to store recordings from Agents (across different clusters) at a central place, on the storage provider you want. You can store your recordings in the cloud (AWS S3, Google Cloud Storage, Azure Blob storage) or at the edge (Minio, Ceph).
+[Kerberos Vault](/docs/vault/first-things-first) is a solution which makes it possible to store recordings from Agents (across different clusters) at a central place, on the storage provider you want. You can store your recordings in the cloud (AWS S3, Google Cloud Storage, Azure Blob storage) or at the edge (Minio, Ceph).
 
 On the other hand it's an open platform, as it allows you build extensions and integrations (web apps, mobile apps, machine learning services much more). Kerberos Vault ships with the ability of real-time messaging (Kafka), and a REST API (documented as Swagger).
 
@@ -170,9 +170,9 @@ To connect one or more Agents to your Kerberos Vault instance, you should open t
 
 ### Kerberos Hub
 
-For the visualisation part Kerberos Hub comes into the picture. Kerberos Hub is a web app, backed up with a number of microservices, that shows dashboards, live streams, filter recordings and much more. Learn more [about the features and functions here](/cloud).
+For the visualisation part Kerberos Hub comes into the picture. Kerberos Hub is a web app, backed up with a number of microservices, that shows dashboards, live streams, filter recordings and much more. Learn more [about the features and functions here]({{< ref "/docs/hub/first-things-first" >}}).
 
-You have two choices when using Kerberos Hub, either you send your recordings from your Agents directly to Kerberos Hub, or you send your recordings to Kerberos Vault, and connect Kerberos Vault to Kerberos Hub. About the latter more is explained on the [Kerberos Vault page](/storage/get-started).
+You have two choices when using Kerberos Hub, either you send your recordings from your Agents directly to Kerberos Hub, or you send your recordings to Kerberos Vault, and connect Kerberos Vault to Kerberos Hub. About the latter more is explained on the [Kerberos Vault page]({{< ref "/docs/vault/getting-started" >}}).
 
 Select the Kerberos Hub option, and copy-paste the credentials from your Kerberos Hub subscription.
 
