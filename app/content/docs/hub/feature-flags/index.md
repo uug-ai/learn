@@ -3,7 +3,7 @@ title: "Feature flags"
 description: "Configure Hub user-interface features and understand related service switches."
 lead: "Configure Hub user-interface features and understand related service switches."
 date: 2026-08-24T00:00:00+00:00
-lastmod: 2026-08-24T00:00:00+00:00
+lastmod: 2026-09-11T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -45,6 +45,8 @@ Use quoted `"true"` and `"false"` values for frontend flags unless the chart fie
 | `kerberoshub.frontend.features.floorplan.enabled` | `FEATURE_FLOORPLAN_ENABLED` | `"true"` | Enables floor-plan functionality in the frontend. |
 | `kerberoshub.frontend.features.i18n.enabled` | `FEATURE_I18N_ENABLED` | `"true"` | Shows the language switcher. When disabled, Hub always uses `i18n.defaultLanguage`. |
 | `kerberoshub.frontend.features.devices.hideAgent` | `FEATURE_DEVICES_HIDE_AGENT` | `"false"` | Hides the Add Agent control on the Devices page when set to `"true"`. |
+| `kerberoshub.frontend.features.devices.analyticsEnabled` | `FEATURE_DEVICE_ANALYTICS_ENABLED` | `"true"` | Shows the Analytics tab on device detail pages. When disabled, analytics fragments fall back to Overview. |
+| `kerberoshub.frontend.features.dashboard.sitesFullscreenEnabled` | `FEATURE_DASHBOARD_SITES_FULLSCREEN_ENABLED` | `"true"` | Shows the fullscreen Sites map action on the Dashboard. |
 
 ## Organisations and projects
 
