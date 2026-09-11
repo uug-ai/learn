@@ -138,9 +138,9 @@ workflow run timed out with stages outstanding   dispatchedStages=1 resolvedStag
 
 ## Distributed tracing
 
-The engine participates in **OpenTelemetry** tracing under the service name `hub-workflows`. For every message it **continues the trace** carried on the run's `traceId` and opens a span tagged with the `operation` and `fileName`, so a single recording's spans line up across the analysis service, the engine and your stages in your tracing backend.
+The engine participates in **OpenTelemetry** tracing under the service name `hub-workflows`. Every stage dispatch carries W3C `traceparent` and optional `tracestate` fields alongside the run's `traceId`. A worker validates that the carrier belongs to the same trace, opens its stage span as a child of the engine dispatch span, and replaces the carrier with that stage span when returning the result. The engine then opens result-ingest, routing and finalization spans beneath the worker span.
 
-The same `traceId` is on the `WorkflowRun` your stage receives. **Propagate it** on your stage's own logs and spans (see the [`traceId` field](/docs/hub/workflows/stages/#the-workflow-run)) and the whole run — pipeline → engine → your microservice — stays correlatable under one id. If the tracing backend is unreachable the engine logs `failed to connect to tracing backend` (at startup) or `tracing failed for event` (per message) and **keeps processing** — tracing is best-effort and never blocks a run.
+Older engines and workers may omit or ignore those W3C fields. In that mixed-version case, the receiver falls back to the same `traceId`, preserving correlation as root-like sibling spans without trusting a malformed or cross-trace carrier. See [the workflow run contract](/docs/hub/workflows/stages/#the-workflow-run) for the fields a custom stage must echo. If the tracing backend is unreachable the engine logs `failed to connect to tracing backend` (at startup) or `tracing failed for event` (per message) and **keeps processing** — tracing is best-effort and never blocks a run.
 
 ## Metrics
 

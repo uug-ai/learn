@@ -295,7 +295,9 @@ Your microservice does **not** receive the pipeline's internal `PipelineEvent`. 
   "runId": "665f1b2c3d4e5f6071829304",
   "key": "front-gate/2026/06/12/08-30-00.mp4",
   "signedUrl": "https://vault.example.com/kerberos-storage/front-gate/2026/06/12/08-30-00.mp4?X-Amz-Signature=…",
-  "traceId": "8f3a1c2b4d5e6f70",
+  "traceId": "0123456789abcdef0123456789abcdef",
+  "traceparent": "00-0123456789abcdef0123456789abcdef-0123456789abcdef-01",
+  "tracestate": "vendor=value",
   "user": {
     "organisationId": "64f0a1b2c3d4e5f600112233",
     "storage": { "uri": "s3://kerberos-vault", "access_key": "AKIA…", "provider": "kerberos-vault", "secret_key": "…" }
@@ -334,7 +336,9 @@ Your microservice does **not** receive the pipeline's internal `PipelineEvent`. 
 | `runId` | string | The run's unique id. Use it as your **idempotency key** — a redelivery carries the same `runId`. |
 | `key` | string | The **recording reference** (media key) the run is about. Resolve *which* recording to fetch from this. |
 | `signedUrl` | string | A short-lived, pre-signed URL to fetch the recording directly over HTTP — a **convenience** so you don't have to re-sign from `storage`. **May be absent or expired**; fall back to `storage` + `key` (see [Fetching the media](#fetching-the-media)). Present only on the inbound dispatch; clear it before returning the run. |
-| `traceId` | string | Distributed-trace id; propagate it on your logs/spans so the run stays traceable end-to-end. |
+| `traceId` | string | Distributed-trace id; retain it for correlation and as the fallback when no valid W3C parent carrier is present. |
+| `traceparent` | string | Optional W3C parent context for the engine's dispatch span. Validate that its trace id matches `traceId`, then use it as the parent of your stage span. |
+| `tracestate` | string | Optional W3C vendor state associated with `traceparent`; propagate it with the parent context. |
 | `user` | object | Curated, secret-free **account context** — see below. |
 | `device` | object | The recording's **device context** — see below. |
 | `inputs` | object | The run's **immutable start context**, keyed by the upstream operation that produced it — see below. Read-only. |
@@ -411,7 +415,7 @@ Your microservice is a stateless consumer: pull a run, fetch the media (prefer `
 
 ## Sending a result back
 
-You return the **same `WorkflowRun` you received** — echo `runId`, `key`, `traceId` and `user` so the engine can locate and scope the run — with `storage` cleared and your result in **exactly one** channel. Publish it back to the engine's queue (`WORKFLOWS_QUEUE`, default `hub-workflows-queue`); the engine marks the **stage** resolved and fires any conditional stage that was waiting on it.
+You return the **same `WorkflowRun` you received** — echo `runId`, `key`, `traceId` and `user` so the engine can locate and scope the run — with `storage` cleared and your result in **exactly one** channel. Replace `traceparent` / `tracestate` with the context of your stage span before publishing, so the engine's result-handling span becomes its child. Publish it back to the engine's queue (`WORKFLOWS_QUEUE`, default `hub-workflows-queue`); the engine marks the **stage** resolved and fires any conditional stage that was waiting on it.
 
 There are **two sinks**. Default to letting the platform persist your result — hand it back and the **ingest core** stores it, so your microservice needs no datastore of its own. A stage that produces genuinely *new* data can instead own its storage and write its own collection.
 
