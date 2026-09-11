@@ -26,7 +26,7 @@ Kerberos Vault allows you to attach one or more (and different) storage provider
 
 ## Prerequisites
 
-Before you can configure a provider, make sure [you have installed a Kerberos Vault](/vault/installation) inside a Kubernetes cluster.
+Before you can configure a provider, make sure [you have installed a Kerberos Vault](/docs/vault/installation) inside a Kubernetes cluster.
 
 ## Configuration of a provider
 

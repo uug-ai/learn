@@ -138,4 +138,4 @@ An easy way to verify if the POST request is happening, you can use a public web
 
 ## What's next
 
-Want to learn more how Kerberos Hub is working under the hood? Then [have a look at the Kerberos Hub pipeline page](/hub/pipeline) where we introduce the microservice architecture.
+Want to learn more how Kerberos Hub is working under the hood? Then [have a look at the Kerberos Hub pipeline page](/docs/hub/pipeline) where we introduce the microservice architecture.

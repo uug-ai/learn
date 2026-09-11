@@ -13,7 +13,7 @@ weight: 304
 toc: true
 ---
 
-If not already the case, start by creating a Kubernetes cluster. This can be done though one of the hyperscalers (AWS, GCP, Azure), cloud providers (Digital Ocean, Scaleway, etc) or inside your private cloud; for the latter it is advised [to follow the edge installation](/factory/installation-edge).
+If not already the case, start by creating a Kubernetes cluster. This can be done though one of the hyperscalers (AWS, GCP, Azure), cloud providers (Digital Ocean, Scaleway, etc) or inside your private cloud; for the latter it is advised [to follow the edge installation](/docs/factory/installation-edge).
 
 {{< figure src="factory-cloud.svg" alt="Process your video streams in the cloud." caption="Process your video streams in the cloud" class="stretch">}}
 

@@ -13,7 +13,7 @@ weight: 303
 toc: true
 ---
 
-If not already the case, start by creating a Kubernetes cluster. This can be done though one of the hyperscalers (**AWS**, **GCP** or **Azure**), cloud providers (Digital Ocean, Scaleway, etc) or inside your private cloud; for the latter it is advised [to follow the edge installation](/vault/installation-edge).
+If not already the case, start by creating a Kubernetes cluster. This can be done though one of the hyperscalers (**AWS**, **GCP** or **Azure**), cloud providers (Digital Ocean, Scaleway, etc) or inside your private cloud; for the latter it is advised [to follow the edge installation](/docs/vault/installation-edge).
 
 {{< figure src="vault-cloud-deployment.svg" alt="Bring your own storage using Kerberos Vault" caption="Bring your own storage using Kerberos Vault" class="stretch">}}
 
@@ -29,7 +29,7 @@ Kerberos Vault requires some initial components to be installed. If you run Kerb
 
 {{< figure src="vault-cloud-storage.svg" alt="Bring your own storage using Kerberos Vault" caption="Bring your own storage using Kerberos Vault" class="stretch">}}
 
-If you plan to run Kerberos Vault in a different cluster (which is perfectly possible), you will need to make sure you complete the initial setup of the [Factory installation](/enterprise/installation). To be more specific you will need to have following components running:
+If you plan to run Kerberos Vault in a different cluster (which is perfectly possible), you will need to make sure you complete the initial setup of the [Factory installation](/docs/enterprise/installation). To be more specific you will need to have following components running:
 
 - Helm
 - MongoDB

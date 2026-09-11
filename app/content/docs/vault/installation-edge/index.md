@@ -31,7 +31,7 @@ Kerberos Vault requires some initial components to be installed. If you run Kerb
 
 {{< figure src="vault-edge-storage.svg" alt="Store your recordings at the edge with Kerberos Vault" caption="Store your recordings at the edge with Kerberos Vault" class="stretch">}}
 
-If you plan to run Kerberos Vault in a different cluster (which is perfectly possible), you will need to make sure you complete the initial setup of [Factory Edge](/enterprise/installation-edge) installation. To be more specific you will need the following components running:
+If you plan to run Kerberos Vault in a different cluster (which is perfectly possible), you will need to make sure you complete the initial setup of [Factory Edge](/docs/enterprise/installation-edge) installation. To be more specific you will need the following components running:
 
 - Helm
 - Calico

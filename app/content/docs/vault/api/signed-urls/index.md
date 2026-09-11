@@ -19,7 +19,7 @@ This page documents the endpoints you need to call, the authentication model, an
 
 ## Authentication
 
-All `/api/storage/*` endpoints described below are **not** behind JWT. They authenticate per-request using **account credentials** that you provision in the Vault admin UI (see [Accounts](/vault/accounts/)).
+All `/api/storage/*` endpoints described below are **not** behind JWT. They authenticate per-request using **account credentials** that you provision in the Vault admin UI (see [Accounts](/docs/vault/accounts/)).
 
 Two HTTP headers are always required:
 

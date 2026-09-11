@@ -34,7 +34,7 @@ Azure Blob Storage is ideal for:
 Before configuring Azure Blob Storage as a provider:
 
 1. [An Azure account](https://portal.azure.com/) with an active subscription
-2. [A Kerberos Vault installation](/vault/installation) in a Kubernetes cluster
+2. [A Kerberos Vault installation](/docs/vault/installation) in a Kubernetes cluster
 3. Appropriate permissions to create storage accounts and containers
 4. Azure CLI installed (optional, for command-line configuration)
 

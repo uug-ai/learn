@@ -19,7 +19,7 @@ Each time an Agent sends a recording to Kerberos Vault, it is persisted on a sto
 
 - [Apache Kafka](https://kafka.apache.org/)
 - [Amazon Web Services SQS](https://aws.amazon.com/sqs/)
-- [Kerberos Hub](/hub/first-things-first/)
+- [Kerberos Hub](/docs/hub/first-things-first/)
 - Kerberos Vault (remote forwarding)
 
 Every time an event is delivered, it will be consumed by the configured integrations. For example in case of a Kafka
@@ -28,7 +28,7 @@ service, etc.
 
 ## Prerequisites
 
-Before you can configure a provider, make sure [you have installed a Kerberos Vault](/vault/installation) inside a Kubernetes cluster.
+Before you can configure a provider, make sure [you have installed a Kerberos Vault](/docs/vault/installation) inside a Kubernetes cluster.
 
 ## Configuration of an integration
 
@@ -98,7 +98,7 @@ To learn more about how to enable the Kerberos Vault integration, have [a look a
 
 ### Kerberos Hub
 
-The Kerberos Hub integration allows you to visualise your recordings, stored in your Kerberos Vault, in you Kerberos Hub account. By using the integration, events are send to [the Kerberos Hub pipeline](/hub/pipeline) and visualised in the Kerberos Hub interface. Each time a recording is uploaded to Kerberos Vault, an event is sent to the REST API of Kerberos Hub, and injected in the Kerberos Hub pipeline. The Kerberos Hub pipeline will start evaluating the recording and generate various metadata.
+The Kerberos Hub integration allows you to visualise your recordings, stored in your Kerberos Vault, in you Kerberos Hub account. By using the integration, events are send to [the Kerberos Hub pipeline](/docs/hub/pipeline) and visualised in the Kerberos Hub interface. Each time a recording is uploaded to Kerberos Vault, an event is sent to the REST API of Kerberos Hub, and injected in the Kerberos Hub pipeline. The Kerberos Hub pipeline will start evaluating the recording and generate various metadata.
 
 {{< figure src="vault-integration-hub.gif" alt="Kerberos Hub integrates with Kerberos Vault to visualise recordings and metadata." caption="Kerberos Hub integrates with Kerberos Vault to visualise recordings and metadata." class="stretch">}}
 
