@@ -40,8 +40,13 @@ There are a couple of interesting configurations you can enable on account level
 #### Details
 
  - Account name: a random name identifying the account.
- - Main provider: the default provider the account is linked too.
- - Day limit: the expiry date of all recordings stored through this account.
+ - Providers: storage providers assigned to the account. Vault persists one as
+     the primary provider and stores any additional selections as secondary
+     provider assignments. Selecting multiple providers does not itself create a
+     backup workflow; use a Vault forwarding integration when recordings must be
+     copied to another Vault.
+ - Day limit: a positive whole number of days that recordings are retained from
+     their upload time.
  - Integrations: all the integrations which will be executed each time a recording was stored in a storage provider.
 
 #### Directory
@@ -49,6 +54,9 @@ There are a couple of interesting configurations you can enable on account level
 By defining a `directory` you force an account, and all its producing Agents, to store all recordings in a specific subdirectory on the selected storage provider. 
 
 By defining the `asteriks` (*) value, you will provide more flexibility and deligate the subdirectory to the connected Agents. This means that different Agents can store in different subdirectories, although they are connected to the same `account`.
+
+When the account has a fixed directory, Vault ignores a directory supplied by
+the Agent. With `*`, the Agent must send the directory on each upload.
 
 #### Credentials
 

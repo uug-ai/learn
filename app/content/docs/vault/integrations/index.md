@@ -13,98 +13,90 @@ weight: 306
 toc: true
 ---
 
-One of the key differentiators, is the ability to extend and integrate. Next to uploading and persisting recordings on your preferred storage providers, Kerberos Vault can trigger events and be configured through APIs.
+Integrations publish an event after Vault has stored a recording and its media
+record. Use these events to feed another Vault, Kerberos Hub, or your own
+message-driven application.
 
-Each time an Agent sends a recording to Kerberos Vault, it is persisted on a storage provider, and an event is triggered through one of the following integrations.
+Vault currently supports:
 
+- [Amazon SQS](https://aws.amazon.com/sqs/)
 - [Apache Kafka](https://kafka.apache.org/)
-- [Amazon Web Services SQS](https://aws.amazon.com/sqs/)
+- [RabbitMQ](https://www.rabbitmq.com/)
 - [Kerberos Hub](/docs/hub/first-things-first/)
-- Kerberos Vault (remote forwarding)
-
-Every time an event is delivered, it will be consumed by the configured integrations. For example in case of a Kafka
-integration, one can build a Kafka consumer with custom application logic; a notification manager, a machine learning
-service, etc.
+- Kerberos Vault forwarding
 
 ## Prerequisites
 
-Before you can configure a provider, make sure [you have installed a Kerberos Vault](/docs/vault/installation) inside a Kubernetes cluster.
+Install Vault and configure at least one [storage provider](/docs/vault/providers/).
+An integration is not active for uploads until it is enabled and assigned to an
+[account](/docs/vault/accounts/).
 
 ## Configuration of an integration
 
-Once you have set up your Kerberos Vault instance, and have successfully login to the application, you should see the integration navigation item on the left.
+Open **Integrations** in the left navigation and select **Add Integration**.
+Choose a type, provide an integration name and connection settings, then use
+**Validate** before saving. Keep the **Enabled** toggle on when Vault should
+deliver events.
 
 {{< figure src="integrations.gif" alt="One or more providers can be configured to centralise your storage." caption="One or more providers can be configured to centralise your storage." class="stretch">}}
 
-When selecting the `+ Add Integration` button, a modal will open that allows you to configure a specific integration. Go a head and select one from the list.
-
 {{< figure src="add-integration.gif" alt="Configure, add and validate a new integration." caption="Configure, add and validate a new integration." class="stretch">}}
 
-Once completed the necessary credentials, specific to your integration, you can verify the connection by click the `Validate` button. If ok, it should return a `green` confirmation box, if something went wrong you should see the relevant error message in a `red` alert box. When completed you can add multiple and different integrations.
+You can create multiple integrations and assign any combination to an account.
 
-## Cloud event integrations
+## Queue integrations
 
-Kerberos Vault integrates with queues and message brokers in the cloud such as AWS SQS. The advantage is that it takes the complete control of your every growing messaging/event requirements.
+### Amazon SQS
 
-### AWS SQS
-
-> Tutorial to be written.
-
-## Edge event integrations
-
-Alternatives to cloud event integrations are self-hosted variants such as a Kafka broker.
+Provide the AWS region, queue name in **Topic**, access key, and secret access
+key. The IAM identity must be able to send messages to that queue.
 
 ### Kafka
 
-Apache Kafka is an open-source distributed event streaming platform used by thousands of companies for high-performance data pipelines, streaming analytics, data integration, and mission-critical applications.
+Provide the broker address, group, topic, username, password, SASL mechanism,
+and security protocol expected by the broker. For example, a SASL-enabled
+broker may use `PLAIN` with `SASL_PLAINTEXT`; use the values required by your
+Kafka deployment.
 
-To integrate a Kafka broker with Kerberos vault you could install your existing Kafka installation, or on board a new Kafka broker inside your Kubernetes cluster. Before installing the Kafka broker, we will need to set up a storage class. As previously mentioned we will use OpenEBS for that, but you could use the storage class you prefer.
+{{< figure src="kafka.gif" alt="Configure and validate a Kafka integration." caption="Configure and validate a Kafka integration." class="stretch">}}
 
-    kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
+Vault is a publisher. Consumers and topic lifecycle remain your responsibility.
 
-Once OpenEBS is installed and configured, go ahead with setting up the Kafka broker.
+### RabbitMQ
 
-    kubectl create namespace kafka
-    helm install kafka bitnami/kafka -f https://raw.githubusercontent.com/kerberos-io/vault/master/yaml/kafka/kafka.values.yaml -n kafka
-
-Once done you should see the relevant kafka pods and zookeeper being deployed
-
-    kubectl get po -n kafka
-
-Now you are ready to configure the Kerberos Vault integration, by selecting the Kafka option. You should add the Kafka credentials and authentication mechanism.
-
-{{< figure src="kafka.gif" alt="Configure, add and validate the Kafka integration." caption="Configure, add and validate the Kafka integration." class="stretch">}}
-
-- Integration name: this a preferred name for the integration.
-- Broker: the url of the broker `kafka.kafka:9092`.
-- Group: the group to which messages are produced, this can be any value you want.
-- Topic: the topic to which a message is produced, if the topic doesn't exist, it will be created automatically.
-- Username: the username, `Yourusername`.
-- Password: the password, `Yourpassword`.
-- Mechanism: the kafka mechanism, `PLAIN`.
-- Security: the kafka security, `SASL_PLAINTEXT`.
+Provide the AMQP broker URL, queue, username, and password. **Exchange** is
+optional; leave it empty to use the default exchange. Vault waits for publisher
+confirmation before considering a delivery complete.
 
 ## Kerberos integrations
 
-Next to third party integrations such as Kafka or AWS SQS, it is possible to integrate with a remote Kerberos Vault, also called chaining or forwarding or with Kerberos Hub.
+Vault can also publish directly to Kerberos services.
 
 ### Kerberos Vault
 
-Kerberos Vaults can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by requesting a forward from Kerberos Hub or building your own forwarding application code.
+Choose **Continuous** to copy every uploaded recording, or **On demand** to
+retain recordings locally until Kerberos Hub requests selected media. Configure
+the destination Vault URL, provider, and an account access key and secret from
+that destination.
 
 {{< figure src="vault-forwarding.gif" alt="Two forwarding modes continuous and on demand." caption="Two forwarding modes continuous and on demand." class="stretch">}}
 
-To learn more about how to enable the Kerberos Vault integration, have [a look at the forwarding page]().
+See [Vault forwarding](/docs/vault/forwarding/) for the runtime settings and
+on-demand request flow.
 
 ### Kerberos Hub
 
-The Kerberos Hub integration allows you to visualise your recordings, stored in your Kerberos Vault, in you Kerberos Hub account. By using the integration, events are send to [the Kerberos Hub pipeline](/docs/hub/pipeline) and visualised in the Kerberos Hub interface. Each time a recording is uploaded to Kerberos Vault, an event is sent to the REST API of Kerberos Hub, and injected in the Kerberos Hub pipeline. The Kerberos Hub pipeline will start evaluating the recording and generate various metadata.
+The Kerberos Hub integration sends each recording event to the
+[Kerberos Hub pipeline](/docs/hub/pipeline/) for indexing, visualization, and
+configured downstream processing. Provide the Hub API URL and credentials shown
+by the integration form.
 
 {{< figure src="vault-integration-hub.gif" alt="Kerberos Hub integrates with Kerberos Vault to visualise recordings and metadata." caption="Kerberos Hub integrates with Kerberos Vault to visualise recordings and metadata." class="stretch">}}
 
-- Integration name: this a preferred name for the integration.
-- Kerberos Hub Url: the url to the API of Kerberos Hub, `https://api.your.hub.com`
-- Hub Key: this is the cloud key that is assigned to your user (owner accounts), by default this is `AKIAxxxxxxG5Q`.
+- **Integration name**: a unique descriptive name.
+- **Kerberos Hub URL**: the Hub API base URL, for example
+    `https://api.example.com`.
+- **Hub key and credentials**: values assigned to the Hub account.
 
 #### Kerberos Hub username
 
@@ -126,4 +118,20 @@ As you are the owner of the Kerberos Vault, you'll need to make Kerberos Hub (SA
 
 ![Kerberos Hub configure Kerberos Vault](./hub-integration-vault.png)
 
-As soon as you have configured the Kerberos Vault settings in your Kerberos Hub account, you'll should be able to open the recordings and view them in the application. Note that you are in full control (and the owner) of your recordings, so once you change the Kerberos Vault credentials or your disconnect the Kerberos Vault, you won't be able to view the recordings in Kerberos Hub anymore.
+As soon as you have configured the Kerberos Vault settings in your Kerberos Hub account, you should be able to open the recordings and view them in the application. If you change the Vault account credentials or disconnect Vault, Hub can no longer request those recordings.
+
+## Durable delivery and retries
+
+Vault writes one delivery entry per integration destination into the media row
+before acknowledging the upload. A background worker retries pending RabbitMQ,
+Kafka, SQS, and Hub deliveries with exponential backoff. Successful destinations
+are removed independently, so one unavailable integration does not replay those
+that already succeeded.
+
+Delivery is **at least once**. A process can stop after a broker accepts a
+message but before Vault records the success, so consumers must handle duplicate
+events idempotently.
+
+Use [Outbox](/docs/vault/outbox/) to inspect pending and retrying deliveries,
+failure history, and per-destination payloads. The activity action beside an
+integration opens its 60-minute delivery and latency view.

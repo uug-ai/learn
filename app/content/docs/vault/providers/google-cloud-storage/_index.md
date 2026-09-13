@@ -18,7 +18,7 @@ draft: false
 - **Cost-Effective**: Tiered storage options (Standard, Nearline, Coldline, Archive)
 - **High Durability**: 99.999999999% (11 nines) annual durability
 - **Security**: Encryption at rest and in transit, IAM integration
-- **S3 Compatible**: Supports S3-compatible API through interoperability mode
+- **Native integration**: Vault uses the Google Cloud Storage API directly
 
 ### Use Cases for Kerberos Vault
 
@@ -67,9 +67,8 @@ To allow Kerberos Vault to access your bucket, create a service account with app
 2. Click **Create Service Account**
 3. Provide a name (e.g., `kerberos-vault-storage`) and description
 4. Click **Create and Continue**
-5. Grant the following role:
-   - **Storage Object Admin** (for full read/write access)
-   - Or **Storage Object Creator** (for write-only access)
+5. Grant **Storage Object Admin**. Vault needs to upload, read, sign, and delete
+  objects as recordings move through their lifecycle.
 6. Click **Continue** and then **Done**
 
 ### Step 3: Create Service Account Keys
@@ -81,26 +80,11 @@ To allow Kerberos Vault to access your bucket, create a service account with app
 5. Click **Create**
 6. The JSON key file will be downloaded automatically - **keep this file secure**
 
-### Step 4: Enable Interoperability for S3 Compatibility
+### Step 4: Prepare the service-account key
 
-Kerberos Vault uses S3-compatible API to interact with GCS:
-
-1. In the Google Cloud Console, go to **Cloud Storage** > **Settings**
-2. Click on the **Interoperability** tab
-3. If not already enabled, click **Enable interoperability access**
-4. Under **Service account HMAC**, select your service account from the dropdown
-5. Click **Create a key for a service account**
-6. Note down the **Access Key** and **Secret** - you'll need these for Kerberos Vault configuration
-
-Alternatively, you can use the `gsutil` command:
-
-```bash
-# Set default project
-gcloud config set project YOUR_PROJECT_ID
-
-# Create HMAC key for service account
-gsutil hmac create SERVICE_ACCOUNT_EMAIL
-```
+Open the JSON key downloaded in the previous step. Vault expects the complete
+JSON document, including `client_email` and `private_key`; it does not use GCS
+interoperability or HMAC credentials.
 
 ### Step 5: Configure Bucket Permissions
 
@@ -124,10 +108,7 @@ Now you're ready to configure Google Cloud Storage as a provider in Kerberos Vau
 5. Fill in the configuration:
    - **Provider name**: A descriptive name (e.g., "GCS Production")
    - **Bucket name**: The name of your GCS bucket (e.g., `kerberos-vault-recordings`)
-   - **Region**: Leave blank or specify the region (e.g., `us-central1`)
-   - **Hostname**: Use `storage.googleapis.com` for global endpoint
-   - **Access Key**: The HMAC Access Key from Step 4
-   - **Secret Access Key**: The HMAC Secret from Step 4
+  - **Service key**: Paste the complete service-account JSON key
 6. Click **Validate** to test the connection
 7. If successful, you'll see a green confirmation message
 8. Click **Save** to add the provider
@@ -173,7 +154,7 @@ Example lifecycle configuration:
 
 1. **Use IAM conditions**: Restrict service account access with IAM conditions
 2. **Enable bucket versioning**: Protect against accidental deletions
-3. **Rotate HMAC keys regularly**: Create new keys and delete old ones periodically
+3. **Rotate service-account keys regularly**: Replace the stored JSON key and revoke the old key
 4. **Use VPC Service Controls**: Restrict access to specific networks (Enterprise feature)
 5. **Enable audit logging**: Track all access to your recordings
 6. **Encrypt with customer-managed keys**: Use Cloud KMS for additional encryption control
@@ -232,9 +213,8 @@ For detailed pricing, visit the [Google Cloud Storage Pricing page](https://clou
 ### Common Issues
 
 **Connection Failed**
-- Verify HMAC keys are correct and active
+- Verify the service-account JSON is complete and valid
 - Ensure service account has proper permissions
-- Check that interoperability is enabled
 - Verify network connectivity to `storage.googleapis.com`
 
 **Access Denied**
@@ -258,6 +238,6 @@ For detailed pricing, visit the [Google Cloud Storage Pricing page](https://clou
 - [Google Cloud Storage Documentation](https://cloud.google.com/storage/docs)
 - [GCS Best Practices](https://cloud.google.com/storage/docs/best-practices)
 - [Pricing Calculator](https://cloud.google.com/products/calculator)
-- [HMAC Keys for S3 Compatibility](https://cloud.google.com/storage/docs/authentication/hmackeys)
+- [Service account keys](https://cloud.google.com/iam/docs/keys-create-delete)
 - [IAM Permissions Reference](https://cloud.google.com/storage/docs/access-control/iam-permissions)
 - [Lifecycle Management Guide](https://cloud.google.com/storage/docs/lifecycle)

@@ -25,7 +25,7 @@ That central storage place is what we call Kerberos Vault. It allows you to stor
 
 ## Kerberos Vault in a nutshell
 
-Kerberos Vault is a solution where you Bring Your Own Storage (BYOS). It allows you to configure the storage providers you want, and makes it possible to connect consuming applications such as [Kerberos Hub](/docs/hub/first-things-first), Machine learning models, Kafka brokers, etc. As discussed before, these so-called storage providers can live in the cloud such as Amazon Web Services S3, Google Cloud Platform Storage, Storj, or reside at the edge such as Minio or Ceph.
+Kerberos Vault is a solution where you Bring Your Own Storage (BYOS). It allows you to configure the storage providers you want, and makes it possible to connect consuming applications such as [Kerberos Hub](/docs/hub/first-things-first), Machine learning models, Kafka brokers, etc. These storage providers can live in the cloud, such as Amazon S3, Google Cloud Storage, Azure Blob Storage, and Storj, or at the edge through MinIO.
 
 Despite the flexible storage capabilities, Kerberos Vault is also an open platform, which can be used to build extensions (mobile apps, web apps, machine learning services, etc) and integrations. It allows you to leverage a scalable and stable system as a strong backbone for your video analytics solutions, machine learning algorithms, and more.
 
@@ -34,10 +34,10 @@ Despite the flexible storage capabilities, Kerberos Vault is also an open platfo
 When deploying Agents you have the possibility to Bring Your Own Storage; at the edge or in the cloud. By configuring Kerberos Vault you persist your recordings in your preferred storage providers. Following providers are supported:
 
 - [Google Cloud Platform Storage](https://cloud.google.com/storage)
+- [Azure Blob Storage](https://azure.microsoft.com/products/storage/blobs/)
 - [Amazon Web Services S3](https://aws.amazon.com/s3/)
 - [Storj](https://storj.io/)
 - [Minio](https://min.io/)
-- [Ceph](https://ceph.io/)
 
 When installing Kerberos Vault in a cloud environment, following architecture may apply. Your Agents are running at the edge, but uploading to Kerberos Vault in a cloud environment.
 
@@ -55,6 +55,7 @@ Each time an Agent sends a recording to Kerberos Vault, it is persisted on a sto
 
 - [Apache Kafka](https://kafka.apache.org/)
 - [Amazon Web Services SQS](https://aws.amazon.com/sqs/)
+- [RabbitMQ](https://www.rabbitmq.com/)
 - [Kerberos Hub](/docs/hub/first-things-first/)
 - Kerberos Vault (remote forwarding)
 

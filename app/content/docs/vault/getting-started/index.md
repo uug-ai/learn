@@ -35,10 +35,10 @@ The default username and password of the Kerberos Vault app is:
 Providers are the persistence layers, where you will store your recording in the edge or in a cloud environment. By adding a specific provider, credentials have to be provided to allow Kerberos Vault to store recordings in that specific provider. Following provider are currently supported. You can choose from:
 
 - [Google Cloud Platform Storage](https://cloud.google.com/storage)
+- [Azure Blob Storage](https://azure.microsoft.com/products/storage/blobs/)
 - [Amazon Web Services S3](https://aws.amazon.com/s3/)
 - [Storj](https://storj.io/)
 - [Minio](https://min.io/)
-- [Ceph](https://ceph.io/)
 
 As explained before, for each provider, the appropriate security settings has to be filled in. For example for AWS you need to define the access and secret key, for GCP you need to define a service account. Find more information about storage providers [on the providers page](/docs/vault/providers).
 
@@ -50,6 +50,7 @@ Events or messages are generated each time a recording was uploaded to Kerberos 
 
 - [Apache Kafka](https://kafka.apache.org/)
 - [Amazon Web Services SQS](https://aws.amazon.com/sqs/)
+- [RabbitMQ](https://www.rabbitmq.com/)
 - [Kerberos Hub](/docs/hub/first-things-first/)
 - Kerberos Vault (remote forwarding)
 
@@ -73,7 +74,7 @@ By creating an account you will receive credentials that give access to the Kerb
 
 Next to credentials, there are a couple of other fields which are specified on account level.
 
-- A provider,
+- one or more providers,
 - the provider directory
 - a public key,
 - a secret Key,
@@ -91,7 +92,7 @@ Once a recording is stored inside a specific `Provider` it will show up on the `
 
 {{< figure src="media.gif" alt="All uploaded recordings are visualised through the media page." caption="All uploaded recordings are visualised through the media page." class="stretch">}}
 
-## Recycle
+## Retention and cleanup
 
 Storing recordings in a `Provider` is one thing, making sure you manage the storage capacity of your `Provider` properly is also important. Storage might need to be recycled after a while because of several reasons:
 
@@ -99,4 +100,9 @@ Storing recordings in a `Provider` is one thing, making sure you manage the stor
 - due to security or compliance,
 - reducing costs, etc.
 
-To make this possible Kerberos Vault comes with a configurable recycle deployment, which you can run next to your Kerberos Vault deployment.
+Vault runs retention cleanup as part of the API process; there is no separate
+Recycle deployment to install. Each account has a positive **Day limit**. Vault
+uses that number of days from the time a media item was uploaded, then removes
+the provider object and its media record. See
+[Retention and cleanup](/docs/vault/recycle/) before choosing a production
+retention value.
