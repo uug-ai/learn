@@ -20,16 +20,17 @@ When deploying Agents you have the possibility to Bring Your Own Storage; at the
 - [Amazon Web Services S3](amazon-s3/)
 - [Storj](#storj)
 - [MinIO](minio/)
+- [Ceph Object Gateway](ceph/) through the Minio provider type
 
-Kerberos Vault allows you to attach one or more (and different) storage providers. Depending on the use case: Kerberos Vault in a cloud environment or at the edge, you will opt for a specific storage provider. For example in the case of a Kerberos Vault installation at the edge, it makes more sense to store your recordings also at the edge, so you avoid cloud storage costs, have better latency, reduce expensive bandwidth.
+Vault allows you to attach one or more (and different) storage providers. Depending on the use case, with Vault in a cloud environment or at the edge, you will opt for a specific storage provider. For example, with a Vault installation at the edge, it makes more sense to store your recordings there too, so you avoid cloud storage costs, improve latency, and reduce expensive bandwidth.
 
 ## Prerequisites
 
-Before you can configure a provider, make sure [you have installed a Kerberos Vault](/docs/vault/installation) inside a Kubernetes cluster.
+Before you can configure a provider, make sure [you have installed Vault](/docs/vault/installation) inside a Kubernetes cluster.
 
 ## Configuration of a provider
 
-Once you have set up your Kerberos Vault instance, and have successfully login to the application, you should see the provider navigation item on the left.
+Once you have set up your Vault instance, and have successfully login to the application, you should see the provider navigation item on the left.
 
 {{< figure src="provider.gif" alt="One or more providers can be configured to centralise your storage." caption="One or more providers can be configured to centralise your storage." class="stretch">}}
 
@@ -43,7 +44,7 @@ Once configured you can add multiple and different providers. Have some fun.
 
 ## Cloud storage providers
 
-Kerberos Vault integrates with storage providers in the cloud such as AWS S3, GCP Storage, Azure Storage and Storj. The advantage of previously mentioned storage providers, is that they take complete control of your ever growing storage requirements. They scale with your needs at a low TCO.
+Vault integrates with storage providers in the cloud such as AWS S3, GCP Storage, Azure Storage and Storj. The advantage of previously mentioned storage providers, is that they take complete control of your ever growing storage requirements. They scale with your needs at a low TCO.
 
 ### GCP Storage
 
@@ -53,7 +54,7 @@ Kerberos Vault integrates with storage providers in the cloud such as AWS S3, GC
 
 ### Azure Storage
 
-[Azure Blob Storage](azure-storage-account/) is Microsoft's enterprise-grade object storage solution offering massive scalability and multiple access tiers (Hot, Cool, Cold, Archive) for cost optimization. With redundancy options like LRS, ZRS, GRS, and RA-GRS, Azure Storage provides the flexibility to meet various availability and compliance requirements. It integrates with Kerberos Vault and is particularly well-suited for organizations already invested in the Azure ecosystem.
+[Azure Blob Storage](azure-storage-account/) is Microsoft's enterprise-grade object storage solution offering massive scalability and multiple access tiers (Hot, Cool, Cold, Archive) for cost optimization. With redundancy options like LRS, ZRS, GRS, and RA-GRS, Azure Storage provides the flexibility to meet various availability and compliance requirements. It integrates with Vault and is particularly well-suited for organizations already invested in the Azure ecosystem.
 
 [Read the full Azure Storage setup guide →](azure-storage-account/)
 
@@ -92,9 +93,9 @@ So now we have created a Bucket, we will need to have credentials to interact wi
 
 #### Integrate
 
-Now you are ready to assign Storj as a storage provider to Kerberos Vault. Open the `Providers` page of Kerberos Vault, and select the Storj provider.
+Now you are ready to assign Storj as a storage provider to Vault. Open the `Providers` page of Vault, and select the Storj provider.
 
-{{< figure src="storj-integrate.gif" alt="Integrate Storj.io with Kerberos Vault." caption="Integrate Storj.io with Kerberos Vault." class="stretch">}}
+{{< figure src="storj-integrate.gif" alt="Integrate Storj.io with Vault." caption="Integrate Storj.io with Vault." class="stretch">}}
 
 - Provider name: this a preferred name for the provider.
 - Bucket name: the name of a bucket created in Storj, make sure this matches.
@@ -105,9 +106,17 @@ Now you are ready to assign Storj as a storage provider to Kerberos Vault. Open 
 
 ## Edge storage providers
 
-Kerberos Vault also integrates with MinIO, an S3-compatible object store that
-you can operate close to your cameras. Edge storage can reduce latency, cloud
-storage costs, and upstream bandwidth.
+Vault also integrates with MinIO and Ceph Object Gateway, S3-compatible
+object stores that you can operate close to your cameras. Edge storage can
+reduce latency, cloud storage costs, and upstream bandwidth.
+
+### Ceph Object Gateway
+
+[Ceph Object Gateway](ceph/) exposes an S3-compatible endpoint backed by a Ceph
+cluster. Configure it in Vault by selecting the **Minio** provider type and
+providing the gateway endpoint, region, bucket, and S3 credentials.
+
+[Read the Ceph Object Gateway setup guide](ceph/)
 
 ### Minio
 
@@ -158,9 +167,9 @@ While accessing the console, you can create a new Bucket.
 
 #### Integrate
 
-Now you are ready to assign Minio as a storage provider to Kerberos Vault. Open the `Providers` page of Kerberos Vault, and select the Minio provider.
+Now you are ready to assign Minio as a storage provider to Vault. Open the `Providers` page of Vault, and select the Minio provider.
 
-{{< figure src="minio-setup.gif" alt="Configuring the minio provider in Kerberos Vault." caption="Configuring the minio provider in Kerberos Vault." class="stretch">}}
+{{< figure src="minio-setup.gif" alt="Configuring the Minio provider in Vault." caption="Configuring the Minio provider in Vault." class="stretch">}}
 
 - Provider name: this a preferred name for the provider.
 - Bucket name: the name of a bucket created in minio, make sure this matches.

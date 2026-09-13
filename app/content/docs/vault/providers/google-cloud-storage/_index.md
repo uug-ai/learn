@@ -1,7 +1,7 @@
 ---
 title: "Google Cloud Storage"
-description: "Configure Google Cloud Storage as a storage provider for Kerberos Vault"
-lead: "Learn how to integrate Google Cloud Storage with Kerberos Vault for scalable and cost-effective video recording storage"
+description: "Configure Google Cloud Storage as a storage provider for Vault"
+lead: "Learn how to integrate Google Cloud Storage with Vault for scalable and cost-effective video recording storage"
 date: 2020-10-06T08:49:31+00:00
 lastmod: 2025-11-14T18:52:34+00:00
 draft: false
@@ -9,7 +9,7 @@ draft: false
 
 ## Introduction
 
-[Google Cloud Storage (GCS)](https://cloud.google.com/storage) is a unified object storage solution from Google Cloud Platform that offers world-wide storage and retrieval of any amount of data at any time. GCS is designed for durability, availability, and scalability, making it an excellent choice for storing video recordings from Kerberos Vault.
+[Google Cloud Storage (GCS)](https://cloud.google.com/storage) is a unified object storage solution from Google Cloud Platform that offers world-wide storage and retrieval of any amount of data at any time. GCS is designed for durability, availability, and scalability, making it an excellent choice for storing video recordings from Vault.
 
 ### Key Features
 
@@ -20,7 +20,7 @@ draft: false
 - **Security**: Encryption at rest and in transit, IAM integration
 - **Native integration**: Vault uses the Google Cloud Storage API directly
 
-### Use Cases for Kerberos Vault
+### Use Cases for Vault
 
 Google Cloud Storage is ideal for:
 - **Cloud-based deployments**: Centralized storage for recordings from distributed agents
@@ -33,7 +33,7 @@ Google Cloud Storage is ideal for:
 Before configuring Google Cloud Storage as a provider:
 
 1. [A Google Cloud Platform account](https://console.cloud.google.com/)
-2. [A Kerberos Vault installation](/docs/vault/installation) in a Kubernetes cluster
+2. [A Vault installation](/docs/vault/installation) in a Kubernetes cluster
 3. A GCP project with billing enabled
 4. Appropriate IAM permissions to create buckets and service accounts
 
@@ -61,7 +61,7 @@ Before configuring Google Cloud Storage as a provider:
 
 ### Step 2: Create a Service Account
 
-To allow Kerberos Vault to access your bucket, create a service account with appropriate permissions:
+To allow Vault to access your bucket, create a service account with appropriate permissions:
 
 1. In the Google Cloud Console, go to **IAM & Admin** > **Service Accounts**
 2. Click **Create Service Account**
@@ -97,11 +97,11 @@ Ensure the service account has the necessary permissions on the bucket:
    - **Principal**: Your service account email
    - **Role**: Storage Object Admin
 
-## Integration with Kerberos Vault
+## Integration with Vault
 
-Now you're ready to configure Google Cloud Storage as a provider in Kerberos Vault:
+Now you're ready to configure Google Cloud Storage as a provider in Vault:
 
-1. Open the Kerberos Vault web interface
+1. Open the Vault web interface
 2. Navigate to **Providers** in the left menu
 3. Click **+ Add Storage Provider**
 4. Select **Google Cloud Storage** from the list
@@ -223,7 +223,7 @@ For detailed pricing, visit the [Google Cloud Storage Pricing page](https://clou
 - Verify the bucket name is correct
 
 **Slow Upload Speeds**
-- Use a bucket in the same region as Kerberos Vault
+- Use a bucket in the same region as Vault
 - Check network bandwidth and latency
 - Consider using Cloud Interconnect for dedicated connectivity
 

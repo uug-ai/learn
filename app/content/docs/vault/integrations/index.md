@@ -23,7 +23,7 @@ Vault currently supports:
 - [Apache Kafka](https://kafka.apache.org/)
 - [RabbitMQ](https://www.rabbitmq.com/)
 - [Kerberos Hub](/docs/hub/first-things-first/)
-- Kerberos Vault forwarding
+- Vault forwarding
 
 ## Prerequisites
 
@@ -72,7 +72,7 @@ confirmation before considering a delivery complete.
 
 Vault can also publish directly to Kerberos services.
 
-### Kerberos Vault
+### Vault
 
 Choose **Continuous** to copy every uploaded recording, or **On demand** to
 retain recordings locally until Kerberos Hub requests selected media. Configure
@@ -91,7 +91,7 @@ The Kerberos Hub integration sends each recording event to the
 configured downstream processing. Provide the Hub API URL and credentials shown
 by the integration form.
 
-{{< figure src="vault-integration-hub.gif" alt="Kerberos Hub integrates with Kerberos Vault to visualise recordings and metadata." caption="Kerberos Hub integrates with Kerberos Vault to visualise recordings and metadata." class="stretch">}}
+{{< figure src="vault-integration-hub.gif" alt="Kerberos Hub integrates with Vault to visualise recordings and metadata." caption="Kerberos Hub integrates with Vault to visualise recordings and metadata." class="stretch">}}
 
 - **Integration name**: a unique descriptive name.
 - **Kerberos Hub URL**: the Hub API base URL, for example
@@ -100,7 +100,7 @@ by the integration form.
 
 #### Kerberos Hub username
 
-When creating a Kerberos Hub account and linking it to your own Kerberos Vault, you have to make sure the Kerberos Hub username is matching the Agent destination directory. If this not matching, your recordings will not be shown in the Kerberos Hub interface.
+When creating a Kerberos Hub account and linking it to your own Vault, you have to make sure the Kerberos Hub username is matching the Agent destination directory. If this not matching, your recordings will not be shown in the Kerberos Hub interface.
 
 Once you logged in, or created an account, you will see your Kerberos Hub username at the left top of the navigation. You have to make sure this username, equals the directory field of the Agent (or Factory settings).
 
@@ -110,15 +110,15 @@ Make sure the `directory` field of your Agents or Factory is configured with the
 
 ![Agent directory](./hub-integration-account-2.png)
 
-#### Kerberos Vault credentials
+#### Vault credentials
 
-Once you have added the integration to Kerberos Vault, and made sure the Kerberos Hub account name matches the Agent directory field, you should see some recordings landing into your Kerberos Hub account. However to view your recordings in Kerberos Hub, you'll need to add your Kerberos Vault credentials to your Kerberos Hub account (or installation).
+Once you have added the integration to Vault, and made sure the Kerberos Hub account name matches the Agent directory field, you should see some recordings landing into your Kerberos Hub account. However to view your recordings in Kerberos Hub, you'll need to add your Vault credentials to your Kerberos Hub account (or installation).
 
-As you are the owner of the Kerberos Vault, you'll need to make Kerberos Hub (SAAS or self-hosted) aware of where your Kerberos Vault is located (DNS name) and the Kerberos Vault account you have used.
+As you are the owner of Vault, you'll need to make Kerberos Hub (SAAS or self-hosted) aware of where Vault is located (DNS name) and the Vault account you have used.
 
-![Kerberos Hub configure Kerberos Vault](./hub-integration-vault.png)
+![Kerberos Hub configure Vault](./hub-integration-vault.png)
 
-As soon as you have configured the Kerberos Vault settings in your Kerberos Hub account, you should be able to open the recordings and view them in the application. If you change the Vault account credentials or disconnect Vault, Hub can no longer request those recordings.
+As soon as you have configured the Vault settings in your Kerberos Hub account, you should be able to open the recordings and view them in the application. If you change the Vault account credentials or disconnect Vault, Hub can no longer request those recordings.
 
 ## Durable delivery and retries
 

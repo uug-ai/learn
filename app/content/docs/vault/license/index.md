@@ -13,7 +13,7 @@ weight: 311
 toc: true
 ---
 
-Kerberos Vault is a closed source solution but is made available free of charge. The solution and its source code is maintained by the Kerberos.io development team, and made available as binaries through a Docker container. Kerberos Vault, and its related binaries, can be used under the MIT license.
+Vault is a closed source solution but is made available free of charge. The solution and its source code is maintained by the Kerberos.io development team, and made available as binaries through a Docker container. Vault and its related binaries can be used under the MIT license.
 
 ## The MIT License (MIT)
 

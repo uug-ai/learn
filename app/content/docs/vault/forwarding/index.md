@@ -13,11 +13,11 @@ weight: 309
 toc: true
 ---
 
-Multiple Kerberos Vaults can be installed in your video landscape. You may have Kerberos Vaults at the edge and/or in a cloud environment, connected to edge and/or cloud storage providers.
+Multiple Vault instances can be installed in your video landscape. You may have Vault instances at the edge and/or in a cloud environment, connected to edge and/or cloud storage providers.
 
-Kerberos Vaults can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by requesting a forward from Kerberos Hub or building your own forwarding application code.
+Vault instances can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by requesting a forward from Kerberos Hub or building your own forwarding application code.
 
-{{< rete caption="Synchronise recordings between multiple Kerberos Vault" alt="Synchronise recordings between multiple Kerberos Vault" height="520" >}}
+{{< rete caption="Synchronise recordings between multiple Vault instances" alt="Synchronise recordings between multiple Vault instances" height="520" >}}
 {
   "groups": [
     { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 320, "h": 540 },
@@ -70,7 +70,7 @@ bytes before Hub requests the recording.
 
 ## Configuration
 
-Go to the integrations page, and click (+ Add Integration). Select the Kerberos Vault option, and choose on-demand or continuous forwarding.
+Go to the integrations page, and click (+ Add Integration). Select the Vault option, and choose on-demand or continuous forwarding.
 
 Provide:
 

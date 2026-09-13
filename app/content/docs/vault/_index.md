@@ -9,7 +9,7 @@ images: []
 weight: 6
 ---
 
-Kerberos Vault stores recordings from Kerberos Agents in object storage that
+Vault stores recordings from Kerberos Agents in object storage that
 you control. Its Go API and React administration UI run as one service backed
 by MongoDB.
 

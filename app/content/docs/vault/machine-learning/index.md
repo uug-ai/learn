@@ -13,11 +13,11 @@ weight: 308
 toc: true
 ---
 
-Machine learning or computer vision at scale is one of the key motivations of the entire Kerberos Enterprise Suite. All services going from Agents, Kerberos Vault to Kerberos Hub are designed in such a way that you can scale them independently of each other. 
+Machine learning or computer vision at scale is one of the key motivations of the entire Kerberos Enterprise Suite. All services going from Agents and Vault to Kerberos Hub are designed in such a way that you can scale them independently of each other.
 
 The design principle of Kerberos Enterprise Suite allows to decouple videos streams from any CPU or GPU workloads, through the creation of video chunks, queueing and event messaging. This is perfect for GPU workloads such as machine learning or other AI services.
 
-{{< figure src="vault-ml-cv.svg" alt="Machine learning and Computer Vision with Kerberos Vault." caption="Machine learning and Computer Vision with Kerberos Vault" class="stretch">}}
+{{< figure src="vault-ml-cv.svg" alt="Machine learning and Computer Vision with Vault." caption="Machine learning and Computer Vision with Vault" class="stretch">}}
 
 ## The problem we solve
 
@@ -39,11 +39,11 @@ Agents are responsible for recording video streams into small chunks, mp4s, of w
 
 ## Queueing and events
 
-Video chunks prepared by one or more Agents are sent to Kerberos Vault where they are persisted in one or more storage providers. The key thing is that they stored through a central application, Kerberos Vault, which has the ability to trigger integrations such as a Kafka broker.
+Video chunks prepared by one or more Agents are sent to Vault where they are persisted in one or more storage providers. The key thing is that they stored through a central application, Vault, which has the ability to trigger integrations such as a Kafka broker.
 
 ## Consuming and interfere 
 
-Once events are being generated, they are ready to be consumed by one or more consumers. Having this publish and subscribe mechanism, for example Kafka, you have one or more producers (Kerberos Vault replicas) and one or more consumers (ML clients). This allows one to scale the number of consumer and workloads as the number of events, and thus recordings, are increasing.
+Once events are being generated, they are ready to be consumed by one or more consumers. Having this publish and subscribe mechanism, for example Kafka, you have one or more producers (Vault replicas) and one or more consumers (ML clients). This allows one to scale the number of consumer and workloads as the number of events, and thus recordings, are increasing.
 
 ## NVIDIA operator
 
@@ -59,13 +59,13 @@ The operator solves two main challenges:
 
 ### Installation
 
-The installation of [the NVIDIA operator can be found here](https://github.com/kerberos-io/nvidia-gpu-kubernetes), with a couple of examples of how to integrate a workload (a machine learning model) with Kerberos Vault.
+The installation of [the NVIDIA operator can be found here](https://github.com/kerberos-io/nvidia-gpu-kubernetes), with a couple of examples of how to integrate a workload (a machine learning model) with Vault.
 
 {{< figure src="yolov3-integration-kerberos-vault.png" alt="The NVIDIA operator brings scale to your GPUs." caption="The NVIDIA operator brings scale to your GPUs." class="stretch">}}
 
 ### An example
 
-The goal of the integration feature of Kerberos Vault is to allow an enterprise to bring its custom logic, while relying on a stable and scalable video management system. One can build its own notification service, triggering IoT or other kind of sensors, or execute a custom machine learning model trying to detect specific objects, patterns or actions in a recording. As described below [you can found a complete aswer here](https://github.com/kerberos-io/vault-ml).
+The goal of the integration feature of Vault is to allow an enterprise to bring its custom logic, while relying on a stable and scalable video management system. One can build its own notification service, triggering IoT or other kind of sensors, or execute a custom machine learning model trying to detect specific objects, patterns or actions in a recording. As described below [you can found a complete aswer here](https://github.com/kerberos-io/vault-ml).
 
 {{< figure src="yolov3-integration-kerberos-vault-example.png" alt="The NVIDIA operator brings scale to your GPUs." caption="The NVIDIA operator brings scale to your GPUs." class="stretch">}}
 
@@ -73,9 +73,9 @@ So having above example let us get a bit more concrete on how this is functionin
 
 - **Step 0**: Small chunks of recordings are created, persisted in a storage provider, and a message is sent to a Kafka topic.
 
-- **Step 1**: an extension/workload which executes the YOLOv3 model is consuming Kafka messages from a topic, produced by Kerberos Vault.
+- **Step 1**: an extension/workload which executes the YOLOv3 model is consuming Kafka messages from a topic, produced by Vault.
 
-- **Step 2**: Before execution of the model, the extension consumes the relevant messages from a specific topic, and downloads the video chunk from Kerberos Vault in memory.
+- **Step 2**: Before execution of the model, the extension consumes the relevant messages from a specific topic, and downloads the video chunk from Vault in memory.
 
 - **Step 3**: The NVIDIA operator has assigned one of the GPUs from the GPU pool to the extension. The assigned GPU is used to execute the YOLOv3 model on the video chunk.
 

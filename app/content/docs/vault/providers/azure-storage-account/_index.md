@@ -1,7 +1,7 @@
 ---
 title: "Azure Storage Account"
-description: "Configure Azure Blob Storage as a storage provider for Kerberos Vault"
-lead: "Learn how to integrate Azure Blob Storage with Kerberos Vault for enterprise-grade video recording storage"
+description: "Configure Azure Blob Storage as a storage provider for Vault"
+lead: "Learn how to integrate Azure Blob Storage with Vault for enterprise-grade video recording storage"
 date: 2020-10-06T08:49:31+00:00
 lastmod: 2025-11-14T18:52:34+00:00
 draft: false
@@ -9,7 +9,7 @@ draft: false
 
 ## Introduction
 
-[Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs/) is Microsoft's object storage solution for the cloud, optimized for storing massive amounts of unstructured data. It provides highly scalable, secure, and cost-effective storage for video recordings from Kerberos Vault.
+[Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs/) is Microsoft's object storage solution for the cloud, optimized for storing massive amounts of unstructured data. It provides highly scalable, secure, and cost-effective storage for video recordings from Vault.
 
 ### Key Features
 
@@ -20,7 +20,7 @@ draft: false
 - **Native integration**: Vault uses the Azure Blob Storage API directly
 - **Global Presence**: Available in 60+ Azure regions worldwide
 
-### Use Cases for Kerberos Vault
+### Use Cases for Vault
 
 Azure Blob Storage is ideal for:
 - **Enterprise deployments**: Integration with existing Azure infrastructure
@@ -34,7 +34,7 @@ Azure Blob Storage is ideal for:
 Before configuring Azure Blob Storage as a provider:
 
 1. [An Azure account](https://portal.azure.com/) with an active subscription
-2. [A Kerberos Vault installation](/docs/vault/installation) in a Kubernetes cluster
+2. [A Vault installation](/docs/vault/installation) in a Kubernetes cluster
 3. Appropriate permissions to create storage accounts and containers
 4. Azure CLI installed (optional, for command-line configuration)
 
@@ -82,7 +82,7 @@ After the storage account is created:
 
 ### Step 3: Get Storage Account Credentials
 
-Kerberos Vault uses the native Azure Blob Storage API with shared-key
+Vault uses the native Azure Blob Storage API with shared-key
 authentication. You need the storage account name and one account key.
 
 #### Storage account access key
@@ -93,9 +93,9 @@ authentication. You need the storage account name and one account key.
    - **Storage account name**: Your account name
    - **Key**: The access key value
 
-## Integration with Kerberos Vault
+## Integration with Vault
 
-1. Open the Kerberos Vault web interface
+1. Open the Vault web interface
 2. Navigate to **Providers** in the left menu
 3. Click **+ Add Storage Provider**
 4. Select **Azure** from the list
@@ -205,7 +205,7 @@ Configure network access:
 1. Go to **Security + networking** > **Networking**
 2. Under **Firewalls and virtual networks**:
    - Select **Enabled from selected virtual networks and IP addresses**
-   - Add your Kerberos Vault's virtual network or IP addresses
+   - Add your Vault virtual network or IP addresses
    - Enable trusted Microsoft services if needed
 3. Consider using **Private endpoints** for secure, private connectivity
 

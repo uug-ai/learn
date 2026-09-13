@@ -13,7 +13,7 @@ weight: 302
 toc: true
 ---
 
-Kerberos Vault is distributed as a container image. The same process serves the
+Vault is distributed as a container image. The same process serves the
 web application and REST API and connects to MongoDB plus the object-storage
 providers configured after login. Kubernetes is recommended for production;
 the image can also run directly in Docker for development or a small deployment.
@@ -46,7 +46,7 @@ For Kubernetes, choose the guide that matches the environment:
 Do not use the legacy manifests under the Vault repository as a reference for a
 new deployment; those examples install an older Vault release.
 
-{{< figure src="vault-edge-cloud-deployments.svg" alt="Kerberos Vault can be installed everywhere your Kubernetes cluster can be installed." caption="Kerberos Vault can be installed everywhere your Kubernetes cluster can be installed." class="stretch">}}
+{{< figure src="vault-edge-cloud-deployments.svg" alt="Vault can be installed everywhere your Kubernetes cluster can be installed." caption="Vault can be installed everywhere your Kubernetes cluster can be installed." class="stretch">}}
 
 ## Managed Kubernetes
 
@@ -54,7 +54,7 @@ Managed Kubernetes services such as GKE, EKS, and AKS provide load balancers,
 volumes, and native object storage. Use the managed deployment guide above and
 configure the matching Vault storage provider after installation.
 
-{{< figure src="vault-cloud-deployment.svg" alt="Bring your own storage using Kerberos Vault" caption="Bring your own storage using Kerberos Vault" class="stretch">}}
+{{< figure src="vault-cloud-deployment.svg" alt="Bring your own storage using Vault" caption="Bring your own storage using Vault" class="stretch">}}
 
 ## Self-hosted Kubernetes
 
@@ -62,7 +62,7 @@ A self-hosted cluster can keep recording traffic and storage close to the
 cameras. It must also provide its own ingress or load balancer, persistent
 volumes for MongoDB, DNS, and object storage such as MinIO.
 
-{{< figure src="vault-edge-deployment.svg" alt="Store your recordings at the edge with Kerberos Vault" caption="Store your recordings at the edge with Kerberos Vault" class="stretch">}}
+{{< figure src="vault-edge-deployment.svg" alt="Store your recordings at the edge with Vault" caption="Store your recordings at the edge with Vault" class="stretch">}}
 
 ## Essential configuration
 
