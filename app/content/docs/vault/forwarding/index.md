@@ -71,6 +71,11 @@ Once the integration is created, you still need to activate the integration for 
 
 {{< figure src="vault-activate-forward.gif" alt="Enable the integration for your account." caption="Enable the integration for your account." class="stretch">}}
 
+For on-demand forwarding, set `MQTT_URI` to the MQTT broker connection string.
+Use `MQTT_USERNAME` and `MQTT_PASSWORD` when the broker requires credentials.
+The older `MQTTURI` name remains supported as a deprecated fallback and is used
+only when `MQTT_URI` is empty.
+
 ## Examples
 
 Two examples of on demand forwarding:
