@@ -3,7 +3,7 @@ title: "White-label"
 description: "Brand Kerberos Hub as you wish."
 lead: "Use Kerberos Hub with your own style guide and marketing branding."
 date: 2020-10-06T08:49:31+00:00
-lastmod: 2020-10-06T08:49:31+00:00
+lastmod: 2026-09-14T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -20,6 +20,43 @@ We believe that a consistent and streamlined company branding is important when 
 Next to styling Kerberos Hub yourself, we can also rebrand the application for your needs as part of the Kerberos Enterprise Suite license. In the end nothing stops you to perform the layout changes yourself, whenever you want.
 
 {{< figure src="brand2.png" alt="By injecting a CSS file into the Kerberos Hub Front-end container, you can choose your own colors." caption="By injecting a CSS file into the Kerberos Hub Front-end container, you can choose your own colors." class="stretch">}}
+
+## Color palette
+
+Use the Helm palette values for first-party charts and video overlays before reaching for CSS overrides. Values may use any browser-supported CSS color syntax, such as hex, `rgb()`/`rgba()`, or `hsl()`/`hsla()`.
+
+```yaml
+kerberoshub:
+  frontend:
+    features:
+      chart:
+        colors:
+          - "#0057b8"
+          - "#00a6a6"
+          - "#f2b134"
+          - "#d64550"
+        colorChartSelectionFill: "rgba(0, 87, 184, 0.12)"
+        colorChartSelectionStroke: "rgba(0, 87, 184, 0.65)"
+        colorChartGridStroke: "rgba(32, 44, 57, 0.18)"
+      floorplan:
+        colorTrackBox: "#0057b8"
+        colorTrackBoxHover: "#f2b134"
+        colorTrackBoxDrawing: "#00a6a6"
+        colorTrackBoxControlsDelete: "#ffffff"
+```
+
+| Helm value | Default | Used for |
+| --- | --- | --- |
+| `kerberoshub.frontend.features.chart.colors` | `#84569f`, `#3ba7ff`, `#ff5c8a`, `#4ad991`, `#ffb84d`, `#ff7043` | Ordered series palette for timeline charts and marker/detection overlays. Colors repeat when there are more series than entries. An empty or invalid list falls back to this default palette. |
+| `kerberoshub.frontend.features.chart.colorChartSelectionFill` | `rgba(132, 86, 159, 0.07)` | Fill of a selected chart range. |
+| `kerberoshub.frontend.features.chart.colorChartSelectionStroke` | `rgba(132, 86, 159, 0.4)` | Outline of a selected chart range. |
+| `kerberoshub.frontend.features.chart.colorChartGridStroke` | `rgba(0, 106, 255, 0.18)` | Chart grid lines. |
+| `kerberoshub.frontend.features.floorplan.colorTrackBox` | `hsla(278, 30%, 48%, 1)` | Track boxes in the redaction editor. |
+| `kerberoshub.frontend.features.floorplan.colorTrackBoxHover` | `hsla(47, 86%, 47%, 1)` | Redaction boxes while their track is hovered. |
+| `kerberoshub.frontend.features.floorplan.colorTrackBoxDrawing` | `hsla(204, 100%, 50%, 1)` | A redaction box while it is being drawn. |
+| `kerberoshub.frontend.features.floorplan.colorTrackBoxControlsDelete` | `hsla(219, 100%, 94%, 1)` | Delete control shown while editing a box. |
+
+The chart also declares device-state, live-control, floor-plan label, and device-marker colors below `kerberoshub.frontend.features.floorplan`. Current chart templates read those values from obsolete top-level paths, however, so they render empty and the frontend uses its built-in defaults. The frontend also understands map-gradient colors and a pre-bootstrap splash accent, but the chart does not currently expose them. Use custom CSS for those colors until the chart mappings are corrected.
 
 ## Overriding the Kerberos Hub styling
 
