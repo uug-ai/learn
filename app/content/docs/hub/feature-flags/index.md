@@ -41,7 +41,9 @@ Use quoted `"true"` and `"false"` values for frontend flags unless the chart fie
 | `kerberoshub.frontend.features.splashScreen.enabled` | `FEATURE_SPLASH_SCREEN_ENABLED` | `"true"` | Shows the pre-bootstrap splash screen. |
 | `kerberoshub.frontend.features.darkModeEnabled` | See [known exposure gaps](#known-exposure-gaps) | `"true"` | Shows the dark-mode toggle. |
 | `kerberoshub.frontend.features.case.enabled` | `FEATURE_CASE_ENABLED` | `"true"` | Enables case-management navigation, routes, and case actions. |
+| `kerberoshub.frontend.caseFilterAssigneesDefault` | `CASE_FILTER_ASSIGNEES_DEFAULT` | `"false"` | Applies the current user as the initial assignee filter on case lists. This changes the initial filter state; it does not restrict which cases the user may access. |
 | `kerberoshub.frontend.features.workflows.enabled` | `FEATURE_WORKFLOWS_ENABLED` | `"false"` | Enables workflow pages and navigation. This does not start the workflow engine. |
+| `kerberoshub.frontend.features.audit.enabled` | `FEATURE_AUDIT_ENABLED` | `"true"` | Shows the owner/admin Audit events page and navigation link. This does not deploy the audit dispatcher or change audit-event authorization. |
 | `kerberoshub.frontend.features.floorplan.enabled` | `FEATURE_FLOORPLAN_ENABLED` | `"true"` | Enables floor-plan functionality in the frontend. |
 | `kerberoshub.frontend.features.i18n.enabled` | `FEATURE_I18N_ENABLED` | `"true"` | Shows the language switcher. When disabled, Hub always uses `i18n.defaultLanguage`. |
 | `kerberoshub.frontend.features.devices.hideAgent` | `FEATURE_DEVICES_HIDE_AGENT` | `"false"` | Hides the Add Agent control on the Devices page when set to `"true"`. |
@@ -74,6 +76,7 @@ The organisation and project flags form a hierarchy:
 | --- | --- | --- | --- |
 | `kerberoshub.frontend.features.liveview.hlsEnabled` | `FEATURE_HLS_ENABLED` | `"true"` | Offers HLS as a LIVE transport. Disabling it removes HLS from transport selection. |
 | `kerberoshub.frontend.features.liveview.moqEnabled` | `FEATURE_MOQ_ENABLED` | `"false"` | Offers Media over QUIC (MoQ) as a LIVE transport. A relay URL and compatible Agent are also required. |
+| `kerberoshub.frontend.features.liveview.remoteRecordingEnabled` | `FEATURE_REMOTE_RECORDING_ENABLED` | `"true"` | Shows the manual REC control in live views. The Agent and the user's permissions must still allow remote recording. |
 
 `liveStreamMode`, `defaultStreamMode`, `paginationMode`, `pageSize`, and `maxStreams` configure behavior but are not on/off feature flags. See the chart values for those settings.
 
@@ -89,22 +92,23 @@ These flags expose frontend controls only. Rendering redacted recordings still r
 
 ## Media filters
 
-All media filter flags default to `"true"`. Disabling one removes that filter control; it does not delete or change existing data.
+Visible media-filter controls default to `"true"`. Disabling one removes that filter control; it does not delete or change existing data. `markerOptionsByDate.enabled` is a behavior flag and defaults to `"false"`.
 
-| Helm value | Container environment variable | Effect |
-| --- | --- | --- |
-| `kerberoshub.frontend.features.media.filter.date.enabled` | `FEATURE_MEDIA_FILTER_DATE_ENABLED` | Date filtering. |
-| `kerberoshub.frontend.features.media.filter.sites.enabled` | `FEATURE_MEDIA_FILTER_SITES_ENABLED` | Site filtering. |
-| `kerberoshub.frontend.features.media.filter.groups.enabled` | `FEATURE_MEDIA_FILTER_GROUPS_ENABLED` | Group filtering. |
-| `kerberoshub.frontend.features.media.filter.devices.enabled` | `FEATURE_MEDIA_FILTER_DEVICES_ENABLED` | Device filtering. |
-| `kerberoshub.frontend.features.media.filter.objectDetection.enabled` | `FEATURE_MEDIA_FILTER_OBJECT_DETECTION_ENABLED` | Object-detection filtering. |
-| `kerberoshub.frontend.features.media.filter.star.enabled` | `FEATURE_MEDIA_FILTER_STAR_ENABLED` | Starred-recording filtering. |
-| `kerberoshub.frontend.features.media.filter.region.enabled` | `FEATURE_MEDIA_FILTER_REGION_ENABLED` | Region filtering. |
-| `kerberoshub.frontend.features.media.filter.sort.enabled` | `FEATURE_MEDIA_FILTER_SORT_ENABLED` | Sort controls. |
-| `kerberoshub.frontend.features.media.filter.category.enabled` | `FEATURE_MEDIA_FILTER_CATEGORIES_ENABLED` | Marker category filtering. |
-| `kerberoshub.frontend.features.media.filter.markers.enabled` | `FEATURE_MEDIA_FILTER_MARKERS_ENABLED` | Marker filtering. |
-| `kerberoshub.frontend.features.media.filter.events.enabled` | `FEATURE_MEDIA_FILTER_EVENTS_ENABLED` | Event filtering. |
-| `kerberoshub.frontend.features.media.filter.tags.enabled` | `FEATURE_MEDIA_FILTER_TAGS_ENABLED` | Tag filtering. |
+| Helm value | Container environment variable | Default | Effect |
+| --- | --- | --- | --- |
+| `kerberoshub.frontend.features.media.filter.date.enabled` | `FEATURE_MEDIA_FILTER_DATE_ENABLED` | `"true"` | Date filtering. |
+| `kerberoshub.frontend.features.media.filter.sites.enabled` | `FEATURE_MEDIA_FILTER_SITES_ENABLED` | `"true"` | Site filtering. |
+| `kerberoshub.frontend.features.media.filter.groups.enabled` | `FEATURE_MEDIA_FILTER_GROUPS_ENABLED` | `"true"` | Group filtering. |
+| `kerberoshub.frontend.features.media.filter.devices.enabled` | `FEATURE_MEDIA_FILTER_DEVICES_ENABLED` | `"true"` | Device filtering. |
+| `kerberoshub.frontend.features.media.filter.objectDetection.enabled` | `FEATURE_MEDIA_FILTER_OBJECT_DETECTION_ENABLED` | `"true"` | Object-detection filtering. |
+| `kerberoshub.frontend.features.media.filter.star.enabled` | `FEATURE_MEDIA_FILTER_STAR_ENABLED` | `"true"` | Starred-recording filtering. |
+| `kerberoshub.frontend.features.media.filter.region.enabled` | `FEATURE_MEDIA_FILTER_REGION_ENABLED` | `"true"` | Region filtering. |
+| `kerberoshub.frontend.features.media.filter.sort.enabled` | `FEATURE_MEDIA_FILTER_SORT_ENABLED` | `"true"` | Sort controls. |
+| `kerberoshub.frontend.features.media.filter.category.enabled` | `FEATURE_MEDIA_FILTER_CATEGORIES_ENABLED` | `"true"` | Marker category filtering. |
+| `kerberoshub.frontend.features.media.filter.markers.enabled` | `FEATURE_MEDIA_FILTER_MARKERS_ENABLED` | `"true"` | Marker filtering. |
+| `kerberoshub.frontend.features.media.filter.markerOptionsByDate.enabled` | `FEATURE_MEDIA_FILTER_MARKER_OPTIONS_BY_DATE_ENABLED` | `"false"` | Limits marker, category, event, and tag option retrieval to the selected recording day. It does not hide those filter controls. |
+| `kerberoshub.frontend.features.media.filter.events.enabled` | `FEATURE_MEDIA_FILTER_EVENTS_ENABLED` | `"true"` | Event filtering. |
+| `kerberoshub.frontend.features.media.filter.tags.enabled` | `FEATURE_MEDIA_FILTER_TAGS_ENABLED` | `"true"` | Tag filtering. |
 
 `media.filter.defaultView` selects the initial media view and is not a boolean feature flag.
 
