@@ -1,7 +1,7 @@
 ---
 title: "Azure Storage Account"
-description: "Configure Azure Blob Storage as a storage provider for Kerberos Vault"
-lead: "Learn how to integrate Azure Blob Storage with Kerberos Vault for enterprise-grade video recording storage"
+description: "Configure Azure Blob Storage as a storage provider for Vault"
+lead: "Learn how to integrate Azure Blob Storage with Vault for enterprise-grade video recording storage"
 date: 2020-10-06T08:49:31+00:00
 lastmod: 2025-11-14T18:52:34+00:00
 draft: false
@@ -9,7 +9,7 @@ draft: false
 
 ## Introduction
 
-[Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs/) is Microsoft's object storage solution for the cloud, optimized for storing massive amounts of unstructured data. It provides highly scalable, secure, and cost-effective storage for video recordings from Kerberos Vault.
+[Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs/) is Microsoft's object storage solution for the cloud, optimized for storing massive amounts of unstructured data. It provides highly scalable, secure, and cost-effective storage for video recordings from Vault.
 
 ### Key Features
 
@@ -17,10 +17,10 @@ draft: false
 - **Multiple Access Tiers**: Hot, Cool, Cold, and Archive for cost optimization
 - **High Availability**: Redundancy options including LRS, ZRS, GRS, and RA-GRS
 - **Enterprise Security**: Azure AD integration, encryption, and advanced threat protection
-- **S3 Compatible**: Supports S3-compatible API for seamless integration
+- **Native integration**: Vault uses the Azure Blob Storage API directly
 - **Global Presence**: Available in 60+ Azure regions worldwide
 
-### Use Cases for Kerberos Vault
+### Use Cases for Vault
 
 Azure Blob Storage is ideal for:
 - **Enterprise deployments**: Integration with existing Azure infrastructure
@@ -34,7 +34,7 @@ Azure Blob Storage is ideal for:
 Before configuring Azure Blob Storage as a provider:
 
 1. [An Azure account](https://portal.azure.com/) with an active subscription
-2. [A Kerberos Vault installation](/docs/vault/installation) in a Kubernetes cluster
+2. [A Vault installation](/docs/vault/installation) in a Kubernetes cluster
 3. Appropriate permissions to create storage accounts and containers
 4. Azure CLI installed (optional, for command-line configuration)
 
@@ -82,9 +82,10 @@ After the storage account is created:
 
 ### Step 3: Get Storage Account Credentials
 
-Kerberos Vault uses the S3-compatible API to connect to Azure Blob Storage. You'll need:
+Vault uses the native Azure Blob Storage API with shared-key
+authentication. You need the storage account name and one account key.
 
-#### Option A: Using Access Keys (Simpler)
+#### Storage account access key
 
 1. In your storage account, go to **Security + networking** > **Access keys**
 2. Under **key1** or **key2**, click **Show** next to the key
@@ -92,129 +93,25 @@ Kerberos Vault uses the S3-compatible API to connect to Azure Blob Storage. You'
    - **Storage account name**: Your account name
    - **Key**: The access key value
 
-#### Option B: Using Shared Access Signature (SAS) - More Secure
+## Integration with Vault
 
-1. In your storage account, go to **Security + networking** > **Shared access signature**
-2. Configure the SAS:
-   - **Allowed services**: Check **Blob**
-   - **Allowed resource types**: Check **Service**, **Container**, and **Object**
-   - **Allowed permissions**: Check **Read**, **Write**, **Delete**, **List**, **Add**, **Create**
-   - **Start and expiry date/time**: Set appropriate timeframe
-   - **Allowed IP addresses**: Optionally restrict to your Kerberos Vault IPs
-   - **Allowed protocols**: HTTPS only
-3. Click **Generate SAS and connection string**
-4. Copy the **SAS token** (starts with `?sv=`)
-
-### Step 4: Configure S3-Compatible Endpoint
-
-Azure Blob Storage supports S3-compatible API access. The endpoint format is:
-
-```
-https://<storage-account-name>.blob.core.windows.net
-```
-
-For S3 compatibility, you may need to use specific tools or SDKs that support Azure's S3-compatible layer.
-
-**Note**: Azure's native S3 compatibility is limited. For best results, you can:
-1. Use Azure Storage's native API (if Kerberos Vault supports it)
-2. Use a compatibility layer like MinIO Gateway for Azure (**Deprecated**; see [MinIO Gateway Deprecation Notice](https://min.io/docs/minio/linux/reference/minio-gateway.html)).  
-   > **Warning:** MinIO Gateway for Azure is deprecated and may not be available in newer MinIO versions. Refer to the [MinIO documentation](https://min.io/docs/minio/linux/reference/minio-gateway.html) for details and migration guidance.
-3. Configure Azure with S3-compatible tools
-
-### Step 5: Alternative - Set Up MinIO Gateway for Azure
-
-For full S3 compatibility, you can deploy MinIO Gateway as a bridge:
-
-```bash
-# Set environment variables
-export MINIO_ROOT_USER=<your-storage-account-name>
-export MINIO_ROOT_PASSWORD=<your-storage-account-key>
-
-# Run MinIO Gateway for Azure
-minio gateway azure
-```
-
-Or deploy in Kubernetes:
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: minio-azure-gateway
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: minio-gateway
-  template:
-    metadata:
-      labels:
-        app: minio-gateway
-    spec:
-      containers:
-      - name: minio
-        image: minio/minio:latest
-        args:
-        - gateway
-        - azure
-        env:
-        - name: MINIO_ROOT_USER
-          value: "<storage-account-name>"
-        - name: MINIO_ROOT_PASSWORD
-          value: "<storage-account-key>"
-        ports:
-        - containerPort: 9000
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: minio-gateway
-spec:
-  selector:
-    app: minio-gateway
-  ports:
-  - port: 9000
-    targetPort: 9000
-```
-
-## Integration with Kerberos Vault
-
-### Direct Azure Blob Storage Configuration
-
-If Kerberos Vault supports Azure Blob Storage natively:
-
-1. Open the Kerberos Vault web interface
+1. Open the Vault web interface
 2. Navigate to **Providers** in the left menu
 3. Click **+ Add Storage Provider**
-4. Select **Azure Storage Account** from the list
+4. Select **Azure** from the list
 5. Fill in the configuration:
    - **Provider name**: A descriptive name (e.g., "Azure Production Storage")
-   - **Bucket name**: Your container name (e.g., `kerberos-recordings`)
-   - **Region**: Your Azure region (e.g., `eastus`)
-   - **Hostname**: `<storage-account-name>.blob.core.windows.net`
-   - **Access Key**: Your storage account name
-   - **Secret Access Key**: Your storage account access key or SAS token
+   - **Account Name**: Your Azure storage account name
+   - **Container Name**: Your Blob container name (e.g., `kerberos-recordings`)
+   - **Account Key**: One of the storage account access keys from Step 3
 6. Click **Validate** to test the connection
 7. If successful, you'll see a green confirmation message
 8. Click **Save** to add the provider
 
-### Using MinIO Gateway Configuration
-
-If using MinIO Gateway for S3 compatibility:
-
-1. Open the Kerberos Vault web interface
-2. Navigate to **Providers** in the left menu
-3. Click **+ Add Storage Provider**
-4. Select **MinIO** or **S3-Compatible** provider
-5. Fill in the configuration:
-   - **Provider name**: A descriptive name (e.g., "Azure via MinIO")
-   - **Bucket name**: Your Azure container name
-   - **Region**: Leave blank or specify region
-   - **Hostname**: MinIO gateway hostname (e.g., `minio-gateway.default.svc.cluster.local:9000`)
-   - **Access Key**: Your storage account name
-   - **Secret Access Key**: Your storage account key
-6. Click **Validate** to test the connection
-7. Click **Save** to add the provider
+Vault derives the endpoint as
+`https://<account-name>.blob.core.windows.net` and uses Azure shared-key
+authentication. The current provider form supports account-key authentication
+only.
 
 ## Configuration Options
 
@@ -291,17 +188,15 @@ Example rule JSON:
 
 ### Security Best Practices
 
-1. **Use Azure AD authentication**: Configure managed identities when possible
-2. **Enable soft delete**: Protect against accidental deletions (retention: 7-365 days)
-3. **Enable blob versioning**: Keep version history for critical recordings
-4. **Rotate access keys regularly**: Use Azure Key Vault for key management
-5. **Use SAS with minimal permissions**: Limit access scope and duration
-6. **Enable encryption**: 
+1. **Enable soft delete**: Protect against accidental deletions (retention: 7-365 days)
+2. **Enable blob versioning**: Keep version history for critical recordings
+3. **Rotate access keys regularly**: Update Vault to the alternate account key before revoking the old key
+4. **Enable encryption**:
    - Encryption at rest (enabled by default)
    - Customer-managed keys via Azure Key Vault (optional)
-7. **Configure firewall rules**: Restrict access to specific IP ranges
-8. **Enable Advanced Threat Protection**: Detect unusual access patterns
-9. **Audit logging**: Enable Azure Monitor and Storage Analytics
+5. **Configure firewall rules**: Restrict access to Vault's network or private endpoint
+6. **Enable Advanced Threat Protection**: Detect unusual access patterns
+7. **Audit logging**: Enable Azure Monitor and Storage Analytics
 
 ### Network Security
 
@@ -310,7 +205,7 @@ Configure network access:
 1. Go to **Security + networking** > **Networking**
 2. Under **Firewalls and virtual networks**:
    - Select **Enabled from selected virtual networks and IP addresses**
-   - Add your Kerberos Vault's virtual network or IP addresses
+   - Add your Vault virtual network or IP addresses
    - Enable trusted Microsoft services if needed
 3. Consider using **Private endpoints** for secure, private connectivity
 
@@ -386,13 +281,13 @@ For detailed pricing, visit the [Azure Blob Storage Pricing page](https://azure.
 ### Common Issues
 
 **Connection Failed**
-- Verify access key or SAS token is correct
+- Verify the account name and account key are correct
 - Check firewall rules and IP restrictions
 - Ensure storage account allows HTTPS connections
-- Verify the endpoint URL format is correct
+- Verify the container exists
 
 **Access Denied**
-- Confirm SAS token has not expired
+- Confirm the account key is active and was copied completely
 - Check container permissions
 - Verify network access rules
 - Ensure the container exists
@@ -411,11 +306,6 @@ For detailed pricing, visit the [Azure Blob Storage Pricing page](https://azure.
 - Reduce unnecessary egress
 - Use Azure Cost Management to analyze spending
 
-**SAS Token Expired**
-- Generate a new SAS token with extended expiry
-- Consider using access keys for longer-term access
-- Implement automatic token rotation
-
 ## Additional Resources
 
 - [Azure Blob Storage Documentation](https://docs.microsoft.com/en-us/azure/storage/blobs/)
@@ -425,4 +315,3 @@ For detailed pricing, visit the [Azure Blob Storage Pricing page](https://azure.
 - [Best Practices](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction)
 - [Performance and Scalability Checklist](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-performance-checklist)
 - [Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/) - Desktop app for managing storage
-<!-- MinIO Gateway for Azure was deprecated in 2022. For S3 compatibility with Azure Blob Storage, consider using Azure Data Lake Storage Gen2 or review current Azure documentation for interoperability options. -->

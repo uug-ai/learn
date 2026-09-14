@@ -113,18 +113,15 @@ An array of `MediaUrlRequest`:
 [
   {
     "filename": "account-a/1776427171_..._29960.mp4",
-    "provider": "primary-provider",
-    "uriExpiryTime": "24h"
+    "provider": "primary-provider"
   },
   {
     "filename": "account-a/1776427171_..._29960_thumbnail.jpg",
-    "provider": "primary-provider",
-    "uriExpiryTime": "24h"
+    "provider": "primary-provider"
   },
   {
     "filename": "account-a/1776427171_..._29960_sprite.jpg",
-    "provider": "primary-provider",
-    "uriExpiryTime": "24h"
+    "provider": "primary-provider"
   }
 ]
 ```
@@ -133,7 +130,10 @@ An array of `MediaUrlRequest`:
 |---|---|---|
 | `filename` | yes | Object key in the provider. |
 | `provider` | no | Provider name. Defaults to the account's default provider. |
-| `uriExpiryTime` | no | TTL of the signed URL. Accepts Go duration strings (`30m`, `1h`, `24h`) or an integer number of seconds. Defaults to `DEFAULT_URI_EXPIRY_TIME` (86400s / 24h). |
+| `uriExpiryTime` | no | Absolute expiry time in RFC 3339 format, for example `2026-09-14T18:00:00Z`. When omitted, Vault uses `DEFAULT_URI_EXPIRY_TIME`; if that setting is absent or invalid, it falls back to 24 hours. |
+
+Use a provider assigned to the authenticated account. For the account's primary
+provider, omitting `provider` is the simplest option.
 
 **Response**
 
@@ -148,6 +148,10 @@ A JSON map of `filename → signed URL`, embedded in the standard envelope as a 
 > **Note:** `data` is a JSON-encoded string, not a nested object. Parse it
 > twice: first the envelope, then `data`.
 
+The response map contains only files for which Vault successfully generated a
+URL. Treat a missing requested filename as an item-level failure and inspect the
+Vault logs for the provider error.
+
 **Example** — get every generated link for a single media in one call:
 
 ```bash
@@ -156,10 +160,10 @@ curl -s -X POST "http://localhost:8085/api/storage/bulk" \
   -H "X-Kerberos-Storage-SecretAccessKey: $VAULT_SECRET" \
   -H "Content-Type: application/json" \
   -d '[
-    {"filename":"account-a/1776427171_..._29960.mp4",            "provider":"primary-provider","uriExpiryTime":"24h"},
-    {"filename":"account-a/1776427171_..._29960_thumbnail.jpg",  "provider":"primary-provider","uriExpiryTime":"24h"},
-    {"filename":"account-a/1776427171_..._29960_sprite.jpg",     "provider":"primary-provider","uriExpiryTime":"24h"},
-    {"filename":"account-a/1776427171_..._29960_redacted.mp4",   "provider":"primary-provider","uriExpiryTime":"24h"}
+    {"filename":"account-a/1776427171_..._29960.mp4"},
+    {"filename":"account-a/1776427171_..._29960_thumbnail.jpg"},
+    {"filename":"account-a/1776427171_..._29960_sprite.jpg"},
+    {"filename":"account-a/1776427171_..._29960_redacted.mp4"}
   ]' | jq -r '.data | fromjson'
 ```
 
@@ -171,7 +175,7 @@ The shape of the URLs returned by the endpoints above is controlled by the `VAUL
 
 | `VAULT_SIGNING` | Returned URL points to | Notes |
 |---|---|---|
-| `false` *(default)* | Native provider presigned URL (S3/MinIO presign, GCS V4 signed URL, Azure SAS) | The client downloads directly from the storage backend. Lowest Vault load. |
+| `false` *(default)* | Native provider presigned URL (S3/MinIO presign, GCS signed URL, Azure SAS) | The client downloads directly from the storage backend. Lowest Vault load. |
 | `true` | A `…/api/storage/signed?...` URL served by Vault itself | Vault streams the object after validating an HMAC. Use when the storage backend is not reachable from clients. |
 
 In both cases your integration code is identical — you call `GET /api/storage` or `POST /api/storage/bulk` and use whatever URL comes back. The next section is only relevant when `VAULT_SIGNING=true`.
@@ -228,10 +232,10 @@ curl -s -X POST "$VAULT_URL/api/storage/bulk" \
   -H "X-Kerberos-Storage-SecretAccessKey: $VAULT_SECRET" \
   -H "Content-Type: application/json" \
   -d "[
-    {\"filename\":\"${MEDIA}\",                  \"uriExpiryTime\":\"1h\"},
-    {\"filename\":\"${BASE}_thumbnail.jpg\",     \"uriExpiryTime\":\"1h\"},
-    {\"filename\":\"${BASE}_sprite.jpg\",        \"uriExpiryTime\":\"1h\"},
-    {\"filename\":\"${BASE}_redacted.mp4\",      \"uriExpiryTime\":\"1h\"}
+    {\"filename\":\"${MEDIA}\"},
+    {\"filename\":\"${BASE}_thumbnail.jpg\"},
+    {\"filename\":\"${BASE}_sprite.jpg\"},
+    {\"filename\":\"${BASE}_redacted.mp4\"}
   ]" | jq -r '.data | fromjson'
 ```
 
@@ -242,4 +246,4 @@ curl -s -X POST "$VAULT_URL/api/storage/bulk" \
 | `200` | URL(s) returned successfully. |
 | `400` | A required header / body field is missing or malformed. |
 | `401` | Account credentials are invalid, or the account is not bound to the requested provider. |
-| `5xx` | Vault could not reach the configured storage provider — check the Vault logs. |
+| `5xx` | Vault could not complete an internal operation. Check the Vault logs. |

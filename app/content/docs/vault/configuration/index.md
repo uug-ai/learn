@@ -13,23 +13,28 @@ weight: 305
 toc: true
 ---
 
-Once you have set up Kerberos Vault successfully on your Kubernetes cluster, it is time to set it up and configure the different elements.
+After Vault starts, sign in to the administration UI and configure how Agents
+authenticate, where recordings are stored, and where events are delivered.
 
-The steps we have to go through to get a functional Kerberos Vault are as following,
+The normal setup order is:
 
-1. Mount and connect a storage provider,
-2. implement and configure one or more integrations,
-3. create an account, so Kerberos Vault can be consumed.
+1. Add and validate one or more storage providers.
+2. Add any optional event or forwarding integrations.
+3. Create an enabled account and assign its providers and integrations.
+4. Configure Agents with the account access key, secret, and Vault URL.
 
 ## 1. Providers
 
-Storage providers are the foundation of Kerberos Vault. As an administrator you bring your own cloud or edge storage, so there is no need to install a specific Kerberos Vault storage, we are open and integrate with others.
+Storage providers are the foundation of Vault. Add AWS S3, Google Cloud
+Storage, Azure Blob Storage, Storj, or MinIO credentials, then use **Validate**
+to confirm Vault can reach the bucket or container.
 
 Go ahead and [have a look at the provider page]({{< ref "/docs/vault/providers" >}}), there we explain how to add and configure specific providers.
 
 ## 2. Integrations
 
-Once you have successfully stored your recordings on a storage provider, it is time to do something with it. This is where integrations come into play. An integration is a way to make another third-party solution or custom workload aware that a recording was stored on a storage provider.
+Integrations are optional. Add one when another service must receive an event or
+when recordings should be forwarded to another Vault.
 
 An integration produces an event with relevant information about the recording:
 
@@ -37,20 +42,32 @@ An integration produces an event with relevant information about the recording:
 - its filesize,
 - metadata about where motion was detected, etc.
 
-By connecting to an integration you will have to power to consume those message and build custom workflows through the programming languages you prefer, or connect [to existing systems such as Kerberos Hub](/docs/hub/first-things-first) for visualisation purposes.
+Vault supports Kafka, RabbitMQ, SQS, Kerberos Hub, and Vault-to-Vault
+forwarding. Delivery is durable and at least once, so custom consumers should
+handle duplicate events safely.
 
 Go ahead and [have a look at the integrations page](/docs/vault/integrations), there we explain how to add and configure specific integrations.
 
 ## 3. Accounts
 
-You should now have a working storage provider that helps you to persist your recordings, and have an integration in place to produce and consume events. Now it is time to leverage those capabilities through the concept of accounts.
+An account defines the credentials presented by Agents and API clients. It also
+assigns storage providers, optional integrations, an upload directory policy,
+and a retention day limit.
 
-By creating an account you create a secure way of leveraging those capabilities by use authentication credentials; an access key and secret key. 
-
-Once those credentials and relevant account has been created and enabled you can link it to your Agents to start forwarding their recordings into your Kerberos Vault installation. On the other hand those credentials can also be leveraged when connecting to Kerberos Hub, so it can read and request recordings from your Kerberos Vault; and underlying storage providers.
+After creating and enabling the account, configure the Agent with its access key
+and secret. Use the same account when an authorized client such as Kerberos Hub
+must request media URLs from Vault.
 
 Go ahead and [have a look at the accounts page](/docs/vault/accounts), there we explain how to add and configure specific accounts.
 
-## You're ready
+## Verify operation
 
-If completed previous configurations, you are now ready to configure your Agents with our without Factory. Learn more here.
+Upload a recording from an Agent, then confirm:
+
+1. **Cameras** shows the Agent and a recent heartbeat.
+2. **Media** shows the recording under the expected account and provider.
+3. **Outbox** remains clear or drains after each configured integration accepts
+  its event.
+
+Use [Retention and cleanup](/docs/vault/recycle/) to verify the account's day
+limit before production ingestion.
