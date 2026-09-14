@@ -42,6 +42,11 @@ Once completed the necessary credentials, specific to your storage provider, you
 
 Once configured you can add multiple and different providers. Have some fun.
 
+For an immutable or GitOps-managed deployment, providers can instead be loaded
+from `VAULT_STORAGE_PROVIDERS`. Environment-managed providers appear in this
+list but are read-only. See [Database and environment configuration](/docs/vault/configuration/#database-and-environment-configuration)
+for JSON examples, required fields, precedence, and secret-handling guidance.
+
 ## Cloud storage providers
 
 Kerberos Vault integrates with storage providers in the cloud such as AWS S3, GCP Storage, Azure Storage and Storj. The advantage of previously mentioned storage providers, is that they take complete control of your ever growing storage requirements. They scale with your needs at a low TCO.

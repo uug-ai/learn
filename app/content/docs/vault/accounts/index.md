@@ -13,6 +13,12 @@ weight: 307
 toc: true
 ---
 
+Accounts can be managed in the Vault interface or supplied through
+`VAULT_ACCOUNTS` for immutable deployments. Environment-managed accounts are
+shown grayed out and cannot be edited or deleted in the interface. See
+[Database and environment configuration](/docs/vault/configuration/#database-and-environment-configuration)
+for the JSON contract, precedence, and secret-handling guidance.
+
 Having setup `Providers` and `Integrations`, you need a secure way to interact with them through the creation of an account.
 
 By creating an account you will receive credentials that give access to the Kerberos Vault's providers, integrations and APIs. Account credentials are being used by an Agent to send recordings, and/or through custom code by API calls to download and/or forward recordings.

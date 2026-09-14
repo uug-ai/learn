@@ -42,7 +42,13 @@ When selecting the `+ Add Integration` button, a modal will open that allows you
 
 Once completed the necessary credentials, specific to your integration, you can verify the connection by click the `Validate` button. If ok, it should return a `green` confirmation box, if something went wrong you should see the relevant error message in a `red` alert box. When completed you can add multiple and different integrations.
 
-## Cloud event integrations
+For an immutable or GitOps-managed deployment, integrations can instead be
+loaded from `VAULT_INTEGRATIONS`. Environment-managed integrations remain
+available to assigned accounts and durable outbox retries, but are read-only in
+the administration UI. See [Database and environment configuration](/docs/vault/configuration/#database-and-environment-configuration)
+for JSON examples, required fields, precedence, and secret-handling guidance.
+
+## Queue integrations
 
 Kerberos Vault integrates with queues and message brokers in the cloud such as AWS SQS. The advantage is that it takes the complete control of your every growing messaging/event requirements.
 
