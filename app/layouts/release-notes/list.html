@@ -8,7 +8,6 @@
   {{- $pagerSize := .Params.pagerSize | default 10 -}}
   {{- $paginator := .Paginate $releases $pagerSize -}}
   {{- $pageReleases := $paginator.Pages -}}
-  {{- $latestRelease := index $releases 0 -}}
   <div class="hx:mx-auto hx:flex hextra-max-page-width">
     {{ partial "sidebar.html" (dict "context" . "disableSidebar" true) }}
     <article class="hx:w-full hx:min-w-0">
@@ -21,6 +20,7 @@
           </header>
 
           {{- if $releases }}
+            {{- $latestRelease := index $releases 0 -}}
             <div class="release-notes__layout">
               <nav class="release-notes__versions" aria-label="Release versions">
                 <h2>Releases</h2>
