@@ -3,7 +3,7 @@ title: "Detection"
 description: "The detection block contract: third-party detection tracks for a recording, stored in the detections collection."
 lead: "A detection run is a bundle of tracks for one recording. A stage emits it as a detection block; the ingest core validates, normalises and stores it in the detections collection."
 date: 2026-06-02T00:00:00+00:00
-lastmod: 2026-06-16T00:00:00+00:00
+lastmod: 2026-09-15T00:00:00+00:00
 draft: false
 images: []
 aliases:
@@ -137,7 +137,7 @@ Provenance for the run. Three `kind`s are first-class:
 | `kind` | enum | yes | `pipeline` \| `model` \| `import`. |
 | `name` | string (≤ 64) | yes | Identifies the producer. This is distinct from the optional top-level `name` displayed for the run in the face-redaction selector. |
 | `version` | string (≤ 32) | yes | Free-form (semver, git SHA, etc.). |
-| `runId` | string (≤ 40) | recommended | ULID/UUID. The natural key the upsert matches on. Server generates one if absent, but supplying a stable `runId` is what makes re-deliveries idempotent. |
+| `runId` | string (≤ 40) | recommended | ULID/UUID. The natural key the upsert matches on. Server generates one if absent, but supplying a stable `runId` is what makes re-deliveries idempotent. It is required when a marker links to one of this run's tracks. |
 | `inputWidth` / `inputHeight` | int > 0 | no | Model input resolution. Reproducibility hint. |
 | `scoreThreshold` | float `0..1` | no | Cutoff already applied by the producer before sending. |
 | `nmsIou` | float `0..1` | no | NMS IoU threshold the producer used. |
@@ -202,7 +202,7 @@ A **track** represents one subject (a face, a license plate, a person) followed 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `id` | string (≤ 64) | yes | Unique within the run. Accepted as int and coerced to string. |
+| `id` | string (≤ 64) | yes | Unique within the run. Accepted as int and coerced to string. A linked marker uses this value as `detections[].trackId`. |
 | `label` | string | no | Default label for every box in the track. A per-box `label`, when set, overrides this. |
 | `classId` | int | no | Default `categories[].id` for every box. A per-box `classId`, when set, overrides this. |
 | `confidence` | float `0..1` | no | Per-track summary score (e.g. mean over boxes). |
@@ -211,6 +211,37 @@ A **track** represents one subject (a face, a license plate, a person) followed 
 | `deletedFrames` | array of int64 | no | Frame indices to skip when rendering this track. |
 | `meta` | object | no | Free-form producer attributes (e.g. `{ "occluded": true }`). Max 4 KB serialised. |
 | `boxes` | array | yes | ≥ 1 entry (an empty array is rejected), max 100 000 per track, sorted by `frame` ascending. Repeating a `frame` within a track keeps the **last** box and emits a `DUPLICATE_FRAME` warning. |
+
+### Linking a track to a marker
+
+A workflow stage can give a detection track a named, searchable timeline span by
+emitting a [`marker`](../marker/) block in the same result envelope. The marker
+must explicitly reference the track:
+
+```json
+{
+  "name": "2-HCP-007",
+  "startTimestamp": 1752482068,
+  "endTimestamp": 1752482079,
+  "detections": [
+    {
+      "runId": "01HF8C3K9X4Y6Q7Z2N8M5W3R1A",
+      "trackId": "plate-0-2-HCP-007"
+    }
+  ]
+}
+```
+
+Here, `runId` must match this detection run's `source.runId`, and `trackId` must
+match one of its `tracks[].id` values. Both blocks must target the same
+recording. Sharing an envelope, label, category or time range does not create
+the link automatically.
+
+Always supply a stable `source.runId` when a marker will reference the run.
+Server-generated run ids are suitable for standalone detections, but the stage
+does not know that generated value when it constructs the marker. See
+[Marker → Detection-track link](../marker/#detection-track-link-detections) for
+a complete paired-block example.
 
 ### Track boxes
 

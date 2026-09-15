@@ -3,7 +3,7 @@ title: "Marker"
 description: "The marker block contract: a labelled point or span on a recording's timeline — a licence-plate read, a transaction, an alert window — delivered by a workflow stage and stored in the markers collection."
 lead: "A marker is one labelled span on a recording's timeline. A stage hands it back as a marker block; the ingest core stores it in the markers collection, keyed so the same annotation refreshes instead of duplicating."
 date: 2026-06-16T00:00:00+00:00
-lastmod: 2026-06-16T00:00:00+00:00
+lastmod: 2026-09-15T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -38,6 +38,12 @@ Like [`detection`](../detection/), a `marker` block is delivered through the sha
     "description": "Licence plate detected at the north gate",
     "categories": [{ "name": "anpr" }],
     "tags": [{ "name": "entry" }],
+    "detections": [
+      {
+        "runId": "01HF8C3K9X4Y6Q7Z2N8M5W3R1A",
+        "trackId": "plate-0-2-HCP-007"
+      }
+    ],
     "events": [
       {
         "startTimestamp": 1752482068,
@@ -100,6 +106,92 @@ The core resolves which recording(s) a marker attaches to in priority order:
 Leave `mediaKeys` empty to accept the default (the run's recording, or timestamp
 overlap); set it only to override which recordings the marker attaches to.
 
+### Detection-track link (`detections`)
+
+When a stage emits both a [`detection`](../detection/) block and a marker derived
+from one or more of its tracks, link them through the marker's optional
+`detections` array. Each reference identifies one track in one stored detection
+run:
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `detections` | `DetectionRef[]` | Optional. Detection tracks from which this marker was derived. |
+| `detections[].runId` | string | Must equal the detection block's `source.runId`. Always set it for new producers. |
+| `detections[].trackId` | string | Must equal an `id` in that detection block's `tracks` array. |
+
+The marker and detection must also target the **same recording**. A workflow
+stage's detection inherits the run's recording key, and its marker defaults to
+that same key when `mediaKeys` is empty. If the marker supplies `mediaKeys`
+explicitly, the list must include the detection's recording key.
+
+```json
+{
+  "blocks": [
+    {
+      "type": "detection",
+      "data": {
+        "schemaVersion": "1.0",
+        "source": {
+          "kind": "model",
+          "name": "plate-reader",
+          "version": "2.3.1",
+          "runId": "01HF8C3K9X4Y6Q7Z2N8M5W3R1A"
+        },
+        "coordinateSpace": "normalized",
+        "tracks": [
+          {
+            "id": "plate-0-2-HCP-007",
+            "label": "license_plate",
+            "boxes": [
+              { "frame": 117, "x": 0.42, "y": 0.31, "w": 0.08, "h": 0.05 }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "marker",
+      "data": {
+        "name": "2-HCP-007",
+        "startTimestamp": 1752482068,
+        "endTimestamp": 1752482079,
+        "duration": 11,
+        "detections": [
+          {
+            "runId": "01HF8C3K9X4Y6Q7Z2N8M5W3R1A",
+            "trackId": "plate-0-2-HCP-007"
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+The join is exact:
+
+```text
+marker.detections[].runId   = detection.source.runId
+marker.detections[].trackId = detection.tracks[].id
+```
+
+Putting both blocks in the same envelope, giving them the same label, or giving
+them overlapping timestamps does **not** create this track-level link. The
+`detections` reference must be present on the marker. Likewise, `mediaKeys`
+links a marker to a recording, not to an individual detection track.
+
+Set `source.runId` yourself whenever markers reference the run. Although the
+server can generate a run id for an unlinked detection, a stage cannot reliably
+reference an id it did not choose. Track ids need only be unique within their
+run. One marker may reference multiple tracks, including multiple tracks in the
+same run.
+
+The ingest core stores the reference on the marker and copies it into the
+recording's `markerSummary` entry. The media UI then loads detection runs for
+that recording and resolves the referenced run and track. Ingest does not infer
+or validate this cross-block relationship, so a misspelled or unstable id leaves
+the marker intact but gives it no resolvable detection overlay.
+
 ### Descriptive fields
 
 All optional; they enrich how the marker reads and filters.
@@ -133,7 +225,9 @@ Delivery is **at-least-once**, so the write is an **idempotent upsert** keyed by
 
 - **Runtime-derived metadata** (`atRuntimeMetadata`, the marker/tag/event time ranges) is computed by the platform for the timeline UI — a producer does not set it.
 - **System fields** — `id`, `synchronize` and `audit` are managed by the platform.
-- **Geometry.** A marker labels *time*, not *space*. If you need a box per frame, emit a [`detection`](../detection/) block instead; the two can travel in the same envelope.
+- **Geometry.** A marker labels *time*, not *space*. If you need a box per frame,
+  emit a [`detection`](../detection/) block and reference its track through
+  `detections`; the two blocks can travel in the same envelope.
 
 ## See also
 
