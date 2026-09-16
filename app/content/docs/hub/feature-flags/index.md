@@ -77,7 +77,7 @@ The organisation and project flags form a hierarchy:
 | `kerberoshub.frontend.features.liveview.hlsEnabled` | `FEATURE_HLS_ENABLED` | `"true"` | Offers HLS as a LIVE transport. Disabling it removes HLS from transport selection. |
 | `kerberoshub.frontend.features.liveview.moqEnabled` | `FEATURE_MOQ_ENABLED` | `"false"` | Offers Media over QUIC (MoQ) as a LIVE transport. A relay URL and compatible Agent are also required. |
 | `kerberoshub.frontend.features.liveview.remoteRecordingEnabled` | `FEATURE_REMOTE_RECORDING_ENABLED` | `"true"` | Shows the manual REC control in live views. The Agent and the user's permissions must still allow remote recording. |
-| `kerberoshub.frontend.features.liveview.deviceStatusEnabled` | `FEATURE_LIVE_VIEW_DEVICE_STATUS_ENABLED` | `"true"` | Shows device connectivity badges in live view tile headers. Disabling it does not change stream availability, device filtering, LIVE health, or REC indicators. |
+| `kerberoshub.frontend.features.liveview.deviceStatusEnabled` | `FEATURE_LIVE_VIEW_DEVICE_STATUS_ENABLED` | `"true"` | Shows device status in live view tile headers. An online badge changes to a red `event detected` badge for 30 seconds after motion. Disabling it hides this badge without changing stream availability, device filtering, LIVE health, or REC indicators. |
 
 `liveStreamMode`, `defaultStreamMode`, `paginationMode`, `pageSize`, and `maxStreams` configure behavior but are not on/off feature flags. See the chart values for those settings.
 
