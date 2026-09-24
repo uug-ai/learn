@@ -25,6 +25,13 @@ This page is the **contract your microservice codes against** — the queue it l
 >
 > This page covers how a microservice *delivers* a result. For the complementary *receiving* side — one shared core that takes a result from either the API or the queue and routes each block to the right actions by its type — see [Ingest](/docs/hub/workflows/ingest/).
 
+{{< callout type="info" >}}
+Does the worker run outside the Hub deployment? Use the
+[workflow forwarder for external stages](../external-stages/) instead. It sends
+a sanitized invocation to a customer RabbitMQ broker or HTTPS endpoint and
+accepts the result through a project-scoped API callback.
+{{< /callout >}}
+
 ## When to add a stage
 
 A stage is one of **two transports** for getting your data into the Hub. The other is an authenticated **ingest API** push. They deliver the **same data** to the **same place**; they differ in *who triggers the work* and *where your code runs*.
