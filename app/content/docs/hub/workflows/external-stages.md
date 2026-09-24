@@ -211,19 +211,55 @@ Content-Type: application/json
 }
 ```
 
-`stage.operation` must match the invocation's `stage.operation`. The `result`
-object becomes that operation's entry in the workflow run's results and can be
-read by downstream conditions.
+`stage.operation` must match the invocation's `stage.operation`. A callback
+must return exactly one output channel:
+
+- `result` contains routing values from a stage that persists its own output.
+  The object becomes that operation's entry in the workflow run's results and
+  can be read by downstream conditions.
+- `payload` contains a workflow
+  [block envelope](ingest/blocks/) for Hub to validate and persist.
+
+For example, a stage can ask Hub to persist a marker:
+
+```json
+{
+  "schema": "uug.ai/workflow-result/v1",
+  "stage": {
+    "operation": "forwarder"
+  },
+  "payload": {
+    "blocks": [
+      {
+        "type": "marker",
+        "data": {
+          "startTimestamp": 1790258400,
+          "endTimestamp": 1790258430,
+          "name": "custom integration",
+          "description": "Created by the customer-managed stage"
+        }
+      }
+    ]
+  }
+}
+```
+
+Do not place blocks under `result.blocks`. That is routing data and is not sent
+to the ingest pipeline. Hub derives the recording, organisation, project, and
+device context from the stored run rather than trusting those values in the
+callback. After successful ingestion, Hub mirrors the persisted blocks into the
+operation's routing result, grouped by block type, for downstream conditions.
 
 The callback request body is limited to 1 MiB. Store large artefacts in the
 customer system or an appropriate object store and return a reference and
-small routing values instead.
+small routing values instead. Use `payload` only for supported ingest blocks
+that Hub should own.
 
 ### Responses and retries
 
 | Response | Meaning | External worker action |
 |---|---|---|
-| `202 Accepted` | Hub accepted and queued the first result. | Mark the callback complete. |
+| `202 Accepted` | Hub validated and queued the first result for workflow processing. | Mark the callback complete. |
 | `200 OK` | The identical result was already recorded. | Treat the retry as successful. |
 | `400 Bad Request` | The schema, operation, or body is invalid. | Correct the request; do not retry unchanged. |
 | `401 Unauthorized` | The bearer token is missing, invalid, or lacks `workflow-runs.update`. | Replace or reconfigure the token. |
@@ -234,7 +270,9 @@ small routing values instead.
 
 Callback processing is **first result wins**. Concurrent duplicate messages
 cannot overwrite the accepted result or dispatch downstream stages twice.
-Retried callbacks should send the same JSON result.
+Retried callbacks should send the same JSON output. A `202` confirms durable
+queue acceptance, not that an ingest block has already been persisted; block
+processing happens asynchronously in the workflow engine.
 
 ## Configure the deployment
 
@@ -364,7 +402,8 @@ through `env`, volumes, and mounts.
 - Keep the Hub access token in a secret manager.
 - Use a project-bound token with only `workflow-runs.update`.
 - Read the callback URL and result schema from the invocation.
-- Return the same operation and a JSON `result` object no larger than 1 MiB.
+- Return the same operation and exactly one JSON `result` or block-envelope
+  `payload`, with a total request size no larger than 1 MiB.
 - Treat `202` and an identical-result `200` as success.
 - Retry transient `503` responses with backoff.
 - Include `traceId` in logs and traces.
