@@ -236,10 +236,12 @@ Callback processing is **first result wins**. Concurrent duplicate messages
 cannot overwrite the accepted result or dispatch downstream stages twice.
 Retried callbacks should send the same JSON result.
 
-## Configure the Helm deployment
+## Configure the deployment
 
-The chart connects the workflow definition's `forwarder` operation to the
-forwarder service and its customer RabbitMQ destination:
+The Hub chart does not need provider-specific forwarder fields. Workflow
+services already accept arbitrary environment variables, volumes, and mounts.
+Register `forwarder` like any other stage, then pass its configuration through
+the existing `env` map:
 
 ```yaml
 kerberoshub:
@@ -257,46 +259,102 @@ kerberoshub:
   services:
     forwarder:
       enabled: true
+      repository: ghcr.io/uug-ai/hub-workflows-forwarder
+      pullPolicy: IfNotPresent
+      tag: "v1.0.1"
+      replicas: 1
+      logLevel: "info"
       queue: "kcloud-forwarder-queue.fifo"
-      rabbitmqDestination:
-        host: "customer-rabbitmq.example.com:5671"
-        username: "workflow-publisher"
-        password: "<from-your-secret-management-overlay>"
-        queue: "customer-workflow-invocations"
-        virtualHost: "/"
-        tls: true
-        declareQueue: false
-      callback:
-        # Empty derives the callback base from kerberoshub.api.schema and .url.
-        baseURL: ""
       env:
-        FORWARDER_OPERATION: "forwarder"
-        FORWARDER_COMPLETION_MODE: "callback"
+        FORWARDER_CONFIG_FILE: "/etc/hub-workflows-forwarder/config.json"
+      volumeMounts:
+        - name: forwarder-config
+          mountPath: /etc/hub-workflows-forwarder
+          readOnly: true
+      volumes:
+        - name: forwarder-config
+          configMap:
+            name: hub-workflows-forwarder
 ```
 
-Set `callback.baseURL` only when external workers must reach a different public
-API origin:
+Create the referenced ConfigMap through the deployment's normal configuration
+management. The mounted JSON selects the provider, destinations, field
+mappings, and completion mode. For example, an HTTPS integration can use:
+
+```json
+{
+  "callback": {
+    "baseUrl": "https://api.example.com"
+  },
+  "integrations": {
+    "customer-system": {
+      "provider": "webhook",
+      "destinations": {
+        "analyse": {
+          "url": "https://customer.example.net/workflows/analyse",
+          "headersFromEnv": {
+            "Authorization": "CUSTOMER_API_AUTHORIZATION"
+          }
+        }
+      }
+    }
+  },
+  "bindings": [
+    {
+      "operation": "forwarder",
+      "integration": "customer-system",
+      "destination": "analyse",
+      "completionMode": "callback",
+      "fields": {
+        "inputs": {
+          "path": "inputs"
+        },
+        "results": {
+          "path": "results"
+        }
+      }
+    }
+  ]
+}
+```
+
+The ConfigMap contains routing configuration, not secrets.
+`CUSTOMER_API_AUTHORIZATION` is the name of an environment variable provisioned
+to the forwarder through the deployment's secret management. It authenticates
+delivery **to the customer endpoint** and is unrelated to the Hub token the
+customer worker uses for the callback.
+
+### RabbitMQ convenience configuration
+
+A deployment with one RabbitMQ destination can skip the JSON file and set the
+forwarder's supported environment variables in the same open `env` map:
 
 ```yaml
 kerberoshub:
   services:
     forwarder:
-      callback:
-        baseURL: "https://api.example.com"
+      env:
+        FORWARDER_OPERATION: "forwarder"
+        FORWARDER_COMPLETION_MODE: "callback"
+        FORWARDER_CALLBACK_BASE_URL: "https://api.example.com"
+        FORWARDER_MAX_RETRIES: "5"
+        FORWARDER_RABBITMQ_HOST: "customer-rabbitmq.example.com:5671"
+        FORWARDER_RABBITMQ_USERNAME: "workflow-publisher"
+        FORWARDER_RABBITMQ_PASSWORD: "<from-your-secret-management-overlay>"
+        FORWARDER_RABBITMQ_QUEUE: "customer-workflow-invocations"
+        FORWARDER_RABBITMQ_VHOST: "/"
+        FORWARDER_RABBITMQ_TLS: "true"
+        FORWARDER_RABBITMQ_DECLARE_QUEUE: "false"
 ```
 
-The callback base must be an absolute HTTPS URL. The forwarder appends
-`/workflows/runs/{runId}`.
-
-The destination connection is separate from Hub's internal `RABBITMQ_*`
+This destination connection is separate from Hub's internal `RABBITMQ_*`
 connection. Use TLS and a customer-broker account that can publish only to the
-required invocation queue. If the queue is provisioned by the customer, keep
-`declareQueue: false`; otherwise the forwarder can declare a durable quorum
-queue and dead-letter queue.
+required invocation queue.
 
-Advanced installations can mount a forwarder JSON configuration to define
-several workflow/operation bindings, explicit field mappings, or HTTPS webhook
-destinations.
+In both configurations, the callback base must be an absolute HTTPS URL. The
+forwarder appends `/workflows/runs/{runId}`. The Helm template remains
+provider-neutral: it only renders the generic service and the values supplied
+through `env`, volumes, and mounts.
 
 ## External worker checklist
 
