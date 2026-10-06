@@ -174,9 +174,13 @@ The shape of the URLs returned by the endpoints above is controlled by the `VAUL
 | `false` *(default)* | Native provider presigned URL (S3/MinIO presign, GCS V4 signed URL, Azure SAS) | The client downloads directly from the storage backend. Lowest Vault load. |
 | `true` | A `…/api/storage/signed?...` URL served by Vault itself | Vault streams the object after validating an HMAC. Use when the storage backend is not reachable from clients. |
 
-In both cases your integration code is identical — you call `GET /api/storage` or `POST /api/storage/bulk` and use whatever URL comes back. The next section is only relevant when `VAULT_SIGNING=true`.
+Each storage provider can override the global mode with its own **URL signing** setting (`signing` field: `vault`, `provider`, or empty to inherit `VAULT_SIGNING`). For example, keep `VAULT_SIGNING=false` and set `signing: "vault"` only on a private MinIO provider so its endpoint is never exposed to clients. See [Storage providers](/docs/vault/providers/#url-signing).
 
-### Vault-signed URLs (`VAULT_SIGNING=true`)
+Kerberos Hub can additionally hide Vault itself: with the Hub [media proxy](/docs/hub/configuration/#media-proxy) enabled, the Hub API wraps whichever URL Vault returns into its own `/media/proxy` URL and streams the object.
+
+In both cases your integration code is identical — you call `GET /api/storage` or `POST /api/storage/bulk` and use whatever URL comes back. The next section is only relevant when URLs are vault-signed.
+
+### Vault-signed URLs (`VAULT_SIGNING=true` or provider `signing: "vault"`)
 
 In this mode the returned URL has the form:
 

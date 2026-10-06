@@ -136,6 +136,29 @@ An easy way to verify if the POST request is happening, you can use a public web
 
 {{< figure src="configure-webhook.gif" alt="Configure the webhook channel." caption="Configure the webhook channel." class="stretch">}}
 
+## Media proxy
+
+By default Kerberos Hub hands the URLs it receives from Kerberos Vault straight to the browser. Depending on the Vault configuration these point to Vault (vault-signed URLs) or directly to the storage provider (S3, MinIO, GCS, Azure presigned URLs).
+
+Enable the media proxy to hide both. The Hub API then asks Vault for the signed URL as usual, seals it into an opaque, encrypted token and returns a Hub API URL instead:
+
+```
+https://api.yourdomain.com/media/proxy?t=<token>
+```
+
+When the browser requests that URL, the Hub API decrypts the token and streams the recording, thumbnail or sprite from Vault/storage. Range requests (seeking, HLS byte ranges) are supported, and upstream error bodies and identifying headers are never forwarded. Backend workers (workflows, redaction, analysis) keep fetching directly from Vault.
+
+Configure it through the Helm chart (`kerberoshub.api.mediaProxy`) or these hub-api environment variables:
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| `MEDIA_PROXY_ENABLED` | `true` to return Hub API proxy URLs instead of Vault/storage URLs. | `false` |
+| `MEDIA_PROXY_PUBLIC_URL` | Public base URL of the Hub API used in proxy URLs. | `API_URL` |
+| `MEDIA_PROXY_KEY` | Key used to encrypt the tokens (`openssl rand -hex 32`). Must be identical on all hub-api replicas. | derived from `KERBEROS_JWT_SECRET` |
+| `MEDIA_PROXY_TTL` | Lifetime of a proxy URL (Go duration, max `168h`). | `24h` |
+
+All media bytes now flow through the Hub API, so size its replicas, ingress timeouts and bandwidth accordingly. The token only grants access to that single object until it expires, exactly like a signed URL.
+
 ## What's next
 
 Want to learn more how Kerberos Hub is working under the hood? Then [have a look at the Kerberos Hub pipeline page](/docs/hub/pipeline) where we introduce the microservice architecture.

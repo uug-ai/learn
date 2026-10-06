@@ -32,7 +32,10 @@ items currently visible. Depending on the enabled features, you can filter by:
 - object classifications;
 - marker **categories**, **names**, **events**, and **tags**;
 - region;
-- starred status; and
+- starred status;
+- **With analysis**, which hides recordings without notable activity: only
+  recordings with markers, a description, detections, classification or
+  counting results, or vision-language analysis remain; and
 - newest-first or oldest-first order.
 
 Active filters replace their leading icon with a clear control. Clearing a
@@ -100,7 +103,7 @@ retention service.
 
 Deployers can independently expose recording actions and filters, including
 case creation, descriptions, sites, groups, devices, classifications, regions,
-marker fields, starred recordings, and the synchronised player. The default
+marker fields, starred recordings, the "With analysis" toggle, and the synchronised player. The default
 view and fallback frame rate are also configurable. See
 [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#media-filters) for the current settings.
 

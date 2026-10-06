@@ -103,6 +103,7 @@ Visible media-filter controls default to `"true"`. Disabling one removes that fi
 | `kerberoshub.frontend.features.media.filter.devices.enabled` | `FEATURE_MEDIA_FILTER_DEVICES_ENABLED` | `"true"` | Device filtering. |
 | `kerberoshub.frontend.features.media.filter.objectDetection.enabled` | `FEATURE_MEDIA_FILTER_OBJECT_DETECTION_ENABLED` | `"true"` | Object-detection filtering. |
 | `kerberoshub.frontend.features.media.filter.star.enabled` | `FEATURE_MEDIA_FILTER_STAR_ENABLED` | `"true"` | Starred-recording filtering. |
+| `kerberoshub.frontend.features.media.filter.analysis.enabled` | `FEATURE_MEDIA_FILTER_ANALYSIS_ENABLED` | `"true"` | "With analysis" toggle that hides recordings without markers, a description, detections or other analysis results. |
 | `kerberoshub.frontend.features.media.filter.region.enabled` | `FEATURE_MEDIA_FILTER_REGION_ENABLED` | `"true"` | Region filtering. |
 | `kerberoshub.frontend.features.media.filter.sort.enabled` | `FEATURE_MEDIA_FILTER_SORT_ENABLED` | `"true"` | Sort controls. |
 | `kerberoshub.frontend.features.media.filter.category.enabled` | `FEATURE_MEDIA_FILTER_CATEGORIES_ENABLED` | `"true"` | Marker category filtering. |

@@ -36,7 +36,7 @@ resource type from a JSON environment variable:
 For example:
 
 ```bash
-VAULT_STORAGE_PROVIDERS='[{"name":"archive","provider":"minio","host":"minio.minio.svc:9000","region":"us-east-1","bucket":"recordings","access_key":"example-key","secret":"example-secret","use_ssl":"false"}]'
+VAULT_STORAGE_PROVIDERS='[{"name":"archive","provider":"minio","host":"minio.minio.svc:9000","region":"us-east-1","bucket":"recordings","access_key":"example-key","secret":"example-secret","use_ssl":"false","signing":"vault"}]'
 VAULT_INTEGRATIONS='[{"name":"events","queue":"rabbitmq","broker":"amqp://rabbitmq.rabbitmq.svc:5672","topic":"recordings","username":"example-user","password":"example-password"}]'
 VAULT_ACCOUNTS='[{"account":"camera-fleet","directory":"fleet","provider":"archive","access_key":"example-account-key","secret_access_key":"example-account-secret","limit":"30","queues":["events"]}]'
 ```

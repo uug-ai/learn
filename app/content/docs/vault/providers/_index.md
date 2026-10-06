@@ -42,6 +42,22 @@ Once completed the necessary credentials, specific to your storage provider, you
 
 Once configured you can add multiple and different providers. Have some fun.
 
+### URL signing
+
+Each provider has a **URL signing** setting that controls the media URLs Vault
+returns for objects stored on it:
+
+| Option | `signing` value | Behaviour |
+| --- | --- | --- |
+| Vault default | `""` (empty) | Follows the global `VAULT_SIGNING` environment variable. |
+| Vault-signed URLs | `vault` | Clients receive a `{VAULT_PUBLIC_URL}/api/storage/signed?...` URL and Vault streams the object. The storage endpoint, bucket and credentials are never exposed. |
+| Storage provider presigned URLs | `provider` | Clients receive the provider's native presigned URL (S3/MinIO presign, GCS signed URL, Azure SAS) and download directly from storage. |
+
+Use `vault` when the storage backend is private or should not be visible to
+end users. Vault-signed URLs require `VAULT_PUBLIC_URL` and a stable
+`VAULT_URL_SIGNING_KEY` shared by every Vault replica. See
+[Signed URLs](/docs/vault/api/signed-urls/#3-two-signing-modes) for details.
+
 For an immutable or GitOps-managed deployment, providers can instead be loaded
 from `VAULT_STORAGE_PROVIDERS`. Environment-managed providers appear in this
 list but are read-only. See [Database and environment configuration](/docs/vault/configuration/#database-and-environment-configuration)
