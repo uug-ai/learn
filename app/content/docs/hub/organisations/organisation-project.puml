@@ -1,0 +1,134 @@
+@startuml
+title Organisation and project domain models
+top to bottom direction
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+hide methods
+namespace models {
+    class "User" << (S,Aquamarine) >> {
+        + Id primitive.ObjectID
+        + OrganisationId primitive.ObjectID
+        + ProjectId primitive.ObjectID
+        + Username string
+        + Role string
+        + CustomRole string
+
+        + WithTimezone()
+
+    }
+    class "Organisation" << (S,Aquamarine) >> {
+        + Id primitive.ObjectID
+        + Name string
+        + Slug string
+        + Description string
+        + Domain string
+        + OwnerId primitive.ObjectID
+        + Settings OrganisationSettings
+        + IsActive bool
+        + Company CompanyDetails
+        + Subscription Subscription
+        + BillingAddress Address
+        + Audit Audit
+
+    }
+    class "Project" << (S,Aquamarine) >> {
+        + Id primitive.ObjectID
+        + OrganisationId primitive.ObjectID
+        + Name string
+        + Slug string
+        + Description string
+        + IsActive bool
+        + PublicKey string
+        + PrivateKey string
+        + LegacyPublicKey string
+        + LegacyPrivateKey string
+        + EncryptionKey string
+        + HasPincode bool
+        + Days []string
+        + Audit Audit
+
+    }
+    class "OrganisationUser" << (S,Aquamarine) >> {
+        + Id primitive.ObjectID
+        + UserId primitive.ObjectID
+        + OrganisationId primitive.ObjectID
+        + Status MembershipStatus
+        + InvitedBy primitive.ObjectID
+        + InvitedAt time.Time
+        + JoinedAt time.Time
+        + ExpiresAt time.Time
+        + Audit Audit
+
+        + IsExpired() bool
+        + IsEffectivelyActive() bool
+
+    }
+    class "Role" << (S,Aquamarine) >> {
+        + Id primitive.ObjectID
+        + OrganisationId primitive.ObjectID
+        + Name string
+        + Description string
+        + ParentRole BaseRole
+        + Permissions []Permission
+        + Pages []string
+        + TimeWindow TimeWindow
+        + IsActive bool
+        + FeaturePermissions FeaturePermissions
+        + TimeWindowActive bool
+        + Audit Audit
+
+        + ValidatePermissions() error
+
+    }
+    class "RoleAssignment" << (S,Aquamarine) >> {
+        + Id primitive.ObjectID
+        + UserId primitive.ObjectID
+        + RoleId primitive.ObjectID
+        + OrganisationId primitive.ObjectID
+        + ExpiresAt time.Time
+        + IsActive bool
+        + Scope RoleAssignmentScope
+        + Audit Audit
+
+        + IsExpired() bool
+        + IsEffectivelyActive() bool
+
+    }
+    class "OrganisationInvitation" << (S,Aquamarine) >> {
+        + Id primitive.ObjectID
+        + OrganisationId primitive.ObjectID
+        + Email string
+        + RoleIds []primitive.ObjectID
+        + Scope RoleAssignmentScope
+        + Token string
+        + InvitedBy primitive.ObjectID
+        + Status InvitationStatus
+        + ExpiresAt time.Time
+        + Audit Audit
+
+    }
+    class "RoleAssignmentScope" << (S,Aquamarine) >> {
+        + ProjectIds []primitive.ObjectID
+        + SiteIds []primitive.ObjectID
+        + GroupIds []primitive.ObjectID
+        + DeviceIds []primitive.ObjectID
+
+        + IsOrganisationWide() bool
+
+    }
+}
+' Relationships below are explicit domain references, not inferred by GoPlantUML.
+models.User "1" <-- "0..*" models.Organisation : OwnerId
+models.Organisation "1" <-- "1..*" models.Project : OrganisationId
+models.User "1" <-- "0..*" models.OrganisationUser : UserId
+models.Organisation "1" <-- "0..*" models.OrganisationUser : OrganisationId
+models.Organisation "1" <-- "0..*" models.Role : OrganisationId
+models.User "1" <-- "0..*" models.RoleAssignment : UserId
+models.Organisation "1" <-- "0..*" models.RoleAssignment : OrganisationId
+models.Role "1" <-- "0..*" models.RoleAssignment : RoleId
+models.Organisation "1" <-- "0..*" models.OrganisationInvitation : OrganisationId
+models.Role "0..*" <-- "0..*" models.OrganisationInvitation : RoleIds
+models.RoleAssignment *-- models.RoleAssignmentScope : Scope
+models.OrganisationInvitation *-- models.RoleAssignmentScope : Scope
+models.RoleAssignmentScope ..> models.Project : ProjectIds (restriction)
+@enduml
