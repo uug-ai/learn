@@ -4,7 +4,7 @@ description: "Understand how organisations, projects, memberships, roles, and re
 lead: "Understand how organisations and projects separate ownership, access, and resources in Kerberos Hub."
 date: 2026-08-11T00:00:00+00:00
 lastmod: 2026-10-07T00:00:00+00:00
-draft: true
+draft: false
 images: []
 menu:
   hub:
