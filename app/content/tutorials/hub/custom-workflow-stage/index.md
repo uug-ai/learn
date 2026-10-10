@@ -62,7 +62,15 @@ This tutorial targets a **self-hosted Hub** that can run custom stages. Make sur
 {{< /tutorial-panel >}}
 
 {{< callout type="info" >}}
-**On a managed / cloud Hub?** You can't deploy a custom stage there, but you can deliver the *same* result over HTTP instead — the [ingest API](/docs/hub/workflows/ingest/#over-the-api-post-ingest) accepts the same `marker` block (the run shape is the [marker contract](/docs/hub/workflows/ingest/blocks/marker/)). The rest of this tutorial is for deployments you control.
+**Running your worker outside the Hub cluster?** When your deployment provides
+the forwarder block, use the [external-stage workflow](/docs/hub/workflows/external-stages/)
+instead: design the workflow in Hub, receive a versioned invocation on your
+own queue, and return results with a scoped Profile access token. The
+[person-detection exercise](https://github.com/uug-ai/exercise) walks through
+that complete path. For standalone ingestion without a workflow run, the
+[ingest API](/docs/hub/workflows/ingest/#over-the-api-post-ingest) also accepts
+the same `marker` block. The internal-stage implementation below remains for
+deployments you control.
 {{< /callout >}}
 
 This tutorial puts two reference pages into practice, and it helps to have skimmed them first — [Workflows → Stages](/docs/hub/workflows/stages/) (how a microservice connects) and [Workflows → Ingest](/docs/hub/workflows/ingest/) (what it hands back). This tutorial is the hands-on path through both.

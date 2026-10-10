@@ -3,7 +3,7 @@ title: "External stages"
 description: "Connect customer-managed workers to Hub workflows through the workflow forwarder and authenticated callback API."
 lead: "Run a workflow stage in your own environment: receive a safe, versioned invocation over RabbitMQ or HTTPS and return its result through the Hub API."
 date: 2026-09-24T00:00:00+00:00
-lastmod: 2026-09-24T00:00:00+00:00
+lastmod: 2026-10-09T00:00:00+00:00
 draft: false
 images: []
 aliases:
@@ -34,6 +34,94 @@ The forwarder is an opt-in workflow service. The deployment must enable
 `hub-workflows-forwarder`, route a workflow stage to its queue, and select a
 completion mode. Callback mode also requires a reachable Hub API URL.
 {{< /callout >}}
+
+## Design the workflow
+
+1. Select the organisation/project containing your Agent, open **Workflows**,
+   and select **Add Workflow**. Enter a name and leave it disabled during setup.
+2. Keep **Recording classified**, the start block, in **Automatic** mode.
+   Drag **Forward to my system** from **Blocks** onto the canvas; its display
+   name may vary by deployment, but its operation must be `forwarder`.
+3. Drag from the start block's output port to the forwarder's input port.
+4. Select the connection's **Start when...** badge. Expand **Which recordings**
+   and select your Agent under **Camera**. Empty camera selection means all
+   devices in scope. Leave **Site**, **Camera group**, **Objects in recording**,
+   and optional activity/extra conditions unset for the first test. Under
+   **Active hours**, select **Always**.
+5. Select **Forward to my system** to configure the external destination.
+   Choose **RabbitMQ** under **Provider**, and enter your own **Host**, **Port**,
+   **Queue**, **Virtual host**, **Username**, and **Password**. Use **Use TLS**
+   outside an approved trusted local network. Custom workflows do not inherit
+   the deployment's broker, credentials, virtual host, or TLS overrides;
+   shared deployment integrations are reserved for global workflows.
+6. Select **Wait for result** (`mode=callback`) under **Completion mode** when
+   the external worker will return analysis results. **Complete after delivery**
+   (`mode=delivered`) finishes the stage without waiting for a callback.
+   The destination queue must match the worker's queue and be reachable by both
+   services. The worker may use separate consumer credentials.
+7. Select **Create workflow** to save the draft. Once your worker and callback
+   token are ready, enable the workflow and select **Save changes**.
+
+{{< figure src="/docs/hub/workflows/images/hub-workflow-designer.png" alt="Live Hub designer with Recording classified connected to Forward to my system" caption="An unsaved example: connect the automatic start block to the external forwarder." class="stretch" >}}
+
+{{< figure src="/docs/hub/workflows/images/hub-workflow-trigger.png" alt="Which recordings trigger settings with Camera, Site, Camera group, and Objects in recording" caption="Select your Agent under Camera. Device names are intentionally omitted from this screenshot." class="stretch" >}}
+
+{{< figure src="/docs/hub/workflows/images/hub-workflow-forwarder.png" alt="Forwarder Delivery settings with RabbitMQ and Wait for result selected" caption="Wait for result is callback mode; Complete after delivery does not wait for external analysis." class="stretch" >}}
+
+The forwarder's **Maximum retries** setting limits failed delivery retries
+(the UI defaults to `5`), not retries inside your external worker.
+**Declare destination queues** creates durable quorum destination and
+destination dead-letter queues when missing. If it is disabled, both must
+already exist. Supply compatible queues and the appropriate declaration or
+inspection permissions for the forwarder's credentials.
+
+Leave **Destination dead-letter queue** blank to use
+`<queue>.forwarder-dead-letter`, or supply a different queue from the destination.
+This setting only declares/checks the queue: configure external-consumer
+dead-letter routing separately. Never use Hub's internal failed-dispatch queue,
+which may contain internal credentials, as the external dead-letter destination.
+
+If the block is absent, the administrator must enable the forwarder service
+and expose its operation in the workflow catalog. Deployment-managed workflows
+are read-only; duplicate one to make an editable copy. The Hub callback base
+URL is configured on the forwarder service, not with a bearer token in the
+workflow designer.
+
+## Create a callback access token
+
+The external worker authenticates as the owner of the workflow's tenant.
+Agent keys and RabbitMQ credentials are not Hub callback credentials.
+
+1. Open **Profile** (`/profile`) and select **Access tokens**
+   (`/profile?tab=access-tokens`). This section is currently available to owner
+   accounts.
+2. Select **Generate access token**.
+3. In **Details**, supply a name of at least three characters and a description.
+4. In **Expiry**, select a short lifetime, such as **24 hours**, or an exact date.
+5. In **Permissions**, select the `workflow-runs` area and enable only `update`.
+   **Assigned permissions** should contain exactly `workflow-runs.update`.
+6. Select **Generate**, copy the token from the success dialog, and store it
+   privately before closing.
+
+{{< figure src="/docs/hub/workflows/images/hub-access-token-details.png" alt="Generate access token Details tab with an example name and description" caption="Details: provide both a name and description." class="stretch" >}}
+
+{{< figure src="/docs/hub/workflows/images/hub-access-token-expiry.png" alt="Access token Expiry tab with 24 hours selected" caption="Expiry: choose a short lifetime covering the exercise, not the literal date pictured." class="stretch" >}}
+
+{{< figure src="/docs/hub/workflows/images/hub-access-token-permissions.png" alt="Access token Permissions tab with only workflow-runs.update assigned" caption="Permissions: select workflow-runs, then update only. No token was generated for these screenshots." class="stretch" >}}
+
+The copy control includes `Bearer ` for use as an Authorization header value.
+If your client adds that prefix itself, supply only the raw token. In
+particular, the [person-detection exercise](https://github.com/uug-ai/exercise)
+expects `WORKFLOW_BEARER_TOKEN` **without** `Bearer `. The permission identifier
+is plural: `workflow-runs.update`, not `workflow-run.update`.
+
+Use a token belonging to the correct tenant. Keep it out of workflow settings,
+Git, logs, and screenshots; revoke or rotate it if exposed. After testing,
+disable the exercise workflow and delete its token.
+
+For a complete walkthrough with an Agent, development container, illustrated
+designer/token guides, YOLO person detection, and result verification, follow
+the [Augment Vision workflow exercise](https://github.com/uug-ai/exercise).
 
 ## End-to-end flow
 
