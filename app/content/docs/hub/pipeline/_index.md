@@ -140,7 +140,7 @@ It is built to be resilient: even if recordings arrive late or an Agent's connec
 
 > kcloud-analysis-queue
 
-Once recordings are sequenced, the analyser orchestrates the post-processing stage. It fans out the event in parallel to the enrichment services — thumbnail, sprite, dominant color, classification, counting, and any custom services you've added. Each of those services runs independently and reports back asynchronously. As soon as the analysis stage as a whole completes, the pipeline continues to the next sequential step.
+Once recordings are sequenced, the analyser orchestrates the post-processing stage. It fans out the event in parallel to the enrichment services — thumbnail, sprite and dominant color (when enabled), classification, counting, and any custom services you've added. Each of those services runs independently and reports back asynchronously. As soon as the analysis stage as a whole completes, the pipeline continues to the next sequential step.
 
 ## Thumbnail
 
@@ -158,7 +158,9 @@ The sprite service builds a video timelapse — a single image strip composed of
 
 > kcloud-dominantcolor-queue.fifo
 
-The dominant color service computes the most prevalent colors in a recording and stores the resulting palette alongside the event metadata. Hub uses these palettes to colour-code recordings, group them visually, and add another dimension to filter and search on.
+The dominant color service computes the most prevalent colors in a recording and stores the resulting palette alongside the event metadata. Hub shows the palette on the recording's detail page.
+
+This stage is optional and off by default. Set `kerberospipeline.dominantColor.enabled: true` in the Hub Helm values to deploy the service and have the analyser schedule it. The same value controls both, so the analyser never publishes to a queue without a consumer. When it is off, recordings have no palette and the rest of the pipeline is unaffected.
 
 ## Classification
 
