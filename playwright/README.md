@@ -23,13 +23,21 @@ Edit `.env` and provide:
 | Variable        | Meaning                                                              |
 | --------------- | -------------------------------------------------------------------- |
 | `HUB_BASE_URL`  | Base URL of the running Hub frontend, e.g. `http://localhost:4200`.  |
-| `HUB_USERNAME`  | Email of a Hub user that can read media and create cases.            |
-| `HUB_PASSWORD`  | Password for that user.                                              |
+| `HUB_USERNAME`  | Login username or email for the `uugai` account.                      |
+| `HUB_PASSWORD`  | Password for the `uugai` account.                                     |
 | `SCREENSHOT_DIR`| _(optional)_ Override the output folder for screenshots.             |
+| `HUB_RECORDINGS_PATH` | _(optional)_ Recordings route with filters, e.g. `/media?date=2026-10-16&devices=front-door`. Used by the recordings spec; defaults to `/media`. |
 
 By default screenshots are written to
 `learn/app/content/docs/hub/<topic>/`, next to the Markdown page that
 references them.
+
+Documentation screenshots must only use the **uugai** account and its approved
+demo footage. Login and the shared capture helper check that the signed-in
+username is exactly `uugai`; captures fail before writing an image if another
+account is active or the account cannot be verified. Do not hide or relabel a
+different account's identity to bypass this check. The same rule applies to
+manual browser captures.
 
 ## Available scripts
 
@@ -38,9 +46,16 @@ references them.
 | `npm run cases`             | Captures the cases overview and the create-case flow (`docs/hub/cases`).      |
 | `npm run cases:headed`      | Same, but with a visible browser window — useful for debugging.               |
 | `npm run media`             | Captures the recording side-panel / context flows (`docs/hub/cases`).         |
+| `npm run recordings`        | Captures the overview, grid, side panel, context player, and detail page (`docs/hub/recordings`). |
+| `npm run recordings:headed` | Same, but with a visible browser window. |
 | `npm run livestream`        | Captures the `/livestream` page (`docs/hub/livestream`).                      |
 | `npm run livestream:headed` | Same, but with a visible browser window.                                      |
 | `npm test`                  | Runs every spec in `tests/`.                                                  |
+
+The recordings spec only opens existing footage and UI panels: it does not
+create cases, send shares, request forwarding, or edit recordings. Use an
+account and `HUB_RECORDINGS_PATH` with at least one playable recording. Missing
+footage fails the capture rather than silently keeping stale screenshots.
 
 ## Adding a new topic
 
