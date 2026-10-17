@@ -17,6 +17,8 @@
     "cases:headed": "node scripts/run-headed.mjs tests/cases.spec.ts",
     "media": "playwright test tests/media.spec.ts",
     "media:headed": "node scripts/run-headed.mjs tests/media.spec.ts",
+    "recordings": "playwright test tests/recordings.spec.ts",
+    "recordings:headed": "node scripts/run-headed.mjs tests/recordings.spec.ts",
     "livestream": "playwright test tests/livestream.spec.ts",
     "livestream:headed": "node scripts/run-headed.mjs tests/livestream.spec.ts",
     "livestream:diagnose": "playwright test tests/livestream-diagnose.spec.ts",

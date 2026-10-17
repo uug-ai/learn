@@ -248,6 +248,11 @@ want to capture, then re-run `npm run <topic>`.
 
 ## Generating the screenshots
 
+Only capture screenshots while signed in to the **uugai** documentation account.
+The shared login and capture helpers enforce this account check. For manual
+browser captures, verify the signed-in username before every capture; never
+hide or relabel another account's identity or use its footage.
+
 The screenshots that illustrate a Hub page are produced by Playwright
 scripts living in `learn/playwright/`. Generating them is a two-step
 process: stand up the Hub stack locally, then run the spec.
@@ -294,7 +299,7 @@ Edit `.env` and set:
 | Variable        | Meaning                                                              |
 | --------------- | -------------------------------------------------------------------- |
 | `HUB_BASE_URL`  | `http://localhost:4200` for a local Hub stack.                        |
-| `HUB_USERNAME`  | Email of a Hub user that can see the data you want to screenshot.    |
+| `HUB_USERNAME`  | Login username or email for the `uugai` documentation account.       |
 | `HUB_PASSWORD`  | Password for that user.                                              |
 | `SCREENSHOT_DIR`| _(optional)_ override the output folder, relative to `learn/playwright/`. |
 

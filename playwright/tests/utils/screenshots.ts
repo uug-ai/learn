@@ -2,6 +2,7 @@ import { Page } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 import { prepareForScreenshot } from './chrome';
+import { assertScreenshotAccount } from './auth';
 
 /**
  * Root of the Hub documentation pages — every topic captured by a spec
@@ -72,6 +73,7 @@ export async function capture(
   filename: string,
   options: CaptureOptions = {},
 ): Promise<string> {
+  await assertScreenshotAccount(page);
   const dir = screenshotDir(options.topic);
   const target = path.join(dir, filename);
 
@@ -94,6 +96,7 @@ export async function capture(
   await page.evaluate((y) => window.scrollTo(0, y), scrollY);
   await page.waitForTimeout(500);
 
+  await assertScreenshotAccount(page);
   await page.screenshot({
     path: target,
     clip: { x: 0, y: 0, width, height },

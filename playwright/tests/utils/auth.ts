@@ -1,4 +1,11 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
+
+export async function assertScreenshotAccount(page: Page): Promise<void> {
+  await expect(
+    page.locator('navigation .profile-footer .username'),
+    'Documentation captures require the signed-in uugai account. Do not capture another account or relabel its UI.',
+  ).toHaveText('uugai');
+}
 
 /**
  * Logs in to the Hub frontend using the credentials provided through the
@@ -30,4 +37,5 @@ export async function login(page: Page): Promise<void> {
     }),
     page.locator('input[type="submit"][value="Sign in"]').click(),
   ]);
+  await assertScreenshotAccount(page);
 }
