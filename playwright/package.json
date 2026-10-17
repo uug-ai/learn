@@ -19,6 +19,8 @@
     "media:headed": "node scripts/run-headed.mjs tests/media.spec.ts",
     "recordings": "playwright test tests/recordings.spec.ts",
     "recordings:headed": "node scripts/run-headed.mjs tests/recordings.spec.ts",
+    "videowall": "playwright test tests/videowall.spec.ts",
+    "videowall:headed": "node scripts/run-headed.mjs tests/videowall.spec.ts",
     "livestream": "playwright test tests/livestream.spec.ts",
     "livestream:headed": "node scripts/run-headed.mjs tests/livestream.spec.ts",
     "livestream:diagnose": "playwright test tests/livestream-diagnose.spec.ts",

@@ -27,6 +27,7 @@ Edit `.env` and provide:
 | `HUB_PASSWORD`  | Password for the `uugai` account.                                     |
 | `SCREENSHOT_DIR`| _(optional)_ Override the output folder for screenshots.             |
 | `HUB_RECORDINGS_PATH` | _(optional)_ Recordings route with filters, e.g. `/media?date=2026-10-16&devices=front-door`. Used by the recordings spec; defaults to `/media`. |
+| `HUB_VIDEOWALL_NAME` | _(optional)_ Existing editable `uugai` wall with cameras for the video wall captures; defaults to `All cameras`. |
 
 By default screenshots are written to
 `learn/app/content/docs/hub/<topic>/`, next to the Markdown page that
@@ -48,6 +49,8 @@ manual browser captures.
 | `npm run media`             | Captures the recording side-panel / context flows (`docs/hub/cases`).         |
 | `npm run recordings`        | Captures the overview, grid, side panel, context player, and detail page (`docs/hub/recordings`). |
 | `npm run recordings:headed` | Same, but with a visible browser window. |
+| `npm run videowall`         | Captures the wall overview and all six editor tabs (`docs/hub/videowall`). |
+| `npm run videowall:headed`  | Same, but with a visible browser window. |
 | `npm run livestream`        | Captures the `/livestream` page (`docs/hub/livestream`).                      |
 | `npm run livestream:headed` | Same, but with a visible browser window.                                      |
 | `npm test`                  | Runs every spec in `tests/`.                                                  |
@@ -56,6 +59,11 @@ The recordings spec only opens existing footage and UI panels: it does not
 create cases, send shares, request forwarding, or edit recordings. Use an
 account and `HUB_RECORDINGS_PATH` with at least one playable recording. Missing
 footage fails the capture rather than silently keeping stale screenshots.
+
+The video wall spec requires an existing editable wall with selected cameras.
+It opens the editor tabs and cancels without saving: it does not create, update,
+delete, or distribute a wall. Captures remain inside the authenticated management
+page so the shared `uugai` account check applies to every image.
 
 ## Adding a new topic
 
