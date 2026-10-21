@@ -3,7 +3,7 @@ title: "White-label"
 description: "Brand Kerberos Hub as you wish."
 lead: "Use Kerberos Hub with your own style guide and marketing branding."
 date: 2020-10-06T08:49:31+00:00
-lastmod: 2020-10-06T08:49:31+00:00
+lastmod: 2026-10-21T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -131,7 +131,7 @@ Start from the [default templates](https://github.com/kerberos-io/helm-charts/tr
 
 Upload your files into a Persistent Volume inside a `templates/` folder and [create a Persistent Volume Claim (PVC)](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/custom-layout-claim.yaml) — you can reuse the same `custom-layout-claim` as the other customizations. The application reads templates from `/mail/templates`, so the `volumeMount` is pointed at `/mail` and your files must live under a `templates/` folder in the volume.
 
-Then add (or uncomment) the `volumes` and `volumeMounts` in the Helm chart `values.yaml` for the three services that send emails — `kerberoshub.api`, `kerberospipeline.notify` and `kerberospipeline.notifyTest`:
+Then add (or uncomment) the `volumes` and `volumeMounts` in the Helm chart `values.yaml` for the four services that send emails: `kerberoshub.api` (account, sharing and task emails), `kerberoshub.monitordevice` (device status emails), `kerberospipeline.notify` (alert emails) and `kerberospipeline.notifyTest`:
 
     kerberoshub:
         api:
@@ -139,6 +139,16 @@ Then add (or uncomment) the `volumes` and `volumeMounts` in the Helm chart `valu
             schema: "https"
             url: "api.yourdomain.com"
 
+            # E-mail templates
+            volumeMounts:
+              - name: custom-email-templates
+                mountPath: /mail
+            volumes:
+              - name: custom-email-templates
+                persistentVolumeClaim:
+                  claimName: custom-layout-claim
+        monitordevice:
+            ...
             # E-mail templates
             volumeMounts:
               - name: custom-email-templates
@@ -195,51 +205,75 @@ Aside from the in-template `{{variables}}`, each email type has two values in th
 
 Within an email template you can use variables, which are indicated through `{{variable}}`. Each variable is automatically replaced by its value when the email is sent.
 
-**Not every variable is available in every template.** Each email is sent with its own set of data, so a variable only resolves in the templates that actually provide it — anywhere else it is simply stripped out (replaced with an empty string). Use the table below to see which variables you can rely on in each template:
+**Not every variable is available in every template.** Each email is sent with its own set of data, so a variable only resolves in the templates that provide it. A variable that has no value for that email stays in the email as literal text (for example `{{link}}`), so only use the variables listed for each email below.
 
-| Template | When it is sent | Variables you can use |
+The bundled templates also contain `{{tab1_href}}`, `{{tab1_title}}`, `{{tab2_href}}` and `{{tab2_title}}`. These are not filled in.
+
+**Links in emails**
+
+Links are built from the front-end address in the Helm chart:
+
+- The **base URL** is `kerberoshub.frontend.schema` + `://` + `kerberoshub.frontend.url`, for example `https://app.yourdomain.com`.
+- The **tenant URL** is the base URL with the first part of the host replaced by the recipient account's domain. With base URL `https://app.yourdomain.com` and account domain `acme`, the tenant URL is `https://acme.yourdomain.com`. Accounts without a domain use the base URL. Only the last two parts of the host are kept, so `app.yourdomain.co.uk` becomes `acme.co.uk`.
+
+**Alert email (`detection`)**
+
+Sent when a custom alert or the generic detection alert fires. The subject is the `alertTitle` value; for a custom alert it is prefixed with the alert's name in brackets, for example `[Front door] Kerberos Hub detected an event`.
+
+| Variable | Value |
+| --- | --- |
+| `{{user}}` | Name of the account that receives the alert: first and last name, or the username when both are empty. This is the account the camera belongs to, not the user who created the alert. |
+| `{{title}}` | The email subject. |
+| `{{text}}` | The alert message: what was detected, on which camera and when. |
+| `{{link}}` | **Custom alerts**: a signed link to the recording file. It stops working when the storage link expires. **Generic detection alert**: the recording's page in Hub, `<tenant URL>/media/<id>`. |
+| `{{medialink}}` | `https://app.kerberos.io/media/<id>`. Always this host; it does not follow your front-end address. |
+| `{{thumbnail}}` | An image of the recording: embedded in the email for custom alerts, a thumbnail link for the generic detection alert. |
+| `{{date}}`, `{{time}}`, `{{datetime}}` | Start of the recording, in the account's timezone. |
+| `{{eventdate}}`, `{{eventtime}}`, `{{eventdatetime}}` | When the alert was sent, in the account's timezone. |
+| `{{timezone}}` | The account's timezone. |
+| `{{devicename}}`, `{{deviceid}}` | Camera name and camera key. |
+| `{{sites}}`, `{{groups}}` | Comma-separated names of the sites and groups the camera belongs to. |
+| `{{classifications}}` | Comma-separated objects detected in the recording. |
+
+**Device status email (`device`)**
+
+Sent when a camera goes online, offline or idle. The subject is the `deviceTitle` value.
+
+| Variable | Value |
+| --- | --- |
+| `{{user}}` | Username of the account the camera belongs to. |
+| `{{title}}` | The email subject. |
+| `{{text}}` | The status change, for example "`<camera>` is online, but the camera stream is not connected." |
+| `{{status}}` | `online`, `offline` or `idle`. |
+| `{{devicename}}`, `{{deviceid}}` | Camera name and camera key. |
+| `{{eventdate}}`, `{{eventtime}}`, `{{eventdatetime}}` | When the status changed, in the server's timezone (normally UTC), not the account's. |
+| `{{link}}` | Not set; replaced with an empty value. |
+
+**Account, sharing and task emails**
+
+| Email (template) | Variable | Value |
 | --- | --- | --- |
-| `welcome` | A new account is created | `{{user}}`, `{{link}}` |
-| `activate` | Account / e-mail activation | `{{user}}`, `{{link}}` |
-| `forgot` | Password reset request | `{{user}}`, `{{password}}`, `{{ipaddress}}`, `{{link}}` |
-| `newip` | Sign-in from a new IP address | `{{user}}`, `{{ipaddress}}`, `{{link}}` |
-| `assign_task` | A task is assigned to a user | `{{user}}`, `{{assignee}}`, `{{task_name}}`, `{{link}}` |
-| `device` | A device changes state | `{{user}}`, `{{text}}`, `{{link}}` |
-| `disable` | A device/account is disabled (e.g. quota reached) | `{{user}}`, `{{text}}`, `{{dataUsage}}`, `{{link}}` |
-| `highupload` | A high upload / usage warning | `{{user}}`, `{{link}}` |
-| `share` | A recording is shared | `{{user}}`, `{{title}}`, `{{body}}`, `{{url}}` |
-| `share_case` | Someone is invited to a shared case | `{{user}}`, `{{firstname}}`, `{{lastname}}`, `{{url}}`, `{{expiry}}` |
-| `share_case_otp` | A one-time verification code for a shared case | `{{code}}`, `{{expiry}}` |
-| `detection` | An event / detection alert | the full event variable set (see *Event / detection variables* below) |
+| Welcome (`welcome`), sent when an account is created | `{{user}}` | The new user's first and last name, or username. |
+| | `{{link}}` | Activation link: `<base URL>/login/activate/<token>`. |
+| | `{{token}}` | The activation token. |
+| Account activated (`activate`) | `{{user}}` | The user's first and last name, or username. |
+| | `{{link}}` | Sign-in page: `<base URL>/login`. |
+| Password reset (`forgot`) | `{{user}}` | The user's first and last name, or username. |
+| | `{{password}}` | The newly generated password. |
+| | `{{ipaddress}}` | IP address the reset was requested from. |
+| Recording shared (`share`) | `{{user}}` | The sender's first and last name, or username. |
+| | `{{url}}` | Signed link to the recording file. |
+| | `{{title}}` | The email subject (`shareTitle`). The share's own title is only used when `shareTitle` is empty. |
+| | `{{body}}` | The note the sender added to the share. |
+| Case shared (`share_case`) | `{{user}}` | The sender's first and last name, or email address. |
+| | `{{firstname}}`, `{{lastname}}` | The sender's first and last name. |
+| | `{{url}}` | Link to the shared case: `<base URL>/share/<token>`. |
+| | `{{expiry}}` | How long the share stays valid, for example "2 days" or "1 week". |
+| Case share code (`share_case_otp`) | `{{code}}` | The one-time code the recipient enters to open the shared case. |
+| | `{{expiry}}` | How long the code stays valid. |
+| Task assigned (`assign_task`) | `{{assignee}}` | The assigned user's first and last name, or username. |
+| | `{{user}}` | Name of the user who assigned the task. |
+| | `{{task_name}}` | The task title. |
+| | `{{link}}` | `<tenant URL>/tasks/`, using the assigned user's domain. |
 
-> **Note:** The `detection` (event alert) email is the only one populated from a complete event, so it can use the full set of event variables listed below. All other (transactional) emails only resolve the variables shown in their row — adding any other variable to them will leave it blank.
-
-**Variable reference**
-
-Account & sharing variables:
-
-- `{{user}}`: name of the user that triggered or sent the message
-- `{{firstname}}` / `{{lastname}}`: first / last name of the case-share recipient
-- `{{title}}`: title (subject) of the message
-- `{{body}}`: body text of the message — for a recording share this is the note the sender typed
-- `{{url}}`: link to the shared media or case
-- `{{expiry}}`: human-readable lifetime of the share link or verification code
-- `{{code}}`: the one-time verification code the recipient enters to open a shared case
-- `{{password}}`: generated / reset password
-- `{{ipaddress}}`: IP address related to the sign-in or reset request
-- `{{assignee}}` / `{{task_name}}`: the assignee and name of an assigned task
-- `{{link}}`: link to the relevant page (media, activation, reset, …)
-
-Event / detection variables (available in the `detection` template):
-
-- `{{text}}`: text of the message
-- `{{medialink}}`: link to the media page on the Hub
-- `{{thumbnail}}`: event thumbnail (embedded image, base64 or URL)
-- `{{classifications}}`: list of classifications detected in the recording
-- `{{timezone}}`: timezone of the account generating the event
-- `{{date}}` / `{{time}}` / `{{datetime}}`: date / time / datetime of the media
-- `{{eventdate}}` / `{{eventtime}}` / `{{eventdatetime}}`: date / time / datetime of the notification
-- `{{devicename}}` / `{{deviceid}}`: device generating the event
-- `{{sites}}` / `{{groups}}`: the sites / groups the device is part of
-- `{{numberOfMedia}}`: number of media attached to the message
-- `{{dataUsage}}`: data usage of the message
+The `newip`, `disable` and `highupload` templates are included in the default set, but no service currently sends them.
