@@ -289,7 +289,9 @@ Other cameras · Camera stream lost · 1 camera
 
 The device monitor sends both device emails, so custom `device` and `device_group` templates only take effect when the template volume is also mounted on `kerberoshub.monitordevice` (see the `values.yaml` example above).
 
-Webhook channels receive the same notification as JSON: `body` holds the summary and `data` holds the email variables (`user`, `count`, `status`, `link`, `sections` as HTML and `sectionsText`).
+**Which channels are grouped.** Grouping applies to the channels people read: email, Slack, Telegram, Pushover, Pushbullet, SMS and Alexa. Webhooks, IFTTT and the real-time feed are never grouped: they keep receiving one notification per camera, with the same fields and at the same moment as without grouping, so existing integrations keep working.
+
+**When email stays per camera.** The grouped email is only sent with the SMTP mail provider. With SendGrid or Mailgun the template name is a template id in that account, so those keep one `device` email per camera. With SMTP, a deployment that mounts its own `device` template but no `device_group` template also keeps one email per camera, so a white-labelled device email never falls back to the default layout. Add a `device_group` template next to your `device` template to get grouped emails.
 
 **Account, sharing and task emails**
 
