@@ -289,7 +289,7 @@ Other cameras · Camera stream lost · 1 camera
 
 The device monitor sends both device emails, so custom `device` and `device_group` templates only take effect when the template volume is also mounted on `kerberoshub.monitordevice` (see the `values.yaml` example above).
 
-Webhook channels receive the same notification as JSON. `body` holds the summary, `data` holds `count`, `status` and `link`, and the cameras are listed in `device_statuses`:
+Webhook channels receive the same notification as JSON. `body` holds the summary, `data` holds the email variables (`user`, `count`, `status`, `link`, `sections` as HTML and `sectionsText`), and the cameras are listed in `device_statuses`:
 
 | Field | Value |
 | --- | --- |
