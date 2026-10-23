@@ -238,7 +238,7 @@ Sent when a custom alert or the generic detection alert fires. The subject is th
 
 **Device status email (`device`)**
 
-Sent when a camera goes online, offline or idle. The subject is the `deviceTitle` value. Accounts with **Group by sites and groups** switched on get the `device_group` email below instead when several cameras change status at the same time.
+Sent when a camera goes online, offline or idle. The subject is the `deviceTitle` value. Accounts with **Group notifications** switched on get the `device_group` email below instead when several cameras change status at the same time.
 
 | Variable | Value |
 | --- | --- |
@@ -252,7 +252,7 @@ Sent when a camera goes online, offline or idle. The subject is the `deviceTitle
 
 **Grouped device status email (`device_group`)**
 
-Sent instead of `device` when an account has **Group by sites and groups** switched on (Alerts → Devices) and **several** of its cameras change status at the same time. Each change is held for one scan of the device monitor (`kerberoshub.monitordevice.scanIntervalSeconds`, default 60 seconds), so the cameras of one outage end up in one email. When only one camera changed, the usual `device` email is sent. The subject is the `deviceGroupTitle` value.
+Sent instead of `device` when an account has **Group notifications** switched on (Alerts → Devices) and **several** of its cameras change status at the same time. Each change is held for one scan of the device monitor (`kerberoshub.monitordevice.scanIntervalSeconds`, default 60 seconds), so the cameras of one outage end up in one email. When only one camera changed, the usual `device` email is sent. The subject is the `deviceGroupTitle` value.
 
 | Variable | Value |
 | --- | --- |
