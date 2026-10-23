@@ -65,6 +65,14 @@ When configuring an alert:
 - set the active time range deliberately; and
 - select at least one recipient or outbound channel for the intended delivery.
 
+The generic device alert sends one notification per camera that goes offline,
+loses its camera stream or comes back online. Switch on **Group by sites and
+groups** in its panel to receive one notification when several cameras change
+status at the same time, with the cameras listed per site or group. Changes are
+then held for one scan of the device monitor (one minute by default) before
+they are sent. See [White-label]({{< ref "/docs/hub/whitelabel" >}}) for the
+email template and webhook fields.
+
 Alert management is restricted to users with the relevant administrative page
 permission. See [Configuration]({{< ref "/docs/hub/configuration" >}}#alerts--channels)
 for the existing alert setup reference.

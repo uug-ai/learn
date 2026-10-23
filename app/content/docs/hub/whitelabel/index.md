@@ -200,6 +200,7 @@ Aside from the in-template `{{variables}}`, each email type has two values in th
 | Task assignment | `assignTask` | `assignTaskTitle` | `assign_task` |
 | Event / detection alert | `detection` | `alertTitle` | `detection` |
 | Device status change | `device` | `deviceTitle` | `device` |
+| Grouped device status change | `deviceGroup` | `deviceGroupTitle` | `device_group` |
 
 **Template variables**
 
@@ -237,17 +238,65 @@ Sent when a custom alert or the generic detection alert fires. The subject is th
 
 **Device status email (`device`)**
 
-Sent when a camera goes online, offline or idle. The subject is the `deviceTitle` value.
+Sent when a camera goes online, offline or idle. The subject is the `deviceTitle` value. Accounts with **Group by sites and groups** switched on get the `device_group` email below instead when several cameras change status at the same time.
 
 | Variable | Value |
 | --- | --- |
 | `{{user}}` | Username of the account the camera belongs to. |
 | `{{title}}` | The email subject. |
 | `{{text}}` | The status change, for example "`<camera>` is online, but the camera stream is not connected." |
-| `{{status}}` | `online`, `offline` or `idle`. |
+| `{{status}}` | The new status: `active` (online), `inactive` (offline) or `idle` (online, camera stream not connected). |
 | `{{devicename}}`, `{{deviceid}}` | Camera name and camera key. |
 | `{{eventdate}}`, `{{eventtime}}`, `{{eventdatetime}}` | When the status changed, in the server's timezone (normally UTC), not the account's. |
 | `{{link}}` | Not set; replaced with an empty value. |
+
+**Grouped device status email (`device_group`)**
+
+Sent instead of `device` when an account has **Group by sites and groups** switched on (Alerts → Devices) and **several** of its cameras change status at the same time. Each change is held for one scan of the device monitor (`kerberoshub.monitordevice.scanIntervalSeconds`, default 60 seconds), so the cameras of one outage end up in one email. When only one camera changed, the usual `device` email is sent. The subject is the `deviceGroupTitle` value.
+
+| Variable | Value |
+| --- | --- |
+| `{{user}}` | Name of the account the cameras belong to: first and last name, or the username when both are empty. |
+| `{{title}}` | The email subject. |
+| `{{text}}` | One-line summary, for example "6 cameras changed status: 4 offline, 1 lost their camera stream, 1 back online." |
+| `{{count}}` | Number of cameras in the email. |
+| `{{status}}` | `active`, `inactive` or `idle` when all cameras have the same new status, otherwise `mixed`. |
+| `{{sections}}` | The cameras as HTML, grouped in sections (see below). |
+| `{{sectionsText}}` | The same sections as plain text, for `device_group.txt`. |
+| `{{link}}` | The cameras page: `<tenant URL>/devices`. |
+| `{{eventdate}}`, `{{eventtime}}`, `{{eventdatetime}}` | When the email was sent, in the server's timezone (normally UTC). |
+
+How cameras are split into sections:
+
+- There is one section per status and per site, group or "Other cameras". Sections are ordered by status (offline, camera stream lost, back online), then sites, groups and "Other cameras".
+- Each camera is listed once: under the site or group that holds the most cameras of the email with the same status. A site wins a tie with a group. Cameras in no site or group are listed under "Other cameras".
+- A section title reads, for example, `Site Gate · Offline · all 3 cameras`, `Group Perimeter · Back online · 2 cameras` or `Other cameras · Camera stream lost · 1 camera`. "all" is added when every camera of the site or group is in the section.
+- Each camera line shows its name and a detail: `no response for 12 min`, `agent online, camera stream not connected` or `online`.
+
+`{{sections}}` is generated HTML with inline styles, because email clients ignore stylesheets: per section a `<p>` with the title, followed by a `<table role="presentation" width="100%">` with one row per camera (name on the left, detail on the right). Put it where the camera list should appear in your template; its look can't be changed from the template. Camera, site and group names are HTML-escaped. If you need full control over the layout, use `{{sectionsText}}` or a webhook channel instead.
+
+`{{sectionsText}}` example:
+
+```text
+Site Gate · Offline · all 3 cameras
+- Gate camera 1 (no response for 4 min)
+- Gate camera 2 (no response for 4 min)
+- Gate camera 3 (no response for 4 min)
+
+Other cameras · Camera stream lost · 1 camera
+- Lobby camera (agent online, camera stream not connected)
+```
+
+The device monitor sends both device emails, so custom `device` and `device_group` templates only take effect when the template volume is also mounted on `kerberoshub.monitordevice` (see the `values.yaml` example above).
+
+Webhook channels receive the same notification as JSON. `body` holds the summary, `data` holds `count`, `status` and `link`, and the cameras are listed in `device_statuses`:
+
+| Field | Value |
+| --- | --- |
+| `device_id`, `device_name` | Camera key and name. |
+| `previous_status`, `status` | Status before and after the change: `active`, `inactive` or `idle`. |
+| `minutes_since_heartbeat` | Minutes since the camera last reported. |
+| `section_type`, `section_name` | The section the camera is listed in: `site`, `group`, or `account` for "Other cameras" (no name). |
 
 **Account, sharing and task emails**
 
