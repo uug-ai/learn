@@ -25,6 +25,13 @@ jobs:
       bump: ${{ github.event.inputs.bump }}
     secrets: inherit
 
+  verify-release:
+    needs: [bump-release, release]
+    uses: ./.github/workflows/security-scan.yml
+    with:
+      image_ref: ghcr.io/uug-ai/learn:${{ needs.bump-release.outputs.tag }}
+    secrets: inherit
+
   # Run the original release pipeline for the freshly created tag.
   # A release created with the default GITHUB_TOKEN does not emit the
   # `release: created` event, so we invoke the reusable workflow directly.

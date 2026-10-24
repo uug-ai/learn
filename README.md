@@ -185,6 +185,17 @@ docker build -t docs-site .
 docker run -p 8080:80 docs-site
 ```
 
+The Nginx runtime requires `brotli-libs>=1.2.1-r0`, which fixes
+CVE-2026-111497. The image build installs that minimum even when the upstream
+Nginx image still contains an older Brotli package.
+
+Security CI builds and smoke-tests both amd64 and arm64 runtimes, reports all
+Trivy vulnerability severities, and fails on HIGH or CRITICAL findings without
+excluding unfixed vulnerabilities. Release workflows also scan both platforms
+of the actual published image. To rescan an existing image, run the **Security
+scan** workflow with its `image_ref` input set to the image tag or immutable
+digest.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
