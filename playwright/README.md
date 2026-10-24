@@ -12,11 +12,14 @@ spec and the images on disk are overwritten in place.
 
 ```bash
 cd learn/playwright
-npm install
+npm ci
 npx playwright install-deps         
 npx playwright install chromium
 cp .env.example .env
 ```
+
+Use the committed lockfile to install the matching Sharp native image-processing
+libraries, including their security fixes. Run `npm audit` after dependency updates.
 
 Edit `.env` and provide:
 
