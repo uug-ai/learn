@@ -42,6 +42,8 @@ RUN cp -r public /data/site
 # ---- Final Stage ----
 FROM nginx:alpine
 
+RUN apk add --no-cache 'brotli-libs>=1.2.1-r0'
+
 COPY --from=builder /data/site /usr/share/nginx/html
 
 # Permissions for nginx to access the files

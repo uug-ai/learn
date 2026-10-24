@@ -22,3 +22,10 @@ jobs:
       gitops_key: ".spec.template.spec.containers[0].image"
       gitops_value: "ghcr.io/uug-ai/learn:${{ github.event.release.tag_name }}"
     secrets: inherit
+
+  verify-release:
+    needs: release
+    uses: ./.github/workflows/security-scan.yml
+    with:
+      image_ref: ghcr.io/uug-ai/learn:${{ github.event.release.tag_name }}
+    secrets: inherit
