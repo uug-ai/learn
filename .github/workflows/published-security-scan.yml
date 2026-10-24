@@ -1,0 +1,65 @@
+name: Scan published image
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/published-security-scan.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - architecture: amd64
+            runner: ubuntu-24.04
+          - architecture: arm64
+            runner: ubuntu-24.04-arm
+    steps:
+      - name: Resolve published image digest
+        id: image
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { appendFileSync } from 'node:fs';
+          const releaseResponse = await fetch('https://api.github.com/repos/uug-ai/learn/releases/latest', {
+            headers: { Authorization: `Bearer ${process.env.GH_TOKEN}` },
+          });
+          assert(releaseResponse.ok, `Release lookup failed: ${releaseResponse.status}`);
+          const { tag_name: tag } = await releaseResponse.json();
+          assert.match(tag, /^v\d+\.\d+\.\d+$/);
+          const authResponse = await fetch('https://ghcr.io/token?service=ghcr.io&scope=repository:uug-ai/learn:pull');
+          assert(authResponse.ok, `Registry authentication failed: ${authResponse.status}`);
+          const { token } = await authResponse.json();
+          const manifestResponse = await fetch(`https://ghcr.io/v2/uug-ai/learn/manifests/${tag}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.index.v1+json',
+            },
+          });
+          assert(manifestResponse.ok, `Manifest lookup failed: ${manifestResponse.status}`);
+          const digest = manifestResponse.headers.get('docker-content-digest');
+          assert.match(digest, /^sha256:[a-f0-9]{64}$/);
+          console.log(`Scanning ${tag}: ${digest}`);
+          appendFileSync(process.env.GITHUB_OUTPUT, `ref=ghcr.io/uug-ai/learn@${digest}\n`);
+          NODE
+
+      - name: Scan actual published image
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
+        env:
+          TRIVY_PLATFORM: linux/${{ matrix.architecture }}
+        with:
+          version: v0.76.1
+          image-ref: ${{ steps.image.outputs.ref }}
+          scanners: vuln
+          severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          ignore-unfixed: false
+          exit-code: "0"
+          timeout: 10m
