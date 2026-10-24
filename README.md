@@ -12,6 +12,15 @@ A modern, fast, and feature-rich documentation website built with [Hugo](https:/
 - 🚀 **SEO Optimized**: Built-in SEO best practices
 - 📦 **Easy to Deploy**: Static files that can be hosted anywhere
 
+## Favicons
+
+The icons in `app/static/` use the same white UUG wordmark on a midnight
+background as the website and design toolkit: ICO, 16/32px browser PNGs, a
+180px Apple touch icon, and 192/512px app icons. The custom
+`app/layouts/_partials/favicons.html` partial and `app/static/site.webmanifest`
+use `?v=uug-midnight` URLs to refresh older cached artwork. The manifest names
+the app **UUG.AI Learn**.
+
 ## Prerequisites
 
 - [Hugo](https://gohugo.io/installation/) (Extended version >= 0.112.0)
