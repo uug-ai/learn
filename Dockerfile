@@ -42,7 +42,7 @@ RUN cp -r public /data/site
 # ---- Final Stage ----
 FROM nginx:alpine
 
-RUN apk add --no-cache 'brotli-libs>=1.2.1-r0'
+RUN apk add --no-cache 'brotli-libs>=1.2.1-r0' 'curl>=8.23.0-r0' 'libcurl>=8.23.0-r0'
 
 COPY --from=builder /data/site /usr/share/nginx/html
 
