@@ -30,6 +30,8 @@ namespace models {
         + BillingAddress Address
         + Audit Audit
 
+        + IsOwner(userId primitive.ObjectID) bool
+
     }
     class "Project" << (S,Aquamarine) >> {
         + Id primitive.ObjectID
@@ -68,67 +70,107 @@ namespace models {
         + OrganisationId primitive.ObjectID
         + Name string
         + Description string
-        + ParentRole BaseRole
+        + Kind RoleKind
+        + Key RoleKey
+        + AssignableAt PermissionScope
         + Permissions []Permission
-        + Pages []string
-        + TimeWindow TimeWindow
+        + Origin *RoleOrigin
         + IsActive bool
-        + FeaturePermissions FeaturePermissions
-        + TimeWindowActive bool
         + Audit Audit
 
         + ValidatePermissions() error
+        + Validate() error
+        + RequiresAllProjects() bool
 
     }
     class "RoleAssignment" << (S,Aquamarine) >> {
         + Id primitive.ObjectID
-        + UserId primitive.ObjectID
-        + RoleId primitive.ObjectID
         + OrganisationId primitive.ObjectID
+        + Principal Principal
+        + RoleId primitive.ObjectID
+        + Scope RoleAssignmentScope
+        + TimeWindow *TimeWindow
+        + Source AssignmentSource
         + ExpiresAt time.Time
         + IsActive bool
-        + Scope RoleAssignmentScope
         + Audit Audit
 
         + IsExpired() bool
         + IsEffectivelyActive() bool
+        + Validate(role Role) error
+
+    }
+    class "Principal" << (S,Aquamarine) >> {
+        + Type PrincipalType
+        + Id primitive.ObjectID
+
+    }
+    class "RoleAssignmentScope" << (S,Aquamarine) >> {
+        + Level PermissionScope
+        + Projects ScopeSelection
+        + ProjectIds []primitive.ObjectID
+        + ProjectId primitive.ObjectID
+        + Resources ScopeSelection
+        + SiteIds []primitive.ObjectID
+        + GroupIds []primitive.ObjectID
+        + DeviceIds []primitive.ObjectID
+
+        + Validate() error
+        + ValidateFor(role Role) error
+
+    }
+    class "TimeWindow" << (S,Aquamarine) >> {
+        + Timezone string
+        + Ranges []TimeWindowRange
+
+        + Validate() error
+        + Allows(at time.Time) (bool, error)
+
+    }
+    class "TimeWindowRange" << (S,Aquamarine) >> {
+        + Days []Weekday
+        + StartMinute int
+        + EndMinute int
 
     }
     class "OrganisationInvitation" << (S,Aquamarine) >> {
         + Id primitive.ObjectID
         + OrganisationId primitive.ObjectID
         + Email string
-        + RoleIds []primitive.ObjectID
-        + Scope RoleAssignmentScope
+        + Assignments []InvitationAssignment
         + Token string
+        + TokenHash string
         + InvitedBy primitive.ObjectID
         + Status InvitationStatus
         + ExpiresAt time.Time
         + Audit Audit
 
     }
-    class "RoleAssignmentScope" << (S,Aquamarine) >> {
-        + ProjectIds []primitive.ObjectID
-        + SiteIds []primitive.ObjectID
-        + GroupIds []primitive.ObjectID
-        + DeviceIds []primitive.ObjectID
-
-        + IsOrganisationWide() bool
+    class "InvitationAssignment" << (S,Aquamarine) >> {
+        + RoleId primitive.ObjectID
+        + Scope RoleAssignmentScope
+        + TimeWindow *TimeWindow
+        + ExpiresAt time.Time
 
     }
 }
 ' Relationships below are explicit domain references, not inferred by GoPlantUML.
-models.User "1" <-- "0..*" models.Organisation : OwnerId
+models.User "1" <-- "0..*" models.Organisation : OwnerId (single owner)
 models.Organisation "1" <-- "1..*" models.Project : OrganisationId
 models.User "1" <-- "0..*" models.OrganisationUser : UserId
 models.Organisation "1" <-- "0..*" models.OrganisationUser : OrganisationId
 models.Organisation "1" <-- "0..*" models.Role : OrganisationId
-models.User "1" <-- "0..*" models.RoleAssignment : UserId
 models.Organisation "1" <-- "0..*" models.RoleAssignment : OrganisationId
 models.Role "1" <-- "0..*" models.RoleAssignment : RoleId
-models.Organisation "1" <-- "0..*" models.OrganisationInvitation : OrganisationId
-models.Role "0..*" <-- "0..*" models.OrganisationInvitation : RoleIds
+models.RoleAssignment *-- models.Principal : Principal
+models.Principal ..> models.User : Id (type user)
 models.RoleAssignment *-- models.RoleAssignmentScope : Scope
-models.OrganisationInvitation *-- models.RoleAssignmentScope : Scope
-models.RoleAssignmentScope ..> models.Project : ProjectIds (restriction)
+models.RoleAssignment *-- "0..1" models.TimeWindow : TimeWindow
+models.TimeWindow *-- "1..*" models.TimeWindowRange : Ranges
+models.Organisation "1" <-- "0..*" models.OrganisationInvitation : OrganisationId
+models.OrganisationInvitation *-- "0..*" models.InvitationAssignment : Assignments
+models.Role "1" <-- "0..*" models.InvitationAssignment : RoleId
+models.InvitationAssignment *-- models.RoleAssignmentScope : Scope
+models.InvitationAssignment *-- "0..1" models.TimeWindow : TimeWindow
+models.RoleAssignmentScope ..> models.Project : ProjectId / ProjectIds
 @enduml

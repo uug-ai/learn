@@ -3,7 +3,7 @@ title: "Organisations and projects"
 description: "Understand how organisations, projects, memberships, roles, and resources fit together in Kerberos Hub."
 lead: "Understand how organisations and projects separate ownership, access, and resources in Kerberos Hub."
 date: 2026-08-11T00:00:00+00:00
-lastmod: 2026-10-07T00:00:00+00:00
+lastmod: 2026-10-27T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -29,8 +29,9 @@ A user can own or belong to more than one organisation without creating another 
 | Membership | Connects a user to an organisation, with its own status and optional expiry. Membership alone grants no capabilities. |
 | Current organisation | Selects the organisation context used by organisation-aware Hub activity. |
 | Current project | Selects the project context used by project-aware Hub activity. It is navigation state, not proof that the user may access the project. |
-| Role | Defines what actions a member may perform. Roles belong to an organisation and can be reused in its projects. |
-| Role assignment | Connects a user and an organisation-owned role, with an optional expiry and resource scope. See [Authorization and rollout](#authorization-and-rollout) for the live authorization path. |
+| Owner | The single user referenced by the organisation's `ownerId`. The owner holds every permission in every project; ownership is not a role. |
+| Role | A named set of permissions, defined once per organisation. A role is assignable at one level: organisation roles administer the organisation, project roles act on project resources. Roles never carry resources. |
+| Role assignment | Grants one role to a principal with an explicit scope, and optionally a time window and expiry. See [Authorization and rollout](#authorization-and-rollout) for the live authorization path. |
 
 ## Organisation and project structure
 
@@ -45,7 +46,7 @@ flowchart TB
     P2 --> R2["Sites, groups and devices<br/>Recordings and derived results"]
 ```
 
-The same user identity can be a member of several organisations. The shared assignment model can describe access to one project, several projects, or the complete organisation; the current API does not yet resolve those assignments for authorization. Hub does not create a separate user account for each project.
+The same user identity can be a member of several organisations. In the shared assignment model, a project role is granted inside one project; a member who works in several projects holds one assignment per project. Organisation roles grant nothing inside projects. The current API does not yet resolve those assignments for authorization. Hub does not create a separate user account for each project.
 
 The records have separate responsibilities:
 
@@ -54,8 +55,8 @@ The records have separate responsibilities:
 | User | One person or service identity | Sign-in, profile, preferences, and current organisation/project selections. |
 | Organisation membership | User + organisation | Membership lifecycle such as pending, active, suspended, revoked, or expired. It grants no capabilities by itself. |
 | Project | Project + organisation | Names an access and resource boundary inside the organisation. |
-| Role | Role + organisation | Defines capabilities such as viewing live video or managing devices. |
-| Role assignment | User + organisation + role + scope | Grants a role to a member and says where that grant applies. |
+| Role | Role + organisation | Defines capabilities such as viewing live video or managing devices, at organisation or project level. |
+| Role assignment | Principal + organisation + role + scope | Grants a role to a member and says where, and optionally when, that grant applies. |
 | Operational resource | Resource + organisation + project | Places a site, group, device, recording, or derived result inside one project boundary. |
 
 Organisation memberships and role assignments are sibling records joined by the same user and organisation identifiers. Assignments are not embedded in the membership, so membership lifecycle and authorization lifecycle can be managed independently.
@@ -66,15 +67,15 @@ These diagrams show the shared domain models and their logical relationships, no
 
 ### Go-model UML overview
 
-The overview below combines the eight organisation/project-related types from the current shared Go models: `User`, `Organisation`, `Project`, `OrganisationUser`, `Role`, `RoleAssignment`, `OrganisationInvitation`, and `RoleAssignmentScope`. Fields were extracted with GoPlantUML; ObjectID relationships and cardinalities were added explicitly because Go types alone do not identify the referenced entities.
+The overview below combines the twelve organisation/project-related types from the shared Go models: `User`, `Organisation`, `Project`, `OrganisationUser`, `Role`, `RoleAssignment`, `Principal`, `RoleAssignmentScope`, `TimeWindow`, `TimeWindowRange`, `OrganisationInvitation`, and `InvitationAssignment`. ObjectID relationships and cardinalities are drawn explicitly because Go types alone do not identify the referenced entities.
 
-![UML overview of users, organisations, projects, memberships, roles, assignments, invitations, and their embedded scopes](organisation-project.svg)
+![UML overview of users, organisations, projects, memberships, roles, assignments, invitations, and their embedded principals, scopes, and time windows](organisation-project.svg)
 
 [Open the full-size SVG](organisation-project.svg) · [Download the PlantUML source](organisation-project.puml)
 
-The diagram is a snapshot of the Go definitions, not the proposed GCP-inspired alternative. Only identity and selection fields are shown for `User`; supporting company, settings, audit, and operational resource types are not expanded. Go field names and types are shown, not JSON/BSON field spellings or an API response schema. Credential fields identify model fields only; no credential values are included.
+The diagram is a snapshot of the Go definitions. Only identity and selection fields are shown for `User`; supporting company, settings, audit, and operational resource types are not expanded, and methods are hidden. Go field names and types are shown, not JSON/BSON field spellings or an API response schema. Credential fields identify model fields only; no credential values are included.
 
-Every organisation has at least one **logical** project: its deterministic default. The `1..*` relationship includes that project even before its metadata document is materialized. Assignment and invitation scopes are separate embedded values of the same type, not references to a shared scope document.
+Every organisation has at least one **logical** project: its deterministic default. The `1..*` relationship includes that project even before its metadata document is materialized. Principals, scopes, and time windows are embedded values, not references to shared documents; an invitation embeds the same scope and time-window types for each assignment it will create.
 
 > [!NOTE] Model versus runtime
 > This diagram describes the shared model, not complete runtime authorization enforcement. Canonical scoped assignments and the invitation model are not yet an end-to-end access-management workflow. See [Authorization and rollout](#authorization-and-rollout).
@@ -126,72 +127,109 @@ erDiagram
 
 ### Roles, assignments, and invitations
 
-Each of these records belongs to an organisation. An assignment references a user and one role; an invitation references the roles intended for its recipient. Membership and assignments are joined through `(userId, organisationId)`, not a `membershipId` field.
+Each of these records belongs to an organisation. An assignment references a principal and one role; an invitation lists the assignments to create for its recipient on acceptance. Membership and assignments are joined through the user ID and `organisationId`, not a `membershipId` field.
 
 ```mermaid
 erDiagram
     Role ||--o{ RoleAssignment : grants
-    Role }o--o{ OrganisationInvitation : proposed_roles
+    OrganisationInvitation ||--o{ InvitationAssignment : creates_on_accept
+    Role ||--o{ InvitationAssignment : proposed_role
 
     Role {
         ObjectID id PK
         ObjectID organisationId FK
-        string roleName
-        string role
+        string name
+        string kind
+        string key
+        string assignableAt
         string_array permissions
-        string_array pages
-        object featurePermissions
+        object origin
         boolean isActive
     }
     RoleAssignment {
         ObjectID id PK
-        ObjectID userId FK
         ObjectID organisationId FK
+        object principal
         ObjectID roleId FK
+        object scope
+        object timeWindow
+        string source
         boolean isActive
         datetime expiresAt
-        object scope
     }
     OrganisationInvitation {
         ObjectID id PK
         ObjectID organisationId FK
         string email
-        ObjectID_array roleIds
-        object scope
+        string tokenHash
         string status
+        datetime expiresAt
+    }
+    InvitationAssignment {
+        ObjectID roleId FK
+        object scope
+        object timeWindow
         datetime expiresAt
     }
 ```
 
 ### Identity and ownership fields
 
-- `Organisation.ownerId` points to the responsible user. It is not the organisation's identifier, except where a legacy owner and its deterministic organisation deliberately share the same ID.
+- `Organisation.ownerId` points to the organisation's single owner and is the only source of ownership; there is no Owner role or Owner assignment. The owner must be an active member and changes only through an ownership transfer by the current owner. `ownerId` is not the organisation's identifier, except where a legacy owner and its deterministic organisation deliberately share the same ID.
 - `OrganisationUser` is the membership join. Its states are `pending`, `active`, `suspended`, and `revoked`. Expiry is an additional time constraint, not a fifth stored membership state.
-- `RoleAssignment` references a role and user within an organisation. Its `isActive` and `expiresAt` are independent of membership status.
-- `OrganisationInvitation` stores the invited email, role IDs, and the scope intended for those roles on acceptance. Its states are `pending`, `accepted`, `expired`, and `revoked`. Having this model does not mean that the invitation workflow is available in the current UI.
+- `RoleAssignment` references a role and a principal within an organisation. The principal is `{type, id}`; `user` is the only type today. `source` records how the assignment was created: `manual`, `invitation`, or `migration`. Its own `isActive` and `expiresAt` are independent of membership status, but a membership that is not effectively active disables all of that member's assignments.
+- `OrganisationInvitation` stores the invited email and a list of assignments (role, scope, optional time window and expiry) to create with the membership on acceptance. Only a hash of the invitation token is stored; the token itself is returned once, when the invitation is created. Its states are `pending`, `accepted`, `expired`, and `revoked`. Having this model does not mean that the invitation workflow is available in the current UI.
 - `User.organisationId` and `User.projectId` store selection state, not a membership or grant. There is no separate project-membership model: project restrictions are represented in assignment scope.
-- The Go field `Role.ParentRole` is serialized as `role`. It identifies a built-in tier such as `guest`, `editor`, `admin`, `owner`, or `application`, not another role document.
+- `Role.kind` is `system` or `legacy` for roles defined by the platform, which carry a stable `key` and are read-only, and `custom` for roles the organisation defines. `Role.origin` records the legacy tier or legacy role a migrated role came from; it is provenance only and grants nothing.
 
 Use the declared field types when integrating with MongoDB. Core organisation, project, membership, and assignment identifiers use BSON ObjectIDs. Operational models such as `Site`, `Group`, `Device`, and `Media` store `organisationId` as a hex string and `projectId` as an optional BSON ObjectID. JSON uses hex strings for ObjectIDs. Do not convert every ownership field to one BSON type or assume that legacy fields all share the same spelling.
 
+### Role levels and permissions
+
+Permissions come from a versioned catalog in the shared models, such as `devices.read`, `live.stream`, or `members.invite`. Every permission has a level, and a role holds permissions of its own `assignableAt` level only:
+
+| Level | Examples | Effective |
+| --- | --- | --- |
+| `organisation` | `organisation.update`, `members.invite`, `roles.update`, `billing.manage`, `projects.manageAccess` | Through an organisation-level assignment. Grants nothing inside projects. |
+| `project` | `devices.read`, `live.stream`, `ptz.control`, `media.export`, `project.manageAccess` | Inside the project and resources the assignment covers. |
+
+Some capabilities are graded: a higher permission implies the lower ones, for example `live.stream` implies `live.preview`, and `ptz.presets` implies `ptz.control`, which implies `ptz.panTilt` and `ptz.zoom`. A role stores the permissions it was given; implied ones are derived.
+
+Organisation permissions that affect the whole organisation, such as billing, storage, the role catalog, removing members, or updating organisation settings, are **tenant-wide**. A role holding any tenant-wide permission can only be assigned to cover all projects.
+
+The platform defines two families of read-only roles, copied into every organisation under a stable key:
+
+- **System roles** such as Organisation manager, Billing admin, Project admin, Editor, and Viewer.
+- **Legacy roles** that reproduce the access of the existing guest, editor, and admin tiers exactly. They let existing accounts move to the new model without gaining or losing access, and can be replaced by system or custom roles afterwards.
+
 ### Assignment scope
 
-`RoleAssignment.scope` is embedded and has four ObjectID-array fields:
+`RoleAssignment.scope` is embedded and always states its level explicitly. Its `level` must match the role's `assignableAt`.
 
-| Field | Restriction |
-| --- | --- |
-| `projectIds` | Projects covered by the assignment. |
-| `siteIds` | Sites covered by the assignment. |
-| `groupIds` | Resource groups covered by the assignment. |
-| `deviceIds` | Devices covered by the assignment. |
+| Field | Level | Meaning |
+| --- | --- | --- |
+| `level` | both | `organisation` or `project`. Required. |
+| `projects` | organisation | `all` or `selected`. Which projects the organisation permissions apply to, for example where a delegated manager may grant access. |
+| `projectIds` | organisation | The covered projects when `projects` is `selected`; at least one. |
+| `projectId` | project | The one project the assignment applies to. Required. |
+| `resources` | project | `all` for every resource in the project, or `selected`. |
+| `siteIds`, `groupIds`, `deviceIds` | project | The selected resources when `resources` is `selected`. |
 
-In the **current shared model**, an empty array means **no restriction on that dimension**. A completely empty scope is organisation-wide for the assigned role. An assignment can name more than one project; use separate assignments when the role, scope, or expiry differs.
+Selected resources combine as a **union**: the assignment covers the devices in the selected sites, the devices in the selected groups, and the selected devices. Sites and groups resolve to their current devices, so a device added to a selected site later is covered.
 
-For example, a scope containing `projectIds: [projectA]` and `deviceIds: [camera1, camera2]` describes one project and two devices within it; empty site/group arrays do not independently restrict those dimensions.
+A member who needs different roles in different places holds several assignments, which add up. For example, an Editor assignment on site A and a Viewer assignment on site B in the same project. There is at most one assignment per principal, role, and project; granting the same role on more resources widens that assignment's selection.
 
 {{< callout type="warning" >}}
-An empty scope is not a deny-all grant. Do not create an active assignment with an empty scope as a placeholder for access that will be configured later. Scope describes the shared RBAC model; the live authorization limitations below still apply.
+An empty field never means "everything". A scope without a `level`, or without the fields its level requires, fails validation. To add a member to a project before choosing resources, use `resources: selected` with no IDs: the member is in the project but has no resource access yet.
 {{< /callout >}}
+
+### Time windows
+
+An assignment can carry a `timeWindow` that limits when it is in force, for example for a night-shift operator. The window belongs to the assignment, not the role.
+
+- `timezone` is an IANA timezone set by whoever grants the assignment. It is never taken from the member's profile.
+- `ranges` lists daily intervals: the days they apply to and a start and end in minutes after local midnight. The start is inclusive and the end exclusive; an overnight shift is two ranges.
+- The window compares local wall-clock time, so daylight-saving changes do not shift it. A window that cannot be evaluated, for example because of an unknown timezone, keeps the assignment out of force.
 
 ## Runtime architecture
 
@@ -235,7 +273,7 @@ The shared models describe the organisation-scoped RBAC design, but **the curren
 | Layer | Current behavior |
 | --- | --- |
 | Organisation selection | Resolves accessible organisations using ownership, current context, and active, unexpired memberships. |
-| Project selection | Validates the project against the selected organisation and its active state; supports the logical default even before its document exists. It does not evaluate `RoleAssignment.scope.projectIds`. |
+| Project selection | Validates the project against the selected organisation and its active state; supports the logical default even before its document exists. It does not evaluate role assignment scopes. |
 | Role and resource permissions | Existing built-in/custom account roles, page/feature permissions, and endpoint-specific site/group/camera allow-lists remain in use. |
 | Organisation/project administration | Organisation updates, project creation/updates, and project credential operations use owner/admin role gates in addition to the applicable organisation/project checks. |
 | Canonical role assignments | Shared model is present, but the assignment-based request resolver and user-facing assignment-management API are not wired into these flows. |
@@ -244,7 +282,9 @@ Project **data isolation** is implemented through ownership filters and session 
 
 The assignment design separates **what** a member may do (the role) from **where** (the scope). It can represent a security-operator role in Project A and a viewer role in Project B as separate assignments for the same user and organisation. A future live assignment resolver must retain that role/scope association and require valid membership; flattening permissions and project IDs separately would incorrectly combine grants.
 
-Sites and groups organize operational resources, not people. They must remain within the appropriate organisation/project boundary. There is no access-team principal in the current shared assignment model, and no separate project membership collection.
+Sites and groups organize operational resources, not people. They must remain within the appropriate organisation/project boundary. There is no separate project membership collection: a member is in a project when they hold an assignment there.
+
+Assignments name a principal so that groups of people can be added later without changing assignments. Only users are supported today. Teams, managed in Hub or synced from an identity provider, are planned as a second principal type; the identity provider would decide who belongs to a team, and assignments in Hub would decide what the team can do.
 
 For the currently available account and custom-role controls, see [Roles]({{< ref "/docs/hub/roles" >}}). The workspace users pane continues to lead to that existing account-management flow.
 
@@ -328,7 +368,7 @@ Deleting a project through the API deactivates it rather than deleting its resou
 
 Ownership, membership, and roles answer different access questions:
 
-- **Ownership** identifies the user responsible for the organisation. Creating an organisation makes the creator its owner.
+- **Ownership** identifies the single user responsible for the organisation. Creating an organisation makes the creator its owner. Ownership is not a role assignment and moves only through an ownership transfer.
 - **Membership** allows a non-owner to select an organisation. Only active memberships that have not expired are included in the organisation switcher, and membership alone grants no capabilities.
 - **Roles and permissions** currently come from the existing account role and resource allow-lists. Organisation-scoped roles and assignments are the target authorization model, not the live authority in this phase.
 
@@ -342,7 +382,7 @@ Organisation records can hold shared company details, billing information, regio
 
 The **Workspace** settings page at `/workspace` exposes organisation general details, company information, billing address, contacts, regional defaults, users, and subscription information, alongside the current project's settings. Its navigation entry is feature-gated and shown to eligible owner/admin users; the API independently checks access.
 
-The users pane links to the existing account-management screen. Do not confuse this with a complete organisation invitation or scoped-role-assignment editor. Likewise, the presence of policy fields such as `forceMFA`, `allowedDomains`, or `defaultRoleId` in the shared model does not by itself establish a complete UI or enforcement flow for those policies.
+The users pane links to the existing account-management screen. Do not confuse this with a complete organisation invitation or scoped-role-assignment editor. Likewise, the presence of policy fields such as `forceMFA` or `allowedDomains` in the shared model does not by itself establish a complete UI or enforcement flow for those policies.
 
 User profile settings remain personal and follow the user when they switch organisations.
 
