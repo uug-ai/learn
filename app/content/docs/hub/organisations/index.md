@@ -29,7 +29,7 @@ A user can own or belong to more than one organisation without creating another 
 | Membership | Connects a user to an organisation, with its own status and optional expiry. Membership alone grants no capabilities. |
 | Current organisation | Selects the organisation context used by organisation-aware Hub activity. |
 | Current project | Selects the project context used by project-aware Hub activity. It is navigation state, not proof that the user may access the project. |
-| Owner | The single user referenced by the organisation's `ownerId`. The owner holds every permission in every project; ownership is not a role. |
+| Owner | A member holding the Owner role, which grants every permission in every project. An organisation has at least one owner; `ownerId` names the primary owner. |
 | Role | A named set of permissions, defined once per organisation. A role is assignable at one level: organisation roles administer the organisation, project roles act on project resources. Roles never carry resources. |
 | Role assignment | Grants one role to a principal with an explicit scope, and optionally a time window and expiry. See [Authorization and rollout](#authorization-and-rollout) for the live authorization path. |
 
@@ -175,7 +175,7 @@ erDiagram
 
 ### Identity and ownership fields
 
-- `Organisation.ownerId` points to the organisation's single owner and is the only source of ownership; there is no Owner role or Owner assignment. The owner must be an active member and changes only through an ownership transfer by the current owner. `ownerId` is not the organisation's identifier, except where a legacy owner and its deterministic organisation deliberately share the same ID.
+- `Organisation.ownerId` points to the **primary owner**: the accountable contact for billing and the contract. Ownership itself is the Owner role, which several members can hold; the primary owner must always hold it, and changing the primary owner changes nobody's role. `ownerId` is not the organisation's identifier, except where a legacy owner and its deterministic organisation deliberately share the same ID.
 - `OrganisationUser` is the membership join. Its states are `pending`, `active`, `suspended`, and `revoked`. Expiry is an additional time constraint, not a fifth stored membership state.
 - `RoleAssignment` references a role and a principal within an organisation. The principal is `{type, id}`; `user` is the only type today. `source` records how the assignment was created: `manual`, `invitation`, or `migration`. Its own `isActive` and `expiresAt` are independent of membership status, but a membership that is not effectively active disables all of that member's assignments.
 - `OrganisationInvitation` stores the invited email and a list of assignments (role, scope, optional time window and expiry) to create with the membership on acceptance. Only a hash of the invitation token is stored; the token itself is returned once, when the invitation is created. Its states are `pending`, `accepted`, `expired`, and `revoked`. Having this model does not mean that the invitation workflow is available in the current UI.
@@ -199,7 +199,7 @@ Organisation permissions that affect the whole organisation, such as billing, st
 
 The platform defines two families of read-only roles, copied into every organisation under a stable key:
 
-- **System roles** such as Organisation manager, Billing admin, Project admin, Editor, and Viewer.
+- **System roles** such as Owner, Organisation manager, Billing admin, Project admin, Editor, and Viewer. Owner is the one role that spans every project: it stores no permission list and grants every permission, including ones added to the catalog later. It is assigned to users only, always covers all projects, and has no time window or expiry.
 - **Legacy roles** that reproduce the access of the existing guest, editor, and admin tiers exactly. They let existing accounts move to the new model without gaining or losing access, and can be replaced by system or custom roles afterwards.
 
 ### Assignment scope
@@ -368,7 +368,7 @@ Deleting a project through the API deactivates it rather than deleting its resou
 
 Ownership, membership, and roles answer different access questions:
 
-- **Ownership** identifies the single user responsible for the organisation. Creating an organisation makes the creator its owner. Ownership is not a role assignment and moves only through an ownership transfer.
+- **Ownership** is the Owner role. Creating an organisation makes the creator its primary owner. Several members can be owners, and an organisation always keeps at least one; only owners can grant or revoke Owner, and never to themselves.
 - **Membership** allows a non-owner to select an organisation. Only active memberships that have not expired are included in the organisation switcher, and membership alone grants no capabilities.
 - **Roles and permissions** currently come from the existing account role and resource allow-lists. Organisation-scoped roles and assignments are the target authorization model, not the live authority in this phase.
 

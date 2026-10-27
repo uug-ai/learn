@@ -30,7 +30,7 @@ namespace models {
         + BillingAddress Address
         + Audit Audit
 
-        + IsOwner(userId primitive.ObjectID) bool
+        + IsPrimaryOwner(userId primitive.ObjectID) bool
 
     }
     class "Project" << (S,Aquamarine) >> {
@@ -155,7 +155,7 @@ namespace models {
     }
 }
 ' Relationships below are explicit domain references, not inferred by GoPlantUML.
-models.User "1" <-- "0..*" models.Organisation : OwnerId (single owner)
+models.User "1" <-- "0..*" models.Organisation : OwnerId (primary owner)
 models.Organisation "1" <-- "1..*" models.Project : OrganisationId
 models.User "1" <-- "0..*" models.OrganisationUser : UserId
 models.Organisation "1" <-- "0..*" models.OrganisationUser : OrganisationId
