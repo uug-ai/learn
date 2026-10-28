@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 304
 toc: true
+podcast: hub-roles
 ---
  
 By default Kerberos Hub users are granted with the `owner` role, which grants the highest level of access. Using the `owner` role you have access to the Kerberos Hub credentials, modify the Kerberos Vault integration, create alerts and integrations, and more.

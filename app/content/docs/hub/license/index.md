@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 307
 toc: true
+podcast: hub-license
 ---
 
 Kerberos Hub is licensed through a monthly or yearly subscription. Find more information about the licensing and features on [the Kerberos Hub landing page](https://kerberos.io/product/hub). 

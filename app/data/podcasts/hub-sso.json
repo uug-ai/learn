@@ -1,0 +1,34 @@
+{
+  "id": "hub-sso",
+  "title": "Connect Hub to your identity provider",
+  "description": "Understand domain-based OIDC sign-in, matching Hub accounts and the additional boundary of SSO chaining.",
+  "duration": 186.744,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/sso/",
+  "sourceSha256": "42b7575fd35d921e56ac3fb9f0dbe34a6d57722737f807f229ab8fa8925ae221",
+  "scriptSha256": "83e4265d9d7f79b55276b69d2eb4ad8cfc92252a2bc9236fd9d6fc89f38550a2",
+  "audioSha256": "fa83beca2e25bd8d896fa9b80ae3eacc0077e0a563f6f94fe190a9b322510260",
+  "audio": "podcasts/hub-sso/episode.mp3",
+  "chapters": [
+    {
+      "title": "Sign-in and Hub access remain distinct",
+      "start": 0,
+      "sourceAnchor": "configuration"
+    },
+    {
+      "title": "Make both ends agree",
+      "start": 51.69,
+      "sourceAnchor": "microsoft-entra-azure-active-directory"
+    },
+    {
+      "title": "Embedding adds another application boundary",
+      "start": 98.63,
+      "sourceAnchor": "sso-chaining"
+    },
+    {
+      "title": "Test before enforcing the sign-in choice",
+      "start": 147.97,
+      "sourceAnchor": "force-sso-for-domain"
+    }
+  ]
+}

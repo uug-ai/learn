@@ -12,6 +12,7 @@ menu:
     parent: "hub"
 weight: 312
 toc: true
+podcast: hub-notifications
 ---
 
 Notifications connect detection and device events to people. An alert defines

@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 302
 toc: true
+podcast: hub-installation
 ---
 
 Kerberos Hub is the single pane of glass for your Agents. It comes with a best of breed open source technology stack, a modular design and out-of-the-box scalability. Kerberos Hub allows building and maintaining an ever-growing video streaming and analytics landscape.

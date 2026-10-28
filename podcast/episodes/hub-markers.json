@@ -1,0 +1,122 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "hub-markers",
+  "title": "Jump to meaningful moments with markers",
+  "description": "Understand marker results, recording links and the difference between a compact summary and the full history.",
+  "sourcePath": "../app/content/docs/hub/markers/index.md",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/markers/",
+  "chapters": [
+    {
+      "title": "Search for a meaningful moment",
+      "sourceAnchor": "find-a-marker",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Our fictional warehouse team is reviewing a busy day. An analysis stage noticed an event near the entrance. How can the operator find that moment without playing every recording?"
+        },
+        {
+          "speaker": "guide",
+          "text": "A marker names a meaningful point or span on a timeline. The marker analysis page lets you search those results by time, device and other available fields. Select a row to inspect its details without leaving the search."
+        },
+        {
+          "speaker": "host",
+          "text": "Does the drawer actually help us reach the footage?"
+        },
+        {
+          "speaker": "guide",
+          "text": "When a recording is linked, the player can seek to the marker's offset. The drawer can also show categories, tags and metadata. Think of the marker as a useful route into the footage, not the footage itself."
+        }
+      ]
+    },
+    {
+      "title": "Use the recording's timeline",
+      "sourceAnchor": "use-markers-on-recordings",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "I've also seen small marker icons on recording cards. Are those a separate set of bookmarks?"
+        },
+        {
+          "speaker": "guide",
+          "text": "They're a compact presentation of marker results on the recording. A positioned icon can start playback at that occurrence. The detail view shows more of the timing and taxonomy information than the card can fit."
+        },
+        {
+          "speaker": "host",
+          "text": "And the moving boxes some markers show?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Those need valid links to detection tracks. When that information exists, overlays can show the associated boxes at the video position. A marker without track references can still carry useful context and timing without an overlay."
+        }
+      ]
+    },
+    {
+      "title": "Results, not hand-written bookmarks",
+      "sourceAnchor": "how-markers-are-created",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Can the operator create these markers by clicking wherever the video looks interesting?"
+        },
+        {
+          "speaker": "guide",
+          "text": "This interface treats markers as processing results, not manually edited bookmarks. Workflow stages and analysis services create them through the ingest contract, supplying the name, time and optional linked information."
+        },
+        {
+          "speaker": "host",
+          "text": "So a marker page with no results could simply mean no relevant stage has produced them yet?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Yes. Check the date, devices and accessible recordings, then confirm the producing workflow or analysis completed. Also check the deployment's feature settings when a marker control is missing."
+        }
+      ]
+    },
+    {
+      "title": "A card isn't the full history",
+      "sourceAnchor": "access-and-limits",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "If a card shows only a few icons, can we conclude there were only a few events?"
+        },
+        {
+          "speaker": "guide",
+          "text": "No. Cards and recording summaries are bounded so they stay quick and readable. Use the marker analysis page to search the authoritative history. Visibility still follows the linked recording and its project, with Analytics access needed for the dedicated page."
+        },
+        {
+          "speaker": "host",
+          "text": "What's a useful first exercise?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Find one marker for an accessible recording, inspect its details, and check the seek position against the footage. That makes the connection between a processing result and the moment it describes concrete."
+        }
+      ]
+    }
+  ],
+  "sourceSha256": "533e90872f0ac78d5c401c8eecec6f242cfe69b4201a74dee3caa504f0d55ac5",
+  "reviewedOn": "2026-10-28",
+  "editorialStyle": {
+    "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
+    "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",
+    "humour": "Optional: one or two brief, relevant light moments are enough. Prefer a relatable analogy over a separate joke. Never pad the overview with banter.",
+    "reactions": "Use occasional short, natural responses such as 'Oh, that makes sense' or 'Wait, so...' followed by a real question. Avoid repetitive praise, canned agreement, and filler.",
+    "laughter": "Optional: at most one or two light reactions such as 'Ha, fair point.' Never insert [laughs], SSML, or repeated ha-ha strings. These are spoken reactions, not a guarantee of genuine laughter from the current speech engine.",
+    "intonation": "Write real questions with question marks, use contractions, alternate short and longer sentences, and make contrasts explicit. Let punctuation and sentence rhythm suggest curiosity, surprise, and emphasis. Avoid all-caps shouting, excessive exclamation marks, and artificial pause tags.",
+    "guardrails": "Keep technical claims source-backed. Never mock the listener, joke about real victims, minimize security or data-loss risks, or let humour replace an explanation. Personality is optional; accuracy and clarity are not."
+  },
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_puck",
+      "speed": 0.98
+    }
+  }
+}

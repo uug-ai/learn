@@ -13,6 +13,7 @@ menu:
     parent: "workflows"
 weight: 15
 toc: true
+podcast: hub-workflows-external-stages
 ---
 
 A [custom workflow stage](../stages/) normally runs beside Hub, consumes an

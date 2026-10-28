@@ -12,6 +12,7 @@ menu:
     parent: "hub"
 weight: 305
 toc: true
+podcast: hub-cases
 ---
 
 By default, recordings are persisted for a limited amount of time. Within Hub you define a retention period per subscription and assign it to a user. The retention period can be set to 30, 60, 90 days or any custom value. It determines how many days of footage are visible to the end-user after login, and controls when the associated recordings metadata are removed from the database.

@@ -12,6 +12,7 @@ menu:
     parent: "hub"
 weight: 304.5
 toc: true
+podcast: hub-workflows
 ---
 
 The [Pipeline]({{< relref "/docs/hub/pipeline" >}}) section describes the fixed chain of microservices that every recording flows through by default. **Workflows** build on top of that pipeline and let an organisation *customise* how its events are routed, filtered and processed — without changing a single line of code or touching the platform configuration.

@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 308
 toc: true
+podcast: hub-mp4-verification
 ---
 
 Video evidence is only useful if you can trust that it has not been altered between the moment it was recorded and the moment it is reviewed. Kerberos Hub addresses this with a built-in **fingerprint and signature** mechanism: every fragmented MP4 written by Agent is signed with a private key at the moment it is closed, and the resulting signature is embedded directly inside the file. Anyone with the matching public key can later verify — entirely offline — that the recording is authentic and bit-perfect.

@@ -1,0 +1,100 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "hub-workflows-ingest-blocks-marker",
+  "title": "Label the moment that matters",
+  "description": "Understand marker timing, recording links and references to detection tracks.",
+  "sourcePath": "../app/content/docs/hub/workflows/ingest/blocks/marker.md",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/workflows/ingest/blocks/marker/",
+  "chapters": [
+    {
+      "title": "A marker describes time, not geometry",
+      "sourceAnchor": "the-marker-contract",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Imagine a fictional service identifying a delivery event in a recording. It wants an operator to jump directly to that moment. What should it return?"
+        },
+        {
+          "speaker": "guide",
+          "text": "A marker block supplies a meaningful name, start, end and duration. Its timestamps use Unix seconds, not frame numbers or milliseconds. Optional descriptions, categories and tags help explain and find the event."
+        },
+        {
+          "speaker": "host",
+          "text": "Should the producer include its own organisation and device to decide where it belongs?"
+        },
+        {
+          "speaker": "guide",
+          "text": "The platform derives that context from the run. The annotation body doesn't get to choose a different owner. Use the supported stage delivery path and the run's established scope."
+        }
+      ]
+    },
+    {
+      "title": "Link to the intended recording",
+      "sourceAnchor": "recording-link-mediakeys",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "How does the marker stay attached to the right clip if timing isn't perfectly aligned?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Explicit recording keys provide an authoritative link within the allowed scope. Without them, the run's recording is the next source of truth. Timestamp overlap is the fallback when there is no recording reference. Recording keys are not media database identifiers."
+        },
+        {
+          "speaker": "host",
+          "text": "And can we connect the marker to the tracked object that produced it?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Yes. Reference the detection's stable source run identifier and track identifier, with both results targeting the same recording. The marker explains when something meaningful happened; the detection supplies the geometry."
+        }
+      ]
+    },
+    {
+      "title": "Repeat safely",
+      "sourceAnchor": "write-semantics-upsert-by-identity",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "What happens if our delivery-event worker returns the same marker again?"
+        },
+        {
+          "speaker": "guide",
+          "text": "The marker upsert uses organisation, device, name and start time as its identity. The same annotation refreshes instead of duplicating. A different moment needs the appropriate different identity, not a random new label on every retry."
+        },
+        {
+          "speaker": "host",
+          "text": "What should the worker leave to Hub?"
+        },
+        {
+          "speaker": "guide",
+          "text": "System and runtime-derived fields. Supply the annotation, meaningful timing and optional supporting links; let Hub maintain its own timeline metadata. Verify the marker on the expected recording before treating the integration as complete."
+        }
+      ]
+    }
+  ],
+  "sourceSha256": "cb3f5e158b01814ca1a3e8cf6cf7d64c94fa763832554d2dcacc21a2e80ae536",
+  "reviewedOn": "2026-10-28",
+  "editorialStyle": {
+    "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
+    "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",
+    "humour": "Optional: one or two brief, relevant light moments are enough. Prefer a relatable analogy over a separate joke. Never pad the overview with banter.",
+    "reactions": "Use occasional short, natural responses such as 'Oh, that makes sense' or 'Wait, so...' followed by a real question. Avoid repetitive praise, canned agreement, and filler.",
+    "laughter": "Optional: at most one or two light reactions such as 'Ha, fair point.' Never insert [laughs], SSML, or repeated ha-ha strings. These are spoken reactions, not a guarantee of genuine laughter from the current speech engine.",
+    "intonation": "Write real questions with question marks, use contractions, alternate short and longer sentences, and make contrasts explicit. Let punctuation and sentence rhythm suggest curiosity, surprise, and emphasis. Avoid all-caps shouting, excessive exclamation marks, and artificial pause tags.",
+    "guardrails": "Keep technical claims source-backed. Never mock the listener, joke about real victims, minimize security or data-loss risks, or let humour replace an explanation. Personality is optional; accuracy and clarity are not."
+  },
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_puck",
+      "speed": 0.98
+    }
+  }
+}

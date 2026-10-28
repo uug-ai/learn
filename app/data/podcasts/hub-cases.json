@@ -1,0 +1,34 @@
+{
+  "id": "hub-cases",
+  "title": "Turn recordings into a case",
+  "description": "Understand evidence archiving, case collaboration and the difference between selecting media and building an export.",
+  "duration": 182.64,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/cases/",
+  "sourceSha256": "8cd6bdc63e4dfa39da3d9f18749d8324b59bb5a09bab9026c981edc5a8c941a2",
+  "scriptSha256": "27108db743a39d717d03bcf5caf6360c03d410fddc873f57002e0ec5eb5e9cce",
+  "audioSha256": "5ec30437cb0570bae99086bc1d7ff9cc59d9825c5e442ad137a2956115a77560",
+  "audio": "podcasts/hub-cases/episode.mp3",
+  "chapters": [
+    {
+      "title": "Preserve a focused incident",
+      "start": 0,
+      "sourceAnchor": "creating-a-case"
+    },
+    {
+      "title": "Make the investigation manageable",
+      "start": 51.065,
+      "sourceAnchor": "working-with-an-open-case"
+    },
+    {
+      "title": "An export is a background build",
+      "start": 95.905,
+      "sourceAnchor": "exporting-a-case"
+    },
+    {
+      "title": "Share deliberately",
+      "start": 143.67,
+      "sourceAnchor": "sharing-a-case"
+    }
+  ]
+}

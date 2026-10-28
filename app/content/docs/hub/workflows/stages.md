@@ -13,6 +13,7 @@ menu:
     parent: "workflows"
 weight: 10
 toc: true
+podcast: hub-workflows-stages
 ---
 
 [Workflows](/docs/hub/workflows/) let you reshape the Hub pipeline without code — wire a device through a few filters into a model on a visual canvas. **Custom stages** are the developer side of that same system: instead of choosing from the built-in nodes, you bring *your own* microservice in as a workflow stage. The engine is **open** — every built-in stage (classification, thumbnails, sprites) is just a service that consumes a message off a queue, does one job, and hands the result back — and your service plugs in the same way.

@@ -12,6 +12,7 @@ menu:
     parent: "hub"
 weight: 308
 toc: true
+podcast: hub-maps
 ---
 
 Hub places sites on a map using the coordinates saved with each site address.

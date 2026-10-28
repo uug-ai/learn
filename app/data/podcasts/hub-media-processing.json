@@ -1,0 +1,34 @@
+{
+  "id": "hub-media-processing",
+  "title": "What happens after a recording arrives",
+  "description": "Follow uploaded media through previews, analysis and workflows without confusing partial results with lost video.",
+  "duration": 174.384,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/media-processing/",
+  "sourceSha256": "d7d9e645b9de39991d349996913d19d365073af2eb436729ef20f170e019e659",
+  "scriptSha256": "7f4ebd1bbbec4ff0e67c163600fe25805827fe32d6c540fe898e95a5bf6b95f5",
+  "audioSha256": "c7a2f8d6408063bd7c1aeb679129eda4f06651a86d6e8ace5c0617896022b365",
+  "audio": "podcasts/hub-media-processing/episode.mp3",
+  "chapters": [
+    {
+      "title": "The recording starts a chain",
+      "start": 0,
+      "sourceAnchor": "1-upload-and-intake"
+    },
+    {
+      "title": "Analysis adds meaning",
+      "start": 51.19,
+      "sourceAnchor": "3-analysis"
+    },
+    {
+      "title": "Workflows coordinate explicit runs",
+      "start": 91.205,
+      "sourceAnchor": "4-workflows"
+    },
+    {
+      "title": "Keep results with their source",
+      "start": 134.07,
+      "sourceAnchor": "access-and-retention"
+    }
+  ]
+}

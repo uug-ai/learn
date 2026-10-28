@@ -1,0 +1,34 @@
+{
+  "id": "hub-pipeline",
+  "title": "Follow a recording through the pipeline",
+  "description": "An introduction to asynchronous intake, enrichment and notification, and how workflows extend the baseline.",
+  "duration": 169.512,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/pipeline/",
+  "sourceSha256": "765e7831ead4c74e7d6bdc672c370a9ce3bbcf06363485e770520d4e623a0d48",
+  "scriptSha256": "cbdc03c88666b8b7c9d35cd3b2073d7d54c198610da8c4429657b8b72625cad3",
+  "audioSha256": "daa5aae0ea43b61d98f959c37b10f5132b36348af2b88e39c5217de9c04315cb",
+  "audio": "podcasts/hub-pipeline/episode.mp3",
+  "chapters": [
+    {
+      "title": "Media and events take different paths",
+      "start": 0,
+      "sourceAnchor": "orchestrator"
+    },
+    {
+      "title": "Intake comes before enrichment",
+      "start": 46.965,
+      "sourceAnchor": "monitoring"
+    },
+    {
+      "title": "Enrichment fans out",
+      "start": 86.455,
+      "sourceAnchor": "analyser"
+    },
+    {
+      "title": "Notifications and the next direction",
+      "start": 131.67,
+      "sourceAnchor": "notification"
+    }
+  ]
+}

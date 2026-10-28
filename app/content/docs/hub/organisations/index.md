@@ -1,7 +1,7 @@
 ---
 title: "Organisations and projects"
-description: "Understand how organisations, projects, memberships, roles, and resources fit together in Kerberos Hub."
-lead: "Understand how organisations and projects separate ownership, access, and resources in Kerberos Hub."
+description: "Understand how organisations, projects, memberships, roles, and resources fit together."
+lead: "Understand how organisations and projects separate ownership, access, and resources."
 date: 2026-08-11T00:00:00+00:00
 lastmod: 2026-10-27T00:00:00+00:00
 draft: false
@@ -14,7 +14,7 @@ toc: true
 podcast: organisations-v2
 ---
 
-An **organisation** is the tenant boundary for shared resources in Kerberos Hub. A **project** separates operational resources inside that organisation. A **workspace** is the organisation/project pair selected for a session; it is not a separate stored entity.
+An **organisation** is the tenant boundary for shared resources. A **project** separates operational resources inside that organisation. A **workspace** is the organisation/project pair selected for a session; it is not a separate stored entity.
 
 A user can own or belong to more than one organisation without creating another login. Membership, resource ownership, authorization, and the currently selected workspace are separate concerns: selecting a workspace does not grant access to it.
 

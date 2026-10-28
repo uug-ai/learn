@@ -1,0 +1,34 @@
+{
+  "id": "hub-whitelabel",
+  "title": "Make Hub feel at home in your organisation",
+  "description": "A practical overview of custom styling, brand assets, translations and email templates.",
+  "duration": 170.784,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/whitelabel/",
+  "sourceSha256": "f8508622b2376b1920cff4b6a0cf51bc54c01b4afe3c7d01cf2eb1b66557b414",
+  "scriptSha256": "ff5d4d022c38b27ecb34babf32d55f0d8d6d0cb5ff7b282ab974f16a23e959f0",
+  "audioSha256": "a79b9a8f3bf70edbf7faf4e86c88322c9d301249451ef6650cb630dea016ef68",
+  "audio": "podcasts/hub-whitelabel/episode.mp3",
+  "chapters": [
+    {
+      "title": "Keep custom presentation separate",
+      "start": 0,
+      "sourceAnchor": "overriding-the-kerberos-hub-styling"
+    },
+    {
+      "title": "Brand assets have specific contracts",
+      "start": 45.115,
+      "sourceAnchor": "custom-logo"
+    },
+    {
+      "title": "Change wording without copying every translation",
+      "start": 86.83,
+      "sourceAnchor": "custom-translations"
+    },
+    {
+      "title": "Email has its own branding surface",
+      "start": 128.345,
+      "sourceAnchor": "custom-email-templates"
+    }
+  ]
+}

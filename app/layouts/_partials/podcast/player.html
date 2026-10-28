@@ -1,60 +1,52 @@
 {{- $seconds := int (math.Round .duration) -}}
-<section id="article-podcast" class="learn-podcast not-prose" data-podcast-player aria-label="Article podcast" hidden>
+<section id="article-podcast" class="learn-podcast not-prose" data-podcast-player data-podcast-progress-key="learn-podcast:{{ .id }}" data-podcast-version="{{ .audioSha256 }}" aria-label="Article podcast" hidden>
   <div class="learn-podcast-heading">
     <div>
-      <p class="learn-podcast-eyebrow">Podcast mode</p>
+      <p class="learn-podcast-eyebrow">Audio overview</p>
       <h2>{{ .title }}</h2>
     </div>
     <button type="button" class="learn-podcast-close" data-podcast-close aria-label="Close podcast player" title="Close podcast player">&times;</button>
   </div>
   <p class="learn-podcast-description">{{ .description }}</p>
-  <p class="learn-podcast-note">Two synthetic voices &middot; {{ printf "%d:%02d" (div $seconds 60) (mod $seconds 60) }} &middot; Adapted from this guide</p>
-  <audio controls preload="none" tabindex="0" aria-label="{{ .title }}">
-    <source src="{{ .audio | relURL }}" type="audio/mpeg" />
-    Your browser does not support audio playback. <a href="{{ .audio | relURL }}">Download the MP3</a>.
-  </audio>
-  <div class="learn-podcast-transport">
-    <button type="button" data-skip="-15" aria-label="Skip back 15 seconds">Back 15s</button>
-    <button type="button" data-skip="15" aria-label="Skip forward 15 seconds">Forward 15s</button>
-    <label for="podcast-speed">Playback speed</label>
-    <select id="podcast-speed" data-podcast-speed>
-      <option value="0.75">0.75x</option><option value="1" selected>1x</option>
-      <option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option>
-    </select>
+  <p class="learn-podcast-note">AI-generated voices &middot; {{ printf "%d:%02d" (div $seconds 60) (mod $seconds 60) }} &middot; Adapted from this guide</p>
+  <div class="learn-podcast-anchor" data-podcast-anchor>
+    <div class="learn-podcast-controls" data-podcast-controls>
+      <button type="button" class="learn-podcast-return" data-podcast-return hidden>
+        <span class="learn-podcast-episode-title">{{ .title }}</span>
+        <span class="learn-podcast-current-section" data-podcast-current-section hidden></span>
+        Back to overview &uarr;
+      </button>
+      <audio controls controlslist="nodownload noplaybackrate" preload="none" tabindex="0" aria-label="{{ .title }}">
+        <source src="{{ .audio | relURL }}?v={{ .audioSha256 }}" type="audio/mpeg" />
+        Your browser does not support audio playback.
+      </audio>
+      <button type="button" class="learn-podcast-close" data-podcast-close data-podcast-dock-close hidden aria-label="Close compact podcast player" title="Close podcast player">&times;</button>
+      <p class="learn-podcast-status" data-podcast-status role="status" aria-live="polite"></p>
+    </div>
   </div>
-  <p class="learn-podcast-status" data-podcast-status role="status" aria-live="polite"></p>
+  <p class="learn-podcast-note" data-podcast-progress-note role="status" aria-live="polite" hidden></p>
   <details class="learn-podcast-chapters">
     <summary>Chapters</summary>
     <ol>
-      {{- range $index, $chapter := .chapters }}
+      {{- range .chapters }}
         {{- $start := int .start -}}
         <li>
-          <button type="button" data-start="{{ .start }}"><span class="learn-podcast-time">{{ printf "%d:%02d" (div $start 60) (mod $start 60) }}</span>{{ .title }}</button>
-          <a href="#podcast-transcript-chapter-{{ $index }}" data-transcript aria-label="Read transcript: {{ .title }}">Transcript</a>
+          <button type="button" data-start="{{ .start }}" data-source-anchor="{{ .sourceAnchor }}"><span class="learn-podcast-time">{{ printf "%d:%02d" (div $start 60) (mod $start 60) }}</span>{{ .title }}</button>
         </li>
       {{- end }}
     </ol>
   </details>
-  <div class="learn-podcast-links">
-    <a href="{{ .audio | relURL }}" download>Download MP3</a>
-    <a href="{{ .transcript | relURL }}" download>Download transcript</a>
-  </div>
-  <details class="learn-podcast-transcript" data-podcast-transcript>
-    <summary>Read the full transcript</summary>
-    {{- range $index, $chapter := .chapters }}
-      <section id="podcast-transcript-chapter-{{ $index }}">
-        <h3>{{ .title }}</h3>
-        <a href="#{{ .sourceAnchor }}">Source section in this article</a>
-        {{- range .turns }}
-          <p><strong>{{ .speaker }}:</strong> {{ .text }}</p>
-        {{- end }}
-      </section>
-    {{- end }}
-  </details>
-  <p class="learn-podcast-note">An adapted explanation, not a replacement for the documentation. Script reviewed {{ .reviewedOn }}.</p>
+  <p class="learn-podcast-note">Playback highlights and scrolls to the current section when topics change, not every detail. Continue below for setup and limitations.</p>
 </section>
 <noscript>
-  <p>Listen to this article: <a href="{{ .audio | relURL }}">Play or download the podcast MP3</a>, or <a href="{{ .transcript | relURL }}">read the transcript</a>.</p>
+  <section class="learn-podcast not-prose" aria-label="Article podcast">
+    <p>Listen to the overview: {{ .title }}</p>
+    <p class="learn-podcast-note">AI-generated voices &middot; Adapted from this guide</p>
+    <audio controls controlslist="nodownload noplaybackrate" preload="none" aria-label="{{ .title }}">
+      <source src="{{ .audio | relURL }}?v={{ .audioSha256 }}" type="audio/mpeg" />
+      Your browser does not support audio playback.
+    </audio>
+  </section>
 </noscript>
 {{- $script := resources.Get "js/podcast.js" | minify | fingerprint -}}
 <script src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}" defer></script>

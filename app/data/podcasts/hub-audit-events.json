@@ -1,0 +1,34 @@
+{
+  "id": "hub-audit-events",
+  "title": "Make sense of audit events",
+  "description": "Find the right activity, read the evidence and understand the organisation-wide audit boundary.",
+  "duration": 177.384,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/audit-events/",
+  "sourceSha256": "47d3ef0c9be9aea0f520191b9eb33f6be597d0b992701f2c790d481db7d7f86b",
+  "scriptSha256": "d4c67413fe0c7fab49e591d6754f24ca92bdcbc307f9117f4ccb3ce49e3d2716",
+  "audioSha256": "73766cfc367e82fc96b33278f8be403dd0ec4af650c3b00be40965e65f0031ba",
+  "audio": "podcasts/hub-audit-events/episode.mp3",
+  "chapters": [
+    {
+      "title": "Start with a focused question",
+      "start": 0,
+      "sourceAnchor": "find-an-event"
+    },
+    {
+      "title": "Read the evidence behind the row",
+      "start": 48.34,
+      "sourceAnchor": "read-the-event-table"
+    },
+    {
+      "title": "Browse the matching history",
+      "start": 90.855,
+      "sourceAnchor": "browse-large-result-sets"
+    },
+    {
+      "title": "History is read-only and restricted",
+      "start": 135.895,
+      "sourceAnchor": "access-and-data-handling"
+    }
+  ]
+}

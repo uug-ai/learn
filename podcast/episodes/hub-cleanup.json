@@ -1,0 +1,122 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "hub-cleanup",
+  "title": "Understand cleanup before enabling it",
+  "description": "Learn how subscription retention, simulation and optional global cleanup affect Hub data.",
+  "sourcePath": "../app/content/docs/hub/cleanup/index.md",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/cleanup/",
+  "chapters": [
+    {
+      "title": "Retention needs an enforcing service",
+      "sourceAnchor": "what-it-does",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Imagine a fictional administrator planning storage for a growing Hub deployment. A subscription says how long data should remain. What makes that policy actually happen?"
+        },
+        {
+          "speaker": "guide",
+          "text": "The cleanup worker finds managed data outside its retention policy and removes it. It works in bounded batches and schedules users for later scans. This is an operational deletion service, not just a filter that hides old recordings."
+        },
+        {
+          "speaker": "host",
+          "text": "So we should treat enabling it as a data-changing decision?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Absolutely. Understand the managed collections, subscription settings and intended scope before a live run. Keep important evidence under the appropriate archive and retention arrangements rather than assuming ordinary records will remain indefinitely."
+        }
+      ]
+    },
+    {
+      "title": "Understand the subscription consequences",
+      "sourceAnchor": "retention-strategy",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "What is the most important behaviour our administrator shouldn't miss?"
+        },
+        {
+          "speaker": "guide",
+          "text": "For an active subscription with a configured day limit, data older than the limit is eligible. An active subscription without that limit is skipped. But inactive, missing or expired subscriptions, and subscription lookup errors, take the much broader deletion path described in the guide."
+        },
+        {
+          "speaker": "host",
+          "text": "Including a lookup error? That's a reason to verify billing integration before treating a run as routine."
+        },
+        {
+          "speaker": "guide",
+          "text": "Exactly. Don't assume uncertainty means keep everything. Review the documented behaviour against your environment, and verify subscription lookups before authorising live cleanup."
+        }
+      ]
+    },
+    {
+      "title": "Simulate before making changes",
+      "sourceAnchor": "runtime-modes",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "How can the administrator check the intended effect without immediately deleting data?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Use the documented dry-run mode. It counts matching data without applying cleanup mutations. Prefer the explicit runtime mode and understand its relationship with the older dry-run toggle instead of mixing settings and guessing which wins."
+        },
+        {
+          "speaker": "host",
+          "text": "Does a simulation advance the live schedule?"
+        },
+        {
+          "speaker": "guide",
+          "text": "No. Dry-run doesn't write scheduling state, so the same due users can appear again on later simulations. That's useful for comparison, but it's not evidence that a continuous cleanup cycle has already processed them."
+        }
+      ]
+    },
+    {
+      "title": "Keep the optional global pass separate",
+      "sourceAnchor": "global-pass-orphan-cleanup",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "The guide also mentions a global pass. Is that simply the same retention check, faster?"
+        },
+        {
+          "speaker": "guide",
+          "text": "No. It's an optional, separately enabled pass that removes old documents across managed collections regardless of ownership. It's disabled by default and has its own age and budget settings. Understand that wider scope before enabling it."
+        },
+        {
+          "speaker": "host",
+          "text": "What should we carry into rollout?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Review the policy, verify subscription data, simulate and inspect the results, then authorise a controlled live rollout. Observe metrics and scheduling. Use the guide's preflight checklist and current configuration rather than copying a deletion command from an audio overview."
+        }
+      ]
+    }
+  ],
+  "sourceSha256": "542c3c5dd46ee09d2cc57183aa9901f252c36b3645d658bc04f7850646180d67",
+  "reviewedOn": "2026-10-28",
+  "editorialStyle": {
+    "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
+    "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",
+    "humour": "Optional: one or two brief, relevant light moments are enough. Prefer a relatable analogy over a separate joke. Never pad the overview with banter.",
+    "reactions": "Use occasional short, natural responses such as 'Oh, that makes sense' or 'Wait, so...' followed by a real question. Avoid repetitive praise, canned agreement, and filler.",
+    "laughter": "Optional: at most one or two light reactions such as 'Ha, fair point.' Never insert [laughs], SSML, or repeated ha-ha strings. These are spoken reactions, not a guarantee of genuine laughter from the current speech engine.",
+    "intonation": "Write real questions with question marks, use contractions, alternate short and longer sentences, and make contrasts explicit. Let punctuation and sentence rhythm suggest curiosity, surprise, and emphasis. Avoid all-caps shouting, excessive exclamation marks, and artificial pause tags.",
+    "guardrails": "Keep technical claims source-backed. Never mock the listener, joke about real victims, minimize security or data-loss risks, or let humour replace an explanation. Personality is optional; accuracy and clarity are not."
+  },
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_puck",
+      "speed": 0.98
+    }
+  }
+}

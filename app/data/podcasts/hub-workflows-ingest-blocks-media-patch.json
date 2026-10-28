@@ -1,0 +1,29 @@
+{
+  "id": "hub-workflows-ingest-blocks-media-patch",
+  "title": "Enrich a recording without changing its identity",
+  "description": "Understand the limited update contract, ownership scope and replacement semantics of a media patch.",
+  "duration": 125.568,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/workflows/ingest/blocks/media-patch/",
+  "sourceSha256": "324637d2b98af75a4a1d2453d6777faec501acdbfa22e2e82205fb52eb452f26",
+  "scriptSha256": "3fb132ff8ed12dcd104fe6a166bc01334d6bca7ab67cbfc14149ad50c8901992",
+  "audioSha256": "713870ee20f15996a211b37e95dccd11a7b01562c29409680d4b889b39512224",
+  "audio": "podcasts/hub-workflows-ingest-blocks-media-patch/episode.mp3",
+  "chapters": [
+    {
+      "title": "Update an existing recording",
+      "start": 0,
+      "sourceAnchor": "the-media-patch-contract"
+    },
+    {
+      "title": "Stay inside the allowed fields and scope",
+      "start": 39.79,
+      "sourceAnchor": "fields-to-patch-allow-list"
+    },
+    {
+      "title": "Set complete values",
+      "start": 84.23,
+      "sourceAnchor": "write-semantics-idempotent-set"
+    }
+  ]
+}

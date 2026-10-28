@@ -12,6 +12,7 @@ menu:
     parent: "hub"
 weight: 307
 toc: true
+podcast: hub-audit-events
 ---
 
 The **Audit events** page provides a read-only history of security,

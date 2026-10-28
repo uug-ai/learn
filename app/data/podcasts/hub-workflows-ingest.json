@@ -1,0 +1,29 @@
+{
+  "id": "hub-workflows-ingest",
+  "title": "Give processing results a shared entry point",
+  "description": "Understand typed block envelopes, validation and the different trust levels of queues and API pushes.",
+  "duration": 129.528,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/workflows/ingest/",
+  "sourceSha256": "85ea8bf1f8fb1ea8e85a0d5968c3faadf107f2e8537a3a7506cf3cd4a7220897",
+  "scriptSha256": "1a942c147715385e1f224190088a5f669d6c22d5eb2b2f8d52e34c746d347dab",
+  "audioSha256": "edac56c9b1f841b2e4b3483c5486388d505c6d8edf6be80fd8dedc3dd5371354",
+  "audio": "podcasts/hub-workflows-ingest/episode.mp3",
+  "chapters": [
+    {
+      "title": "A result describes what it contains",
+      "start": 0,
+      "sourceAnchor": "the-block-envelope"
+    },
+    {
+      "title": "Validation comes before writes",
+      "start": 42.715,
+      "sourceAnchor": "how-the-platform-processes-an-envelope"
+    },
+    {
+      "title": "Transport doesn't erase trust boundaries",
+      "start": 82.605,
+      "sourceAnchor": "trust-the-source-allow-list"
+    }
+  ]
+}

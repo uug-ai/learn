@@ -11,6 +11,7 @@ menu:
     parent: "blocks"
 weight: 20
 toc: true
+podcast: hub-workflows-ingest-blocks-marker
 ---
 
 A **marker** is a single annotation on a recording's timeline — a labelled point or span that says *something happened here, and here is what it was*. Where a [detection](../detection/) is a run of geometric tracks (a box per frame), a marker is a higher-level, human-meaningful label on a stretch of time:

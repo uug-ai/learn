@@ -11,6 +11,7 @@ menu:
     parent: "workflows"
 weight: 20
 toc: true
+podcast: hub-workflows-triggers
 ---
 
 {{< callout type="info" >}}

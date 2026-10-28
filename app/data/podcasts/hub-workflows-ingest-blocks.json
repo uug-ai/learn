@@ -1,0 +1,24 @@
+{
+  "id": "hub-workflows-ingest-blocks",
+  "title": "Choose the right result block",
+  "description": "A short guide to detection tracks, timeline markers and updates to an existing recording.",
+  "duration": 82.92,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/workflows/ingest/blocks/",
+  "sourceSha256": "0e996c0d20e4d59a7ebd9888b1e54d07d1b523c502742a5166eb60008bc95b7c",
+  "scriptSha256": "06d21ada2062e89615b307087ac15ccc9da251564cb33e174db5fb2bff64d900",
+  "audioSha256": "0bda93026cc00e44f40083d28b11ab2bea39a638be39c11119651092d256ed5a",
+  "audio": "podcasts/hub-workflows-ingest-blocks/episode.mp3",
+  "chapters": [
+    {
+      "title": "Match the block to the meaning",
+      "start": 0,
+      "sourceAnchor": "the-block-types"
+    },
+    {
+      "title": "Reuse shapes rather than inventing types",
+      "start": 43.815,
+      "sourceAnchor": "type-not-variant"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "hub-cleanup",
+  "title": "Understand cleanup before enabling it",
+  "description": "Learn how subscription retention, simulation and optional global cleanup affect Hub data.",
+  "duration": 182.904,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/cleanup/",
+  "sourceSha256": "542c3c5dd46ee09d2cc57183aa9901f252c36b3645d658bc04f7850646180d67",
+  "scriptSha256": "61a2aad7db69266fc62fdf73373ed531563e0c228b2881404750f7fbba9ea267",
+  "audioSha256": "3baeb410e668d4e3fc569a0a86473dc1c2d0c913ebdc259541daeac8f8b122ed",
+  "audio": "podcasts/hub-cleanup/episode.mp3",
+  "chapters": [
+    {
+      "title": "Retention needs an enforcing service",
+      "start": 0,
+      "sourceAnchor": "what-it-does"
+    },
+    {
+      "title": "Understand the subscription consequences",
+      "start": 50.54,
+      "sourceAnchor": "retention-strategy"
+    },
+    {
+      "title": "Simulate before making changes",
+      "start": 95.355,
+      "sourceAnchor": "runtime-modes"
+    },
+    {
+      "title": "Keep the optional global pass separate",
+      "start": 137.07,
+      "sourceAnchor": "global-pass-orphan-cleanup"
+    }
+  ]
+}

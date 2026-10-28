@@ -1,0 +1,34 @@
+{
+  "id": "hub-maps",
+  "title": "Find your sites on the map",
+  "description": "Learn what map pins represent, how to correct a position, and why map visibility is not edit permission.",
+  "duration": 172.392,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/maps/",
+  "sourceSha256": "c8891517784021e0810b405877a0505d9205fd073f3f6f4f2e36814ac03c8428",
+  "scriptSha256": "322e6f146f28a149b16d306b2be90b2cb0034e620bd97cb34f0b348e9c4120c1",
+  "audioSha256": "e56c002f96875597e2be4380065a56ec64c513d410cbc0b10ef498163c9eed36",
+  "audio": "podcasts/hub-maps/episode.mp3",
+  "chapters": [
+    {
+      "title": "Give a site a real position",
+      "start": 0,
+      "sourceAnchor": "add-a-site-location"
+    },
+    {
+      "title": "Read the overview without moving sites",
+      "start": 45.415,
+      "sourceAnchor": "use-the-sites-map"
+    },
+    {
+      "title": "Correct the entrance, keep the address",
+      "start": 87.63,
+      "sourceAnchor": "fine-tune-a-site-position"
+    },
+    {
+      "title": "Visibility is not permission",
+      "start": 131.67,
+      "sourceAnchor": "access"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ menu:
     parent: "blocks"
 weight: 30
 toc: true
+podcast: hub-workflows-ingest-blocks-media-patch
 ---
 
 A **media-patch** is a partial update to a single recording. Where a [detection](../detection/) creates a run of tracks and a [marker](../marker/) creates a timeline annotation, a media-patch **changes fields on a media document that already exists** — it enriches the recording itself:

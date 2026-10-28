@@ -42,8 +42,8 @@
 .learn-podcast[hidden] { display: none; }
 
 .learn-podcast {
-  margin: 1.5rem 0 2rem;
-  padding: 1.25rem;
+  margin: 1rem 0 1.5rem;
+  padding: 1rem;
   border: 1px solid var(--border);
   border-radius: 1rem;
   background: var(--surface);
@@ -55,42 +55,86 @@
 }
 
 .learn-podcast-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
-.learn-podcast h2 { margin: 0; font-size: 1.15rem; line-height: 1.4; font-weight: 650; }
-.learn-podcast h3 { margin: 1.25rem 0 0.5rem; font-size: 1rem; font-weight: 650; }
-.learn-podcast p { margin: 0.75rem 0; }
+.learn-podcast h2 { margin: 0; font-size: 1.05rem; line-height: 1.4; font-weight: 650; }
+.learn-podcast p { margin: 0.5rem 0; }
 .learn-podcast .learn-podcast-eyebrow { margin: 0 0 0.35rem; color: var(--primary-color); font-size: 0.7rem; font-weight: 650; letter-spacing: 0.1em; text-transform: uppercase; }
 .learn-podcast .learn-podcast-note { color: var(--text-secondary); font-size: 0.8rem; }
-.learn-podcast audio { display: block; width: 100%; margin-top: 1rem; }
-.learn-podcast-transport { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; margin-top: 1rem; }
-.learn-podcast button,
-.learn-podcast select { min-height: 44px; padding: 0.45rem 0.65rem; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--background); color: var(--text-primary); font: inherit; }
+.learn-podcast audio { display: block; width: 100%; min-width: 0; }
+.learn-podcast-anchor { min-height: 54px; margin-top: 0.75rem; }
+.learn-podcast button { min-height: 44px; padding: 0.45rem 0.65rem; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--background); color: var(--text-primary); font: inherit; }
 .learn-podcast button { cursor: pointer; }
 .learn-podcast button:hover,
 .learn-podcast button[aria-current="true"] { border-color: var(--primary-color); background: var(--surface-strong); }
-.learn-podcast .learn-podcast-close { flex-shrink: 0; width: 44px; padding: 0; font-size: 1.5rem; }
+.learn-podcast button.learn-podcast-close { flex-shrink: 0; width: 44px; padding: 0; border: 0; background: transparent; font-size: 1.5rem; }
+.learn-podcast [hidden] { display: none; }
+.learn-podcast-controls.is-docked {
+  position: fixed;
+  z-index: 50;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(60rem, calc(100% - 2rem));
+  padding: 0.65rem;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow: 0 4px 24px #0003;
+}
+.learn-podcast .learn-podcast-return { min-width: 0; border: 0; background: transparent; text-align: left; color: var(--primary-color); font-size: 0.75rem; }
+.learn-podcast-return span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); font-size: 0.8rem; }
+.learn-podcast-return .learn-podcast-current-section { color: var(--text-secondary); font-size: 0.75rem; }
+.is-docked .learn-podcast-status { grid-column: 1 / -1; margin: 0; }
 .learn-podcast-toggle:focus-visible,
 .learn-podcast :focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; }
 .learn-podcast summary { margin: 1rem 0 0.5rem; font-weight: 600; cursor: pointer; }
 .learn-podcast-chapters ol { display: grid; gap: 0.5rem; list-style: none; margin: 0; padding: 0; }
 .learn-podcast-chapters li { display: flex; align-items: center; gap: 0.65rem; }
 .learn-podcast-chapters button { flex: 1; text-align: left; min-width: 0; }
-.learn-podcast-chapters a { font-size: 0.75rem; }
 .learn-podcast-time { display: inline-block; margin-right: 0.6rem; color: var(--primary-color); font-variant-numeric: tabular-nums; }
-.learn-podcast a { color: var(--primary-color); text-decoration: underline; text-underline-offset: 0.15em; }
-.learn-podcast-links { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
-.learn-podcast-transcript section { scroll-margin-top: calc(var(--navbar-height) + 1rem); }
-.learn-podcast-transcript section:target { outline: 1px solid var(--primary-color); outline-offset: 0.5rem; }
-.learn-podcast-transcript strong { color: var(--primary-color); }
 .learn-podcast-status:empty { display: none; }
 
+.learn-podcast-topic-content {
+  position: relative;
+  isolation: isolate;
+}
+.learn-podcast-topic-heading {
+  position: relative;
+  scroll-margin-top: calc(var(--navbar-height) + 1.5rem);
+}
+.learn-podcast-topic-highlight {
+  position: absolute;
+  z-index: -1;
+  inset-inline: -0.75rem;
+  top: calc(var(--podcast-topic-top) - 0.75rem);
+  height: calc(var(--podcast-topic-height) + 1.5rem);
+  margin: 0;
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--primary-color) 18%, transparent);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--primary-color) 5%, transparent);
+  pointer-events: none;
+}
+.learn-podcast-topic-highlight[hidden] { display: none; }
+
 @media (max-width: 640px) {
-  .learn-article-header { column-gap: 0.6rem; }
+  .learn-article-header { grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
+  .learn-article-actions { justify-content: flex-start; }
   .learn-article-header h1 { font-size: 1.8rem; }
   .learn-podcast-toggle { padding: 0.55rem; }
-  .learn-podcast-duration { display: none; }
+  .learn-podcast-duration { display: inline; }
   .learn-podcast { padding: 1rem; }
+  .learn-podcast-controls.is-docked { grid-template-columns: minmax(0, 1fr) 44px; gap: 0.35rem; width: calc(100% - 1rem); bottom: calc(0.5rem + env(safe-area-inset-bottom)); }
+  .is-docked .learn-podcast-return { grid-column: 1; grid-row: 1; }
+  .is-docked .learn-podcast-return .learn-podcast-episode-title { display: none; }
+  .is-docked .learn-podcast-close { grid-column: 2; grid-row: 1; }
+  .is-docked audio { grid-column: 1 / -1; grid-row: 2; }
 }
 
 @media print {
-  .learn-article-actions, .learn-podcast { display: none; }
+  .learn-article-actions, .learn-podcast, .learn-podcast-topic-highlight { display: none; }
 }
