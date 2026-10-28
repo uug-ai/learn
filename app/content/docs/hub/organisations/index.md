@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 303
 toc: true
+podcast: organisations-v2
 ---
 
 An **organisation** is the tenant boundary for shared resources in Kerberos Hub. A **project** separates operational resources inside that organisation. A **workspace** is the organisation/project pair selected for a session; it is not a separate stored entity.

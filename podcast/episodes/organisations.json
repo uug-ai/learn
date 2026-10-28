@@ -1,0 +1,177 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "organisations",
+  "title": "Organisations and projects, explained",
+  "description": "A two-host walkthrough of ownership, workspaces, access, and safe rollout in Kerberos Hub.",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/organisations/",
+  "sourcePath": "../app/content/docs/hub/organisations/index.md",
+  "sourceSha256": "28d35a4f536a8e5195c220ee16ee4e5abb9fa905c55fc7b3af85627470abb129",
+  "reviewedOn": "2026-10-28",
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_michael",
+      "speed": 0.98
+    }
+  },
+  "chapters": [
+    {
+      "title": "One login, two boundaries",
+      "sourceAnchor": "core-concepts",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Welcome to Learn, in podcast mode. This is a local pilot with two synthetic voices, based on the organisations and projects guide for Kerberos Hub. Instead of reading the diagrams aloud, let's build a mental model you can use. What changes when a team starts working across several organisations and projects?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Start with three words. An organisation is the tenant boundary. It owns shared resources, memberships, billing, and policy settings. A project is an operational boundary inside that organisation. And a workspace is simply the organisation and project you have selected for your session. It is not a third kind of stored entity."
+        },
+        {
+          "speaker": "host",
+          "text": "Let's use a fictional example. A security company monitors two locations, a warehouse and a shop. We could place both inside one organisation, but use a different project for each location. Does someone need two logins to work in both?"
+        },
+        {
+          "speaker": "guide",
+          "text": "No. One identity can own or belong to several organisations, and work across projects without becoming a new account each time. But keep the boundaries clear. Ownership, membership, permissions, and your selected workspace answer different questions. Selecting a workspace does not grant access to it."
+        }
+      ]
+    },
+    {
+      "title": "Membership is not permission",
+      "sourceAnchor": "authorization-and-rollout",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "That sounds like a distinction worth slowing down for. If I have an active membership in the organisation, does that make me a camera operator in every project?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Membership alone grants no capabilities. It describes your relationship with the organisation, including status and optional expiry. A role describes what actions someone may perform. A role assignment connects a user to an organisation-owned role, and can describe where that role applies. Memberships and assignments are separate records."
+        },
+        {
+          "speaker": "host",
+          "text": "The guide also separates the shared model from the live implementation. What should an administrator rely on today?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Today, the Hub interface and A P I still use existing account roles, page and feature permissions, and endpoint-specific resource allow-lists. Canonical role assignments are not the live permission source. Inserting an assignment is not a supported way to grant or restrict current access. Project data isolation exists, but that is not the same as per-member project entitlement through scoped assignments."
+        },
+        {
+          "speaker": "host",
+          "text": "So the diagram describes the direction of the access model, not a promise that every invitation screen, membership editor, or project-scoped permission flow already exists. For access administration in this rollout, follow the existing account and custom-role controls."
+        }
+      ]
+    },
+    {
+      "title": "Switching without moving data",
+      "sourceAnchor": "switching-organisations-and-projects",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Back to our warehouse and shop. If I open the workspace menu and browse the shop project, have I already changed where I'm working?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Not yet. Browsing an organisation in the menu is a draft selection. Selecting a project switches the organisation and project together. The backend checks the organisation context and that the project belongs to it and is active. It saves the pair, returns a refreshed session token, and the application reloads to clear the old workspace view."
+        },
+        {
+          "speaker": "host",
+          "text": "And this affects the switching session, rather than silently repointing every other session. Switching also doesn't create a membership, grant a new permission, or transfer a camera. What about a recording that's still being processed when I switch?"
+        },
+        {
+          "speaker": "guide",
+          "text": "It stays with its source. Suppose the warehouse camera created a recording, then you switched to the shop. The recording and its derived detections or workflow results must keep the warehouse's organisation and project. Background processing follows stored source ownership, not your latest navigation choice. Think of switching as choosing a view, not moving the contents."
+        }
+      ]
+    },
+    {
+      "title": "The default project and older recordings",
+      "sourceAnchor": "legacy-compatibility-without-a-required-migration",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Now imagine an existing installation with years of recordings. Does enabling projects mean those recordings disappear until we run a migration?"
+        },
+        {
+          "speaker": "guide",
+          "text": "No. Every organisation has a deterministic default project. Its identifier is the same as the organisation identifier, its initial name is Project One, and its reserved slug is project dash one. It is a real project identity, not a wildcard for all projects. The metadata record can be created lazily."
+        },
+        {
+          "speaker": "host",
+          "text": "And if an old project-owned record has no canonical organisation or project fields, but does have a valid stable owner identifier?"
+        },
+        {
+          "speaker": "guide",
+          "text": "That owner identifier supplies both missing boundaries. The record belongs to that owner's organisation and deterministic default project immediately, through runtime compatibility. Existing non-empty canonical ownership or project values must be preserved. Creator, recipient, payer, and actor information must not be used to replace higher-precedence ownership."
+        },
+        {
+          "speaker": "host",
+          "text": "So older, unstamped resources appear in the correct default project, not in every new project. A backfill can normalize storage later, but it must not be required for visibility, isolation, authorization, or correct processing. If recordings vanish, investigate ownership resolution and workspace scope rather than treating a migration as the fix."
+        }
+      ]
+    },
+    {
+      "title": "Creating and managing a workspace",
+      "sourceAnchor": "creating-an-organisation",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Let's make this practical. When the relevant controls are enabled, how does someone create an organisation?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Open the workspace menu below the Hub logo and choose Create organisation. The required name is between two and one hundred and twenty characters. Company and contact details are optional. The creator becomes the owner and receives an active membership. After creation, the interface selects the organisation, stores the refreshed token, and reloads."
+        },
+        {
+          "speaker": "host",
+          "text": "For a new project, first switch to the organisation where it should live. Merely browsing another organisation is not enough. Then use the creation action with the project name, slug, and optional description. Hub selects the project after creating it."
+        },
+        {
+          "speaker": "guide",
+          "text": "Workspace settings bring together organisation details, company information, billing, regional defaults, users, subscription information, and current-project settings. User profile preferences stay personal. Project integration credentials belong to the project, and dedicated credential operations control access to secrets. Also, deleting a project deactivates it rather than deleting its resources. The default project cannot be deleted."
+        }
+      ]
+    },
+    {
+      "title": "Rollout checks and the takeaway",
+      "sourceAnchor": "configuration-and-rollout",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Two final traps. First, the organisation has a domain field. Does filling it in configure a login domain?"
+        },
+        {
+          "speaker": "guide",
+          "text": "No. A login domain controls the sign-in namespace through the Hub hostname. An organisation controls resource ownership and working context after sign-in. Its domain field is metadata. It does not create D N S records or enable domain-based login, and sharing a login domain does not automatically put users in one organisation."
+        },
+        {
+          "speaker": "host",
+          "text": "Second, if the switcher or create action is missing, where should we look?"
+        },
+        {
+          "speaker": "guide",
+          "text": "The controls are opt-in, with hierarchical feature flags. An explicit organisation umbrella overrides both organisation and project controls. Otherwise the group and individual flags apply. Creation needs the matching switching interface. Those flags show or hide controls; they do not grant backend permissions or activate canonical role assignments."
+        },
+        {
+          "speaker": "host",
+          "text": "And keep storage mode separate from those interface flags. Compatibility mode is the default when unset. Canonical-only storage needs validated canonical coverage first. Legacy mode is not a multi-project isolation contract."
+        },
+        {
+          "speaker": "guide",
+          "text": "Here's the takeaway. The organisation owns. The project isolates operational resources. The workspace selects your session context. Membership is not permission, and switching is not moving data. If a switch fails, check access, active state, and the refreshed token. If resources are missing, check both ownership boundaries and the default-project compatibility path."
+        },
+        {
+          "speaker": "host",
+          "text": "That is our local pilot of Learn in podcast mode. This is an adapted explanation, not a replacement for the guide. Follow the linked documentation for diagrams, exact endpoints, configuration, and current rollout details. Before publishing, we'll review the voices, pronunciation, pacing, and technical accuracy."
+        }
+      ]
+    }
+  ]
+}

@@ -72,6 +72,18 @@ hugo server -D
 
 The site will automatically reload when you make changes to the content.
 
+### Article podcasts
+
+The [podcast template](podcast/README.md) scaffolds source-linked, two-host
+episodes for any documentation page, using a consistent conversational outline
+and shared interactive player. Generation and review remain local until an
+episode is approved. Approved episodes are exported into site assets and
+enabled with a page's `podcast` front matter.
+The organisations guide now includes the approved second episode through a
+headphone **Listen** button at the article's top right. Other articles are
+unchanged. See the [publication workflow](podcast/README.md#publish-an-approved-episode-to-learn)
+and run `npm run podcast` in `playwright/` for the focused browser tests.
+
 ## Project Structure
 
 ```

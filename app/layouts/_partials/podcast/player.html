@@ -1,0 +1,60 @@
+{{- $seconds := int (math.Round .duration) -}}
+<section id="article-podcast" class="learn-podcast not-prose" data-podcast-player aria-label="Article podcast" hidden>
+  <div class="learn-podcast-heading">
+    <div>
+      <p class="learn-podcast-eyebrow">Podcast mode</p>
+      <h2>{{ .title }}</h2>
+    </div>
+    <button type="button" class="learn-podcast-close" data-podcast-close aria-label="Close podcast player" title="Close podcast player">&times;</button>
+  </div>
+  <p class="learn-podcast-description">{{ .description }}</p>
+  <p class="learn-podcast-note">Two synthetic voices &middot; {{ printf "%d:%02d" (div $seconds 60) (mod $seconds 60) }} &middot; Adapted from this guide</p>
+  <audio controls preload="none" tabindex="0" aria-label="{{ .title }}">
+    <source src="{{ .audio | relURL }}" type="audio/mpeg" />
+    Your browser does not support audio playback. <a href="{{ .audio | relURL }}">Download the MP3</a>.
+  </audio>
+  <div class="learn-podcast-transport">
+    <button type="button" data-skip="-15" aria-label="Skip back 15 seconds">Back 15s</button>
+    <button type="button" data-skip="15" aria-label="Skip forward 15 seconds">Forward 15s</button>
+    <label for="podcast-speed">Playback speed</label>
+    <select id="podcast-speed" data-podcast-speed>
+      <option value="0.75">0.75x</option><option value="1" selected>1x</option>
+      <option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option>
+    </select>
+  </div>
+  <p class="learn-podcast-status" data-podcast-status role="status" aria-live="polite"></p>
+  <details class="learn-podcast-chapters">
+    <summary>Chapters</summary>
+    <ol>
+      {{- range $index, $chapter := .chapters }}
+        {{- $start := int .start -}}
+        <li>
+          <button type="button" data-start="{{ .start }}"><span class="learn-podcast-time">{{ printf "%d:%02d" (div $start 60) (mod $start 60) }}</span>{{ .title }}</button>
+          <a href="#podcast-transcript-chapter-{{ $index }}" data-transcript aria-label="Read transcript: {{ .title }}">Transcript</a>
+        </li>
+      {{- end }}
+    </ol>
+  </details>
+  <div class="learn-podcast-links">
+    <a href="{{ .audio | relURL }}" download>Download MP3</a>
+    <a href="{{ .transcript | relURL }}" download>Download transcript</a>
+  </div>
+  <details class="learn-podcast-transcript" data-podcast-transcript>
+    <summary>Read the full transcript</summary>
+    {{- range $index, $chapter := .chapters }}
+      <section id="podcast-transcript-chapter-{{ $index }}">
+        <h3>{{ .title }}</h3>
+        <a href="#{{ .sourceAnchor }}">Source section in this article</a>
+        {{- range .turns }}
+          <p><strong>{{ .speaker }}:</strong> {{ .text }}</p>
+        {{- end }}
+      </section>
+    {{- end }}
+  </details>
+  <p class="learn-podcast-note">An adapted explanation, not a replacement for the documentation. Script reviewed {{ .reviewedOn }}.</p>
+</section>
+<noscript>
+  <p>Listen to this article: <a href="{{ .audio | relURL }}">Play or download the podcast MP3</a>, or <a href="{{ .transcript | relURL }}">read the transcript</a>.</p>
+</noscript>
+{{- $script := resources.Get "js/podcast.js" | minify | fingerprint -}}
+<script src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}" defer></script>
