@@ -1,0 +1,69 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "hub-overview",
+  "title": "See how Hub brings your sites together",
+  "description": "Follow an event from an Agent through Hub to the people watching, then choose where to start.",
+  "sourcePath": "../app/content/docs/hub/_index.md",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/",
+  "sourceSha256": "5523aec43f6eb1876a365ee816a3b9277ee4ab4eb062d323d602f3def0e0f86a",
+  "reviewedOn": "2026-10-28",
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_puck",
+      "speed": 0.98
+    }
+  },
+  "chapters": [
+    {
+      "title": "One event, from site to operator",
+      "sourceAnchor": "how-an-event-moves-through-hub",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Imagine a fictional team looking after three sites. Their Agents already record the cameras. What does adding Hub give them?"
+        },
+        {
+          "speaker": "guide",
+          "text": "One place to bring those Agents, sites and recordings together. Recording still happens at the edge, close to the cameras. Hub adds the shared view: live views and videowalls, searchable recordings with detections, and alerts for the people who need them."
+        },
+        {
+          "speaker": "host",
+          "text": "Great, fewer places to check. Can we follow one event through that picture?"
+        },
+        {
+          "speaker": "guide",
+          "text": "The Agent records the event and uploads the recording to Vault, using the storage you choose. Hub picks up the event. Its pipeline groups recordings into sequences, analyses them, and decides whether someone should be notified. Operators see the result in their views, recordings or notifications."
+        }
+      ]
+    },
+    {
+      "title": "Choose your next step",
+      "sourceAnchor": "where-to-start",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "So our team has the big picture. How do workflows and access fit around it?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Workflows let you choose which cameras, models and time windows apply. Organisations, projects and member roles manage who sees what. Bringing sites into one application doesn't mean giving every person the same view."
+        },
+        {
+          "speaker": "host",
+          "text": "What's a useful first stop, without trying to learn every setting at once?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Start with First things first for why Hub exists, or Getting started for a tour of the main features. Use the Pipeline guide when you want to understand the services an event passes through. Keep this mental model: recording at the edge, coordination in Hub, and useful results for operators."
+        }
+      ]
+    }
+  ]
+}

@@ -79,11 +79,11 @@ episodes for any documentation page, using a consistent conversational outline
 and shared interactive player. Generation and review remain local until an
 episode is approved. Approved episodes are exported into site assets and
 enabled with a page's `podcast` front matter.
-All 35 published, content-bearing Hub guides include an overview through a
+All 36 published, content-bearing Hub guides include an overview through a
 headphone **Listen to the overview** button with an estimated duration,
-including the nested workflow and result-contract guides. The empty Hub
-navigation landing page and unpublished ANPR draft intentionally have none.
-The 34 new episodes use the existing female host and Kokoro's `am_puck` male
+including the Hub landing page and nested workflow and result-contract guides.
+The unpublished ANPR draft intentionally has none.
+The 35 new episodes use the existing female host and Kokoro's `am_puck` male
 guide with upbeat conversational wording; the original organisations overview
 is preserved.
 Episodes introduce the mental model and one everyday example rather than

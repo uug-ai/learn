@@ -1,0 +1,24 @@
+{
+  "id": "hub-overview",
+  "title": "See how Hub brings your sites together",
+  "description": "Follow an event from an Agent through Hub to the people watching, then choose where to start.",
+  "duration": 98.064,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/",
+  "sourceSha256": "5523aec43f6eb1876a365ee816a3b9277ee4ab4eb062d323d602f3def0e0f86a",
+  "scriptSha256": "0631fbc47aac65d855daa866b50850bdcf1c47d239b8bda686e6fcab1ce9ea9d",
+  "audioSha256": "e8cb405a45ad31a9c1ec8e105e6ae3e3942fa3a4ed3ac2c932f0855f8ef12b10",
+  "audio": "podcasts/hub-overview/episode.mp3",
+  "chapters": [
+    {
+      "title": "One event, from site to operator",
+      "start": 0,
+      "sourceAnchor": "how-an-event-moves-through-hub"
+    },
+    {
+      "title": "Choose your next step",
+      "start": 52.315,
+      "sourceAnchor": "where-to-start"
+    }
+  ]
+}

@@ -32,7 +32,7 @@ const pages = await sourcePages(hub);
 const eligible = pages.filter((page) => page.body && !/^draft:\s*true\s*$/m.test(page.metadata));
 
 test("every published content-bearing Hub page has its own reviewed podcast", async () => {
-  assert.ok(eligible.length >= 35, `Unexpectedly incomplete Hub inventory: ${eligible.length}`);
+  assert.ok(eligible.length >= 36, `Unexpectedly incomplete Hub inventory: ${eligible.length}`);
   const ids = new Set();
   for (const page of eligible) {
     const id = page.metadata.match(/^podcast:\s*([a-z0-9-]+)\s*$/m)?.[1];
@@ -51,9 +51,9 @@ test("every published content-bearing Hub page has its own reviewed podcast", as
   }
 });
 
-test("the empty Hub landing page and unpublished drafts remain without podcasts", () => {
+test("the Hub overview is included while empty pages and unpublished drafts remain without podcasts", () => {
+  assert.ok(eligible.some((page) => page.path === join(hub, "_index.md")));
   const excluded = pages.filter((page) => !eligible.includes(page));
-  assert.ok(excluded.some((page) => page.path === join(hub, "_index.md")));
   assert.ok(excluded.some((page) => page.path === join(hub, "workflows/anpr.md")));
   for (const page of excluded) assert.doesNotMatch(page.metadata, /^podcast:/m);
 });

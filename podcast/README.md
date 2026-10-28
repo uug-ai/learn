@@ -4,17 +4,18 @@ Use one conversational episode format and one interactive player for any Learn
 documentation page. The first example is an adaptation of the
 [organisations and projects guide](https://learn.uug.ai/docs/hub/organisations/).
 Generation and review stay local. Approved episodes can be exported into Learn's
-static assets and enabled individually on documentation pages. All 35 published,
+static assets and enabled individually on documentation pages. All 36 published,
 content-bearing Hub pages now have their own overview, including the nested
-workflow guides. The organisations guide keeps its second episode. The empty
-Hub navigation landing page and the unpublished ANPR draft are intentionally
-excluded; documentation outside Hub is unchanged.
+workflow guides and Hub landing page. The organisations guide keeps its second
+episode. The unpublished ANPR draft is intentionally excluded; documentation
+outside Hub is unchanged.
 Nothing under `output/`, `.cache/`, or `node_modules/` is part of the site.
 
 ## Hub episode coverage
 
-The 34 additional scripts use `hub-<page-path>` IDs, with nested path segments
-joined by hyphens, and live under `episodes/`. Each source page selects its own
+The 35 additional scripts use `hub-<page-path>` IDs, with nested path segments
+joined by hyphens and `hub-overview` for the landing page, and live under
+`episodes/`. Each source page selects its own
 episode through YAML front matter. The episodes are source-specific overviews,
 not narrated copies of configuration tables or code.
 
