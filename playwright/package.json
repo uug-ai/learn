@@ -6,6 +6,7 @@
   "scripts": {
     "install:browsers": "playwright install chromium",
     "test": "playwright test",
+    "podcast": "playwright test --config=podcast.config.ts",
     "new": "node scripts/new-hub-page.mjs",
     "tutorial-headers": "node scripts/generate-tutorial-headers.mjs",
     "tutorial-header:comparison": "node scripts/generate-transport-comparison-header.mjs",

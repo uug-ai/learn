@@ -1,0 +1,15 @@
+{{- $podcast := false -}}
+{{- with .Params.podcast -}}
+  {{- $id := . -}}
+  {{- with index hugo.Data.podcasts $id -}}
+    {{- $podcast = . -}}
+    {{- range slice .audio .transcript -}}
+      {{- if not (fileExists (printf "static/%s" .)) -}}
+        {{- errorf "Podcast %q is missing its site asset %q. Run npm run publish -- %s in podcast/." $id . $id -}}
+      {{- end -}}
+    {{- end -}}
+  {{- else -}}
+    {{- errorf "Page %q references unpublished podcast %q. Run npm run publish -- %s in podcast/." $.RelPermalink $id $id -}}
+  {{- end -}}
+{{- end -}}
+{{- return $podcast -}}

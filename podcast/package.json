@@ -1,0 +1,24 @@
+{
+  "name": "learn-podcast-pilot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local-only, reviewed documentation podcast pilot.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "new": "node new.mjs",
+    "generate": "node generate.mjs",
+    "sample": "node generate.mjs --sample",
+    "publish": "node publish.mjs",
+    "test": "node --test",
+    "preview": "http-server output -a 127.0.0.1 -p 4175 -c-1"
+  },
+  "dependencies": {
+    "kokoro-js": "1.2.1"
+  },
+  "devDependencies": {
+    "http-server": "14.1.1"
+  }
+}
