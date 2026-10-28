@@ -12,6 +12,7 @@ menu:
     parent: "hub"
 weight: 304
 toc: true
+podcast: hub-livestream
 ---
 
 The **Live view** page in the Hub streams the cameras connected to

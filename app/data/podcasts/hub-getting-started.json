@@ -1,0 +1,34 @@
+{
+  "id": "hub-getting-started",
+  "title": "Getting started with Hub",
+  "description": "Build a practical mental model of recordings, storage, search, alerts and live viewing.",
+  "duration": 198.672,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/getting-started/",
+  "sourceSha256": "41d361e2b9d7ef5b703f3ffc306b642e6c7af9459e6f529f57b57fa0486c5fc4",
+  "scriptSha256": "e8e74c9ddd7fd57dfcbdab5cf929d8e620354b84ddd1542d8b8cc63f8b0dcc1b",
+  "audioSha256": "57d870d6b6708e2c2b9d05d030fbee0dbe63898c8f1f511f724a433e7ccf9e83",
+  "audio": "podcasts/hub-getting-started/episode.mp3",
+  "chapters": [
+    {
+      "title": "Keep storage and review distinct",
+      "start": 0,
+      "sourceAnchor": "bring-your-own-storage"
+    },
+    {
+      "title": "Turn a busy day into a search",
+      "start": 51.04,
+      "sourceAnchor": "advanced-searching"
+    },
+    {
+      "title": "Connect events to useful notifications",
+      "start": 95.18,
+      "sourceAnchor": "integrations"
+    },
+    {
+      "title": "Choose the view that fits the question",
+      "start": 143.395,
+      "sourceAnchor": "livestreaming"
+    }
+  ]
+}

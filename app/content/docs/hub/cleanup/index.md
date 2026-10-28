@@ -12,6 +12,7 @@ menu:
     parent: "hub"
 weight: 306
 toc: true
+podcast: hub-cleanup
 ---
 
 [![Go Version](https://img.shields.io/badge/Go-1.24.12%2B-blue.svg)](https://go.dev/)

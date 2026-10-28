@@ -37,19 +37,34 @@ async function fixture(t) {
   return { root, directory, episode, manifest, output, audio, save };
 }
 
-test("publishes only checked audio, transcript, and page-ready chapter data", async (t) => {
-  const { root, directory, episode, audio } = await fixture(t);
+test("publishes checked audio and chapter data without exposing the transcript", async (t) => {
+  const { root, directory, episode, output, audio } = await fixture(t);
   const assets = await publishEpisode(episode.id, { root });
   assert.equal(assets, join(directory, "app/static/podcasts", episode.id));
   assert.deepEqual(await readFile(join(assets, "episode.mp3")), audio);
-  assert.equal(await readFile(join(assets, "transcript.txt"), "utf8"), renderTranscript(episode));
+  await assert.rejects(readFile(join(assets, "transcript.txt")), { code: "ENOENT" });
+  assert.equal(await readFile(join(output, "transcript.txt"), "utf8"), renderTranscript(episode));
   const data = JSON.parse(await readFile(join(directory, "app/data/podcasts", `${episode.id}.json`), "utf8"));
   assert.equal(data.audio, `podcasts/${episode.id}/episode.mp3`);
-  assert.equal(data.chapters.length, 6);
-  assert.equal(data.chapters[0].turns[0].speaker, "Host");
-  assert.equal(data.chapters[0].turns[0].text, episode.chapters[0].turns[0].text);
+  assert.deepEqual(data.chapters, episode.chapters.map((chapter, index) => ({
+    title: chapter.title, start: index * 60, sourceAnchor: chapter.sourceAnchor,
+  })));
+  assert.equal(data.transcript, undefined);
   assert.equal(data.editorialStyle, undefined);
   assert.equal(data.audioSha256, sha256(audio));
+});
+
+test("republishing removes previously exported and stale built transcripts", async (t) => {
+  const { root, directory, episode } = await fixture(t);
+  const assets = join(directory, "app/static/podcasts", episode.id);
+  const builtAssets = join(directory, "app/public/podcasts", episode.id);
+  await mkdir(assets, { recursive: true });
+  await mkdir(builtAssets, { recursive: true });
+  await writeFile(join(assets, "transcript.txt"), renderTranscript(episode));
+  await writeFile(join(builtAssets, "transcript.txt"), renderTranscript(episode));
+  await publishEpisode(episode.id, { root });
+  await assert.rejects(readFile(join(assets, "transcript.txt")), { code: "ENOENT" });
+  await assert.rejects(readFile(join(builtAssets, "transcript.txt")), { code: "ENOENT" });
 });
 
 for (const [name, mutate, message] of [

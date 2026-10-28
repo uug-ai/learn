@@ -1,9 +1,9 @@
-{{- $seconds := int (math.Round .duration) -}}
-<button type="button" class="learn-podcast-toggle" data-podcast-toggle aria-controls="article-podcast" aria-expanded="false" aria-label="Listen to podcast" title="Listen to this article as a podcast">
+{{- $minutes := int (math.Max 1 (math.Round (div .duration 60))) -}}
+<button type="button" class="learn-podcast-toggle" data-podcast-toggle aria-controls="article-podcast" aria-expanded="false" aria-label="Listen to the overview" title="Listen to a short overview of this guide">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
     <path d="M3 14v-3a9 9 0 0 1 18 0v3" />
     <rect x="3" y="12" width="4" height="9" rx="2" /><rect x="17" y="12" width="4" height="9" rx="2" />
   </svg>
-  <span>Listen</span>
-  <span class="learn-podcast-duration">{{ printf "%d:%02d" (div $seconds 60) (mod $seconds 60) }}</span>
+  <span>Listen to the overview</span>
+  <span class="learn-podcast-duration">{{ $minutes }} min</span>
 </button>

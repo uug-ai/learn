@@ -1,0 +1,34 @@
+{
+  "id": "hub-recordings",
+  "title": "Find the footage that matters",
+  "description": "Move from a broad recording search to the right moment, its surrounding context and safe evidence preservation.",
+  "duration": 180.72,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/recordings/",
+  "sourceSha256": "f5c60586ca57fbdf5e344d30dc2a383c8e45e21f11914085303389c3b4a9e407",
+  "scriptSha256": "b19ea5eb6b42bb157c0ab35e819d5e0a2d889a64feef6a444ba71288b3366127",
+  "audioSha256": "1a422e867dce2cc50a1cc7f5136fd6a349e3e43f3c5f9a92bb0b63cf22ff7195",
+  "audio": "podcasts/hub-recordings/episode.mp3",
+  "chapters": [
+    {
+      "title": "Narrow the question first",
+      "start": 0,
+      "sourceAnchor": "finding-recordings"
+    },
+    {
+      "title": "A card is a doorway into detail",
+      "start": 47.49,
+      "sourceAnchor": "browsing-and-playing-footage"
+    },
+    {
+      "title": "See what happened before and after",
+      "start": 91.48,
+      "sourceAnchor": "reviewing-surrounding-footage"
+    },
+    {
+      "title": "Finding again isn't preserving forever",
+      "start": 134.445,
+      "sourceAnchor": "permissions-and-retention"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 305
 toc: true
+podcast: hub-sso
 ---
 
 Kerberos Hub is a multi-tenancy application that allow you to onboard multiple users (with sub accounts). Each users is granted a subscription, given specific permissions and features, and credentials to link multiple cameras to their user account. Afterwards a user can delegate cameras and recordings to sub accounts, so they can review in a divide-and-conquer strategy.

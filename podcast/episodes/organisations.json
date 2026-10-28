@@ -3,10 +3,10 @@
   "draft": false,
   "id": "organisations",
   "title": "Organisations and projects, explained",
-  "description": "A two-host walkthrough of ownership, workspaces, access, and safe rollout in Kerberos Hub.",
+  "description": "A two-host walkthrough of ownership, workspaces, access, and safe rollout.",
   "sourceUrl": "https://learn.uug.ai/docs/hub/organisations/",
   "sourcePath": "../app/content/docs/hub/organisations/index.md",
-  "sourceSha256": "28d35a4f536a8e5195c220ee16ee4e5abb9fa905c55fc7b3af85627470abb129",
+  "sourceSha256": "b765d09f6359b8c1ceab5ebdf3f6b92771d91e846bb6be843b2b6253ac012e07",
   "reviewedOn": "2026-10-28",
   "speakers": {
     "host": {
@@ -27,7 +27,7 @@
       "turns": [
         {
           "speaker": "host",
-          "text": "Welcome to Learn, in podcast mode. This is a local pilot with two synthetic voices, based on the organisations and projects guide for Kerberos Hub. Instead of reading the diagrams aloud, let's build a mental model you can use. What changes when a team starts working across several organisations and projects?"
+          "text": "Welcome to Learn, in podcast mode. This is a local pilot with two synthetic voices, based on the organisations and projects guide. Instead of reading the diagrams aloud, let's build a mental model you can use. What changes when a team starts working across several organisations and projects?"
         },
         {
           "speaker": "guide",

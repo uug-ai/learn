@@ -79,9 +79,27 @@ episodes for any documentation page, using a consistent conversational outline
 and shared interactive player. Generation and review remain local until an
 episode is approved. Approved episodes are exported into site assets and
 enabled with a page's `podcast` front matter.
-The organisations guide now includes the approved second episode through a
-headphone **Listen** button at the article's top right. Other articles are
-unchanged. See the [publication workflow](podcast/README.md#publish-an-approved-episode-to-learn)
+All 35 published, content-bearing Hub guides include an overview through a
+headphone **Listen to the overview** button with an estimated duration,
+including the nested workflow and result-contract guides. The empty Hub
+navigation landing page and unpublished ANPR draft intentionally have none.
+The 34 new episodes use the existing female host and Kokoro's `am_puck` male
+guide with upbeat conversational wording; the original organisations overview
+is preserved.
+Episodes introduce the mental model and one everyday example rather than
+narrating setup details. The compact player offers playback and chapters,
+remembers progress in this browser, and keeps audio controls reachable while
+reading, without transcript or download links. A single soft background marks
+the current topic's section, without badges or marks on earlier topics.
+The bottom playbar also shows the current section beside the audio controls,
+updating as playback moves or seeks between topics.
+Playback scrolls to each new section below the fixed header; chapter selection
+also brings its section into view. It does not keep scrolling within a topic
+and respects reduced-motion preferences.
+Playback never starts automatically. Documentation outside Hub is unchanged.
+Source review and automated audio checks do not constitute human listening
+approval; listen before a production release.
+See the [publication workflow](podcast/README.md#publish-an-approved-episode-to-learn)
 and run `npm run podcast` in `playwright/` for the focused browser tests.
 
 ## Project Structure

@@ -14,6 +14,7 @@ menu:
     identifier: "blocks"
 weight: 10
 toc: true
+podcast: hub-workflows-ingest-blocks
 ---
 
 A **block** is the smallest unit of a delegated result. Each one is a pair:

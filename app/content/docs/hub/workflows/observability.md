@@ -11,6 +11,7 @@ menu:
     parent: "workflows"
 weight: 30
 toc: true
+podcast: hub-workflows-observability
 ---
 
 [Stages](/docs/hub/workflows/stages/) is the contract a microservice codes against; [Ingest](/docs/hub/workflows/ingest/) is how a result is stored. This page is for whoever **runs** the platform: it documents what the **workflows engine** (`hub-workflows`) writes to its logs and traces as it drives a run, so you can answer the questions that come up in practice — *did this recording open a run? did it reach a stage? why not? did a stage time out?* — and so the logs you forward to us are precise enough to act on.

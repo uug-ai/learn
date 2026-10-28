@@ -1,0 +1,29 @@
+{
+  "id": "hub-workflows",
+  "title": "Give recordings a purposeful workflow",
+  "description": "Understand workflow scope, stages and the difference between authoring a graph and operating its workers.",
+  "duration": 142.44,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/workflows/",
+  "sourceSha256": "c60f5044dc6b78ed4907aef4fbce06c000dac2561b51d9b6d1c0cfd2c664eb6e",
+  "scriptSha256": "5397eaf8f7b38ed99ee743568e62caafc903c0d95b8dcef7de542c494d633c80",
+  "audioSha256": "eb3f4c698a95fba40ec5201030d65512949b794331a8b19c5655ae7e83793832",
+  "audio": "podcasts/hub-workflows/episode.mp3",
+  "chapters": [
+    {
+      "title": "Start with a specific need",
+      "start": 0,
+      "sourceAnchor": "why-workflows"
+    },
+    {
+      "title": "Know the current authoring path",
+      "start": 43.54,
+      "sourceAnchor": "defining-a-workflow-in-configuration"
+    },
+    {
+      "title": "Deploy and verify the whole chain",
+      "start": 94.005,
+      "sourceAnchor": "deploying-and-operating"
+    }
+  ]
+}

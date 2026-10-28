@@ -1,0 +1,29 @@
+{
+  "id": "hub-workflows-ingest-blocks-detection",
+  "title": "Deliver a useful detection run",
+  "description": "Understand recording targets, track coordinates, source identity and safe redelivery.",
+  "duration": 132.144,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/workflows/ingest/blocks/detection/",
+  "sourceSha256": "93c845ed017b003632b35d507e674ec287002a938de2244b2453391adf018e38",
+  "scriptSha256": "7a2e4b75c843bd4ee389a76b5aebb86ae306bad85b04658a9589a4efc4025b78",
+  "audioSha256": "2bb13603ecca3bda761912911e154c09c1089a4840df34d4258ef95295e41614",
+  "audio": "podcasts/hub-workflows-ingest-blocks-detection/episode.mp3",
+  "chapters": [
+    {
+      "title": "Target one recording",
+      "start": 0,
+      "sourceAnchor": "the-detection-run"
+    },
+    {
+      "title": "Describe geometry consistently",
+      "start": 41.565,
+      "sourceAnchor": "box-geometry-rules"
+    },
+    {
+      "title": "Give retries the same identity",
+      "start": 84.255,
+      "sourceAnchor": "write-semantics-upsert-by-runid"
+    }
+  ]
+}

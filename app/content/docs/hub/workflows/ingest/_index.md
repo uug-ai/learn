@@ -12,6 +12,7 @@ menu:
     identifier: "ingest"
 weight: 20
 toc: true
+podcast: hub-workflows-ingest
 ---
 
 A **stage** is a step in a workflow; you implement it as a **microservice**. [Stages](../stages/) covers how your microservice *connects* — the queue it consumes, the `WorkflowRun` envelope it receives, and how to register the stage. This page is the other half: **what your microservice hands back**, and what the platform does with it.

@@ -1,0 +1,34 @@
+{
+  "id": "hub-markers",
+  "title": "Jump to meaningful moments with markers",
+  "description": "Understand marker results, recording links and the difference between a compact summary and the full history.",
+  "duration": 168.96,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/markers/",
+  "sourceSha256": "533e90872f0ac78d5c401c8eecec6f242cfe69b4201a74dee3caa504f0d55ac5",
+  "scriptSha256": "3163a868c94ccf40a169bdf62fb2e750ef433bab80c776c91d75bb97c76a9bff",
+  "audioSha256": "e58242654ab4a5fc5c8aa137ccb3e440411f53389a698ca724fc0f36812385bd",
+  "audio": "podcasts/hub-markers/episode.mp3",
+  "chapters": [
+    {
+      "title": "Search for a meaningful moment",
+      "start": 0,
+      "sourceAnchor": "find-a-marker"
+    },
+    {
+      "title": "Use the recording's timeline",
+      "start": 45.69,
+      "sourceAnchor": "use-markers-on-recordings"
+    },
+    {
+      "title": "Results, not hand-written bookmarks",
+      "start": 86.305,
+      "sourceAnchor": "how-markers-are-created"
+    },
+    {
+      "title": "A card isn't the full history",
+      "start": 128.17,
+      "sourceAnchor": "access-and-limits"
+    }
+  ]
+}

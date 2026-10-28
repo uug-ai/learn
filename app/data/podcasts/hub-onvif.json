@@ -1,0 +1,19 @@
+{
+  "id": "hub-onvif",
+  "title": "Camera control through ONVIF",
+  "description": "Understand the Agent connection behind remote camera controls and why support depends on the camera.",
+  "duration": 95.208,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/onvif/",
+  "sourceSha256": "51bfc80023cd9f99566cfd337d7fde34293f03dfda50cf6533b81f36784adebd",
+  "scriptSha256": "6af094a9beb4d4a3262b2134cf1d09b811e2d6e81f4f05e136ab3344cb8c8512",
+  "audioSha256": "ab67dfe99bbf34445d35563e273276d42b0a0c959f9198790cc5c450214d7a3c",
+  "audio": "podcasts/hub-onvif/episode.mp3",
+  "chapters": [
+    {
+      "title": "From Hub to the camera",
+      "start": 0,
+      "sourceAnchor": "ptz"
+    }
+  ]
+}

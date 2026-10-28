@@ -1,0 +1,126 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "hub-getting-started",
+  "title": "Getting started with Hub",
+  "description": "Build a practical mental model of recordings, storage, search, alerts and live viewing.",
+  "sourcePath": "../app/content/docs/hub/getting-started/index.md",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/getting-started/",
+  "chapters": [
+    {
+      "title": "Keep storage and review distinct",
+      "sourceAnchor": "bring-your-own-storage",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Let's give our fictional shop manager a first day with Hub. Cameras are producing recordings, but the manager wants a useful overview, not another storage puzzle. Where do we start?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Start with two separate jobs. Vault connects recordings to storage providers. Hub keeps the information that helps people find and review those recordings. The video itself and the metadata about it don't have to live in the same service."
+        },
+        {
+          "speaker": "host",
+          "text": "So seeing a video in Hub doesn't mean Hub keeps another full copy?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Correct. The guide explains signed links: Vault can arrange temporary access to an object in storage so the browser can retrieve it. Keep the storage connection in mind when diagnosing a video that appears in the overview but won't play."
+        }
+      ]
+    },
+    {
+      "title": "Turn a busy day into a search",
+      "sourceAnchor": "advanced-searching",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Our manager wants activity near the shop entrance yesterday afternoon. Does that mean opening every clip?"
+        },
+        {
+          "speaker": "guide",
+          "text": "No. Start with the time and the relevant Agent, then narrow the search using the information your deployment has available. The consolidated view groups activity so you can begin broadly and drill into a particular recording when it matters."
+        },
+        {
+          "speaker": "host",
+          "text": "And object labels can help too?"
+        },
+        {
+          "speaker": "guide",
+          "text": "When analysis has produced that metadata, yes. It can help search and notifications, but don't treat a predicted label as a substitute for reviewing the footage. The dedicated analytics and recordings guides explain their current controls in more detail."
+        }
+      ]
+    },
+    {
+      "title": "Connect events to useful notifications",
+      "sourceAnchor": "integrations",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Once the manager finds the kind of event that matters, how do they avoid searching for it every morning?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Alerts describe the conditions that matter. Channels describe where a notification goes. Keeping those ideas separate helps: one is the decision, the other is delivery. The guide distinguishes older generic alerts from more flexible custom detection alerts."
+        },
+        {
+          "speaker": "host",
+          "text": "So adding an email address alone doesn't define what should trigger a message?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Exactly. Check both the rule and the enabled delivery channel. Also check which alert types your installation supports rather than assuming every condition is available in every alert generation. Start with one clear scenario and test the result."
+        }
+      ]
+    },
+    {
+      "title": "Choose the view that fits the question",
+      "sourceAnchor": "livestreaming",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Sometimes the question is what happened yesterday. Sometimes it's what's happening right now. How should the manager separate those?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Use recordings for captured history and live viewing for current activity. The introductory guide distinguishes lightweight snapshot previews from high-definition streaming. The live-view guide has the current transport choices, requirements and troubleshooting."
+        },
+        {
+          "speaker": "host",
+          "text": "What's a sensible first-day checklist, without turning this into a manual?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Connect the storage and Agents, confirm a recording arrives, practise a simple search, and test one alert with its channel. Organise access and locations as the team grows. Learn one complete journey before switching on everything."
+        },
+        {
+          "speaker": "host",
+          "text": "A working journey beats a collection of unchecked settings. Keep the getting-started guide nearby for the details."
+        }
+      ]
+    }
+  ],
+  "sourceSha256": "41d361e2b9d7ef5b703f3ffc306b642e6c7af9459e6f529f57b57fa0486c5fc4",
+  "reviewedOn": "2026-10-28",
+  "editorialStyle": {
+    "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
+    "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",
+    "humour": "Optional: one or two brief, relevant light moments are enough. Prefer a relatable analogy over a separate joke. Never pad the overview with banter.",
+    "reactions": "Use occasional short, natural responses such as 'Oh, that makes sense' or 'Wait, so...' followed by a real question. Avoid repetitive praise, canned agreement, and filler.",
+    "laughter": "Optional: at most one or two light reactions such as 'Ha, fair point.' Never insert [laughs], SSML, or repeated ha-ha strings. These are spoken reactions, not a guarantee of genuine laughter from the current speech engine.",
+    "intonation": "Write real questions with question marks, use contractions, alternate short and longer sentences, and make contrasts explicit. Let punctuation and sentence rhythm suggest curiosity, surprise, and emphasis. Avoid all-caps shouting, excessive exclamation marks, and artificial pause tags.",
+    "guardrails": "Keep technical claims source-backed. Never mock the listener, joke about real victims, minimize security or data-loss risks, or let humour replace an explanation. Personality is optional; accuracy and clarity are not."
+  },
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_puck",
+      "speed": 0.98
+    }
+  }
+}

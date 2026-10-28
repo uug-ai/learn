@@ -1,0 +1,90 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "hub-roles",
+  "title": "Give people the access they need",
+  "description": "Understand standard account roles, delegated cameras and the limits of custom-role navigation settings.",
+  "sourcePath": "../app/content/docs/hub/roles/index.md",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/roles/",
+  "chapters": [
+    {
+      "title": "Delegate deliberately",
+      "sourceAnchor": "accounts",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Here's a fictional shop team. The owner needs to configure the system, while a colleague only needs to review selected cameras. Should they share the owner's login?"
+        },
+        {
+          "speaker": "guide",
+          "text": "The roles guide describes creating additional users with a smaller set of cameras and an appropriate role. Owner has the highest level of access, including sensitive settings. Give the colleague a separate account that fits the job instead."
+        },
+        {
+          "speaker": "host",
+          "text": "How do the standard roles differ from a custom choice?"
+        },
+        {
+          "speaker": "guide",
+          "text": "The application defines the standard owner, admin, editor and guest roles. Their built-in rules aren't editable. The guide's example is a guest who cannot change settings or create alerts, compared with roles that can perform more management actions."
+        },
+        {
+          "speaker": "host",
+          "text": "So choosing a role and deciding which cameras to delegate are both part of the task?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Yes. Consider both the resources someone needs and the actions they need to take. Check the actual result with that user's account. A familiar role name isn't a reason to skip verifying the access you're granting."
+        }
+      ]
+    },
+    {
+      "title": "Know the custom-role boundary",
+      "sourceAnchor": "custom-roles",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "The team wants a more tailored experience. Does a custom role mean every possible permission can be redesigned?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Don't assume that. This guide describes custom roles controlling access to main navigation and notes that coverage is limited. Hiding a page is not the same claim as enforcing every underlying resource action."
+        },
+        {
+          "speaker": "host",
+          "text": "And this isn't a promise that the newer organisation assignment model already authorizes every request?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Correct. Keep this account-role guide distinct from the organisation and project model. Read the current rollout notes for that model. For today's setup, choose the least access that supports the person's work and verify the actual behaviour."
+        },
+        {
+          "speaker": "host",
+          "text": "Give each colleague a suitable account, check the cameras and actions, and keep the documented limits in view."
+        }
+      ]
+    }
+  ],
+  "sourceSha256": "66ff1bbf05453e90b81c0217d7d134bb0a3b86702565f099e2e83a029a6d6e0e",
+  "reviewedOn": "2026-10-28",
+  "editorialStyle": {
+    "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
+    "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",
+    "humour": "Optional: one or two brief, relevant light moments are enough. Prefer a relatable analogy over a separate joke. Never pad the overview with banter.",
+    "reactions": "Use occasional short, natural responses such as 'Oh, that makes sense' or 'Wait, so...' followed by a real question. Avoid repetitive praise, canned agreement, and filler.",
+    "laughter": "Optional: at most one or two light reactions such as 'Ha, fair point.' Never insert [laughs], SSML, or repeated ha-ha strings. These are spoken reactions, not a guarantee of genuine laughter from the current speech engine.",
+    "intonation": "Write real questions with question marks, use contractions, alternate short and longer sentences, and make contrasts explicit. Let punctuation and sentence rhythm suggest curiosity, surprise, and emphasis. Avoid all-caps shouting, excessive exclamation marks, and artificial pause tags.",
+    "guardrails": "Keep technical claims source-backed. Never mock the listener, joke about real victims, minimize security or data-loss risks, or let humour replace an explanation. Personality is optional; accuracy and clarity are not."
+  },
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_puck",
+      "speed": 0.98
+    }
+  }
+}

@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 306
 toc: true
+podcast: hub-onvif
 ---
 
 When adding and deploying your Agents you have [the option to enable ONVIF](/docs/factory/getting-started/#adding-a-new-deployment) integration. Once enabled and connected properly to your camera using ONVIF, you can leverage specific functions and features of the camera, such as as PTZ, Streaming Profiles, etc. Which features are available depends on the camera you are using, and [which ONVIF profiles](https://www.onvif.org/profiles) are supported.

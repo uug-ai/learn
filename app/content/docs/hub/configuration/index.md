@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 303
 toc: true
+podcast: hub-configuration
 ---
 
 Once you have installed the Kerberos Hub Helm chart, and you confirm to have all microservices properly running you should be able to access the Kerberos Hub login screen and sign in through the default username and password [which was defined during the installation step](https://github.com/kerberos-io/hub#post-installation).

@@ -12,6 +12,7 @@ menu:
     parent: "hub"
 weight: 310
 toc: true
+podcast: hub-recordings
 ---
 
 The **Recordings** page is the main starting point for reviewing footage in

@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 303.5
 toc: true
+podcast: hub-feature-flags
 ---
 
 Hub frontend feature flags control which pages, controls, and optional data sources are available to users. They do not grant permissions and they do not start backend services. Roles and resource authorization still apply after a feature is visible.

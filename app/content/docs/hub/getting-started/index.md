@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 301
 toc: true
+podcast: hub-getting-started
 ---
 
 You might wonder what is inside the Kerberos Hub solution? We'll provide you a concrete list of functionalities below, this should give you more insights about how Kerberos Hub looks like and what the capabilities are.

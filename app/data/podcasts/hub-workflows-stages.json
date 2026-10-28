@@ -1,0 +1,29 @@
+{
+  "id": "hub-workflows-stages",
+  "title": "Connect your own workflow stage",
+  "description": "Learn the worker contract: register an operation, consume a run and return one durable result.",
+  "duration": 135.24,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/workflows/stages/",
+  "sourceSha256": "1782f9c8f943b3caccf29de4e4c5d55295b2f70345708eeee93ce2323ee4140d",
+  "scriptSha256": "332f7e6f0de0a52c5cc4ff9933864970b781dc5b546a0a73c4f9b22b1b881383",
+  "audioSha256": "7872d69a77d9f653c0c39f99936cf82a930e5c077cacb45290612f0480e80a68",
+  "audio": "podcasts/hub-workflows-stages/episode.mp3",
+  "chapters": [
+    {
+      "title": "Choose the right integration boundary",
+      "start": 0,
+      "sourceAnchor": "when-to-add-a-stage"
+    },
+    {
+      "title": "Registration and deployment must match",
+      "start": 43.59,
+      "sourceAnchor": "registering-a-stage"
+    },
+    {
+      "title": "Return one result channel",
+      "start": 83.13,
+      "sourceAnchor": "sending-a-result-back"
+    }
+  ]
+}

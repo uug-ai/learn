@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 305
 toc: true
+podcast: hub-domains
 ---
 
 By default the Kerberos Hub project can be used in a multi tenancy mode. By creating multiple user and related (sub) accounts you can provide multiple users/customers/companies access to the (same) central platform. Each master user will have a set of sites, groups and cameras attached which can be further delegated to (sub) accounts. This means that sites in a geography can be managed by a specific user working in that specific timezone, etc.

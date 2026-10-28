@@ -31,6 +31,31 @@ test("every completed episode has a matching filename and reviewed source", asyn
   }
 });
 
+test("the published overview stays short, source-linked, and high-level", async () => {
+  const overview = JSON.parse(await readFile(new URL("./episodes/organisations-v2.json", import.meta.url), "utf8"));
+  const spoken = overview.chapters.flatMap((chapter) => chapter.turns).map((turn) => turn.text).join(" ");
+  const words = spoken.split(/\s+/).length;
+  assert.equal(overview.chapters.length, 4);
+  assert.ok(words >= 450 && words <= 550, `Expected 450-550 spoken words, got ${words}`);
+  assert.doesNotMatch(spoken, /sourceSha256|canonical-only|JWT|token|BSON|local pilot|listening review/i);
+  assert.match(spoken, /without requiring a data migration/);
+  assert.match(spoken, /Selection isn't permission/);
+  assert.match(spoken, /shouldn't treat that design as a live access-management feature/);
+  const guide = (await readFile(new URL(overview.sourcePath, import.meta.url))).toString();
+  for (const chapter of overview.chapters) {
+    const heading = chapter.sourceAnchor.replaceAll("-", " ");
+    assert.ok(guide.toLowerCase().includes(`## ${heading}`), `Missing source heading: ${chapter.sourceAnchor}`);
+  }
+});
+
+test("the organisations article and episode scripts omit the legacy product name", async () => {
+  assert.doesNotMatch(source.toString(), /Kerberos Hub/i);
+  for (const id of ["organisations", "organisations-v2"]) {
+    const script = await readFile(new URL(`./episodes/${id}.json`, import.meta.url), "utf8");
+    assert.doesNotMatch(script, /Kerberos Hub/i);
+  }
+});
+
 test("source changes require an explicit script review", () => {
   assert.throws(() => assertSourceMatches(episode, Buffer.from("changed guide")), /source guide changed/);
 });

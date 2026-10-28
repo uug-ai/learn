@@ -12,6 +12,7 @@ menu:
     parent: "hub"
 weight: 305
 toc: true
+podcast: hub-analytics
 ---
 
 The **Analytics** page in the Hub turns a day's worth of recordings,

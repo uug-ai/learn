@@ -12,6 +12,7 @@ menu:
     parent: "hub"
 weight: 309
 toc: true
+podcast: hub-floor-plans
 ---
 
 Floor plans provide an indoor view of a site. Upload a building plan, place the

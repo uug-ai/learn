@@ -1,0 +1,29 @@
+{
+  "id": "hub-workflows-observability",
+  "title": "Follow one workflow run without guessing",
+  "description": "Use correlated logs, routing explanations and metrics to distinguish skipped work from failed work.",
+  "duration": 130.536,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/workflows/observability/",
+  "sourceSha256": "7680c35416d62953bebec130126b1ac2a42bbf56135df9404d11ed9300481c70",
+  "scriptSha256": "8047cfc048540a54ab82936d75c3586d0c6025219617151c5610c779241520e5",
+  "audioSha256": "bc2b3c30c3ae0e4b14cb8965735a1314d9a5c5cdcbcbbe3c852a5d46e957603b",
+  "audio": "podcasts/hub-workflows-observability/episode.mp3",
+  "chapters": [
+    {
+      "title": "Start with a recording identity",
+      "start": 0,
+      "sourceAnchor": "anatomy-of-a-log-line"
+    },
+    {
+      "title": "Completed can mean no stage matched",
+      "start": 44.015,
+      "sourceAnchor": "routing-decisions-info--debug"
+    },
+    {
+      "title": "Separate faults from normal decisions",
+      "start": 84.305,
+      "sourceAnchor": "metrics"
+    }
+  ]
+}

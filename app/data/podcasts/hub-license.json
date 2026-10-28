@@ -1,0 +1,24 @@
+{
+  "id": "hub-license",
+  "title": "Choosing a Hub license",
+  "description": "Distinguish a hosted subscription from licensing a self-hosted deployment.",
+  "duration": 102.168,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/license/",
+  "sourceSha256": "1a49df075415d08bd7f7cf619396748a51a632dab6314c5fd681da4572f4d3b6",
+  "scriptSha256": "b40ac9573a448fb4ab8f6ce6f6f34722c782638ff4619297b093c16cab188b59",
+  "audioSha256": "3921d85ce12ba8dba28581db3fa5a7375ef55a875943114e0dbf18a44afea8ef",
+  "audio": "podcasts/hub-license/episode.mp3",
+  "chapters": [
+    {
+      "title": "A subscription for the hosted service",
+      "start": 0,
+      "sourceAnchor": "software-as-a-service-saas"
+    },
+    {
+      "title": "A license for your own installation",
+      "start": 48.84,
+      "sourceAnchor": "self-hosted"
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "hub-workflows-ingest-blocks-media-patch",
+  "title": "Enrich a recording without changing its identity",
+  "description": "Understand the limited update contract, ownership scope and replacement semantics of a media patch.",
+  "sourcePath": "../app/content/docs/hub/workflows/ingest/blocks/media-patch.md",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/workflows/ingest/blocks/media-patch/",
+  "chapters": [
+    {
+      "title": "Update an existing recording",
+      "sourceAnchor": "the-media-patch-contract",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Imagine a fictional stage that has produced a short description of a recording. Does it need a new detection run just to add that text?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Use a media patch when the result changes allowed fields on an existing recording. It names the media document identifier and the fields to set. That identifier differs from the recording key used in other block contracts."
+        },
+        {
+          "speaker": "host",
+          "text": "Can it create a recording if that identifier doesn't exist?"
+        },
+        {
+          "speaker": "guide",
+          "text": "No. A missing target is rejected. This enriches existing metadata; it doesn't upload video or create a new media record."
+        }
+      ]
+    },
+    {
+      "title": "Stay inside the allowed fields and scope",
+      "sourceAnchor": "fields-to-patch-allow-list",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Could the stage also move the recording to a different owner or device?"
+        },
+        {
+          "speaker": "guide",
+          "text": "No. The contract has a closed allow-list for fields such as description, star and supported name arrays. Identity and access-control fields aren't patchable. The organisation comes from the persisted workflow run, not the returned body."
+        },
+        {
+          "speaker": "host",
+          "text": "And can an ordinary ingest API client send this block?"
+        },
+        {
+          "speaker": "guide",
+          "text": "It's pipeline-only. A recording in another organisation is not a valid target, and unknown fields or incorrect value types reject the block. The limited contract is intentional, not an invitation to send arbitrary database updates."
+        }
+      ]
+    },
+    {
+      "title": "Set complete values",
+      "sourceAnchor": "write-semantics-idempotent-set",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "If our patch includes tags, does it append them to whatever is there?"
+        },
+        {
+          "speaker": "guide",
+          "text": "No. Each named field is replaced by the supplied value. Send the full intended array, not just an extra item. Repeating the same patch sets the same values again, which supports safe redelivery."
+        },
+        {
+          "speaker": "host",
+          "text": "What's the final distinction to remember?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Detection adds tracks, marker adds timeline meaning, and media patch updates permitted fields on the recording itself. Choose the right contract, preserve ownership and verify the resulting metadata. Starring a recording still isn't an archive or a retention guarantee."
+        }
+      ]
+    }
+  ],
+  "sourceSha256": "324637d2b98af75a4a1d2453d6777faec501acdbfa22e2e82205fb52eb452f26",
+  "reviewedOn": "2026-10-28",
+  "editorialStyle": {
+    "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
+    "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",
+    "humour": "Optional: one or two brief, relevant light moments are enough. Prefer a relatable analogy over a separate joke. Never pad the overview with banter.",
+    "reactions": "Use occasional short, natural responses such as 'Oh, that makes sense' or 'Wait, so...' followed by a real question. Avoid repetitive praise, canned agreement, and filler.",
+    "laughter": "Optional: at most one or two light reactions such as 'Ha, fair point.' Never insert [laughs], SSML, or repeated ha-ha strings. These are spoken reactions, not a guarantee of genuine laughter from the current speech engine.",
+    "intonation": "Write real questions with question marks, use contractions, alternate short and longer sentences, and make contrasts explicit. Let punctuation and sentence rhythm suggest curiosity, surprise, and emphasis. Avoid all-caps shouting, excessive exclamation marks, and artificial pause tags.",
+    "guardrails": "Keep technical claims source-backed. Never mock the listener, joke about real victims, minimize security or data-loss risks, or let humour replace an explanation. Personality is optional; accuracy and clarity are not."
+  },
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_puck",
+      "speed": 0.98
+    }
+  }
+}

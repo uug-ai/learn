@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 304
 toc: true
+podcast: hub-pipeline
 ---
 
 > [!WARNING] Workflows are the future direction

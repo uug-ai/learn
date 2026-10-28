@@ -13,6 +13,7 @@ menu:
     parent: "blocks"
 weight: 10
 toc: true
+podcast: hub-workflows-ingest-blocks-detection
 ---
 
 A **detection run** is a self-contained bundle of tracks produced by a single source for a single recording. It answers one question — *"what was detected in this media?"* — and nothing more. It is candidate data stored verbatim for later retrieval.

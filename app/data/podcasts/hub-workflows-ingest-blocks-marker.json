@@ -1,0 +1,29 @@
+{
+  "id": "hub-workflows-ingest-blocks-marker",
+  "title": "Label the moment that matters",
+  "description": "Understand marker timing, recording links and references to detection tracks.",
+  "duration": 131.976,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/workflows/ingest/blocks/marker/",
+  "sourceSha256": "cb3f5e158b01814ca1a3e8cf6cf7d64c94fa763832554d2dcacc21a2e80ae536",
+  "scriptSha256": "f11a7eed787ed8e158d774ff4f653d1d558a2ccecb20f8cde868a8b08eea06b5",
+  "audioSha256": "b537a8b874f664643de56c4384f338a28903b6337a4e26fcba7804b6f8f1a72a",
+  "audio": "podcasts/hub-workflows-ingest-blocks-marker/episode.mp3",
+  "chapters": [
+    {
+      "title": "A marker describes time, not geometry",
+      "start": 0,
+      "sourceAnchor": "the-marker-contract"
+    },
+    {
+      "title": "Link to the intended recording",
+      "start": 45.015,
+      "sourceAnchor": "recording-link-mediakeys"
+    },
+    {
+      "title": "Repeat safely",
+      "start": 89.63,
+      "sourceAnchor": "write-semantics-upsert-by-identity"
+    }
+  ]
+}

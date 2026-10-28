@@ -12,6 +12,7 @@ menu:
     parent: "hub"
 weight: 313
 toc: true
+podcast: hub-media-processing
 ---
 
 Media processing turns an uploaded video into a recording that operators can

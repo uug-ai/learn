@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { assertSourceMatches, renderTranscript, sha256, validateEpisode, validateEpisodeId } from "./episode.mjs";
@@ -38,15 +38,15 @@ export async function publishEpisode(id, { root = defaultRoot } = {}) {
   await mkdir(assets, { recursive: true });
   await mkdir(data, { recursive: true });
   await copyFile(join(output, "episode.mp3"), join(assets, "episode.mp3"));
-  await copyFile(join(output, "transcript.txt"), join(assets, "transcript.txt"));
+  await rm(join(assets, "transcript.txt"), { force: true });
+  await rm(resolve(root, "../app/public", assetPath, "transcript.txt"), { force: true });
   const published = {
     id, title: episode.title, description: episode.description, duration: manifest.duration,
     reviewedOn: episode.reviewedOn, sourceUrl: episode.sourceUrl,
     sourceSha256: episode.sourceSha256, scriptSha256: manifest.scriptSha256, audioSha256: manifest.audio.sha256,
-    audio: `${assetPath}/episode.mp3`, transcript: `${assetPath}/transcript.txt`,
+    audio: `${assetPath}/episode.mp3`,
     chapters: episode.chapters.map((chapter, index) => ({
       title: chapter.title, start: manifest.chapters[index].start, sourceAnchor: chapter.sourceAnchor,
-      turns: chapter.turns.map((turn) => ({ speaker: episode.speakers[turn.speaker].name, text: turn.text })),
     })),
   };
   await writeFile(join(data, `${id}.json`), JSON.stringify(published, null, 2) + "\n");

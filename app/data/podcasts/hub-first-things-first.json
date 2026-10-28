@@ -1,0 +1,29 @@
+{
+  "id": "hub-first-things-first",
+  "title": "One view of your video landscape",
+  "description": "Understand how Hub, Agents and Vault work together, and choose a hosted or self-hosted starting point.",
+  "duration": 183.576,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/first-things-first/",
+  "sourceSha256": "1bdee9c9fdb3a3be7e600dd029f44fbf205f79af6cdb453460eea655cfe83ede",
+  "scriptSha256": "3bb00b3ead58a4321174a5d428cf28ecf5c5b2cbfcdca2bf73d3b8021acafe3b",
+  "audioSha256": "162fee2eed5d30b2d8c1c26a13bbe7d606b3279258896f1b10980ac32d8a80c5",
+  "audio": "podcasts/hub-first-things-first/episode.mp3",
+  "chapters": [
+    {
+      "title": "A shared place to look",
+      "start": 0,
+      "sourceAnchor": "architecture"
+    },
+    {
+      "title": "Try the hosted service",
+      "start": 83.85,
+      "sourceAnchor": "software-as-a-service-saas"
+    },
+    {
+      "title": "Run it in your environment",
+      "start": 132.065,
+      "sourceAnchor": "self-hosted"
+    }
+  ]
+}

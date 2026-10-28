@@ -35,9 +35,11 @@ test("scaffolds independent page episodes with source metadata and reusable dial
     assert.equal(draft.sourcePath, `../app/content/${path}`);
     assert.equal(draft.format, "learn-dialogue-v1");
     assert.equal(draft.draft, true);
-    assert.equal(draft.chapters.length, 6);
+    assert.equal(draft.chapters.length, 4);
     assert.deepEqual(Object.keys(draft.speakers), ["host", "guide"]);
-    assert.match(draft.editorialStyle.humour, /two or three/);
+    assert.match(draft.editorialStyle.scope, /four to five minutes/);
+    assert.match(draft.editorialStyle.scope, /500-550 spoken words/);
+    assert.match(draft.editorialStyle.humour, /one or two/);
     assert.match(draft.editorialStyle.laughter, /not a guarantee of genuine laughter/);
     assert.match(draft.editorialStyle.intonation, /question marks/);
     for (const chapter of draft.chapters) {

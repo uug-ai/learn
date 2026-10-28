@@ -1,0 +1,24 @@
+{
+  "id": "hub-domains",
+  "title": "Domains and the right sign-in context",
+  "description": "Understand how subdomains separate login namespaces without confusing them with operational projects.",
+  "duration": 125.112,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/domains/",
+  "sourceSha256": "ff805aa2aca5d8ec20e74fda22d9804ef7e462aa95f2069ff116fd3f0005a152",
+  "scriptSha256": "4523ea77e40e05232edb8d4d9734c8aff1ef0d667441cc00014b5b6216eab82e",
+  "audioSha256": "d30769943315fdd36b7a72d64812717e4f2b0723fb139ecba5da92ff8cdb71f2",
+  "audio": "podcasts/hub-domains/episode.mp3",
+  "chapters": [
+    {
+      "title": "The address helps choose the context",
+      "start": 0,
+      "sourceAnchor": "introduction"
+    },
+    {
+      "title": "Enable it as a deployment feature",
+      "start": 72.4,
+      "sourceAnchor": "configuration"
+    }
+  ]
+}

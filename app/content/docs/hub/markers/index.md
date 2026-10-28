@@ -12,6 +12,7 @@ menu:
     parent: "hub"
 weight: 311
 toc: true
+podcast: hub-markers
 ---
 
 A marker identifies a meaningful point or span on a recording timeline. A

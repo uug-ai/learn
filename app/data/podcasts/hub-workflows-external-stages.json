@@ -1,0 +1,34 @@
+{
+  "id": "hub-workflows-external-stages",
+  "title": "Run a stage beyond the Hub deployment",
+  "description": "Understand sanitized invocations, completion modes and project-scoped callbacks for external workers.",
+  "duration": 179.448,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/workflows/external-stages/",
+  "sourceSha256": "3a58c96d0e59308b993d1a3eeb92e8706052abc023f243c36911bcb14c8b5a41",
+  "scriptSha256": "e2751b8b8ce130511ac53cdbfa7a88808b3f1abf970a0533eaa7b50654488a51",
+  "audioSha256": "0659233adaa62e2ec789e8c64857fc917540ec0f21b307130f38ad0ad57a5d17",
+  "audio": "podcasts/hub-workflows-external-stages/episode.mp3",
+  "chapters": [
+    {
+      "title": "Use a boundary, not the internal queue",
+      "start": 0,
+      "sourceAnchor": "design-the-workflow"
+    },
+    {
+      "title": "Delivery isn't always completion",
+      "start": 48.09,
+      "sourceAnchor": "completion-modes"
+    },
+    {
+      "title": "Provision the callback identity separately",
+      "start": 90.805,
+      "sourceAnchor": "create-a-callback-access-token"
+    },
+    {
+      "title": "Return the right kind of result",
+      "start": 135.52,
+      "sourceAnchor": "return-the-result"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "hub-livestream",
+  "title": "Make sense of Live view",
+  "description": "Choose useful live views and distinguish snapshot previews, full video and connection health.",
+  "duration": 186.72,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/livestream/",
+  "sourceSha256": "e5b16af98df21fc1e24b752e561f2fe0fb378003a28f969b1f87c810af8702a4",
+  "scriptSha256": "800524dd503f51a547c4ba62223f0a4436244d7adc3e89f9f3da0c2a8b58641d",
+  "audioSha256": "f4ebcf0e43e47c83b91d13eeeefd525e5fe47cfe8e74cea554eac1087ee9c06d",
+  "audio": "podcasts/hub-livestream/episode.mp3",
+  "chapters": [
+    {
+      "title": "A preview isn't a full live stream",
+      "start": 0,
+      "sourceAnchor": "how-the-streams-reach-your-browser"
+    },
+    {
+      "title": "Watch the relevant cameras",
+      "start": 51.265,
+      "sourceAnchor": "filtering-and-searching"
+    },
+    {
+      "title": "Read status and capability separately",
+      "start": 96.03,
+      "sourceAnchor": "reading-a-tile"
+    },
+    {
+      "title": "Troubleshoot the path in use",
+      "start": 142.145,
+      "sourceAnchor": "troubleshooting"
+    }
+  ]
+}

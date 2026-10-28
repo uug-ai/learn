@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 305
 toc: true
+podcast: hub-whitelabel
 ---
 
 Kerberos Hub can be styled towards your company marketing branding and/or preferred style guides. By injecting a custom CSS file, and overriding our icon library, you can make Kerberos Hub feel like it's your own product; and we do not have any problem with that.

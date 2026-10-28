@@ -1,0 +1,34 @@
+{
+  "id": "hub-notifications",
+  "title": "From an alert to the right person",
+  "description": "Separate alert matching, Watchlist inboxes and external delivery, and test the complete notification path.",
+  "duration": 164.856,
+  "reviewedOn": "2026-10-28",
+  "sourceUrl": "https://learn.uug.ai/docs/hub/notifications/",
+  "sourceSha256": "31626202bcb4040b19cafb7446117a2b0948bb5aaec4a174220829c7ab59fd14",
+  "scriptSha256": "3461998e2f13c499ae0ea70f0d885064dad9e7d88428951a5b27a79730a4b026",
+  "audioSha256": "9ce5e92605ff9d0c7e6953d26c25060485c614737f4b54c27a1278a8598367b3",
+  "audio": "podcasts/hub-notifications/episode.mp3",
+  "chapters": [
+    {
+      "title": "A decision and a delivery",
+      "start": 0,
+      "sourceAnchor": "how-a-notification-is-created"
+    },
+    {
+      "title": "Use the Watchlist as an inbox",
+      "start": 45.015,
+      "sourceAnchor": "use-the-watchlist"
+    },
+    {
+      "title": "Make the rule specific enough",
+      "start": 84.28,
+      "sourceAnchor": "configure-alerts"
+    },
+    {
+      "title": "Test channels and respect retention",
+      "start": 124.17,
+      "sourceAnchor": "configure-channels"
+    }
+  ]
+}

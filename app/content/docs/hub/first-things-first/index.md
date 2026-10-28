@@ -11,6 +11,7 @@ menu:
     parent: "hub"
 weight: 300
 toc: true
+podcast: hub-first-things-first
 ---
 
 When installing an Agent inside your local network, it's possible to review your activity by using the agents' web interface. By all network principles, you will not be able to access the web interface from the internet (outside your local network). On top of that, the Agent doesn't come with a consolidated overview. This means that you will need to open multiple web interfaces, one for each Agent.
