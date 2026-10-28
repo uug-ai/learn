@@ -5,8 +5,8 @@
   "duration": 182.904,
   "reviewedOn": "2026-10-28",
   "sourceUrl": "https://learn.uug.ai/docs/hub/cleanup/",
-  "sourceSha256": "542c3c5dd46ee09d2cc57183aa9901f252c36b3645d658bc04f7850646180d67",
-  "scriptSha256": "61a2aad7db69266fc62fdf73373ed531563e0c228b2881404750f7fbba9ea267",
+  "sourceSha256": "04164e1931155f759e3364a2fb7460f3f95d6f4a1dc2e4e8d16bca48820a0c6b",
+  "scriptSha256": "007662f79fe1649216fca1c1be6112df32d597372991ad120409c5e666d69c88",
   "audioSha256": "3baeb410e668d4e3fc569a0a86473dc1c2d0c913ebdc259541daeac8f8b122ed",
   "audio": "podcasts/hub-cleanup/episode.mp3",
   "chapters": [

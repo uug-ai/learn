@@ -1,7 +1,7 @@
 ---
 title: "Configuration"
-description: "Configure Kerberos Hub to your own needs."
-lead: "Configure Kerberos Hub to your own needs."
+description: "Configure Hub to your own needs."
+lead: "Configure Hub to your own needs."
 date: 2020-10-06T08:49:31+00:00
 lastmod: 2020-10-06T08:49:31+00:00
 draft: false
@@ -14,9 +14,9 @@ toc: true
 podcast: hub-configuration
 ---
 
-Once you have installed the Kerberos Hub Helm chart, and you confirm to have all microservices properly running you should be able to access the Kerberos Hub login screen and sign in through the default username and password [which was defined during the installation step](https://github.com/kerberos-io/hub#post-installation).
+Once you have installed the Hub Helm chart, and you confirm to have all microservices properly running you should be able to access the Hub login screen and sign in through the default username and password [which was defined during the installation step](https://github.com/kerberos-io/hub#post-installation).
 
-{{< figure src="hub-login.gif" alt="Kerberos Hub login screen after installation." caption="Kerberos Hub login screen after installation." class="stretch">}}
+{{< figure src="hub-login.gif" alt="Hub login screen after installation." caption="Hub login screen after installation." class="stretch">}}
 
 # Accounts
 
@@ -33,7 +33,7 @@ On top of that a sub account can have a specific role such as **guest** or **edi
 
 You can create a new sub account by navigation to the accounts page and clicking on the `(+ Add Account)` button at the left top.
 
-{{< figure src="hub-add-account.gif" alt="Give another user limited access to Kerberos Hub by creating a sub account." caption="Give another user limited access to Kerberos Hub by creating a sub account." class="stretch">}}
+{{< figure src="hub-add-account.gif" alt="Give another user limited access to Hub by creating a sub account." caption="Give another user limited access to Hub by creating a sub account." class="stretch">}}
 
 ## Sites
 
@@ -64,23 +64,23 @@ On the cameras page you will have an overview of all the
 
 {{< figure src="hub-cameras.gif" alt="Structure your Agents by using groups, another level of flexibility." caption="Structure your Agents by using groups, another level of flexibility." class="stretch">}}
 
-By clicking on the `(+ Add Camera)` button, you will see a modal explaining you how to connect an Agent to Kerberos Hub, and the different deployments which are available.
+By clicking on the `(+ Add Camera)` button, you will see a modal explaining you how to connect an Agent to Hub, and the different deployments which are available.
 
 ### Assign an Agent
 
 As explained in the modal, there are different possibilities to set up and run an Agent. 
 
-Nevertheless, how you deployed an Agent, to connect the Agent to Kerberos Hub, you will require the account credentials from your Kerberos Hub account to be shared with your Agents. By sharing those credentials you are linking your Agents to the relevant Kerberos Hub account.
+Nevertheless, how you deployed an Agent, to connect the Agent to Hub, you will require the account credentials from your Hub account to be shared with your Agents. By sharing those credentials you are linking your Agents to the relevant Hub account.
 
 By navigating to the profile page, and selecting your plan you will find the required credentials for your Agents.
 
-Please note that when you are using the Kerberos Hub Saas offering you will need both an access and secret key. If you are using Kerberos Hub self-hosted you will only need an access key.
+Please note that when you are using the Hub Saas offering you will need both an access and secret key. If you are using Hub self-hosted you will only need an access key.
 
 {{< figure src="hub-link-agent.gif" alt="Get your credentials to link your Agents." caption="Get your credentials to link your Agents." class="stretch">}}
 
 ## Integrations
 
-You got your accounts setup, sites and groups created and last but not least, one or more Agents connected to your Kerberos Hub.
+You got your accounts setup, sites and groups created and last but not least, one or more Agents connected to your Hub.
 
 Now it is time to configure some integrations using alerts and channels. The idea of integrations is that you can send messages to other 3rd-party services, or your own APIs, when an interesting event/alert occurred.
 
@@ -94,7 +94,7 @@ Alerts can be configured to trigger one or more channels on a specific events. G
 
 #### Generic Alerts
 
-Generic alerts (legacy) are the first alerts created in Kerberos Hub. Three different alerts can be configured:
+Generic alerts (legacy) are the first alerts created in Hub. Three different alerts can be configured:
 
 ![Configuring alerts](hub-alerts.gif)
 
@@ -139,7 +139,7 @@ An easy way to verify if the POST request is happening, you can use a public web
 
 ## Media proxy
 
-By default Kerberos Hub hands the URLs it receives from Kerberos Vault straight to the browser. Depending on the Vault configuration these point to Vault (vault-signed URLs) or directly to the storage provider (S3, MinIO, GCS, Azure presigned URLs).
+By default Hub hands the URLs it receives from Vault straight to the browser. Depending on the Vault configuration these point to Vault (vault-signed URLs) or directly to the storage provider (S3, MinIO, GCS, Azure presigned URLs).
 
 Enable the media proxy to hide both. The Hub API then asks Vault for the signed URL as usual, seals it into an opaque, encrypted token and returns a Hub API URL instead:
 
@@ -162,4 +162,4 @@ All media bytes now flow through the Hub API, so size its replicas, ingress time
 
 ## What's next
 
-Want to learn more how Kerberos Hub is working under the hood? Then [have a look at the Kerberos Hub pipeline page](/docs/hub/pipeline) where we introduce the microservice architecture.
+Want to learn more how Hub is working under the hood? Then [have a look at the Hub pipeline page](/docs/hub/pipeline) where we introduce the microservice architecture.

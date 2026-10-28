@@ -1,6 +1,6 @@
 ---
 title: 'Deploy a MoQ relay on Kubernetes'
-description: 'Run a TLS-enabled Media over QUIC relay behind a Kubernetes UDP LoadBalancer, then connect Kerberos Hub and Agent to it.'
+description: 'Run a TLS-enabled Media over QUIC relay behind a Kubernetes UDP LoadBalancer, then connect Hub and Agent to it.'
 date: '2026-08-19'
 weight: 3
 toc: true

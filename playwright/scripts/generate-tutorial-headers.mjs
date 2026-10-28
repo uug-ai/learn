@@ -466,7 +466,7 @@ for (const header of headers) {
       });
 
       drawArchitectureCard(215, 102, 190, 156, colors.cyan, 'EDGE', 'Kerberos Agent', 'WebRTC peer · media');
-      drawArchitectureCard(500, 90, 260, 120, blue, 'KERBEROS HUB', 'Signalling plane', 'MQTT · SDP + ICE');
+      drawArchitectureCard(500, 90, 260, 120, blue, 'HUB', 'Signalling plane', 'MQTT · SDP + ICE');
       drawArchitectureCard(550, 240, 210, 86, colors.lime, 'TURN SERVER', 'coturn', 'STUN · relay fallback');
       drawArchitectureCard(970, 98, 195, 160, 'rgba(143, 167, 178, 0.9)', 'HUB FRONTEND', 'Live viewer', 'Video + talk');
 

@@ -26,6 +26,19 @@ the app **UUG.AI Learn**.
 - [Hugo](https://gohugo.io/installation/) (Extended version >= 0.112.0)
 - [Git](https://git-scm.com/)
 
+## Product naming
+
+Use **Hub**, **Vault**, and **Factory** in article copy, metadata, captions,
+podcasts, and generated artwork. **Kerberos Agent** remains a supported name.
+Keep existing URLs, section IDs, image filenames, Kubernetes namespaces, chart
+keys, and other operational identifiers unchanged. Historical product screenshots
+retain their captured UI; refresh them from the applications rather than
+retouching their labels.
+
+Run `npm run product-names` in `playwright/` to scan authored content, every
+published page, metadata, feeds, and search data, and verify preserved section
+deep links. `npm run podcast` includes these checks alongside player regressions.
+
 ## Getting Started
 
 ### Installation

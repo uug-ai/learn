@@ -13,7 +13,7 @@ weight: 302
 toc: true
 ---
 
-When running an edge deployment for Factory, Kerberos Vault, Kerberos Hub and/or your storage providers, you can enhance security by bringing your own self-signed certificates. Those certificates will be consumed to create a secure connection between the different applications, and for example encrypt your data while it's being send or retrieved from your storage provider (Minio, Ceph).
+When running an edge deployment for Factory, Vault, Hub and/or your storage providers, you can enhance security by bringing your own self-signed certificates. Those certificates will be consumed to create a secure connection between the different applications, and for example encrypt your data while it's being send or retrieved from your storage provider (Minio, Ceph).
 
 When using self-signed certificates, the different deployments needs to be aware of those certificates and more importantly trust them. To achieve this trust, traditionally you would benefit from services like Certmanager.io and LetsEncrypt which act as a trusted CA (Certification Authority). However when self-signing you will need to make your deployments aware as there is probably no public CA available.
 
@@ -25,7 +25,7 @@ When using self-signed certificates you might experience the following errors.
     \"https://vault.xxx.xxx/storage\": x509: certificate signed by unknown 
     authority","time":"2022-01-06T14:17:07Z"}
 
-To overcome this you will need to inject a custom `ca-certificates.crt` holding your self-signed certificate in the `/etc/ssl/certs` directory. By injecting this in your Factory, Kerberos Vault, Kerberos Hub deployments you will be able to create a secured and trusted connection over SSL with all relevant services.
+To overcome this you will need to inject a custom `ca-certificates.crt` holding your self-signed certificate in the `/etc/ssl/certs` directory. By injecting this in your Factory, Vault, Hub deployments you will be able to create a secured and trusted connection over SSL with all relevant services.
 
 ## Injecting a ca-certificates.crt
 
@@ -46,7 +46,7 @@ This will include and override the existing `ca-certificates.crt` file and inclu
 
 ## Factory / Vault
 
-As Factory and Kerberos Vault are specified as a single deployment file, you can inject the configmap directly in the `deployment.yaml` file. Go and uncomment the `volumes` and `volumeMounts` sections. This will copy the configmap into your Factory and/or Kerberos Vault deployments.
+As Factory and Vault are specified as a single deployment file, you can inject the configmap directly in the `deployment.yaml` file. Go and uncomment the `volumes` and `volumeMounts` sections. This will copy the configmap into your Factory and/or Vault deployments.
 
     # Injecting the ca-certificates inside the container.
     volumeMounts:

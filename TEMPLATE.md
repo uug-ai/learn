@@ -99,8 +99,8 @@ the same shape — copy an existing one (`cases/index.md` and
 ```yaml
 ---
 title: "Live view"
-description: "Watch your devices in real time from Kerberos Hub."
-lead: "Watch your devices in real time from Kerberos Hub."
+description: "Watch your devices in real time from Hub."
+lead: "Watch your devices in real time from Hub."
 date: 2020-10-06T08:49:31+00:00
 lastmod: 2020-10-06T08:49:31+00:00
 draft: false

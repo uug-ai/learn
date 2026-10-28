@@ -5,8 +5,8 @@
   "duration": 172.2,
   "reviewedOn": "2026-10-28",
   "sourceUrl": "https://learn.uug.ai/docs/hub/mp4-verification/",
-  "sourceSha256": "fd920d675505875a3279a5aeba135860e501af520fd8a3c983863027faf1baf8",
-  "scriptSha256": "a4022f77c34498d1ab9c35427ba057ee6c18da4dce350ef5524a002aba38cf5b",
+  "sourceSha256": "bdebf1880fa1b886f18d9e08adbc2a288f532f55992450387671d9bdfe1d6972",
+  "scriptSha256": "95db3205ef8afbe2049151ac5755e6b81de4d09bf7ae3e7938fb3fc653a507bb",
   "audioSha256": "ae45bf40c694a6bde953e61030b7ccafe71a13aa99f8743e20ea70715d4f1f8e",
   "audio": "podcasts/hub-mp4-verification/episode.mp3",
   "chapters": [

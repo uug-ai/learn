@@ -17,14 +17,14 @@ Agent main goal is to make recordings and store them somewhere so you can access
 
 ![Encryption diagram](./encryption.svg)
 
-## Encryption from Agent to Kerberos Vault
+## Encryption from Agent to Vault {#encryption-from-agent-to-kerberos-vault}
 
-![Encryption Agent to Kerberos Vault](./encryption-agent-vault.svg)
+![Encryption Agent to Vault](./encryption-agent-vault.svg)
 
-## Decryption from Kerberos Vault to Kerberos Hub
+## Decryption from Vault to Hub {#decryption-from-kerberos-vault-to-kerberos-hub}
 
-![Encryption Kerberos Vault to Kerberos Hub](./encryption-vault-hub.svg)
+![Encryption Vault to Hub](./encryption-vault-hub.svg)
 
-## Encryption from Agent to Kerberos Hub
+## Encryption from Agent to Hub {#encryption-from-agent-to-kerberos-hub}
 
-![Encryption Agent to Kerberos Hub](./encryption-agent-hub.svg)
+![Encryption Agent to Hub](./encryption-agent-hub.svg)

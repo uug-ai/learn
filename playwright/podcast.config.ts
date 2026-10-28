@@ -4,7 +4,7 @@ const baseURL = process.env.LEARN_BASE_URL || 'http://127.0.0.1:4176';
 
 export default defineConfig({
   testDir: './site-tests',
-  testMatch: 'podcast.spec.ts',
+  testMatch: ['podcast.spec.ts', 'product-names.spec.ts'],
   timeout: 60_000,
   expect: { timeout: 10_000 },
   workers: 1,

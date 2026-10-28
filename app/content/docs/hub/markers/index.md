@@ -1,6 +1,6 @@
 ---
 title: "Markers"
-description: "Find significant moments and open their linked recordings in Kerberos Hub."
+description: "Find significant moments and open their linked recordings in Hub."
 lead: "Use named timeline events to move from analysis results to the exact moment in a recording."
 date: 2026-09-09T00:00:00+00:00
 lastmod: 2026-09-09T00:00:00+00:00

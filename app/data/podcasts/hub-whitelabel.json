@@ -5,8 +5,8 @@
   "duration": 170.784,
   "reviewedOn": "2026-10-28",
   "sourceUrl": "https://learn.uug.ai/docs/hub/whitelabel/",
-  "sourceSha256": "f8508622b2376b1920cff4b6a0cf51bc54c01b4afe3c7d01cf2eb1b66557b414",
-  "scriptSha256": "ff5d4d022c38b27ecb34babf32d55f0d8d6d0cb5ff7b282ab974f16a23e959f0",
+  "sourceSha256": "e3edf6e2e2fc739e7850fd23b703d48bf0571869909e55beb658a475daa597ad",
+  "scriptSha256": "3a2f954e7535537d9ea9713de9992ff30cf93ec78332de4ef56d1dc626b2f9cb",
   "audioSha256": "a79b9a8f3bf70edbf7faf4e86c88322c9d301249451ef6650cb630dea016ef68",
   "audio": "podcasts/hub-whitelabel/episode.mp3",
   "chapters": [

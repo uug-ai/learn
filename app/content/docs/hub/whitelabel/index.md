@@ -1,7 +1,7 @@
 ---
 title: "White-label"
-description: "Brand Kerberos Hub as you wish."
-lead: "Use Kerberos Hub with your own style guide and marketing branding."
+description: "Brand Hub as you wish."
+lead: "Use Hub with your own style guide and marketing branding."
 date: 2020-10-06T08:49:31+00:00
 lastmod: 2026-10-21T00:00:00+00:00
 draft: false
@@ -14,17 +14,17 @@ toc: true
 podcast: hub-whitelabel
 ---
 
-Kerberos Hub can be styled towards your company marketing branding and/or preferred style guides. By injecting a custom CSS file, and overriding our icon library, you can make Kerberos Hub feel like it's your own product; and we do not have any problem with that.
+Hub can be styled towards your company marketing branding and/or preferred style guides. By injecting a custom CSS file, and overriding our icon library, you can make Hub feel like it's your own product; and we do not have any problem with that.
 
 We believe that a consistent and streamlined company branding is important when using 3rd party applications in your companies ecosystem.
 
-Next to styling Kerberos Hub yourself, we can also rebrand the application for your needs as part of the Kerberos Enterprise Suite license. In the end nothing stops you to perform the layout changes yourself, whenever you want.
+Next to styling Hub yourself, we can also rebrand the application for your needs as part of the Kerberos Enterprise Suite license. In the end nothing stops you to perform the layout changes yourself, whenever you want.
 
-{{< figure src="brand2.png" alt="By injecting a CSS file into the Kerberos Hub Front-end container, you can choose your own colors." caption="By injecting a CSS file into the Kerberos Hub Front-end container, you can choose your own colors." class="stretch">}}
+{{< figure src="brand2.png" alt="By injecting a CSS file into the Hub Front-end container, you can choose your own colors." caption="By injecting a CSS file into the Hub Front-end container, you can choose your own colors." class="stretch">}}
 
-## Overriding the Kerberos Hub styling
+## Overriding the Hub styling {#overriding-the-kerberos-hub-styling}
 
-The recommended approach to add your custom styling is to inject a custom stylesheet file `.css` in the Kerberos Hub Front-end container. Let's start by creating a `.css` file, and include all the relevant CSS elements which you would like to modify. This could look like [this](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/style.css).
+The recommended approach to add your custom styling is to inject a custom stylesheet file `.css` in the Hub Front-end container. Let's start by creating a `.css` file, and include all the relevant CSS elements which you would like to modify. This could look like [this](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/style.css).
 
     .app .sidebar.closed {
       background: red !important;
@@ -36,15 +36,15 @@ Once you are happy with your styling, you can proceed with the injection in the 
 
 Injection is done through the concept of Persistent Volumes (PV). A PV is mapped in a front-end container, and is overriding the local directory of the front-end container with your changes made in the PV. If you are not familiar with a PV, [you might need to learn about it first](<https://kubernetes.io/docs/concepts/storage/persistent-volumes/#:~:text=A%20PersistentVolume%20(PV)%20is%20a,node%20is%20a%20cluster%20resource.>).
 
-Once you created a PV and uploaded your stylesheet, you should [create a Persistent Volume Claim (PVC)](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/custom-layout-claim.yaml), so you can share it with the Kerberos Hub front-end container.
+Once you created a PV and uploaded your stylesheet, you should [create a Persistent Volume Claim (PVC)](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/custom-layout-claim.yaml), so you can share it with the Hub front-end container.
 
-To share the PVC, you need to make a few changes in the Kerberos Hub Helm chart `values.yaml`. [Uncomment](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/values.yaml) the `volumeMounts` and `volumes` properties. Change the PVC accordingly and keep the `mountPath` unchanged.
+To share the PVC, you need to make a few changes in the Hub Helm chart `values.yaml`. [Uncomment](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/values.yaml) the `volumeMounts` and `volumes` properties. Change the PVC accordingly and keep the `mountPath` unchanged.
 
 If all set, commit your changes by doing an `helm install` or `helm upgrade`.
 
 ## Custom logo
 
-Similar to **overriding the Kerberos Hub styling** you can inject your own company logo as well. This logo will be used on the login page and sidebar once signed in. Make sure to name your company logo as following, `logo-sidebar.svg`.
+Similar to **overriding the Hub styling** you can inject your own company logo as well. This logo will be used on the login page and sidebar once signed in. Make sure to name your company logo as following, `logo-sidebar.svg`.
 
 To inject your logo, upload it into the same PV as you used for the custom styling.
 
@@ -81,7 +81,7 @@ To make this work an additional `volumeMount` has to be created and relevant PVC
 
 ## Custom translations
 
-Kerberos Hub ships with built-in internationalization (i18n) files for the supported languages. These translation files live in the front-end container under the `assets/i18n` directory, and contain one `.json` file per language (e.g. `en.json`, `nl.json`, `fr.json`, ...). You can override any of these strings with your own translations, which is handy to rename labels, reword sentences or fully white-label the wording used throughout the application.
+Hub ships with built-in internationalization (i18n) files for the supported languages. These translation files live in the front-end container under the `assets/i18n` directory, and contain one `.json` file per language (e.g. `en.json`, `nl.json`, `fr.json`, ...). You can override any of these strings with your own translations, which is handy to rename labels, reword sentences or fully white-label the wording used throughout the application.
 
 To customize the wording, you provide your own files in the `assets/i18n-custom` directory. Each file only needs the keys you want to change; any key you leave out keeps the shipped translation, so you only maintain your own changes and only need files for the languages you actually customize.
 
@@ -97,7 +97,7 @@ To rename the **Dashboard** label in the navigation, for example, your `en.json`
 
 Make sure to keep the same file names (`en.json`, `nl.json`, ...) so the front-end can match them to the correct language.
 
-To inject your translations, upload your `.json` files into a Persistent Volume and [create a Persistent Volume Claim (PVC)](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/i18n-custom/custom-i18n-claim.yaml) so it can be shared with the Kerberos Hub front-end container. Then add an additional `volumeMount` and `volume` to the `kerberoshub.frontend` section of the Helm chart `values.yaml`, pointing the `mountPath` to `/usr/share/nginx/html/assets/i18n-custom`.
+To inject your translations, upload your `.json` files into a Persistent Volume and [create a Persistent Volume Claim (PVC)](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/custom-layout/i18n-custom/custom-i18n-claim.yaml) so it can be shared with the Hub front-end container. Then add an additional `volumeMount` and `volume` to the `kerberoshub.frontend` section of the Helm chart `values.yaml`, pointing the `mountPath` to `/usr/share/nginx/html/assets/i18n-custom`.
 
     kerberoshub:
       frontend:
@@ -116,15 +116,15 @@ You can combine this with the `volumeMounts` and `volumes` used for the custom s
 
 ## Custom email templates
 
-Within the Kerberos Hub application different events and notifications are sent; for example the email shown below. Notifications are sent on different events such as account creation, forgot-password requests, event detection (an object found in a region or crossing a counting line), and more.
+Within the Hub application different events and notifications are sent; for example the email shown below. Notifications are sent on different events such as account creation, forgot-password requests, event detection (an object found in a region or crossing a counting line), and more.
 
 ![Email example](./email-example.png).
 
-As Kerberos Hub can be white-labeled, you can bring your own email templates and style them to match the Kerberos Hub interface. By doing so you get a unique, consistent styling across the entire Kerberos Hub application.
+As Hub can be white-labeled, you can bring your own email templates and style them to match the Hub interface. By doing so you get a unique, consistent styling across the entire Hub application.
 
-Within Kerberos Hub we use a couple of different [email templates](https://github.com/kerberos-io/helm-charts/tree/main/charts/hub/custom-layout/templates), which are used in different scenarios (as described above). For each template there is a `.txt` and `.html` which respectively provides the email in a text-only mode and for the latter a designed email that the email client is able to render.
+Within Hub we use a couple of different [email templates](https://github.com/kerberos-io/helm-charts/tree/main/charts/hub/custom-layout/templates), which are used in different scenarios (as described above). For each template there is a `.txt` and `.html` which respectively provides the email in a text-only mode and for the latter a designed email that the email client is able to render.
 
-These templates cover the full range of Kerberos Hub notifications — account lifecycle (welcome, activation, password reset), sharing (recording and case sharing), task assignment, and event and device alerts. Each one ships with a Kerberos-branded default and can be overridden in the same way; the complete list of template names and the values they map to is in the tables further down.
+These templates cover the full range of Hub notifications — account lifecycle (welcome, activation, password reset), sharing (recording and case sharing), task assignment, and event and device alerts. Each one ships with a Kerberos-branded default and can be overridden in the same way; the complete list of template names and the values they map to is in the tables further down.
 
 Email templates are injected just like the custom stylesheet, logo and icons, through a Persistent Volume. The differences are that the files live in a `templates` directory (instead of `custom`), and that the volume is shared with the back-end services that actually send the emails rather than with the front-end.
 
@@ -219,7 +219,7 @@ Links are built from the front-end address in the Helm chart:
 
 **Alert email (`detection`)**
 
-Sent when a custom alert or the generic detection alert fires. The subject is the `alertTitle` value; for a custom alert it is prefixed with the alert's name in brackets, for example `[Front door] Kerberos Hub detected an event`.
+Sent when a custom alert or the generic detection alert fires. The subject is the `alertTitle` value; for a custom alert it is prefixed with the alert's name in brackets, for example `[Front door] Hub detected an event`.
 
 | Variable | Value |
 | --- | --- |

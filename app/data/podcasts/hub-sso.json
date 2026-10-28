@@ -5,8 +5,8 @@
   "duration": 186.744,
   "reviewedOn": "2026-10-28",
   "sourceUrl": "https://learn.uug.ai/docs/hub/sso/",
-  "sourceSha256": "42b7575fd35d921e56ac3fb9f0dbe34a6d57722737f807f229ab8fa8925ae221",
-  "scriptSha256": "83e4265d9d7f79b55276b69d2eb4ad8cfc92252a2bc9236fd9d6fc89f38550a2",
+  "sourceSha256": "c0a7c7a92a11ff0cb2a9f9ddeedbeb40baa4f574fff777db132a3af913d03e05",
+  "scriptSha256": "01f0b4381530025d621ccb9682807a195b4db097dac58e48bcb16440499526d3",
   "audioSha256": "fa83beca2e25bd8d896fa9b80ae3eacc0077e0a563f6f94fe190a9b322510260",
   "audio": "podcasts/hub-sso/episode.mp3",
   "chapters": [

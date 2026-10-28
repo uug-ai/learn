@@ -12,7 +12,7 @@ toc: true
 
 The Agent is an isolated and scalable video management agent with a strong focus on user experience, scalability, resilience, extension and integration. It is the backbone of the entire Kerberos.io ecosystem, and is used as a foundation for small deployments to production level deployments with thousands of cameras.
 
-Next to the Agent, Kerberos.io provides many other tools such as [Factory](/docs/factory/first-things-first), [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/hub/first-things-first) to provide additional capabilities: bring your own cloud, bring your own storage, central overview, live streaming, machine learning etc.
+Next to the Agent, Kerberos.io provides many other tools such as [Factory](/docs/factory/first-things-first), [Vault](/docs/vault/first-things-first) and [Hub](/docs/hub/first-things-first) to provide additional capabilities: bring your own cloud, bring your own storage, central overview, live streaming, machine learning etc.
 
 As [explained before](/docs/prologue/how/), there is no need to install all those components from the start. Usually you just start with a few Agents, scale over time, and add additional components to support additional use cases.
 

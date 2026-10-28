@@ -16,7 +16,7 @@ tags: ['Live video', 'Networking', 'Architecture']
 
 Live video has no single best transport. The right choice depends on what you are optimizing: the shortest delay, the largest audience, the strictest corporate network, or interactive audio.
 
-This tutorial compares **Media over QUIC (MoQ)**, **HTTP Live Streaming (HLS)** and **WebRTC** as they are used by Kerberos Hub. You will turn product requirements into a transport choice, then validate that choice on the network where it will run.
+This tutorial compares **Media over QUIC (MoQ)**, **HTTP Live Streaming (HLS)** and **WebRTC** as they are used by Hub. You will turn product requirements into a transport choice, then validate that choice on the network where it will run.
 
 {{< tutorial-meta time="~15 min" level="Beginner" stack="Live video · Networking" prerequisites="A camera connected to Hub" >}}
 
@@ -129,7 +129,7 @@ Its benefits come from using the web delivery path almost every network already 
 - **Firewall and proxy compatibility.** HLS uses ordinary authenticated HTTPS requests without ICE, STUN, TURN or peer-to-peer connectivity.
 - **Shared delivery.** Multiple viewers can fetch the same media session instead of opening a new media path back to the Agent.
 - **Operational familiarity.** HTTP logs, reverse proxies and common observability tools can inspect the delivery path.
-- **Large-audience scaling.** HLS is naturally compatible with caching and CDN-style distribution, although Kerberos Hub serves authenticated live playlists directly by default.
+- **Large-audience scaling.** HLS is naturally compatible with caching and CDN-style distribution, although Hub serves authenticated live playlists directly by default.
 
 The cost is delay. A player needs enough segment or partial-segment data to decode smoothly, so HLS normally trails the live edge by seconds rather than frames. It is also one-way: Hub's two-way talk feature is unavailable on HLS.
 

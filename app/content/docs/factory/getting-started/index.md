@@ -70,7 +70,7 @@ Instead of creating a new Agent through a RTSP stream, you can discover streams 
 
 {{< figure src="add-through-onvif.gif" alt="Deploy an Agent with ONVIF capabilities." caption="Deploy an Agent with ONVIF capabilities." class="stretch">}}
 
-Once the Agent is added, PTZ and other ONVIF capabilities will be enabled through Kerberos Hub.
+Once the Agent is added, PTZ and other ONVIF capabilities will be enabled through Hub.
 
 {{< figure src="ptz-onvif.gif" alt="Moving a camera through ONVIF PTZ." caption="Moving a camera through ONVIF PTZ." class="stretch">}}
 
@@ -86,7 +86,7 @@ Following settings can be changed:
 - Time based conditions,
 - Pre- and post recording
 - Continuous recording
-- Linking to [Kerberos Hub Saas](/docs/hub/first-things-first) or [Kerberos Vault](/docs/vault/first-things-first)
+- Linking to [Hub Saas](/docs/hub/first-things-first) or [Vault](/docs/vault/first-things-first)
 
 {{< callout type="info" >}}
 Before the configuration screen opens, Factory runs a quick **reachability check** (a ping) against the agent. If an agent is temporarily unreachable you get a fast, friendly message instead of a long hang, and any unsaved changes are confirmed before you close the screen.
@@ -144,52 +144,52 @@ This page is most useful when the factory uses the `configmap` or `secret` confi
 
 Factory allows you to scale your video landscape horizontally, using the concept of Kubernetes, and brings a strong backbone for stability and performance. It allows you to avoid reinventing the wheel, and get stuck in the numerous challenges of developing a scalable video platform.
 
-Agents store their recordings locally for a short period. This means that long-term storage is not included in the solution. On top of that it also does not have a visual component, which allows you te review dashboards or recordings. To overcome these two challenges, long-term storage with extensibility/integration capabilities and visualisation features, following solutions were developed [Kerberos Vault]({{< ref "/docs/vault/first-things-first" >}}) and [Kerberos Hub]({{< ref "/docs/hub/first-things-first" >}}).
+Agents store their recordings locally for a short period. This means that long-term storage is not included in the solution. On top of that it also does not have a visual component, which allows you te review dashboards or recordings. To overcome these two challenges, long-term storage with extensibility/integration capabilities and visualisation features, following solutions were developed [Vault]({{< ref "/docs/vault/first-things-first" >}}) and [Hub]({{< ref "/docs/hub/first-things-first" >}}).
 
-### Kerberos Vault
+### Vault {#kerberos-vault}
 
-[Kerberos Vault](/docs/vault/first-things-first) is a solution which makes it possible to store recordings from Agents (across different clusters) at a central place, on the storage provider you want. You can store your recordings in the cloud (AWS S3, Google Cloud Storage, Azure Blob storage) or at the edge (Minio, Ceph).
+[Vault](/docs/vault/first-things-first) is a solution which makes it possible to store recordings from Agents (across different clusters) at a central place, on the storage provider you want. You can store your recordings in the cloud (AWS S3, Google Cloud Storage, Azure Blob storage) or at the edge (Minio, Ceph).
 
-On the other hand it's an open platform, as it allows you build extensions and integrations (web apps, mobile apps, machine learning services much more). Kerberos Vault ships with the ability of real-time messaging (Kafka), and a REST API (documented as Swagger).
+On the other hand it's an open platform, as it allows you build extensions and integrations (web apps, mobile apps, machine learning services much more). Vault ships with the ability of real-time messaging (Kafka), and a REST API (documented as Swagger).
 
-{{< figure src="vault-cloud-storage.svg" alt="Kerberos Vault allows you to centralise your recordings and build integrations." caption="Kerberos Vault allows you to centralise your recordings and build integrations." class="stretch">}}
+{{< figure src="vault-cloud-storage.svg" alt="Vault allows you to centralise your recordings and build integrations." caption="Vault allows you to centralise your recordings and build integrations." class="stretch">}}
 
-To connect one or more Agents to your Kerberos Vault instance, you should open the configuration option and navigate to the `cloud` tab. After selected you need to fill-in the credentials from your Kerberos Vault account.
+To connect one or more Agents to your Vault instance, you should open the configuration option and navigate to the `cloud` tab. After selected you need to fill-in the credentials from your Vault account.
 
-- Kerberos Vault URI: this is the API endpoint of your Kerberos Vault instance. Usually this is in the following format: `http(s)://yourdomain.com/api`. Where `yourdomain.com` should match your Kerberos Vault endpoint. If you are deploying Kerberos Vault at the edge, in the same cluster, you can use the internal DNS name, as following `http://vault.kerberos-vault/api`. Where `vault` is the `service name` and `kerberos-vault` is the `namespace`.
+- Vault URI: this is the API endpoint of your Vault instance. Usually this is in the following format: `http(s)://yourdomain.com/api`. Where `yourdomain.com` should match your Vault endpoint. If you are deploying Vault at the edge, in the same cluster, you can use the internal DNS name, as following `http://vault.kerberos-vault/api`. Where `vault` is the `service name` and `kerberos-vault` is the `namespace`.
 
-- Provider: the name of the provider, which you created on the Kerberos Vault providers page, to which you want to send your recordings to.
+- Provider: the name of the provider, which you created on the Vault providers page, to which you want to send your recordings to.
 
-- Directory: this is the subdirectory in which your files will be stored. At the time of writing this should also equal your Kerberos Hub username, if you plan to upload to Kerberos Hub.
+- Directory: this is the subdirectory in which your files will be stored. At the time of writing this should also equal your Hub username, if you plan to upload to Hub.
 
-- Access Key: this should match the access key of one of your Kerberos Vault accounts.
+- Access Key: this should match the access key of one of your Vault accounts.
 
-- Secret Key: this should match the secret key of one of your Kerberos Vault accounts.
+- Secret Key: this should match the secret key of one of your Vault accounts.
 
-{{< figure src="kerberos-factory-kerberos-vault.gif" alt="Using Kerberos Vault you can bring your own storage, and store the recordings of your agents in your own storage provider." caption="Using Kerberos Vault you can bring your own storage, and store the recordings of your agents in your own storage provider." class="stretch">}}
+{{< figure src="kerberos-factory-kerberos-vault.gif" alt="Using Vault you can bring your own storage, and store the recordings of your agents in your own storage provider." caption="Using Vault you can bring your own storage, and store the recordings of your agents in your own storage provider." class="stretch">}}
 
-### Kerberos Hub
+### Hub {#kerberos-hub}
 
-For the visualisation part Kerberos Hub comes into the picture. Kerberos Hub is a web app, backed up with a number of microservices, that shows dashboards, live streams, filter recordings and much more. Learn more [about the features and functions here]({{< ref "/docs/hub/first-things-first" >}}).
+For the visualisation part Hub comes into the picture. Hub is a web app, backed up with a number of microservices, that shows dashboards, live streams, filter recordings and much more. Learn more [about the features and functions here]({{< ref "/docs/hub/first-things-first" >}}).
 
-You have two choices when using Kerberos Hub, either you send your recordings from your Agents directly to Kerberos Hub, or you send your recordings to Kerberos Vault, and connect Kerberos Vault to Kerberos Hub. About the latter more is explained on the [Kerberos Vault page]({{< ref "/docs/vault/getting-started" >}}).
+You have two choices when using Hub, either you send your recordings from your Agents directly to Hub, or you send your recordings to Vault, and connect Vault to Hub. About the latter more is explained on the [Vault page]({{< ref "/docs/vault/getting-started" >}}).
 
-Select the Kerberos Hub option, and copy-paste the credentials from your Kerberos Hub subscription.
+Select the Hub option, and copy-paste the credentials from your Hub subscription.
 
-{{< figure src="kerberos-factory-kerberos-hub.gif" alt="By linking the Agent to Kerberos Hub, your recordings and livestreams will become available online." caption="By linking your Enterprise agent to Kerberos Hub, your recordings and livestreams will become available online." class="stretch">}}
+{{< figure src="kerberos-factory-kerberos-hub.gif" alt="By linking the Agent to Hub, your recordings and livestreams will become available online." caption="By linking your Enterprise agent to Hub, your recordings and livestreams will become available online." class="stretch">}}
 
-- Proxy URI: this is a proxy service which moves the recording in the Kerberos Hub SAAS version. By default `http://proxy.kerberos.io`.
+- Proxy URI: this is a proxy service which moves the recording in the Hub SAAS version. By default `http://proxy.kerberos.io`.
 
 - Region: this is the region where your recordings will be stored. Only `eu-west-1` for now (will change, on the roadmap).
 
-- Bucket: the name of the Kerberos Hub bucket. Only `kerberosaccept` for now (will change, on the roadmap).
+- Bucket: the name of the Hub bucket. Only `kerberosaccept` for now (will change, on the roadmap).
 
-- Directory: this is your personal directory, and matches your Kerberos Hub username.
+- Directory: this is your personal directory, and matches your Hub username.
 
-In the Kerberos Hub section (next to persistence) provide following information
+In the Hub section (next to persistence) provide following information
 
-- API url: the url of the Kerberos Hub endpoint. By default `https://api.cloud.kerberos.io` for our Kerberos Hub SAAS version.
+- API url: the url of the Hub endpoint. By default `https://api.cloud.kerberos.io` for our Hub SAAS version.
 
-- Public Key: this should match the public key of your Kerberos Hub subscription.
+- Public Key: this should match the public key of your Hub subscription.
 
-- Private Key: this should match the private key of your Kerberos Hub subscription.
+- Private Key: this should match the private key of your Hub subscription.

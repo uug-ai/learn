@@ -95,7 +95,7 @@ Installing Factory in a managed Kubernetes cluster (Azure, GCP, AWS) is straight
 
 ## Self-hosted Kubernetes
 
-No need to install Factory on a Kubernetes Service Provider, it can be installed on your own Kubernetes cluster in your private cloud, or at the edge. The closer you bring Kerberos Vault to your video streams, and Agents, the more benefits you will experience (low latency, low bandwidth, etc).
+No need to install Factory on a Kubernetes Service Provider, it can be installed on your own Kubernetes cluster in your private cloud, or at the edge. The closer you bring Vault to your video streams, and Agents, the more benefits you will experience (low latency, low bandwidth, etc).
 
 In contradiction to the Kubernetes Service Provider, there will be more work required. Setting up a Kubernetes Cluster, configure a load balancer, create persistent bolumes and claims.
 

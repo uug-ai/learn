@@ -5,8 +5,8 @@
   "duration": 160.944,
   "reviewedOn": "2026-10-28",
   "sourceUrl": "https://learn.uug.ai/docs/hub/floor-plans/",
-  "sourceSha256": "d0fed95f2f17aa60ed692415dd7562edd9758696ae9b3cbaccffe339d50e55d7",
-  "scriptSha256": "82fe21fd89ac7483d5d60b817c81835222228d2267c287612d865f7bc04d8641",
+  "sourceSha256": "0ae204a5e2280605373a090ae68ef044f83ac7ce5dd7796b14d1d6efa70892a1",
+  "scriptSha256": "7b542ca007dd6279565c28681f0a2c60c230e9358b22d9480e64b5ee4de6f60c",
   "audioSha256": "622db2a30e7aa735df9ed48290a4fa2709e59e5f772b55fd89b2814f8abc5131",
   "audio": "podcasts/hub-floor-plans/episode.mp3",
   "chapters": [

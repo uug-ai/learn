@@ -22,15 +22,15 @@ When deploying Agents you have the possibility to Bring Your Own Storage; at the
 - [Minio](https://min.io/)
 - [Ceph](https://ceph.io/)
 
-Kerberos Vault allows you to attach one or more (and different) storage providers. Depending on the use case: Kerberos Vault in a cloud environment or at the edge, you will opt for a specific storage provider. For example in the case of a Kerberos Vault installation at the edge, it makes more sense to store your recordings also at the edge, so you avoid cloud storage costs, have better latency, reduce expensive bandwidth.
+Vault allows you to attach one or more (and different) storage providers. Depending on the use case: Vault in a cloud environment or at the edge, you will opt for a specific storage provider. For example in the case of a Vault installation at the edge, it makes more sense to store your recordings also at the edge, so you avoid cloud storage costs, have better latency, reduce expensive bandwidth.
 
 ## Prerequisites
 
-Before you can configure a provider, make sure [you have installed a Kerberos Vault](/docs/vault/installation) inside a Kubernetes cluster.
+Before you can configure a provider, make sure [you have installed a Vault](/docs/vault/installation) inside a Kubernetes cluster.
 
 ## Configuration of a provider
 
-Once you have set up your Kerberos Vault instance, and have successfully login to the application, you should see the provider navigation item on the left.
+Once you have set up your Vault instance, and have successfully login to the application, you should see the provider navigation item on the left.
 
 {{< figure src="provider.gif" alt="One or more providers can be configured to centralise your storage." caption="One or more providers can be configured to centralise your storage." class="stretch">}}
 
@@ -65,17 +65,17 @@ for JSON examples, required fields, precedence, and secret-handling guidance.
 
 ## Cloud storage providers
 
-Kerberos Vault integrates with storage providers in the cloud such as AWS S3, GCP Storage, Azure Storage and Storj. The advantage of previously mentioned storage providers, is that they take complete control of your ever growing storage requirements. They scale with your needs at a low TCO.
+Vault integrates with storage providers in the cloud such as AWS S3, GCP Storage, Azure Storage and Storj. The advantage of previously mentioned storage providers, is that they take complete control of your ever growing storage requirements. They scale with your needs at a low TCO.
 
 ### GCP Storage
 
-[Google Cloud Storage](google-cloud-storage/) provides world-wide, highly durable object storage that scales automatically with your needs. It offers multiple storage classes for cost optimization and integrates seamlessly with Kerberos Vault through S3-compatible HMAC authentication. GCS is ideal for cloud-based deployments requiring global availability, with features like automatic lifecycle management, strong security controls, and competitive pricing across different access patterns.
+[Google Cloud Storage](google-cloud-storage/) provides world-wide, highly durable object storage that scales automatically with your needs. It offers multiple storage classes for cost optimization and integrates seamlessly with Vault through S3-compatible HMAC authentication. GCS is ideal for cloud-based deployments requiring global availability, with features like automatic lifecycle management, strong security controls, and competitive pricing across different access patterns.
 
 [Read the full Google Cloud Storage setup guide →](google-cloud-storage/)
 
 ### Azure Storage
 
-[Azure Blob Storage](azure-storage-account/) is Microsoft's enterprise-grade object storage solution offering massive scalability and multiple access tiers (Hot, Cool, Cold, Archive) for cost optimization. With redundancy options like LRS, ZRS, GRS, and RA-GRS, Azure Storage provides the flexibility to meet various availability and compliance requirements. It integrates with Kerberos Vault and is particularly well-suited for organizations already invested in the Azure ecosystem.
+[Azure Blob Storage](azure-storage-account/) is Microsoft's enterprise-grade object storage solution offering massive scalability and multiple access tiers (Hot, Cool, Cold, Archive) for cost optimization. With redundancy options like LRS, ZRS, GRS, and RA-GRS, Azure Storage provides the flexibility to meet various availability and compliance requirements. It integrates with Vault and is particularly well-suited for organizations already invested in the Azure ecosystem.
 
 [Read the full Azure Storage setup guide →](azure-storage-account/)
 
@@ -111,9 +111,9 @@ So now we have created a Bucket, we will need to have credentials to interact wi
 
 #### Integrate
 
-Now you are ready to assign Storj as a storage provider to Kerberos Vault. Open the `Providers` page of Kerberos Vault, and select the Storj provider.
+Now you are ready to assign Storj as a storage provider to Vault. Open the `Providers` page of Vault, and select the Storj provider.
 
-{{< figure src="storj-integrate.gif" alt="Integrate Storj.io with Kerberos Vault." caption="Integrate Storj.io with Kerberos Vault." class="stretch">}}
+{{< figure src="storj-integrate.gif" alt="Integrate Storj.io with Vault." caption="Integrate Storj.io with Vault." class="stretch">}}
 
 - Provider name: this a preferred name for the provider.
 - Bucket name: the name of a bucket created in Storj, make sure this matches.
@@ -124,7 +124,7 @@ Now you are ready to assign Storj as a storage provider to Kerberos Vault. Open 
 
 ## Edge storage providers
 
-Kerberos Vault also integrates with storage providers that are more suitable for edge deployments. Examples are Minio and Ceph, these are storage providers that you can install wherever you want. Therefore, they are interesting when considering edge computing to reduce latency, cloud billing and bandwidth. Examples are machine learning use cases, to trigger events or limit the transfer to a cloud storage.
+Vault also integrates with storage providers that are more suitable for edge deployments. Examples are Minio and Ceph, these are storage providers that you can install wherever you want. Therefore, they are interesting when considering edge computing to reduce latency, cloud billing and bandwidth. Examples are machine learning use cases, to trigger events or limit the transfer to a cloud storage.
 
 ### Minio
 
@@ -175,9 +175,9 @@ While accessing the console, you can create a new Bucket.
 
 #### Integrate
 
-Now you are ready to assign Minio as a storage provider to Kerberos Vault. Open the `Providers` page of Kerberos Vault, and select the Minio provider.
+Now you are ready to assign Minio as a storage provider to Vault. Open the `Providers` page of Vault, and select the Minio provider.
 
-{{< figure src="minio-setup.gif" alt="Configuring the minio provider in Kerberos Vault." caption="Configuring the minio provider in Kerberos Vault." class="stretch">}}
+{{< figure src="minio-setup.gif" alt="Configuring the minio provider in Vault." caption="Configuring the minio provider in Vault." class="stretch">}}
 
 - Provider name: this a preferred name for the provider.
 - Bucket name: the name of a bucket created in minio, make sure this matches.

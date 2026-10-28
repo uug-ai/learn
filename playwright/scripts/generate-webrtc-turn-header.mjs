@@ -90,7 +90,7 @@ const artwork = String.raw`
     <circle cx="46" cy="44" r="16" fill="#326ce5"/>
     <circle cx="46" cy="44" r="5" fill="#dff9ff"/>
     <path d="M46 22V13M46 75V66M24 44H15M77 44H68" stroke="#79a2ff" stroke-width="4" stroke-linecap="round"/>
-    <text x="92" y="51" fill="#effcff" font-family="DejaVu Sans, sans-serif" font-size="28" font-weight="700">Kerberos Hub</text>
+    <text x="92" y="51" fill="#effcff" font-family="DejaVu Sans, sans-serif" font-size="28" font-weight="700">Hub</text>
     <text x="36" y="93" fill="#a9c2ff" font-family="DejaVu Sans, sans-serif" font-size="16" font-weight="700" letter-spacing="3">SIGNALLING PLANE</text>
     <rect x="36" y="120" width="212" height="76" rx="16" fill="#326ce5" fill-opacity="0.16"/>
     <text x="56" y="151" fill="#effcff" font-family="DejaVu Sans, sans-serif" font-size="18" font-weight="700">MQTT broker</text>

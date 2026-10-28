@@ -5,8 +5,8 @@
   "duration": 195.144,
   "reviewedOn": "2026-10-28",
   "sourceUrl": "https://learn.uug.ai/docs/hub/installation/",
-  "sourceSha256": "e2377c3eae99d2a65966f00bfa4cb9ec64b86481b2261287fd90501c512c7184",
-  "scriptSha256": "6e9a3acf5ab24a1ecc232d0fdc53ed1a5162a6df5910b8ef6baf1823301d256b",
+  "sourceSha256": "1fbbd4e818be93a1d8ae30864805321a0b802547b6cfaf58d0f668cd55a67796",
+  "scriptSha256": "c1cdaa16dbb4a96174c0bbf98509aa9a445fb8ac5bfb2a1b03392e127e909629",
   "audioSha256": "0b1468737bb75e6f385346592e0dd9af6100787db5b35a4f018735de8720f9a1",
   "audio": "podcasts/hub-installation/episode.mp3",
   "chapters": [

@@ -13,7 +13,7 @@ weight: 310
 toc: true
 ---
 
-Next to persisting your recordings, recycling up is evenly important. Recycling avoids your disks being filled up with recordings and locking up the entire OS and cluster, and also important helps you to reduce costs. Recycling is managed through a recycle service called Kerberos Vault Recycle, which you can use to remove recordings based on different rules.
+Next to persisting your recordings, recycling up is evenly important. Recycling avoids your disks being filled up with recordings and locking up the entire OS and cluster, and also important helps you to reduce costs. Recycling is managed through a recycle service called Vault Recycle, which you can use to remove recordings based on different rules.
 
 ## Recycling rules
 
@@ -21,17 +21,17 @@ Different recycling rules can be defined. A rule determines when and how recordi
 
 ### Account day limit
 
-When creating an `account` in Kerberos Vault, you have the option to specify a day limit. This day limit is used by the recycle service, to determine if one ore more recordings are ready to be removed from the selected storage provider.
+When creating an `account` in Vault, you have the option to specify a day limit. This day limit is used by the recycle service, to determine if one ore more recordings are ready to be removed from the selected storage provider.
 
 {{< figure src="vault-recycle.gif" alt="You can remove your recordings by specifying the day limit field." caption="You can remove your recordings by specifying the day limit field." class="stretch">}}
 
 ## Prerequisites
 
-This installation guide assumes you have set up Kerberos Vault properly.
+This installation guide assumes you have set up Vault properly.
 
 ## Installation
 
-Modify the Mongodb credentials, as you did for the Kerberos Vault deployment.
+Modify the Mongodb credentials, as you did for the Vault deployment.
 
         - name: MONGODB_USERNAME
           value: "root"

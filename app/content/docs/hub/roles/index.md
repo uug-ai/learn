@@ -14,11 +14,11 @@ toc: true
 podcast: hub-roles
 ---
  
-By default Kerberos Hub users are granted with the `owner` role, which grants the highest level of access. Using the `owner` role you have access to the Kerberos Hub credentials, modify the Kerberos Vault integration, create alerts and integrations, and more.
+By default Hub users are granted with the `owner` role, which grants the highest level of access. Using the `owner` role you have access to the Hub credentials, modify the Vault integration, create alerts and integrations, and more.
 
 ## Accounts
 
-A Kerberos Hub user with the `owner` role, has the ability to create additional sub accounts or sub users. By creating additional users, the `owner` user can decide to delegate a subset of cameras and specify different access roles such as `admin`, `editor` or `guest`.
+A Hub user with the `owner` role, has the ability to create additional sub accounts or sub users. By creating additional users, the `owner` user can decide to delegate a subset of cameras and specify different access roles such as `admin`, `editor` or `guest`.
 
 By creating a subaccount you have the option to specify the required role that should be sufficient for the user. When the user would login, the actions which can be executed are limited to the assigned role.
 
@@ -26,7 +26,7 @@ For example a `guest` user will not be able to modify any settings or create any
 
 ![Add a user](add-user.png)
 
-The access and rules for the different standard roles (`owner`, `admin`, `editor` and `guest`) are defined by the Kerberos Hub application, and cannot be modified. If you like to have more control over permissions you'll need to look into custom roles; read more below.
+The access and rules for the different standard roles (`owner`, `admin`, `editor` and `guest`) are defined by the Hub application, and cannot be modified. If you like to have more control over permissions you'll need to look into custom roles; read more below.
 
 ## Custom Roles
 

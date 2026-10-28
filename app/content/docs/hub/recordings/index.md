@@ -1,6 +1,6 @@
 ---
 title: "Recordings"
-description: "Find, review, organize, and process recordings in Kerberos Hub."
+description: "Find, review, organize, and process recordings in Hub."
 lead: "Find the footage that matters and move from playback to investigation."
 date: 2026-09-09T00:00:00+00:00
 lastmod: 2026-10-17T00:00:00+00:00
@@ -16,7 +16,7 @@ podcast: hub-recordings
 ---
 
 The **Recordings** page is the main starting point for reviewing footage in
-Kerberos Hub. Use it to find an incident by date, device, location, or analysis
+Hub. Use it to find an incident by date, device, location, or analysis
 result, play the relevant recordings, and preserve evidence in a case.
 
 ## Introduction

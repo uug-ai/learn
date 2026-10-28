@@ -315,7 +315,7 @@ Storing a run feeds the recording's detection boxes into the media-side region-s
 
 ## Contract guarantees
 
-These are properties Kerberos Hub commits to maintaining across minor versions of the schema. Build integrations against them, regardless of delivery method.
+These are properties Hub commits to maintaining across minor versions of the schema. Build integrations against them, regardless of delivery method.
 
 1. **Coordinate space.** Producers may send `"pixel"` or `"normalized"`. The server always stores `"normalized"` and preserves the original in `originalCoordinateSpace`.
 2. **Box geometry.** Producers may send `{x, y, w, h}` (preferred) or `{x1, y1, x2, y2}`. Stored in normalized `TrackBox` shape.

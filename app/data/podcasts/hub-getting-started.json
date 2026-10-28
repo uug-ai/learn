@@ -5,8 +5,8 @@
   "duration": 198.672,
   "reviewedOn": "2026-10-28",
   "sourceUrl": "https://learn.uug.ai/docs/hub/getting-started/",
-  "sourceSha256": "41d361e2b9d7ef5b703f3ffc306b642e6c7af9459e6f529f57b57fa0486c5fc4",
-  "scriptSha256": "e8e74c9ddd7fd57dfcbdab5cf929d8e620354b84ddd1542d8b8cc63f8b0dcc1b",
+  "sourceSha256": "16663311be88607707706f2e34cb20256a8f0a35f589b4e057e86cc68ffb6e8f",
+  "scriptSha256": "3dd6a4e9e96b316c0007090e179f90417b253b47bd34897436e8908329ffc9c4",
   "audioSha256": "57d870d6b6708e2c2b9d05d030fbee0dbe63898c8f1f511f724a433e7ccf9e83",
   "audio": "podcasts/hub-getting-started/episode.mp3",
   "chapters": [

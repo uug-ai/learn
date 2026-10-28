@@ -44,7 +44,7 @@ to the Agents it provisions.
 
 - **`secret`** — behaves exactly like `configmap`, but the values are kept in
   Kubernetes **Secrets** instead of ConfigMaps. Use this when your agent
-  configuration contains sensitive settings (storage credentials, Kerberos Hub
+  configuration contains sensitive settings (storage credentials, Hub
   keys, encryption keys, …): the values are stored base64-encoded and can be
   protected with your cluster's Secret access controls (RBAC). No MongoDB
   connection is used.

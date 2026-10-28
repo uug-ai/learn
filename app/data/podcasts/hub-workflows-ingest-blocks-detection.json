@@ -5,8 +5,8 @@
   "duration": 132.144,
   "reviewedOn": "2026-10-28",
   "sourceUrl": "https://learn.uug.ai/docs/hub/workflows/ingest/blocks/detection/",
-  "sourceSha256": "93c845ed017b003632b35d507e674ec287002a938de2244b2453391adf018e38",
-  "scriptSha256": "7a2e4b75c843bd4ee389a76b5aebb86ae306bad85b04658a9589a4efc4025b78",
+  "sourceSha256": "36dbf207e0cb6ab0f843abed2709b245b77f1f770d61e5cee43c79beea3617f2",
+  "scriptSha256": "b000b5a2e7dd86c1ca4b0fbd6d08181db4dc99920778e05c06c25e5fecc48219",
   "audioSha256": "2bb13603ecca3bda761912911e154c09c1089a4840df34d4258ef95295e41614",
   "audio": "podcasts/hub-workflows-ingest-blocks-detection/episode.mp3",
   "chapters": [

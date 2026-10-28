@@ -5,8 +5,8 @@
   "duration": 125.808,
   "reviewedOn": "2026-10-28",
   "sourceUrl": "https://learn.uug.ai/docs/hub/workflows/triggers/",
-  "sourceSha256": "5167d96c66d5a134937aab39ff0fe9db43872232f2dfcc02ea4ee2612fdba391",
-  "scriptSha256": "10726c52c9074ddc44168a854a361d5b007fd044033934ce3bba90b426ed8c71",
+  "sourceSha256": "3e0bef6877207b16c8c352ce5dab10ee4751df8197aabaf48c7b011b7e3562da",
+  "scriptSha256": "8b2d4c8fe85accb53d35a3fa4abfcba5a8f0adf7a10e6cb244bed69ab4b8f921",
   "audioSha256": "262d1536d89da2ddd72c83cf5c91d5007b4f27316a671e4e95725a52e9c0a416",
   "audio": "podcasts/hub-workflows-triggers/episode.mp3",
   "chapters": [

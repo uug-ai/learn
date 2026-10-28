@@ -1,6 +1,6 @@
 ---
 title: "Floor plans"
-description: "Place cameras on site floor plans in Kerberos Hub."
+description: "Place cameras on site floor plans in Hub."
 lead: "Upload a floor plan and place site cameras where they are installed."
 date: 2026-09-09T00:00:00+00:00
 lastmod: 2026-09-09T00:00:00+00:00

@@ -13,25 +13,25 @@ weight: 304
 toc: true
 ---
 
-Welcome to the Kerberos Vault Edge installation. This is the way to go if you want to install Kerberos Vault on your bare metal infrastructure or inside a private cloud.
+Welcome to the Vault Edge installation. This is the way to go if you want to install Vault on your bare metal infrastructure or inside a private cloud.
 
 Before we can start installing the different deployments in our cluster, we need to make sure we have a Kubernetes cluster available.
 
-{{< figure src="vault-edge-deployment.svg" alt="Store your recordings at the edge with Kerberos Vault" caption="Store your recordings at the edge with Kerberos Vault" class="stretch">}}
+{{< figure src="vault-edge-deployment.svg" alt="Store your recordings at the edge with Vault" caption="Store your recordings at the edge with Vault" class="stretch">}}
 
 ## Prerequisites
 
-Kerberos Vault is the storage component of the Kerberos Enterprise Suite. It is used to store your recordings at a central place, on the storage system you prefer. Next to that it can be used for extension and integration capabilities. Learn more about [Kerberos Vault here](/vault).
+Vault is the storage component of the Kerberos Enterprise Suite. It is used to store your recordings at a central place, on the storage system you prefer. Next to that it can be used for extension and integration capabilities. Learn more about [Vault here](/vault).
 
-To use Kerberos Vault, you will need to have one or more Agents installed. Independent of that one can also use the Kerberos Vault API `/swagger/index.html` to send recordings from a custom build VMS. Nothing stops you from developing a custom agent.
+To use Vault, you will need to have one or more Agents installed. Independent of that one can also use the Vault API `/swagger/index.html` to send recordings from a custom build VMS. Nothing stops you from developing a custom agent.
 
 ## Installation
 
-Kerberos Vault requires some initial components to be installed. If you run Kerberos Vault in the same cluster as where you have a Factory installed, there is not much to do.
+Vault requires some initial components to be installed. If you run Vault in the same cluster as where you have a Factory installed, there is not much to do.
 
-{{< figure src="vault-edge-storage.svg" alt="Store your recordings at the edge with Kerberos Vault" caption="Store your recordings at the edge with Kerberos Vault" class="stretch">}}
+{{< figure src="vault-edge-storage.svg" alt="Store your recordings at the edge with Vault" caption="Store your recordings at the edge with Vault" class="stretch">}}
 
-If you plan to run Kerberos Vault in a different cluster (which is perfectly possible), you will need to make sure you complete the initial setup of [Factory Edge](/docs/enterprise/installation-edge) installation. To be more specific you will need the following components running:
+If you plan to run Vault in a different cluster (which is perfectly possible), you will need to make sure you complete the initial setup of [Factory Edge](/docs/enterprise/installation-edge) installation. To be more specific you will need the following components running:
 
 - Helm
 - Calico
@@ -45,7 +45,7 @@ Once this is done start by cloning the configurations from our [Github repo](htt
 
 ### Vault deployment
 
-Before installing Kerberos Vault, open the `./vault/yaml/deployment.yaml` configuration file. At the bottom of the file you will find two endpoints, similar to the Traefik configuration file below.
+Before installing Vault, open the `./vault/yaml/deployment.yaml` configuration file. At the bottom of the file you will find two endpoints, similar to the Traefik configuration file below.
 
 Update the domain names to your own domain, and add these to your DNS server or `/etc/hosts` file . Make sure to point to the DNS name to the same IP as the Traefik service `EXTERNAL-IP`.
 
@@ -83,7 +83,7 @@ If you are using Ingress Nginx, do not forgot to comment `Traefik` and uncomment
         kubernetes.io/ingress.class: nginx
         nginx.ingress.kubernetes.io/proxy-body-size: 200m
 
-Kerberos Vault requires a MongoDB instance to be running, it uses it to store media, configurations, etc. To specify those credentials a configmap is created and injected into the Factory deployment.
+Vault requires a MongoDB instance to be running, it uses it to store media, configurations, etc. To specify those credentials a configmap is created and injected into the Factory deployment.
 
 Modify the MongoDB credentials in the configmap `./vault/yaml/mongodb.config.yaml`, and make sure they match the credentials of your MongoDB instance.
 
@@ -101,7 +101,7 @@ Create the config map.
 
     kubectl apply -f ./vault/yaml/mongodb.config.yaml -n kerberos-vault
 
-Once you have corrected the DNS names and MongoDB credentials, install Kerberos Vault inside your cluster.
+Once you have corrected the DNS names and MongoDB credentials, install Vault inside your cluster.
 
     kubectl create namespace kerberos-vault
     kubectl apply -f ./vault/yaml/deployment.yaml -n kerberos-vault
@@ -125,6 +125,6 @@ It should look like this.
 
 ## Access the system
 
-Once everything is configured correctly your cluster and DNS or `/etc/hosts` file, you should be able to access the Kerberos Vault application. By navigating to the domain `vault.domain.com` in your browser you will see the Kerberos Vault login page showing up.
+Once everything is configured correctly your cluster and DNS or `/etc/hosts` file, you should be able to access the Vault application. By navigating to the domain `vault.domain.com` in your browser you will see the Vault login page showing up.
 
-{{< figure src="login.gif" alt="Once successfully installed Kerberos Vault, it will show you the login page." caption="Once successfully installed Kerberos Vault, it will show you the login page." class="stretch">}}
+{{< figure src="login.gif" alt="Once successfully installed Vault, it will show you the login page." caption="Once successfully installed Vault, it will show you the login page." class="stretch">}}

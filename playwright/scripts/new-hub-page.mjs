@@ -173,10 +173,10 @@ toc: true
     - learn/app/content/docs/hub/livestream/index.md
 -->
 
-The **${title}** page in Kerberos Hub <!-- TODO: 1–2 sentences explaining
+The **${title}** page in Hub <!-- TODO: 1–2 sentences explaining
 what this page lets the user do and the route it lives on. -->.
 
-{{< figure src="hub-${topic}-overview.png" alt="The ${title} page in Kerberos Hub." caption="The ${title} page in Kerberos Hub." class="stretch">}}
+{{< figure src="hub-${topic}-overview.png" alt="The ${title} page in Hub." caption="The ${title} page in Hub." class="stretch">}}
 
 ## How it works
 

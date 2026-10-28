@@ -5,8 +5,8 @@
   "duration": 177.384,
   "reviewedOn": "2026-10-28",
   "sourceUrl": "https://learn.uug.ai/docs/hub/audit-events/",
-  "sourceSha256": "47d3ef0c9be9aea0f520191b9eb33f6be597d0b992701f2c790d481db7d7f86b",
-  "scriptSha256": "d4c67413fe0c7fab49e591d6754f24ca92bdcbc307f9117f4ccb3ce49e3d2716",
+  "sourceSha256": "d34310f5d45e84236c974f0fabeb39c98199b5adc0ad58c5d4718582b97af6a4",
+  "scriptSha256": "d928bd61175ab100659f728c0ef75cda0ea979271289409ad0f239d23aef85af",
   "audioSha256": "73766cfc367e82fc96b33278f8be403dd0ec4af650c3b00be40965e65f0031ba",
   "audio": "podcasts/hub-audit-events/episode.mp3",
   "chapters": [
