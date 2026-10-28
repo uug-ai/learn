@@ -1,0 +1,637 @@
+/* Iso illustrations for the docs ({{< iso-figure >}} shortcode).
+   The figure styles below are copied from the design library
+   (uug-ai/design, src/components/IsoIllustration/component.css); keep them in
+   sync there first. This header maps the design tokens onto the docs palette:
+   light by default, dark under Hextra's html.dark. */
+.iso-illustration-figure {
+  --background: #ffffff;
+  --surface: #f7f5fb;
+  --surface-strong: #ece6f6;
+  --text-primary: #111827;
+  --iso-accent: #a239d7;
+
+  margin: 1.5rem 0;
+}
+
+html.dark .iso-illustration-figure {
+  --background: #111111;
+  --surface: #1a1a1f;
+  --surface-strong: #24242c;
+  --text-primary: #f3f4f6;
+  --iso-accent: #b46cf2;
+}
+
+.iso-illustration-figure figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  text-align: center;
+  opacity: 0.75;
+}
+
+/* Iso illustrations: hairline isometric figures on neutral faces.
+   Only live parts (.iso-lit) use the accent, and they only glow when the
+   illustration glows: in a dark theme with glow="auto", or always with
+   glow="on". Recolour a figure by setting --iso-accent on it or an ancestor
+   (the Hub frontend maps it to --hub). */
+.iso-illustration {
+  --iso-color: var(--iso-accent, var(--accent-color));
+  --iso-top: var(--background);
+  --iso-front: var(--surface);
+  --iso-side: var(--surface-strong);
+  --iso-line: color-mix(in srgb, var(--text-primary) 38%, transparent);
+  --iso-detail: color-mix(in srgb, var(--text-primary) 16%, transparent);
+  --iso-grid: color-mix(in srgb, var(--iso-color) 13%, transparent);
+  --iso-pane: color-mix(in srgb, var(--iso-color) 12%, var(--background));
+  --iso-pane-on: color-mix(in srgb, var(--iso-color) 75%, var(--background));
+  --iso-sweep: 0.2;
+
+  display: block;
+  pointer-events: none;
+}
+
+/* Dark pages: the top face is the lightest, as if lit from above.
+   .dark-theme is the Hub frontend's theme class, .dark the Tailwind / Hextra one (learn). */
+:is([data-theme='dark'], .dark-theme, .dark) .iso-illustration {
+  --iso-top: var(--surface-strong);
+  --iso-front: var(--surface);
+  --iso-side: var(--background);
+  --iso-line: color-mix(in srgb, var(--text-primary) 42%, transparent);
+  --iso-detail: color-mix(in srgb, var(--text-primary) 18%, transparent);
+}
+
+.iso-illustration svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.iso-illustration svg * {
+  vector-effect: non-scaling-stroke;
+}
+
+.iso-illustration .iso-face {
+  stroke: var(--iso-line);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+.iso-illustration .iso-top {
+  fill: var(--iso-top);
+}
+
+.iso-illustration .iso-front {
+  fill: var(--iso-front);
+}
+
+.iso-illustration .iso-side {
+  fill: var(--iso-side);
+}
+
+.iso-illustration .iso-detail {
+  fill: none;
+  stroke: var(--iso-detail);
+  stroke-width: 1;
+}
+
+.iso-illustration .iso-grid {
+  stroke: var(--iso-grid);
+  stroke-width: 1;
+}
+
+.iso-illustration .iso-wire {
+  fill: none;
+  stroke: var(--iso-line);
+  stroke-width: 1;
+}
+
+.iso-illustration .iso-wire--dashed {
+  stroke-dasharray: 3 3;
+}
+
+/* A dash of light travelling along a wire (paths carry pathLength="1000"). */
+.iso-illustration .iso-pulse {
+  fill: none;
+  stroke: var(--iso-color);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.iso-illustration .iso-pane {
+  fill: var(--iso-pane);
+  stroke: var(--iso-color);
+  stroke-width: 1;
+}
+
+.iso-illustration .iso-window {
+  fill: var(--iso-pane-on);
+  stroke: var(--iso-color);
+  stroke-width: 1;
+}
+
+.iso-illustration .iso-beacon,
+.iso-illustration .iso-led,
+.iso-illustration .iso-rec {
+  fill: var(--iso-color);
+  stroke: none;
+}
+
+.iso-illustration .iso-antenna {
+  stroke: var(--iso-color);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.iso-illustration .iso-sweep {
+  fill: var(--iso-color);
+  opacity: var(--iso-sweep);
+}
+
+.iso-illustration .iso-halo,
+.iso-illustration .iso-beacon-halo {
+  display: none;
+  fill: var(--iso-color);
+}
+
+/* Printed text on faces and lit screen text. */
+.iso-illustration .iso-label {
+  fill: color-mix(in srgb, var(--text-primary) 70%, transparent);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+
+.iso-illustration .iso-label--zone {
+  opacity: 0.6;
+}
+
+.iso-illustration .iso-screen-text {
+  fill: var(--iso-color);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+
+.iso-illustration .iso-det {
+  fill: none;
+  stroke: var(--iso-color);
+  stroke-width: 1;
+}
+
+/* Glow: lit parts get the instance's glow filter and halos appear. Without it
+   lit parts stay flat accent. */
+:is([data-theme='dark'], .dark-theme, .dark) .iso-illustration--glow-auto,
+.iso-illustration--glow-on {
+  --iso-pane: color-mix(in srgb, var(--iso-color) 18%, var(--background));
+  --iso-pane-on: var(--iso-color);
+  --iso-sweep: 0.32;
+}
+
+:is([data-theme='dark'], .dark-theme, .dark) .iso-illustration--glow-auto .iso-lit,
+.iso-illustration--glow-on .iso-lit {
+  filter: var(--iso-glow);
+}
+
+:is([data-theme='dark'], .dark-theme, .dark) .iso-illustration--glow-auto :is(.iso-halo, .iso-beacon-halo),
+.iso-illustration--glow-on :is(.iso-halo, .iso-beacon-halo) {
+  display: block;
+  filter: var(--iso-bloom);
+}
+
+/* Agent: one 3.6s cycle. The pulse leaves the Agent, reaches the tower at 55%
+   and the cab, halo and beacon light up as it arrives. */
+.iso-figure--agent {
+  --iso-cycle: 3.6s;
+}
+
+.iso-figure--agent .iso-pulse {
+  stroke-dasharray: 40 2000;
+  stroke-dashoffset: 40;
+  animation: iso-agent-pulse var(--iso-cycle) linear infinite;
+}
+
+.iso-figure--agent .iso-pane {
+  animation: iso-agent-pane var(--iso-cycle) ease-in-out infinite;
+}
+
+.iso-figure--agent .iso-halo {
+  opacity: 0;
+  animation: iso-agent-halo var(--iso-cycle) ease-in-out infinite;
+}
+
+.iso-figure--agent .iso-beacon {
+  animation: iso-agent-beacon var(--iso-cycle) ease-out infinite;
+}
+
+.iso-figure--agent .iso-led {
+  animation: iso-agent-led var(--iso-cycle) ease-out infinite;
+}
+
+.iso-figure--agent .iso-radar {
+  animation: iso-radar 6s linear infinite;
+}
+
+@keyframes iso-agent-pulse {
+  0% {
+    stroke-dashoffset: 40;
+  }
+
+  55%,
+  100% {
+    stroke-dashoffset: -1000;
+  }
+}
+
+@keyframes iso-agent-pane {
+  0%,
+  55%,
+  100% {
+    fill: var(--iso-pane);
+  }
+
+  62%,
+  85% {
+    fill: var(--iso-pane-on);
+  }
+}
+
+@keyframes iso-agent-halo {
+  0%,
+  55%,
+  100% {
+    opacity: 0;
+  }
+
+  62%,
+  85% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes iso-agent-beacon {
+  0%,
+  58%,
+  100% {
+    opacity: 0.3;
+  }
+
+  62% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes iso-agent-led {
+  0% {
+    opacity: 1;
+  }
+
+  20%,
+  100% {
+    opacity: 0.3;
+  }
+}
+
+/* Control tower: a large hero figure, so lines are lighter. Panes scan around
+   the cab (delays are set per pane), pulses run continuously on four wires.
+   The grid and wires run past the frame on purpose, so it clips them. */
+.iso-illustration .iso-figure--control-tower {
+  overflow: hidden;
+  --iso-line: color-mix(in srgb, var(--text-primary) 30%, transparent);
+  --iso-detail: color-mix(in srgb, var(--text-primary) 13%, transparent);
+  --iso-grid: color-mix(in srgb, var(--iso-color) 11%, transparent);
+}
+
+.iso-figure--control-tower .iso-pulse {
+  stroke-dasharray: 70 2000;
+  stroke-dashoffset: 70;
+  animation: iso-tower-pulse 4.4s linear infinite;
+}
+
+.iso-figure--control-tower .iso-pane {
+  animation: iso-tower-pane 4.8s ease-in-out infinite;
+}
+
+.iso-figure--control-tower .iso-halo {
+  opacity: 0.22;
+}
+
+.iso-figure--control-tower .iso-beacon {
+  animation: iso-tower-beacon 2.2s ease-out infinite;
+}
+
+.iso-figure--control-tower .iso-beacon-halo {
+  opacity: 0;
+  animation: iso-tower-beacon-halo 2.2s ease-out infinite;
+}
+
+.iso-figure--control-tower .iso-radar {
+  animation: iso-radar 7s linear infinite;
+}
+
+@keyframes iso-tower-pulse {
+  from {
+    stroke-dashoffset: 70;
+  }
+
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+@keyframes iso-tower-pane {
+  0%,
+  100% {
+    fill: var(--iso-pane);
+  }
+
+  12%,
+  30% {
+    fill: var(--iso-pane-on);
+  }
+}
+
+@keyframes iso-tower-beacon {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+
+  8% {
+    opacity: 1;
+  }
+
+  40% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes iso-tower-beacon-halo {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  8% {
+    opacity: 0.8;
+  }
+
+  40% {
+    opacity: 0;
+  }
+}
+
+/* Hub: a 3s beat, one camera per beat over a 9s round. Camera parts and
+   videowall tiles run on the 9s round with a 3s delay per camera; the Agent,
+   the pipeline floors (0.35s apart), the outputs and the phone run on the beat. */
+.iso-figure--hub .iso-pulse {
+  stroke-dasharray: 70 2000;
+  stroke-dashoffset: 70;
+}
+
+.iso-figure--hub .iso-hub-cam-pulse {
+  animation: iso-hub-cam-pulse 9s linear infinite;
+}
+
+.iso-figure--hub .iso-hub-agent-pulse {
+  animation: iso-hub-agent-pulse 3s linear infinite;
+}
+
+.iso-figure--hub .iso-hub-out-pulse {
+  animation: iso-hub-out-pulse 3s linear infinite;
+}
+
+.iso-figure--hub .iso-hub-rec {
+  opacity: 0.3;
+  animation: iso-hub-rec 9s ease-out infinite;
+}
+
+.iso-figure--hub .iso-hub-agent-led {
+  opacity: 0.3;
+  animation: iso-hub-agent-led 3s ease-out infinite;
+}
+
+.iso-figure--hub .iso-hub-floor {
+  animation: iso-hub-floor 3s ease-in-out infinite;
+}
+
+.iso-figure--hub .iso-halo {
+  opacity: 0;
+  animation: iso-hub-halo 3s ease-in-out infinite;
+}
+
+.iso-figure--hub .iso-beacon {
+  opacity: 0.3;
+  animation: iso-hub-beacon 3s ease-out infinite;
+}
+
+.iso-figure--hub .iso-hub-tile {
+  animation: iso-hub-tile 9s ease-in-out infinite;
+}
+
+.iso-figure--hub .iso-hub-reveal {
+  opacity: 0;
+}
+
+.iso-figure--hub .iso-hub-tile-reveal {
+  animation: iso-hub-tile-reveal 9s ease-in-out infinite;
+}
+
+.iso-figure--hub .iso-hub-phone {
+  animation: iso-hub-phone 3s ease-in-out infinite;
+}
+
+.iso-figure--hub .iso-hub-phone-reveal {
+  animation: iso-hub-phone-reveal 3s ease-in-out infinite;
+}
+
+@keyframes iso-hub-cam-pulse {
+  0% {
+    stroke-dashoffset: 70;
+  }
+
+  6%,
+  100% {
+    stroke-dashoffset: -1000;
+  }
+}
+
+@keyframes iso-hub-agent-pulse {
+  0%,
+  17% {
+    stroke-dashoffset: 70;
+  }
+
+  35%,
+  100% {
+    stroke-dashoffset: -1000;
+  }
+}
+
+@keyframes iso-hub-out-pulse {
+  0%,
+  65% {
+    stroke-dashoffset: 70;
+  }
+
+  83%,
+  100% {
+    stroke-dashoffset: -1000;
+  }
+}
+
+@keyframes iso-hub-rec {
+  0%,
+  6% {
+    opacity: 1;
+  }
+
+  10%,
+  100% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes iso-hub-agent-led {
+  0%,
+  15% {
+    opacity: 0.3;
+  }
+
+  18%,
+  30% {
+    opacity: 1;
+  }
+
+  36%,
+  100% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes iso-hub-floor {
+  0%,
+  33%,
+  92%,
+  100% {
+    fill: var(--iso-pane);
+  }
+
+  37%,
+  85% {
+    fill: var(--iso-pane-on);
+  }
+}
+
+@keyframes iso-hub-halo {
+  0%,
+  56%,
+  96%,
+  100% {
+    opacity: 0;
+  }
+
+  62%,
+  88% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes iso-hub-beacon {
+  0%,
+  57%,
+  80%,
+  100% {
+    opacity: 0.3;
+  }
+
+  61% {
+    opacity: 1;
+  }
+}
+
+@keyframes iso-hub-tile {
+  0%,
+  26%,
+  62%,
+  100% {
+    fill: var(--iso-pane);
+  }
+
+  28%,
+  58% {
+    fill: var(--iso-pane-on);
+  }
+}
+
+@keyframes iso-hub-tile-reveal {
+  0%,
+  26%,
+  62%,
+  100% {
+    opacity: 0;
+  }
+
+  28%,
+  58% {
+    opacity: 1;
+  }
+}
+
+@keyframes iso-hub-phone {
+  0%,
+  80%,
+  100% {
+    fill: var(--iso-pane);
+  }
+
+  83%,
+  96% {
+    fill: var(--iso-pane-on);
+  }
+}
+
+@keyframes iso-hub-phone-reveal {
+  0%,
+  80%,
+  100% {
+    opacity: 0;
+  }
+
+  83%,
+  96% {
+    opacity: 1;
+  }
+}
+
+@keyframes iso-radar {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+/* Reduced motion: hold the lit state and drop the travelling pulses. */
+@media (prefers-reduced-motion: reduce) {
+  .iso-illustration :is(.iso-pane, .iso-halo, .iso-beacon, .iso-beacon-halo, .iso-led, .iso-radar, .iso-hub-reveal) {
+    animation: none;
+  }
+
+  .iso-figure--hub :is(.iso-hub-reveal, .iso-hub-rec, .iso-hub-agent-led, .iso-beacon) {
+    opacity: 1;
+  }
+
+  .iso-figure--hub .iso-halo {
+    opacity: 0.35;
+  }
+
+  .iso-illustration .iso-pane {
+    fill: var(--iso-pane-on);
+  }
+
+  .iso-figure--agent .iso-halo {
+    opacity: 0.35;
+  }
+
+  .iso-illustration .iso-pulse {
+    display: none;
+  }
+}

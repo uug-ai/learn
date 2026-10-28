@@ -1,0 +1,36 @@
+{{- /*
+  iso-figure shortcode — embed an isometric illustration from the design library.
+
+  Usage:
+    {{< iso-figure figure="hub" caption="How an event moves through Hub." >}}
+
+  The SVG in assets/iso/<figure>.svg is generated from the design library
+  (uug-ai/design, renderIsoSvg) with ISO_ID as a placeholder for the filter ids;
+  the styles live in assets/css/iso-illustration.css. The figure animates with
+  CSS only, glows in dark mode and holds a lit frame under reduced motion.
+*/ -}}
+
+{{- $figure := .Get "figure" | default "hub" -}}
+{{- $caption := .Get "caption" -}}
+{{- $alt := .Get "alt" | default $caption -}}
+{{- $svg := resources.Get (printf "iso/%s.svg" $figure) -}}
+{{- if not $svg -}}
+  {{- errorf "iso-figure: no assets/iso/%s.svg (used at %s)" $figure .Position -}}
+{{- end -}}
+{{- $id := printf "iso-%s-%d" $figure .Ordinal -}}
+
+{{- /* Emit the stylesheet only once per page. */ -}}
+{{- if not (.Page.Store.Get "isoAssetsEmitted") -}}
+  {{- .Page.Store.Set "isoAssetsEmitted" true -}}
+  {{- with resources.Get "css/iso-illustration.css" -}}
+    {{- $css := . | minify | fingerprint -}}
+    <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
+  {{- end }}
+{{- end }}
+
+<figure class="iso-illustration-figure">
+  <div class="iso-illustration iso-illustration--glow-auto" {{ with $alt }}role="img" aria-label="{{ . }}"{{ else }}aria-hidden="true"{{ end }}>
+    {{- replace $svg.Content "ISO_ID" $id | safeHTML -}}
+  </div>
+  {{ with $caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}
+</figure>
