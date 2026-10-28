@@ -184,7 +184,7 @@ test('keeps pages without a podcast unchanged', async ({ page }) => {
   page.on('request', request => {
     if (/podcast[\w.-]*\.(css|js)/.test(request.url())) podcastAssets.push(request.url());
   });
-  await page.goto('/docs/hub/');
+  await page.goto('/docs/vault/first-things-first/');
   await expect(page.locator('h1')).toBeVisible();
   await expect(page.locator('[data-podcast-toggle]')).toHaveCount(0);
   await expect(page.locator('.learn-podcast-topic-heading, .learn-podcast-topic-badge')).toHaveCount(0);
