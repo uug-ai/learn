@@ -3,7 +3,7 @@ title: "Organisations and projects"
 description: "Understand how organisations, projects, memberships, roles, and resources fit together in Kerberos Hub."
 lead: "Understand how organisations and projects separate ownership, access, and resources in Kerberos Hub."
 date: 2026-08-11T00:00:00+00:00
-lastmod: 2026-10-27T00:00:00+00:00
+lastmod: 2026-10-28T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -142,6 +142,7 @@ erDiagram
         string kind
         string key
         string assignableAt
+        string grants
         string_array permissions
         object origin
         boolean isActive
@@ -195,11 +196,20 @@ Permissions come from a versioned catalog in the shared models, such as `devices
 
 Some capabilities are graded: a higher permission implies the lower ones, for example `live.stream` implies `live.preview`, and `ptz.presets` implies `ptz.control`, which implies `ptz.panTilt` and `ptz.zoom`. A role stores the permissions it was given; implied ones are derived.
 
+Every role states explicitly what it grants in `grants`:
+
+| `grants` | Meaning |
+| --- | --- |
+| `selected` | Exactly the permissions listed in `permissions`. An empty list grants nothing. |
+| `all` | Every permission, including ones added to the catalog later. Only the Owner role uses it, and it lists no permissions. |
+
+A role without `grants` is invalid, so an empty permission list never means "everything".
+
 Organisation permissions that affect the whole organisation, such as billing, storage, the role catalog, removing members, or updating organisation settings, are **tenant-wide**. A role holding any tenant-wide permission can only be assigned to cover all projects.
 
 The platform defines two families of read-only roles, copied into every organisation under a stable key:
 
-- **System roles** such as Owner, Organisation manager, Billing admin, Project admin, Editor, and Viewer. Owner is the one role that spans every project: it stores no permission list and grants every permission, including ones added to the catalog later. It is assigned to users only, always covers all projects, and has no time window or expiry.
+- **System roles** such as Owner, Organisation manager, Billing admin, Project admin, Editor, and Viewer. Owner is the one role that spans every project: it has `grants: all`, so it holds every permission, including ones added to the catalog later. It is assigned to users only, always covers all projects, and has no time window or expiry.
 - **Legacy roles** that reproduce the access of the existing guest, editor, and admin tiers exactly. They let existing accounts move to the new model without gaining or losing access, and can be replaced by system or custom roles afterwards.
 
 ### Assignment scope

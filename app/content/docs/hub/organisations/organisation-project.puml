@@ -73,6 +73,7 @@ namespace models {
         + Kind RoleKind
         + Key RoleKey
         + AssignableAt PermissionScope
+        + Grants ScopeSelection
         + Permissions []Permission
         + Origin *RoleOrigin
         + IsActive bool
