@@ -8,6 +8,8 @@
   (uug-ai/design, renderIsoSvg) with ISO_ID as a placeholder for the filter ids;
   the styles live in assets/css/iso-illustration.css. The figure animates with
   CSS only, glows in dark mode and holds a lit frame under reduced motion.
+  Parts the figure marks with data-iso-at replay their moment when clicked
+  (assets/js/iso-figure.js).
 */ -}}
 
 {{- $figure := .Get "figure" | default "hub" -}}
@@ -25,6 +27,10 @@
   {{- with resources.Get "css/iso-illustration.css" -}}
     {{- $css := . | minify | fingerprint -}}
     <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
+  {{- end }}
+  {{- with resources.Get "js/iso-figure.js" -}}
+    {{- $js := . | minify | fingerprint -}}
+    <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
   {{- end }}
 {{- end }}
 

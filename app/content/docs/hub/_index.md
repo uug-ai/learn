@@ -19,7 +19,7 @@ sidebar:
 
 Kerberos Hub is the web application that brings all your Agents, sites and recordings together in one place. Agents keep doing the recording at the edge, close to the cameras. Hub adds what a single Agent can't: one overview across every site, live views and videowalls, searchable recordings with machine learning detections, and alerts for the people who need them.
 
-{{< iso-figure figure="hub" alt="Isometric illustration of Kerberos Hub. A person or a car moves in front of one of three cameras on a site and triggers it. Each camera is wired to its own Agent; the Agents run on one gateway machine, which sends each event to Hub. Hub's workflows, analyse and notify stages light up in turn, then the detection appears on the operators' videowall and as an alert on a phone." caption="How an event moves from a camera on site, through Hub, to the people watching." >}}
+{{< iso-figure figure="hub" alt="Isometric illustration of Kerberos Hub. A person or a car moves in front of one of three cameras on a site and triggers it. Each camera is wired to its own Agent; the Agents run on one gateway machine, which sends each event to Hub. Hub's workflows, analyse and notify stages light up in turn, then the detection appears on the operators' videowall and as an alert on a phone." caption="How an event moves from a camera on site, through Hub, to the people watching. Click a camera or its Agent to send its event." >}}
 
 ## How an event moves through Hub
 

@@ -21,6 +21,17 @@ html.dark .iso-illustration-figure {
   --iso-accent: #b46cf2;
 }
 
+/* Parts that replay their moment when clicked (assets/js/iso-figure.js); the
+   rest of the illustration ignores the pointer. */
+.iso-illustration-figure [data-iso-at] {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.iso-illustration-figure [data-iso-at]:hover .iso-face {
+  stroke: var(--iso-color);
+}
+
 .iso-illustration-figure figcaption {
   margin-top: 0.5rem;
   font-size: 0.875rem;
