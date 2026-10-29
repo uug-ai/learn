@@ -3,7 +3,7 @@ title: "SSO"
 description: "Use your own Identity Provider through OpenID Connect (OIDC)"
 lead: "Use your own Identity Provider through OpenID Connect (OIDC)"
 date: 2020-10-06T08:49:31+00:00
-lastmod: 2020-10-06T08:49:31+00:00
+lastmod: 2026-10-29T17:26:00+00:00
 draft: false
 images: []
 menu:
@@ -14,9 +14,9 @@ toc: true
 podcast: hub-sso
 ---
 
-Kerberos Hub is a multi-tenancy application that allow you to onboard multiple users (with sub accounts). Each users is granted a subscription, given specific permissions and features, and credentials to link multiple cameras to their user account. Afterwards a user can delegate cameras and recordings to sub accounts, so they can review in a divide-and-conquer strategy.
+This guide covers the integration details for single sign-on (SSO) through OpenID Connect (OIDC). For an overview of all sign-in options, including passwords, authenticator-based 2FA, passkeys, and recovery, start with [Authentication]({{< relref "/docs/hub/authentication" >}}).
 
-By default a user is authenticating using their username/email and password. These credentials are stored within the Kerberos Hub database, and hashed and salted using a specific algorithm to hide the password. This means that if your users would be using various applications, they will have seperate credentials (which might be the same) for each of the other applications. The complexity begins with your users updating their password across various applications and they might get out-of-sync or completely lost.
+Kerberos Hub supports multiple users with access controlled by [organisations, projects]({{< relref "/docs/hub/organisations" >}}), and [roles]({{< relref "/docs/hub/roles" >}}). Local sign-in uses a username or email address and a Hub password. OIDC delegates authentication to an external identity provider so users can use their centrally managed identity rather than another application-specific password.
 
 {{< figure src="hub-add-account.gif" alt="Give another user limited access to Kerberos Hub by creating a sub account." caption="Give another user limited access to Kerberos Hub by creating a sub account." class="stretch">}}
 
@@ -39,7 +39,9 @@ To overcome these challenges, Kerberos Hub can be linked to multiple OIDC provid
         clientVerificationId: "" # This is only required for SSO chaining.
       - ...
 
-Once authenticated with the OIDC provider, you will redirected back to the `redirectUrl`, and an access token is verified to reveal the identity of the authentication request. Once verified, a user in the Kerberos Hub is located, and used to sign in. Hence you'll still need to create a user in Kerberos Hub that matches the identity of your OIDC provider, but the credentials for that user will reside in the OIDC provider and not in the Kerberos Hub application.
+Once authenticated with the OIDC provider, you are redirected back to the configured `redirectUrl`. Hub exchanges the authorization code and verifies the returned ID token, then locates an existing Hub user by the returned identity's email address or username. Create that matching user in Hub before signing in; this flow does not automatically provision an account.
+
+The identity provider manages the password and MFA policy for OIDC sign-in. Hub's local 2FA challenge and **force MFA** enrollment apply to password sign-in, not this OIDC flow. An existing local Hub password is not removed by configuring SSO; it is also still required when adding or removing Hub passkeys.
 
 {{< figure src="sso-kerberos-hub.gif" alt="Example of how SSO works with Kerberos Hub." caption="Example of how SSO works with Kerberos Hub." class="stretch">}}
 
@@ -55,7 +57,7 @@ After creating the new `App registration`, you should be able to abstract follow
 
 - issuer: https://login.microsoftonline.com/{yourtenantid}/v2.0
 - clientId: Application (client) ID
-- clientSecret: Secret ID
+- clientSecret: Client secret **value**, not the secret's identifier
 - redirectUrl: this is something that you have configured in the Kerberos Hub helm chart, but also need to add in your Azure tenant.
 
 ### Other OIDC provider
@@ -90,6 +92,8 @@ The `clientVerificationId` should be the same clientId you have used to configur
 ## Force SSO for Domain
 
 When leveraging the domain feature, you can force the SSO usage, by setting the `forceSSO` value to `true`. This will make sure that once you arrive on the domain page, the SSO redirection is shown by default and the username/password fields are hidden.
+
+This option also hides the local passkey selector. It changes the login screen; do not treat it alone as an API-wide policy that disables local password or passkey authentication.
 
 {{< figure src="force-sso-domains.gif" alt="Forcing SSO for domains, this will hide the username and password fields." caption="Forcing SSO for domains, this will hide the username and password fields." class="stretch">}}
 

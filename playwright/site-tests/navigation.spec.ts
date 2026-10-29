@@ -8,7 +8,7 @@ const products = [
     article: 'organisations',
     gettingStarted: 'Getting started',
     topics: [
-      'Analytics', 'Audit events', 'Cases', 'Cleanup', 'Configuration', 'Domains',
+      'Analytics', 'Audit events', 'Authentication', 'Cases', 'Cleanup', 'Configuration', 'Domains',
       'Feature flags', 'Floor plans', 'License', 'Live view', 'Maps', 'Markers',
       'Media processing', 'MP4 Verification', 'Notifications', 'ONVIF',
       'Organisations and projects', 'Pipeline', 'Recordings', 'Roles', 'SSO',
@@ -235,6 +235,24 @@ for (const mobile of [false, true]) {
         await expect(vault.locator(`a[href="/docs/vault/${route}/"]`)).toBeVisible();
       }
     });
+
+    test('hub: links the authentication overview and SSO integration guide', async ({ page }) => {
+      await page.goto('/docs/hub/getting-started/');
+      const content = page.locator('#content .content');
+      await content.getByRole('link', { name: 'Authentication', exact: true }).click();
+      await expect(page).toHaveURL(/\/docs\/hub\/authentication\/$/);
+      await expect(page.locator('#content h1')).toHaveText('Authentication');
+      for (const heading of [
+        'Password sign-in', 'Two-factor authentication (2FA)', 'Passkeys',
+        'Single sign-on with OIDC', 'Recovery and troubleshooting',
+      ]) {
+        await expect(content.getByRole('heading', { name: heading, level: 2 })).toBeVisible();
+      }
+      await content.getByRole('link', { name: 'SSO integration guide', exact: true }).click();
+      await expect(page).toHaveURL(/\/docs\/hub\/sso\/$/);
+      await content.getByRole('link', { name: 'Authentication', exact: true }).click();
+      await expect(page).toHaveURL(/\/docs\/hub\/authentication\/$/);
+    });
   });
 }
 
@@ -242,6 +260,8 @@ test('keeps footer navigation consistent with each product topic order', async (
   const cases: [string, string, string?][] = [
     ['hub/installation', 'Getting started', 'Analytics'],
     ['hub/analytics', 'Installation', 'Audit events'],
+    ['hub/audit-events', 'Analytics', 'Authentication'],
+    ['hub/authentication', 'Audit events', 'Cases'],
     ['hub/pipeline', 'Organisations and projects', 'Recordings'],
     ['hub/workflows', 'White-label', undefined],
     ['agent/installation', 'Getting Started', 'License'],
