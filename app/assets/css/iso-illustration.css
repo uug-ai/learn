@@ -1150,6 +1150,248 @@ html.dark .iso-illustration-figure {
   }
 }
 
+/* Factory: a 12s round of four 3s beats, one camera per beat (3s delay each).
+   A beat: the scan reaches the camera (0-0.5s), which lights up as found; the
+   hatch opens and its new Agent rolls out (1.05-1.5s), the press stamps the
+   global settings onto it (1.5-1.8s) and it rides to its node (1.8-2.4s),
+   sliding in as a pod that stays lit (2.6s on). The camera's stream then runs
+   to that node (2.7-3.3s) and the camera stays lit while its Agent records. The windows, hatch, beacon and press run on the beat. */
+.iso-figure--factory .iso-pulse {
+  vector-effect: none;
+  stroke-width: 1.2;
+  stroke-dasharray: 70 2000;
+  stroke-dashoffset: 80;
+}
+
+.iso-figure--factory .iso-factory-scan {
+  animation: iso-factory-scan 12s linear infinite;
+}
+
+.iso-figure--factory .iso-factory-record {
+  animation: iso-factory-record 12s linear infinite;
+}
+
+.iso-figure--factory :is(.iso-factory-found, .iso-factory-agent-led, .iso-factory-beacon) {
+  opacity: 0.3;
+}
+
+.iso-figure--factory .iso-factory-found {
+  animation: iso-factory-found 12s ease-out infinite;
+}
+
+.iso-figure--factory .iso-factory-beacon {
+  animation: iso-factory-beacon 3s ease-out infinite;
+}
+
+.iso-figure--factory .iso-factory-glass {
+  animation: iso-factory-glass 3s ease-in-out infinite;
+}
+
+.iso-figure--factory .iso-factory-hatch {
+  transform-box: fill-box;
+  transform-origin: top;
+  animation: iso-factory-hatch 3s ease-in-out infinite;
+}
+
+.iso-figure--factory .iso-factory-agent {
+  opacity: 0;
+  animation: iso-factory-agent 12s linear infinite;
+}
+
+.iso-figure--factory .iso-factory-agent-led {
+  animation: iso-factory-agent-led 12s linear infinite;
+}
+
+.iso-figure--factory .iso-factory-press {
+  animation: iso-factory-press 3s ease-in-out infinite;
+}
+
+.iso-figure--factory .iso-factory-gear {
+  animation: iso-factory-gear 3s ease-in-out infinite;
+}
+
+.iso-figure--factory .iso-factory-pod {
+  opacity: 0;
+  fill: var(--iso-pane-on);
+}
+
+.iso-figure--factory .iso-factory-pod {
+  animation: iso-factory-pod 12s ease-in-out infinite;
+}
+
+@keyframes iso-factory-scan {
+  0% {
+    stroke-dashoffset: 80;
+  }
+
+  4.2%,
+  100% {
+    stroke-dashoffset: -1080;
+  }
+}
+
+@keyframes iso-factory-record {
+  0%,
+  22.5% {
+    stroke-dashoffset: 80;
+  }
+
+  28%,
+  100% {
+    stroke-dashoffset: -1080;
+  }
+}
+
+/* Lit when the scan finds the camera, then again from the moment its Agent
+   records it until just before the next round redeploys it. */
+@keyframes iso-factory-found {
+  0%,
+  3.8%,
+  11%,
+  22%,
+  96.5%,
+  100% {
+    opacity: 0.3;
+  }
+
+  4.2%,
+  10%,
+  23%,
+  95.8% {
+    opacity: 1;
+  }
+}
+
+@keyframes iso-factory-beacon {
+  0%,
+  10%,
+  100% {
+    opacity: 0.3;
+  }
+
+  2% {
+    opacity: 1;
+  }
+}
+
+@keyframes iso-factory-glass {
+  0%,
+  28%,
+  58%,
+  100% {
+    fill: var(--iso-pane);
+  }
+
+  32%,
+  54% {
+    fill: var(--iso-pane-on);
+  }
+}
+
+@keyframes iso-factory-hatch {
+  0%,
+  30%,
+  48%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  33%,
+  45% {
+    transform: scaleY(0.12);
+  }
+}
+
+/* Out of the hatch, 23 units to the press (19.9, 11.5 on screen), on to the
+   node (--tx / --ty) and 10 units back into it while fading. */
+@keyframes iso-factory-agent {
+  0%,
+  8.75% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+
+  9.2% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+
+  12.5%,
+  15% {
+    transform: translate(19.9px, 11.5px);
+  }
+
+  20% {
+    transform: translate(calc(19.9px + var(--tx)), calc(11.5px + var(--ty)));
+  }
+
+  21.5% {
+    opacity: 1;
+  }
+
+  22.5%,
+  100% {
+    opacity: 0;
+    transform: translate(calc(28.6px + var(--tx)), calc(6.5px + var(--ty)));
+  }
+}
+
+@keyframes iso-factory-agent-led {
+  0%,
+  13.5%,
+  23%,
+  100% {
+    opacity: 0.3;
+  }
+
+  14%,
+  22.5% {
+    opacity: 1;
+  }
+}
+
+@keyframes iso-factory-press {
+  0%,
+  48%,
+  62%,
+  100% {
+    transform: translateY(0);
+  }
+
+  52%,
+  56% {
+    transform: translateY(5px);
+  }
+}
+
+@keyframes iso-factory-gear {
+  0%,
+  49%,
+  66%,
+  100% {
+    fill: var(--iso-pane);
+  }
+
+  52%,
+  62% {
+    fill: var(--iso-pane-on);
+  }
+}
+
+@keyframes iso-factory-pod {
+  0%,
+  21%,
+  96.5%,
+  100% {
+    opacity: 0;
+  }
+
+  22%,
+  95.8% {
+    opacity: 1;
+  }
+}
+
 /* Reduced motion: hold the lit state and drop the travelling pulses. */
 @media (prefers-reduced-motion: reduce) {
   .iso-illustration :is(.iso-pane, .iso-halo, .iso-beacon, .iso-beacon-halo, .iso-led, .iso-radar, .iso-hub-reveal) {
@@ -1180,6 +1422,14 @@ html.dark .iso-illustration-figure {
   .iso-figure--vault .iso-vault-crate--rest {
     opacity: 1;
     transform: translate(15.6px, 9px);
+  }
+
+  .iso-figure--factory :is(.iso-factory-hatch, .iso-factory-agent, .iso-factory-press, .iso-factory-pod) {
+    animation: none;
+  }
+
+  .iso-figure--factory :is(.iso-factory-found, .iso-factory-agent-led, .iso-factory-beacon, .iso-factory-pod) {
+    opacity: 1;
   }
 
   .iso-illustration .iso-pane {
