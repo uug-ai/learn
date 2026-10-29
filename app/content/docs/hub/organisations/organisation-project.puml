@@ -72,7 +72,8 @@ namespace models {
         + Description string
         + Kind RoleKind
         + Key RoleKey
-        + AssignableAt PermissionScope
+        + AssignableAt Level
+        + Grants Selection
         + Permissions []Permission
         + Origin *RoleOrigin
         + IsActive bool
@@ -106,11 +107,11 @@ namespace models {
 
     }
     class "RoleAssignmentScope" << (S,Aquamarine) >> {
-        + Level PermissionScope
-        + Projects ScopeSelection
+        + Level Level
+        + Projects Selection
         + ProjectIds []primitive.ObjectID
         + ProjectId primitive.ObjectID
-        + Resources ScopeSelection
+        + Resources Selection
         + SiteIds []primitive.ObjectID
         + GroupIds []primitive.ObjectID
         + DeviceIds []primitive.ObjectID
