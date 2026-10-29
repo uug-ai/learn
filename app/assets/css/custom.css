@@ -48,6 +48,110 @@
   padding-top: 0.75rem;
 }
 
+.learn-footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 2rem 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.learn-footer-actions h2,
+.learn-cookie-banner h2 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-family-heading);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.learn-footer-actions p,
+.learn-cookie-banner p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.learn-footer-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.learn-action-link {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  background: var(--background);
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.learn-action-link:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.learn-action-link:focus-visible,
+.learn-cookie-settings:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 3px;
+}
+
+.learn-cookie-controls {
+  padding-bottom: 1rem;
+}
+
+.learn-cookie-settings {
+  min-height: 44px;
+  color: var(--text-secondary);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.learn-analytics-status {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.learn-cookie-banner {
+  position: fixed;
+  z-index: 60;
+  inset: auto 1rem 1rem;
+  max-width: 38rem;
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  margin-left: auto;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--background);
+  color: var(--text-primary);
+  box-shadow: 0 12px 40px var(--shadow);
+}
+
+.learn-cookie-banner .learn-footer-buttons {
+  margin-top: 1rem;
+}
+
+@media print {
+  .learn-footer-actions,
+  .learn-cookie-controls,
+  .learn-cookie-banner {
+    display: none;
+  }
+}
+
 .learn-topbar {
   position: sticky;
   top: 0;

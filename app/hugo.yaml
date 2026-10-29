@@ -1,6 +1,10 @@
 # Hugo configuration file
 title: 
 
+services:
+  googleAnalytics:
+    ID: G-ZW744GSN4M
+
 # import hextra as module
 module:
   imports:
@@ -70,6 +74,9 @@ menu:
         icon: github
 
 params:
+  analytics:
+    productionHost: learn.uug.ai
+
   navbar:
     displayTitle: true
     displayLogo: false

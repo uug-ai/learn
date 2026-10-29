@@ -1,0 +1,24 @@
+<div class="learn-footer-actions">
+  <div>
+    <h2>Put what you learn into practice.</h2>
+    <p>Explore the live demo or talk with our team about your deployment.</p>
+  </div>
+  <div class="learn-footer-buttons">
+    <a class="learn-action-link" href="https://app-demo.kerberos.io/" target="_blank" rel="noopener noreferrer" data-learn-cta="view_demo">View demo</a>
+    <a class="learn-action-link" href="https://uug.ai/contact/" data-learn-cta="contact_sales">Talk to our team</a>
+  </div>
+</div>
+{{- if and hugo.IsProduction .context.Site.Config.Services.GoogleAnalytics.ID -}}
+  <div class="learn-cookie-controls">
+    <button type="button" class="learn-cookie-settings" data-cookie-settings aria-controls="learn-cookie-banner" aria-expanded="false" hidden>Cookie settings</button>
+    <p class="learn-analytics-status" role="status" data-analytics-status hidden></p>
+  </div>
+  <section id="learn-cookie-banner" class="learn-cookie-banner" aria-labelledby="learn-cookie-heading" hidden>
+    <h2 id="learn-cookie-heading">Analytics on UUG.AI Learn</h2>
+    <p>With your permission, we use Google Analytics to understand which guides are useful and how readers use our demos and resources. Advertising storage stays disabled. You can change your choice in Cookie settings.</p>
+    <div class="learn-footer-buttons">
+      <button type="button" class="learn-action-link" data-analytics-consent="granted">Allow analytics</button>
+      <button type="button" class="learn-action-link" data-analytics-consent="denied">Reject analytics</button>
+    </div>
+  </section>
+{{- end -}}
