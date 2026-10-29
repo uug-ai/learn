@@ -108,14 +108,16 @@ images: []
 menu:
   hub:
     parent: "hub"
-weight: 304   # see /docs/hub/_index.md for the existing ordering
+weight: 304
 toc: true
 ---
 ```
 
-Pick a `weight` that places the page in a sensible spot relative to its
-neighbours. The existing pages currently span roughly 301–399 for the
-core Hub features.
+New top-level Hub pages automatically appear in the sidebar's **Topics**
+group, sorted A-Z by navigation title; their weight does not affect that
+order. The three introductory guides remain above the group, configured in
+`app/content/docs/hub/_index.md`. Keep using weights to order nested guides
+within a topic.
 
 ### Recommended sections
 
@@ -181,7 +183,7 @@ content folder (`docs/hub/<topic>/`) and the spec filename
 | `--description=<text>` | `Documentation for the <Title> page.` | Frontmatter `description` and `lead`.                                    |
 | `--route=<path>`       | `/<topic>`                         | Frontend route the spec navigates to (`page.goto`).                      |
 | `--heading=<text>`     | same as `--title`                  | Text the spec waits for to confirm the page rendered.                    |
-| `--weight=<n>`         | `399`                              | Hugo menu weight — pick a value that slots between existing pages.       |
+| `--weight=<n>`         | `399`                              | Hugo weight; top-level Hub topics are sorted alphabetically in the sidebar. |
 | `--force`, `-f`        | off                                | Overwrite the doc page, spec file or npm scripts if they already exist.  |
 
 ### What it generates
@@ -369,7 +371,7 @@ screenshot is rendered with the right caption and at the right size.
 
 Before opening a PR, confirm that:
 
-- [ ] The page is reachable from the sidebar at the expected `weight`.
+- [ ] The page is reachable alphabetically under Hub's **Topics** group (or in the intended weight order within a nested topic).
 - [ ] Every screenshot referenced from the Markdown exists in the topic
       folder and was produced by the spec (no manual crops).
 - [ ] The spec passes headlessly against a freshly logged-in Hub user.

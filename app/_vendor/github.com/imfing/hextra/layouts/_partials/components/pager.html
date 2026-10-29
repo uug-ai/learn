@@ -5,6 +5,24 @@
 {{- $prev := cond $reversePagination .PrevInSection .NextInSection -}}
 {{- $next := cond $reversePagination .NextInSection .PrevInSection -}}
 
+{{- with .Parent -}}
+  {{- if .Params.sidebar.topicGroup -}}
+    {{- $navigation := partial "docs/topic-navigation.html" . -}}
+    {{- range $index, $item := $navigation.pages -}}
+      {{- if eq $item $ -}}
+        {{- $prev = false -}}
+        {{- $next = false -}}
+        {{- if gt $index 0 -}}
+          {{- $prev = index $navigation.pages (sub $index 1) -}}
+        {{- end -}}
+        {{- if lt $index (sub (len $navigation.pages) 1) -}}
+          {{- $next = index $navigation.pages (add $index 1) -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
 {{- if eq .Params.prev false }}
   {{- if $reversePagination }}{{ $next = false }}{{ else }}{{ $prev = false }}{{ end -}}
 {{ else }}

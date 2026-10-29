@@ -1,0 +1,13 @@
+{{- $section := . -}}
+{{- $items := where (union .RegularPages .Sections) "Params.sidebar.exclude" "!=" true -}}
+{{- $introductory := slice -}}
+{{- range .Params.sidebar.introductoryPages -}}
+  {{- $item := $section.GetPage . -}}
+  {{- if not (in $items $item) -}}
+    {{- errorf "Sidebar introductory page %q must be a visible child of %s" . $section.Path -}}
+  {{- else -}}
+    {{- $introductory = $introductory | append $item -}}
+  {{- end -}}
+{{- end -}}
+{{- $topics := (complement $introductory $items).ByLinkTitle -}}
+{{- return (dict "introductory" $introductory "topics" $topics "pages" (union $introductory $topics)) -}}
