@@ -1,0 +1,33 @@
+{{- if hugo.IsProduction -}}
+  {{- with .Site.Config.Services.GoogleAnalytics.ID -}}
+    {{- if not (findRE `^G-[A-Z0-9]+$` .) -}}
+      {{- errorf "Learn requires a GA4 measurement ID, got %q" . -}}
+    {{- end -}}
+    {{- if not $.Site.Params.analytics.productionHost -}}
+      {{- errorf "Learn analytics requires params.analytics.productionHost" -}}
+    {{- end -}}
+    {{- $script := resources.Get "js/analytics.js" | minify | fingerprint -}}
+    {{- $product := "" -}}
+    {{- range split $.RelPermalink "/" -}}
+      {{- if in (slice "agent" "factory" "hub" "vault") . -}}
+        {{- $product = . -}}
+      {{- end -}}
+    {{- end -}}
+    <script defer src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}"
+      data-learn-analytics
+      data-measurement-id="{{ . }}"
+      data-production-host="{{ $.Site.Params.analytics.productionHost }}"
+      data-page-path="{{ $.RelPermalink }}"
+      data-content-section="{{ $.Section | default "home" }}"
+      data-product-id="{{ $product }}"></script>
+  {{- end -}}
+  {{- with .Site.Params.analytics.umami -}}
+    {{- partial "components/analytics/umami.html" $ -}}
+  {{- end -}}
+  {{- with .Site.Params.analytics.matomo -}}
+    {{- partial "components/analytics/matomo.html" $ -}}
+  {{- end -}}
+  {{- with .Site.Params.analytics.goatCounter -}}
+    {{- partial "components/analytics/goat-counter.html" $ -}}
+  {{- end -}}
+{{- end -}}

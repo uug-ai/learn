@@ -102,6 +102,83 @@ approval; listen before a production release.
 See the [publication workflow](podcast/README.md#publish-an-approved-episode-to-learn)
 and run `npm run podcast` in `playwright/` for the focused browser tests.
 
+## Google Analytics and calls to action
+
+Production Learn uses its own **UUG.AI Learn** web stream
+(`G-ZW744GSN4M`, stream ID `16226732617`) in the existing UUG.AI GA4 property
+(`540298183`). The public website retains its separate stream
+(`G-PLRKXEQ42W`). Filter by Stream name, hostname, or `site_area = learn`.
+Separate streams and consent choices are not a guarantee of uninterrupted
+cross-site user/session attribution.
+
+The measurement ID is configured through `services.googleAnalytics.ID` and
+the permitted hostname through `params.analytics.productionHost` in
+`app/hugo.yaml`. The Hextra analytics override loads the local consent controller
+only in production builds. Google code loads only after an explicit Allow
+analytics choice on HTTPS `learn.uug.ai`; localhost, development builds, and
+other preview hosts never initialize production analytics. Changing the ID
+requires a rebuild, not an environment variable in the nginx container.
+
+Cookie settings in the footer lets readers allow or reject analytics.
+Advertising consent stays denied. Learn uses the `learn` cookie prefix and
+limits cookies to `learn.uug.ai`. Withdrawal disables further collection and
+clears only Learn's accessible GA cookies, leaving the public website's shared
+parent-domain cookies alone.
+Consent is stored per origin in `uug-analytics-consent`; a choice on `uug.ai`
+does not automatically count as a choice on `learn.uug.ai`. Blocked storage is
+reported and the choice then applies only to the current page.
+
+Every page offers View demo and Talk to our team in the footer. The controller
+also classifies existing onboarding, support, GitHub, website, product, and
+explicit download links, without changing their destinations or blocking
+navigation:
+
+| Event | Meaning | Parameters beyond page context |
+| --- | --- | --- |
+| `page_view` | One page view after consent | None |
+| `view_demo` | Demo launch intent | `cta_id`, `cta_placement`, `destination_host` |
+| `contact_sales_click` | Click to the public contact page, not a submitted lead | Same CTA parameters |
+| `learn_resource_click` | Existing resource/onboarding/support link | Same CTA parameters |
+| `learn_podcast_start` | First playback per article audio element, not merely opening the player | None |
+
+Page context is `site_area: learn`, `content_section` (docs, tutorials, guides,
+etc.), and `product_id` where the route identifies Agent, Factory, Hub, or
+Vault. A product link uses its destination product as `product_id`.
+`cta_id` is a bounded label such as `github`, `support`, `support_email`,
+`getting_started`, `product`, `website`, or `download`; `cta_placement` is
+`footer`, `navigation`, `article`, or `sidebar`. No custom events include link
+text, email addresses, search input, query strings, or fragments. Page locations
+omit all query parameters (including UTMs); own-site referrers omit queries and
+external referrers retain only their origin. Enhanced measurement is disabled
+on the Learn stream to avoid duplicate automatic interactions and uncontrolled
+search/form/link parameters; the explicit page-view and CTA events still work.
+The public website's enhanced-measurement settings are unchanged.
+
+GA Admin has event-scoped custom dimensions for `site_area`, `content_section`,
+`product_id`, `cta_id`, and `cta_placement`. `view_demo` and
+`contact_sales_click` are key events, counted once per session with no default
+monetary value. They measure intent, not successful demos or submitted enquiries.
+Key-event definitions are property-wide: use the Learn stream filter for Learn
+results. Existing career dimensions and job-application events are unchanged.
+Do not mark all resource clicks or page views as conversions. Actual enquiry
+completion remains the responsibility of the public website. New custom
+dimensions can take 24-48 hours to appear in reports.
+
+Validate without sending production telemetry:
+
+```bash
+cd playwright
+npm run test:learn-analytics
+```
+
+The tests serve a production Hugo build locally and proxy an HTTPS Learn
+fixture to it. Google scripts and external CTA destinations are intercepted
+inside the local Playwright runner; no forms are submitted. They cover
+consent/rejection, persistence, withdrawal, privacy, event shapes, podcast
+deduplication, and localhost gating.
+Deploy/rebuild the Learn site before expecting production traffic in the new
+stream. Local tests intentionally intercept telemetry rather than polluting GA.
+
 ## Project Structure
 
 ```
@@ -198,6 +275,18 @@ hugo --minify
 The generated site will be in the `app/public/` directory.
 
 ## Deployment
+
+The hosted `https://learn.uug.ai` site uses versioned
+`ghcr.io/uug-ai/learn` images managed by `uug-ai/gitops` and Argo CD.
+After merging a change, run the **Bump release** workflow with a patch bump.
+It publishes amd64/arm64 images, scans the published release, and opens a
+GitOps PR for `environments/staging/learn/deployment.yaml`.
+That PR does not deploy production. After the release checks pass, merge the
+staging update and promote the same versioned image in
+`environments/production/learn/deployment.yaml` through a separate GitOps PR.
+Argo CD automatically reconciles the merged production manifest. Verify the
+public HTTPS site after rollout; publishing a GitHub release alone is not
+confirmation of a production deployment.
 
 The site can be deployed to various platforms:
 
