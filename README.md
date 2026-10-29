@@ -197,16 +197,29 @@ cross-site user/session attribution.
 The measurement ID is configured through `services.googleAnalytics.ID` and
 the permitted hostname through `params.analytics.productionHost` in
 `app/hugo.yaml`. The Hextra analytics override loads the local consent controller
-only in production builds. Google code loads only after an explicit Allow
-analytics choice on HTTPS `learn.uug.ai`; localhost, development builds, and
-other preview hosts never initialize production analytics. Changing the ID
+only in production builds, and only on HTTPS `learn.uug.ai`; localhost,
+development builds, and other preview hosts never initialize production
+analytics. Changing the ID
 requires a rebuild, not an environment variable in the nginx container.
 
-Cookie settings in the footer lets readers allow or reject analytics.
-Advertising consent stays denied. Learn uses the `learn` cookie prefix and
-limits cookies to `learn.uug.ai`. Withdrawal disables further collection and
-clears only Learn's accessible GA cookies, leaving the public website's shared
-parent-domain cookies alone.
+To debug the consent banner locally, start the dev server with
+`HUGO_PARAMS_ANALYTICS_DEBUG=true hugo server -D`. Non-production builds then
+render the banner and run the consent controller on any host, but log every
+`gtag` call to the browser console instead of loading Google. Production builds
+ignore the flag.
+
+Learn uses Google Consent Mode v2 in advanced mode: the GA tag loads on every
+page with all consent types denied, so until a reader accepts (and after they
+reject) GA receives only cookieless pings, which Google uses for modelled
+reporting. Accept cookies grants `analytics_storage`; advertising consent always
+stays denied. The banner tells readers about the cookieless collection. Get
+privacy sign-off before changing this behaviour.
+
+Readers accept or reject analytics cookies in the banner, which appears until they
+choose; there is no footer link to reopen it.
+Learn uses the `learn` cookie prefix and limits cookies to `learn.uug.ai`.
+Rejecting returns GA to cookieless pings and clears only Learn's accessible GA
+cookies, leaving the public website's shared parent-domain cookies alone.
 Consent is stored per origin in `uug-analytics-consent`; a choice on `uug.ai`
 does not automatically count as a choice on `learn.uug.ai`. Blocked storage is
 reported and the choice then applies only to the current page.
@@ -218,7 +231,7 @@ navigation:
 
 | Event | Meaning | Parameters beyond page context |
 | --- | --- | --- |
-| `page_view` | One page view after consent | None |
+| `page_view` | One page view per page load (cookieless until consent) | None |
 | `view_demo` | Demo launch intent | `cta_id`, `cta_placement`, `destination_host` |
 | `contact_sales_click` | Click to the public contact page, not a submitted lead | Same CTA parameters |
 | `learn_resource_click` | Existing resource/onboarding/support link | Same CTA parameters |
