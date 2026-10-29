@@ -3,7 +3,7 @@ title: "Getting started"
 description: "Features you want to consume but don't want to build yourself"
 lead: "Features you want to consume but don't want to build yourself"
 date: 2020-10-06T08:49:31+00:00
-lastmod: 2020-10-06T08:49:31+00:00
+lastmod: 2026-10-29T17:26:00+00:00
 draft: false
 images: []
 menu:
@@ -15,6 +15,10 @@ podcast: hub-getting-started
 ---
 
 You might wonder what is inside the Kerberos Hub solution? We'll provide you a concrete list of functionalities below, this should give you more insights about how Kerberos Hub looks like and what the capabilities are.
+
+## Sign in securely
+
+Hub supports local passwords, authenticator-based two-factor authentication (2FA), passkeys, and single sign-on (SSO) through OpenID Connect. See [Authentication]({{< relref "/docs/hub/authentication" >}}) to compare the options, set up your account, and plan recovery. Administrators integrating an identity provider can continue with the detailed [SSO guide]({{< relref "/docs/hub/sso" >}}).
 
 ## Bring your own storage
 
