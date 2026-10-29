@@ -423,13 +423,28 @@ html.dark .iso-illustration-figure {
   }
 }
 
-/* Hub: a 3s beat, one camera per beat over a 9s round. Camera parts, their
-   Agents and the videowall tiles run on the 9s round with a 3s delay per
-   camera; the gateway uplink, the pipeline floors (0.35s apart), the outputs
-   and the phone run on the beat. */
+/* Hub: a 3s beat, one camera per beat over a 9s round. The scene in front of
+   each camera, the camera parts, their Agents and the videowall tiles run on
+   the 9s round with a 3s delay per camera (the scenes with a negative delay,
+   so they are already running when the figure appears); the gateway uplink,
+   the pipeline floors (0.35s apart), the outputs and the phone run on the
+   beat. */
 .iso-figure--hub .iso-pulse {
   stroke-dasharray: 70 2000;
   stroke-dashoffset: 70;
+}
+
+.iso-figure--hub .iso-hub-event {
+  opacity: 0;
+  animation: iso-hub-event 9s linear infinite;
+}
+
+.iso-figure--hub .iso-hub-fov {
+  fill: color-mix(in srgb, var(--iso-color) 22%, transparent);
+  stroke: var(--iso-color);
+  stroke-width: 1;
+  opacity: 0;
+  animation: iso-hub-fov 9s ease-out infinite;
 }
 
 .iso-figure--hub .iso-hub-cam-pulse {
@@ -493,6 +508,51 @@ html.dark .iso-illustration-figure {
 
 .iso-figure--hub .iso-hub-phone-reveal {
   animation: iso-hub-phone-reveal 3s ease-in-out infinite;
+}
+
+/* The scene walks in along +x just before its camera fires (0%) and leaves
+   after; the translate follows the x axis of the projection. */
+@keyframes iso-hub-event {
+  0% {
+    opacity: 1;
+    transform: translate(-3.5px, -2px);
+  }
+
+  14% {
+    opacity: 1;
+  }
+
+  17% {
+    opacity: 0;
+    transform: translate(3.5px, 2px);
+  }
+
+  17.1%,
+  90% {
+    opacity: 0;
+    transform: translate(-10.4px, -6px);
+  }
+
+  94% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-3.5px, -2px);
+  }
+}
+
+@keyframes iso-hub-fov {
+  0%,
+  9% {
+    opacity: 1;
+  }
+
+  14%,
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes iso-hub-cam-pulse {
@@ -684,6 +744,11 @@ html.dark .iso-illustration-figure {
   }
 
   .iso-figure--hub :is(.iso-hub-reveal, .iso-hub-rec, .iso-hub-agent-led, .iso-hub-uplink-led, .iso-beacon) {
+    opacity: 1;
+  }
+
+  .iso-figure--hub :is(.iso-hub-event, .iso-hub-fov) {
+    animation: none;
     opacity: 1;
   }
 
