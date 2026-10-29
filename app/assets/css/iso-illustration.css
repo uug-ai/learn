@@ -21,6 +21,17 @@ html.dark .iso-illustration-figure {
   --iso-accent: #b46cf2;
 }
 
+/* Parts that replay their moment when clicked (assets/js/iso-figure.js); the
+   rest of the illustration ignores the pointer. */
+.iso-illustration-figure [data-iso-at] {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.iso-illustration-figure [data-iso-at]:hover .iso-face {
+  stroke: var(--iso-color);
+}
+
 .iso-illustration-figure figcaption {
   margin-top: 0.5rem;
   font-size: 0.875rem;
@@ -35,14 +46,16 @@ html.dark .iso-illustration-figure {
    (the Hub frontend maps it to --hub). */
 .iso-illustration {
   --iso-color: var(--iso-accent, var(--accent-color));
+  --iso-text: var(--text-primary);
+  --iso-base: var(--background);
   --iso-top: var(--background);
   --iso-front: var(--surface);
   --iso-side: var(--surface-strong);
-  --iso-line: color-mix(in srgb, var(--text-primary) 38%, transparent);
-  --iso-detail: color-mix(in srgb, var(--text-primary) 16%, transparent);
+  --iso-line: color-mix(in srgb, var(--iso-text) 38%, transparent);
+  --iso-detail: color-mix(in srgb, var(--iso-text) 16%, transparent);
   --iso-grid: color-mix(in srgb, var(--iso-color) 13%, transparent);
-  --iso-pane: color-mix(in srgb, var(--iso-color) 12%, var(--background));
-  --iso-pane-on: color-mix(in srgb, var(--iso-color) 75%, var(--background));
+  --iso-pane: color-mix(in srgb, var(--iso-color) 12%, var(--iso-base));
+  --iso-pane-on: color-mix(in srgb, var(--iso-color) 75%, var(--iso-base));
   --iso-sweep: 0.2;
 
   display: block;
@@ -55,8 +68,8 @@ html.dark .iso-illustration-figure {
   --iso-top: var(--surface-strong);
   --iso-front: var(--surface);
   --iso-side: var(--background);
-  --iso-line: color-mix(in srgb, var(--text-primary) 42%, transparent);
-  --iso-detail: color-mix(in srgb, var(--text-primary) 18%, transparent);
+  --iso-line: color-mix(in srgb, var(--iso-text) 42%, transparent);
+  --iso-detail: color-mix(in srgb, var(--iso-text) 18%, transparent);
 }
 
 .iso-illustration svg {
@@ -155,7 +168,7 @@ html.dark .iso-illustration-figure {
 
 /* Printed text on faces and lit screen text. */
 .iso-illustration .iso-label {
-  fill: color-mix(in srgb, var(--text-primary) 70%, transparent);
+  fill: color-mix(in srgb, var(--iso-text) 70%, transparent);
   font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
@@ -178,7 +191,7 @@ html.dark .iso-illustration-figure {
    lit parts stay flat accent. */
 :is([data-theme='dark'], .dark-theme, .dark) .iso-illustration--glow-auto,
 .iso-illustration--glow-on {
-  --iso-pane: color-mix(in srgb, var(--iso-color) 18%, var(--background));
+  --iso-pane: color-mix(in srgb, var(--iso-color) 18%, var(--iso-base));
   --iso-pane-on: var(--iso-color);
   --iso-sweep: 0.32;
 }
@@ -190,6 +203,47 @@ html.dark .iso-illustration-figure {
 
 :is([data-theme='dark'], .dark-theme, .dark) .iso-illustration--glow-auto :is(.iso-halo, .iso-beacon-halo),
 .iso-illustration--glow-on :is(.iso-halo, .iso-beacon-halo) {
+  display: block;
+  filter: var(--iso-bloom);
+}
+
+/* Inside the Hub widget catalog (HubTheme), use Hub's own tokens as the Hub
+   frontend does: card tones for the faces, --hub for live parts, and the
+   widget theme rather than the site theme decides the glow. */
+.hub-widgets[data-hub-theme] .iso-illustration {
+  --iso-color: var(--iso-accent, var(--hub));
+  --iso-text: hsl(var(--text-hsl));
+  --iso-base: var(--card);
+  --iso-top: var(--card);
+  --iso-front: var(--card-muted);
+  --iso-side: var(--bg);
+}
+
+.hub-widgets[data-hub-theme='light'] .iso-illustration--glow-auto {
+  --iso-pane: color-mix(in srgb, var(--iso-color) 12%, var(--iso-base));
+  --iso-pane-on: color-mix(in srgb, var(--iso-color) 75%, var(--iso-base));
+  --iso-sweep: 0.2;
+}
+
+.hub-widgets[data-hub-theme='light'] .iso-illustration--glow-auto .iso-lit {
+  filter: none;
+}
+
+.hub-widgets[data-hub-theme='light'] .iso-illustration--glow-auto :is(.iso-halo, .iso-beacon-halo) {
+  display: none;
+}
+
+.hub-widgets[data-hub-theme='dark'] .iso-illustration--glow-auto {
+  --iso-pane: color-mix(in srgb, var(--iso-color) 18%, var(--iso-base));
+  --iso-pane-on: var(--iso-color);
+  --iso-sweep: 0.32;
+}
+
+.hub-widgets[data-hub-theme='dark'] .iso-illustration--glow-auto .iso-lit {
+  filter: var(--iso-glow);
+}
+
+.hub-widgets[data-hub-theme='dark'] .iso-illustration--glow-auto :is(.iso-halo, .iso-beacon-halo) {
   display: block;
   filter: var(--iso-bloom);
 }
@@ -296,8 +350,8 @@ html.dark .iso-illustration-figure {
    The grid and wires run past the frame on purpose, so it clips them. */
 .iso-illustration .iso-figure--control-tower {
   overflow: hidden;
-  --iso-line: color-mix(in srgb, var(--text-primary) 30%, transparent);
-  --iso-detail: color-mix(in srgb, var(--text-primary) 13%, transparent);
+  --iso-line: color-mix(in srgb, var(--iso-text) 30%, transparent);
+  --iso-detail: color-mix(in srgb, var(--iso-text) 13%, transparent);
   --iso-grid: color-mix(in srgb, var(--iso-color) 11%, transparent);
 }
 
@@ -380,20 +434,38 @@ html.dark .iso-illustration-figure {
   }
 }
 
-/* Hub: a 3s beat, one camera per beat over a 9s round. Camera parts and
-   videowall tiles run on the 9s round with a 3s delay per camera; the Agent,
-   the pipeline floors (0.35s apart), the outputs and the phone run on the beat. */
+/* Hub: a 3s beat, one camera per beat over a 9s round. The scene in front of
+   each camera, the camera parts, their Agents and the videowall tiles run on
+   the 9s round with a 3s delay per camera (the scenes with a negative delay,
+   so they are already running when the figure appears); the gateway uplink,
+   the pipeline floors (0.35s apart), the outputs and the phone run on the
+   beat. */
 .iso-figure--hub .iso-pulse {
   stroke-dasharray: 70 2000;
   stroke-dashoffset: 70;
 }
 
+.iso-figure--hub .iso-hub-event {
+  opacity: 0;
+  animation: iso-hub-event 9s linear infinite;
+}
+
+.iso-figure--hub .iso-hub-fov {
+  fill: color-mix(in srgb, var(--iso-color) 22%, transparent);
+  stroke: var(--iso-color);
+  stroke-width: 1;
+  opacity: 0;
+  animation: iso-hub-fov 9s ease-out infinite;
+}
+
 .iso-figure--hub .iso-hub-cam-pulse {
+  stroke-dasharray: 220 2000;
+  stroke-dashoffset: 220;
   animation: iso-hub-cam-pulse 9s linear infinite;
 }
 
-.iso-figure--hub .iso-hub-agent-pulse {
-  animation: iso-hub-agent-pulse 3s linear infinite;
+.iso-figure--hub .iso-hub-uplink-pulse {
+  animation: iso-hub-uplink-pulse 3s linear infinite;
 }
 
 .iso-figure--hub .iso-hub-out-pulse {
@@ -407,7 +479,12 @@ html.dark .iso-illustration-figure {
 
 .iso-figure--hub .iso-hub-agent-led {
   opacity: 0.3;
-  animation: iso-hub-agent-led 3s ease-out infinite;
+  animation: iso-hub-agent-led 9s ease-out infinite;
+}
+
+.iso-figure--hub .iso-hub-uplink-led {
+  opacity: 0.3;
+  animation: iso-hub-uplink-led 3s ease-out infinite;
 }
 
 .iso-figure--hub .iso-hub-floor {
@@ -444,9 +521,54 @@ html.dark .iso-illustration-figure {
   animation: iso-hub-phone-reveal 3s ease-in-out infinite;
 }
 
+/* The scene walks in along +x just before its camera fires (0%) and leaves
+   after; the translate follows the x axis of the projection. */
+@keyframes iso-hub-event {
+  0% {
+    opacity: 1;
+    transform: translate(-3.5px, -2px);
+  }
+
+  14% {
+    opacity: 1;
+  }
+
+  17% {
+    opacity: 0;
+    transform: translate(3.5px, 2px);
+  }
+
+  17.1%,
+  90% {
+    opacity: 0;
+    transform: translate(-10.4px, -6px);
+  }
+
+  94% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-3.5px, -2px);
+  }
+}
+
+@keyframes iso-hub-fov {
+  0%,
+  9% {
+    opacity: 1;
+  }
+
+  14%,
+  100% {
+    opacity: 0;
+  }
+}
+
 @keyframes iso-hub-cam-pulse {
   0% {
-    stroke-dashoffset: 70;
+    stroke-dashoffset: 220;
   }
 
   6%,
@@ -455,7 +577,7 @@ html.dark .iso-illustration-figure {
   }
 }
 
-@keyframes iso-hub-agent-pulse {
+@keyframes iso-hub-uplink-pulse {
   0%,
   17% {
     stroke-dashoffset: 70;
@@ -492,6 +614,23 @@ html.dark .iso-illustration-figure {
 }
 
 @keyframes iso-hub-agent-led {
+  0%,
+  4% {
+    opacity: 0.3;
+  }
+
+  6%,
+  10% {
+    opacity: 1;
+  }
+
+  13%,
+  100% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes iso-hub-uplink-led {
   0%,
   15% {
     opacity: 0.3;
@@ -615,7 +754,12 @@ html.dark .iso-illustration-figure {
     animation: none;
   }
 
-  .iso-figure--hub :is(.iso-hub-reveal, .iso-hub-rec, .iso-hub-agent-led, .iso-beacon) {
+  .iso-figure--hub :is(.iso-hub-reveal, .iso-hub-rec, .iso-hub-agent-led, .iso-hub-uplink-led, .iso-beacon) {
+    opacity: 1;
+  }
+
+  .iso-figure--hub :is(.iso-hub-event, .iso-hub-fov) {
+    animation: none;
     opacity: 1;
   }
 
