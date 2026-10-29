@@ -1,0 +1,24 @@
+{
+  "id": "vault-providers-google-cloud-storage",
+  "title": "Planning Google Cloud storage for Vault",
+  "description": "Understand buckets, HMAC interoperability and storage lifecycle choices.",
+  "duration": 87.072,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/providers/google-cloud-storage/",
+  "sourceSha256": "842b1ffb19320fbaf901bf240984148fb0987426f868980d9b62bd780e93a8b6",
+  "scriptSha256": "f9cfb03ce23fe080c556a502d56f4978ac84243a28e0ab9d3b8cfe69ee3345d0",
+  "audioSha256": "0bbb0f114d9c45d2270d7420770316f098cf3b4e2408686e3cce55e1fa6e7db1",
+  "audio": "podcasts/vault-providers-google-cloud-storage/episode.mp3",
+  "chapters": [
+    {
+      "title": "A bucket for recordings",
+      "start": 0,
+      "sourceAnchor": "introduction"
+    },
+    {
+      "title": "Plan for the life of a recording",
+      "start": 43.34,
+      "sourceAnchor": "configuration-options"
+    }
+  ]
+}

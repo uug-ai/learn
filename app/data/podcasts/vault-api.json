@@ -1,0 +1,19 @@
+{
+  "id": "vault-api",
+  "title": "A quick introduction to Vault's asset API",
+  "description": "Find the signed-URL guide for temporary access to stored media.",
+  "duration": 43.056,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/api/",
+  "sourceSha256": "3896d191950319ab4dcf52fdc8d40ceee3d4d341f8e662e22da6057d91328a18",
+  "scriptSha256": "41813007166f36521b6af2f5789f846be9e12cd27af3cd5f62046ddbf1c654fb",
+  "audioSha256": "6a4ec39e11f520a4d9b4d98622a1e3dc43f128979df1aedf7460db02e6666a67",
+  "audio": "podcasts/vault-api/episode.mp3",
+  "chapters": [
+    {
+      "title": "Temporary access to assets",
+      "start": 0,
+      "sourceAnchor": "overview"
+    }
+  ]
+}

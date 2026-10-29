@@ -1,0 +1,24 @@
+{
+  "id": "vault-configuration",
+  "title": "Configuring Vault's building blocks",
+  "description": "Connect providers, integrations and accounts, including declarative configuration.",
+  "duration": 91.224,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/configuration/",
+  "sourceSha256": "c6a392b89744fa740cc47fb66cb3c3889a92568ff1620ad7e5df4058eb5a23e1",
+  "scriptSha256": "4eb6ba7784a7b9ce58f3381eb3211c49992df7a383ae87c22f8b2c4df6296b8c",
+  "audioSha256": "6039d6ae4e00028b2575521220a9507727dab17425895e1557c81c975aa38b57",
+  "audio": "podcasts/vault-configuration/episode.mp3",
+  "chapters": [
+    {
+      "title": "Three connected decisions",
+      "start": 0,
+      "sourceAnchor": "1-providers"
+    },
+    {
+      "title": "Configuration has an owner",
+      "start": 45.265,
+      "sourceAnchor": "database-and-environment-configuration"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 ---
+podcast: vault-providers-google-cloud-storage
 title: "Google Cloud Storage"
 description: "Configure Google Cloud Storage as a storage provider for Kerberos Vault"
 lead: "Learn how to integrate Google Cloud Storage with Kerberos Vault for scalable and cost-effective video recording storage"

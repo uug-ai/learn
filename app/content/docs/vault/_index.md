@@ -1,4 +1,5 @@
 ---
+podcast: vault
 title: "Vault"
 description: "Store recordings on your own infrastructure and connect them to your applications."
 lead: "Store recordings on your own infrastructure and connect them to your applications."

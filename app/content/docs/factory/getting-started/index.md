@@ -1,4 +1,5 @@
 ---
+podcast: factory-getting-started
 title: "Getting Started"
 description: "What to expect from Factory"
 lead: "What to expect from Factory"

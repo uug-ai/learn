@@ -1,4 +1,5 @@
 ---
+podcast: factory
 title: "Factory"
 description: "Deploy, configure and maintain your Agents from one place."
 lead: "Deploy, configure and maintain your Agents from one place."

@@ -1,0 +1,24 @@
+{
+  "id": "blog-2025-11-14-ai-video-surveillance-revolution",
+  "title": "From video archives to useful observations",
+  "description": "Explore the article's motivation for video analytics while keeping privacy and human review central.",
+  "duration": 87.024,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/blog/2025-11-14-ai-video-surveillance-revolution/",
+  "sourceSha256": "3d80cc9e5998ecfbada48bc0afd4808f70f47ea117b7c461a9a982f406bc0cdd",
+  "scriptSha256": "009fa9c472286699d9d4a79342d909267eac645b7efebd8e2cb343c9cd082491",
+  "audioSha256": "253dc321acb6e3ac4522d1552f59bf778e498f08a04a65140d9088a04385f140",
+  "audio": "podcasts/blog-2025-11-14-ai-video-surveillance-revolution/episode.mp3",
+  "chapters": [
+    {
+      "title": "Help people find relevant activity",
+      "start": 0,
+      "sourceAnchor": "the-evolution-from-passive-recording-to-intelligent-analysis"
+    },
+    {
+      "title": "Capability needs boundaries",
+      "start": 44.59,
+      "sourceAnchor": "the-privacy-and-ethical-imperative"
+    }
+  ]
+}

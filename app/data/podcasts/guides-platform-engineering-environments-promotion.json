@@ -1,0 +1,24 @@
+{
+  "id": "guides-platform-engineering-environments-promotion",
+  "title": "Promote a validated release",
+  "description": "Understand reviewed image promotion and the customer staging path.",
+  "duration": 80.16,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/guides/platform-engineering/environments/promotion/",
+  "sourceSha256": "0ac85af6d99a0d3598577dd7dad27e846e4d59dc28dab2dc85e8b4423fe0c3b7",
+  "scriptSha256": "57c183e604db43dad44bc2a66f162a7e4e4906b8b6318647294580e048358f3b",
+  "audioSha256": "7ed3b1abd7a22a9c55040d24b6aca7f2819582acfa5dac73d0eada61edd14728",
+  "audio": "podcasts/guides-platform-engineering-environments-promotion/episode.mp3",
+  "chapters": [
+    {
+      "title": "Move approved versions",
+      "start": 0,
+      "sourceAnchor": "when-to-use-this-workflow"
+    },
+    {
+      "title": "Review before deployment",
+      "start": 40.24,
+      "sourceAnchor": "after-the-pull-request-is-created"
+    }
+  ]
+}

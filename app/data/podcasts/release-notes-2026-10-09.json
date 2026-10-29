@@ -1,0 +1,24 @@
+{
+  "id": "release-notes-2026-10-09",
+  "title": "Release highlights: October 9, 2026",
+  "description": "Review paginated timelines, configurable workflow contracts and processing efficiency.",
+  "duration": 82.008,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-10-09/",
+  "sourceSha256": "a1ce1063469e0e18ea54caf7a275856f92d372f01ca28c8df6a5bcd19cf5b613",
+  "scriptSha256": "8066c227196fc3916a68d3db2275cc4bc4d8095820dcffec5fd987628eb19ebb",
+  "audioSha256": "b57118846feb1f9b24171fde2bdf5e2ccd550aab6d94e3c763716bd80174603a",
+  "audio": "podcasts/release-notes-2026-10-09/episode.mp3",
+  "chapters": [
+    {
+      "title": "Bound the result set",
+      "start": 0,
+      "sourceAnchor": "hub-api"
+    },
+    {
+      "title": "Keep each run's settings separate",
+      "start": 40.94,
+      "sourceAnchor": "hub-workflows"
+    }
+  ]
+}

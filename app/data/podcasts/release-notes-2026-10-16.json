@@ -1,0 +1,24 @@
+{
+  "id": "release-notes-2026-10-16",
+  "title": "Release highlights: October 16, 2026",
+  "description": "Review resource administration, richer audit context and targeted workflows.",
+  "duration": 78.648,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-10-16/",
+  "sourceSha256": "789f0cc7ba04ac87f06133ca96a88cb7436aef5e68298293d03253d4aa9dfbc0",
+  "scriptSha256": "c9ee56f2c4db889acda810d8f11fd838acfce04105592dc61f8a3fae8b3c76bc",
+  "audioSha256": "f4ab428fc0a41ef7d8e988df0bf039c7762c29140e3131687c16d6a261fe1725",
+  "audio": "podcasts/release-notes-2026-10-16/episode.mp3",
+  "chapters": [
+    {
+      "title": "Manage resources consistently",
+      "start": 0,
+      "sourceAnchor": "admin"
+    },
+    {
+      "title": "Better evidence around actions",
+      "start": 33.94,
+      "sourceAnchor": "hub-api"
+    }
+  ]
+}

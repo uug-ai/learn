@@ -1,0 +1,24 @@
+{
+  "id": "release-notes-2026-08-28",
+  "title": "Release highlights: August 28, 2026",
+  "description": "Review historical playback, device analytics and stronger project-aware processing.",
+  "duration": 76.344,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-08-28/",
+  "sourceSha256": "5cc3d0c7760c5afd3e3919146e6456cede4ad7a35dfbe651b820e6adbaa1b078",
+  "scriptSha256": "545d8d8b17ebdb659624cb1f17cd26e7fe7973240b03b82fc007eb4c93c9f5fd",
+  "audioSha256": "a3ed5394e1a6afbb6b9ab692ff44626ef522fb182e206e9e903df108128caef4",
+  "audio": "podcasts/release-notes-2026-08-28/episode.mp3",
+  "chapters": [
+    {
+      "title": "Review past activity in context",
+      "start": 0,
+      "sourceAnchor": "historical-recordings-and-analytics"
+    },
+    {
+      "title": "Reliability across concurrent work",
+      "start": 37.765,
+      "sourceAnchor": "workflow-and-notification-reliability"
+    }
+  ]
+}

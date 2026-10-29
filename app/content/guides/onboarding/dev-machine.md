@@ -1,4 +1,5 @@
 ---
+podcast: guides-onboarding-dev-machine
 title: Dev machine
 description: Prepare a local workstation for developing the Augment Vision platform.
 toc: true

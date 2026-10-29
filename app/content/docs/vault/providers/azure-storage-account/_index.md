@@ -1,4 +1,5 @@
 ---
+podcast: vault-providers-azure-storage-account
 title: "Azure Storage Account"
 description: "Configure Azure Blob Storage as a storage provider for Kerberos Vault"
 lead: "Learn how to integrate Azure Blob Storage with Kerberos Vault for enterprise-grade video recording storage"

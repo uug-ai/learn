@@ -1,4 +1,5 @@
 ---
+podcast: cli
 title: "CLI"
 description: ""
 lead: ""

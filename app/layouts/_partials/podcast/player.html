@@ -8,7 +8,7 @@
     <button type="button" class="learn-podcast-close" data-podcast-close aria-label="Close podcast player" title="Close podcast player">&times;</button>
   </div>
   <p class="learn-podcast-description">{{ .description }}</p>
-  <p class="learn-podcast-note">AI-generated voices &middot; {{ printf "%d:%02d" (div $seconds 60) (mod $seconds 60) }} &middot; Adapted from this guide</p>
+  <p class="learn-podcast-note">AI-generated voices &middot; {{ printf "%d:%02d" (div $seconds 60) (mod $seconds 60) }} &middot; Adapted from this article</p>
   <div class="learn-podcast-anchor" data-podcast-anchor>
     <div class="learn-podcast-controls" data-podcast-controls>
       <button type="button" class="learn-podcast-return" data-podcast-return hidden>
@@ -41,7 +41,7 @@
 <noscript>
   <section class="learn-podcast not-prose" aria-label="Article podcast">
     <p>Listen to the overview: {{ .title }}</p>
-    <p class="learn-podcast-note">AI-generated voices &middot; Adapted from this guide</p>
+    <p class="learn-podcast-note">AI-generated voices &middot; Adapted from this article</p>
     <audio controls controlslist="nodownload noplaybackrate" preload="none" aria-label="{{ .title }}">
       <source src="{{ .audio | relURL }}?v={{ .audioSha256 }}" type="audio/mpeg" />
       Your browser does not support audio playback.

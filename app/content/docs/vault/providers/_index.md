@@ -1,4 +1,5 @@
 ---
+podcast: vault-providers
 title: "Providers"
 description: ""
 lead: ""

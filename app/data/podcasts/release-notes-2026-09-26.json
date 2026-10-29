@@ -1,0 +1,24 @@
+{
+  "id": "release-notes-2026-09-26",
+  "title": "Release highlights: September 26, 2026",
+  "description": "Understand the dated improvements to scene context and activity-focused observations.",
+  "duration": 75.6,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-09-26/",
+  "sourceSha256": "fab5b6a505a4e98fbb07ebc5f8396ee071ac2c692697740a6eaaf862f69d32cd",
+  "scriptSha256": "2aacf37d1834d9438bb8712e506602dfde3d0d521bc2e7c50a48f979cfc59fd9",
+  "audioSha256": "8f90d3ccc263e9885c87a5fe9cc21489ac079c05a474da91b59ee05e9a8f1a2b",
+  "audio": "podcasts/release-notes-2026-09-26/episode.mp3",
+  "chapters": [
+    {
+      "title": "Context accompanies the work",
+      "start": 0,
+      "sourceAnchor": "hub-workflows"
+    },
+    {
+      "title": "Activity still needs review",
+      "start": 36.84,
+      "sourceAnchor": "hub-vlm"
+    }
+  ]
+}

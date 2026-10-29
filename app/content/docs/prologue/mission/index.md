@@ -1,4 +1,5 @@
 ---
+podcast: prologue-mission
 title: "Mission"
 description: "The Kerberos.io mission statement"
 lead: "The Kerberos.io mission statement"
@@ -12,6 +13,8 @@ menu:
 weight: 104
 toc: true
 ---
+
+## Overview
 
 We want to provide every human being on this planet with a free-of-charge solution, a video platform, to protect its families, friends, homes, or anything it cares for, in the form of Open Source; MIT license.
 

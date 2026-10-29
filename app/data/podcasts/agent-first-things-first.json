@@ -1,0 +1,19 @@
+{
+  "id": "agent-first-things-first",
+  "title": "Why start with an Agent?",
+  "description": "Build a simple mental model of Agent and its place in the platform.",
+  "duration": 66.144,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/agent/first-things-first/",
+  "sourceSha256": "973ac00a9bd257593c05d878455acac81a67a28019378bc6a2163c3c93423f39",
+  "scriptSha256": "dad6504db052e2146dc14553ab43d04bfc3ea2596df3732f083ed2d2015cf230",
+  "audioSha256": "7ce28824739286b2bb9008068984b5fb9580746dc4e647974a5ba4549caeac6c",
+  "audio": "podcasts/agent-first-things-first/episode.mp3",
+  "chapters": [
+    {
+      "title": "A recording companion",
+      "start": 0,
+      "sourceAnchor": "introduction"
+    }
+  ]
+}

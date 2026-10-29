@@ -1,0 +1,19 @@
+{
+  "id": "vault-license",
+  "title": "Understanding Vault's license",
+  "description": "Distinguish free binaries from source availability and review the stated terms.",
+  "duration": 48.6,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/license/",
+  "sourceSha256": "08f8f938c8aa2f02d5494b51129f34707230e71e5333855480c15e4bb51eb2f4",
+  "scriptSha256": "cfda23d2602295acfb977f88a8874036da25d6fc730adeaa9c26c7a85f1fdd21",
+  "audioSha256": "e052b86bf08a6790158082223df43d8258e5a285486b17bfb2e9bfa3ed64bdf2",
+  "audio": "podcasts/vault-license/episode.mp3",
+  "chapters": [
+    {
+      "title": "Read the actual terms",
+      "start": 0,
+      "sourceAnchor": "the-mit-license-mit"
+    }
+  ]
+}

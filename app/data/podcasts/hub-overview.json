@@ -3,10 +3,10 @@
   "title": "See how Hub brings your sites together",
   "description": "Follow an event from an Agent through Hub to the people watching, then choose where to start.",
   "duration": 98.064,
-  "reviewedOn": "2026-10-28",
+  "reviewedOn": "2026-10-29",
   "sourceUrl": "https://learn.uug.ai/docs/hub/",
-  "sourceSha256": "5523aec43f6eb1876a365ee816a3b9277ee4ab4eb062d323d602f3def0e0f86a",
-  "scriptSha256": "0631fbc47aac65d855daa866b50850bdcf1c47d239b8bda686e6fcab1ce9ea9d",
+  "sourceSha256": "9b8b7381ff3d9adbc1c1d7b6e34e09c5efd0d9197bbe434f7cbde6c6f0940275",
+  "scriptSha256": "0968f7b3ec238005b8aace1c59ea5829597918eae8224d24be9547d8d62c48b4",
   "audioSha256": "e8cb405a45ad31a9c1ec8e105e6ae3e3942fa3a4ed3ac2c932f0855f8ef12b10",
   "audio": "podcasts/hub-overview/episode.mp3",
   "chapters": [

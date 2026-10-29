@@ -1,0 +1,24 @@
+{
+  "id": "vault-integrations",
+  "title": "Let recordings trigger useful work",
+  "description": "Understand storage events, custom consumers and the connection to Hub.",
+  "duration": 85.608,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/integrations/",
+  "sourceSha256": "7451fdce2332af6bd73b01a4e7468b4e5d864dded476ae6d829e036b8a0a629b",
+  "scriptSha256": "1d20e561d5b7ef0c379d0a6d17104c6a5ea81ce9e7df693f5e11d96d48d63102",
+  "audioSha256": "eb846c9d6493e353ec121b5f7d6874f35e5e93b4ae9624363433d63873cd896a",
+  "audio": "podcasts/vault-integrations/episode.mp3",
+  "chapters": [
+    {
+      "title": "An event after storage",
+      "start": 0,
+      "sourceAnchor": "configuration-of-an-integration"
+    },
+    {
+      "title": "Visibility also needs access",
+      "start": 43.115,
+      "sourceAnchor": "kerberos-hub"
+    }
+  ]
+}

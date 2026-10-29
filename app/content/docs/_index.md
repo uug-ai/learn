@@ -1,4 +1,5 @@
 ---
+podcast: docs
 title: "Documentation"
 description: "And so it began. The ecosystem of Kerberos.io"
 lead: "And so it began.  The ecosystem of Kerberos.io"

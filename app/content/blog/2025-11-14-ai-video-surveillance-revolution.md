@@ -1,4 +1,5 @@
 ---
+podcast: blog-2025-11-14-ai-video-surveillance-revolution
 title: The AI Revolution in Video Surveillance
 date: 2025-11-14
 subtitle: How artificial intelligence is transforming video surveillance from passive recording to intelligent analytics, reshaping security, safety, and operational efficiency across industries.

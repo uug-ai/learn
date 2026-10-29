@@ -1,0 +1,24 @@
+{
+  "id": "guides-code-style-go-logging",
+  "title": "Make Go logs useful to operators",
+  "description": "Choose meaningful severity and structured context using the documented wrappers.",
+  "duration": 84.816,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/guides/code-style/go/logging/",
+  "sourceSha256": "2bacaf82d664a7ca9d2d215e2a3397b8ebce73419568ead8a6e0536d5cf2d76a",
+  "scriptSha256": "0b2b44215d148d90ee41a3f89377bd36711583daa2c6bd397d8f57f7865fee1d",
+  "audioSha256": "ec6e1da90cfb6d330a931dda659a0a3c71db56e5f898db21e22ce236e5482737",
+  "audio": "podcasts/guides-code-style-go-logging/episode.mp3",
+  "chapters": [
+    {
+      "title": "Severity communicates consequence",
+      "start": 0,
+      "sourceAnchor": "levels"
+    },
+    {
+      "title": "Use the shared pattern",
+      "start": 42.465,
+      "sourceAnchor": "usage"
+    }
+  ]
+}

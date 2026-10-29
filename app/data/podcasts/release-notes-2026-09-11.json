@@ -1,0 +1,24 @@
+{
+  "id": "release-notes-2026-09-11",
+  "title": "Release highlights: September 11, 2026",
+  "description": "Review device auditing, media filtering, notification freshness and worker reliability.",
+  "duration": 80.64,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-09-11/",
+  "sourceSha256": "a9b7890a9d715026269e41a8b83986d38481fcaf55608a88d5abe110ea04e021",
+  "scriptSha256": "9f6966296a541b91eaed2022fe86b92cb75c41313aed31d1ba364b6163b4c29d",
+  "audioSha256": "ae521a405a74e6048ed9a79cc21d4fe23019b57159cb245c1c6cfcdf36220759",
+  "audio": "podcasts/release-notes-2026-09-11/episode.mp3",
+  "chapters": [
+    {
+      "title": "A clearer action history",
+      "start": 0,
+      "sourceAnchor": "hub-api"
+    },
+    {
+      "title": "Useful alerts and resilient work",
+      "start": 40.515,
+      "sourceAnchor": "pipeline-notification"
+    }
+  ]
+}

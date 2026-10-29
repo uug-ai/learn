@@ -4,11 +4,12 @@ import { readFile, readdir } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { test } from "node:test";
-import { assertSourceMatches, sha256, validateEpisode } from "./episode.mjs";
+import { sha256, validateEpisode } from "./episode.mjs";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 const app = resolve(root, "../app");
-const hub = join(app, "content/docs/hub");
+const content = join(app, "content");
+const hub = join(content, "docs/hub");
 
 async function sourcePages(directory) {
   const pages = [];
@@ -28,37 +29,55 @@ async function sourcePages(directory) {
   return pages;
 }
 
-const pages = await sourcePages(hub);
-const eligible = pages.filter((page) => page.body && !/^draft:\s*true\s*$/m.test(page.metadata));
+const pages = await sourcePages(content);
+const eligible = pages.filter((page) => {
+  if (/^draft:\s*true\s*$/m.test(page.metadata)) return false;
+  const body = page.body.replace(/<!--[\s\S]*?-->/g, "").replace(/<br\s*\/?>/gi, "").trim();
+  if (!body || /^To be written\.?$/i.test(body)) return false;
+  const path = relative(content, page.path);
+  if (path.startsWith("docs/")) return true;
+  if (!path.endsWith("_index.md")) return true;
+  return path === "support/_index.md" || (path.startsWith("guides/") && /^#{2,6} /m.test(body));
+});
 
-test("every published content-bearing Hub page has its own reviewed podcast", async () => {
-  assert.ok(eligible.length >= 36, `Unexpectedly incomplete Hub inventory: ${eligible.length}`);
+test("every published Learn article has its own reviewed podcast", async () => {
+  assert.ok(eligible.length >= 104, `Unexpectedly incomplete Learn inventory: ${eligible.length}`);
+  for (const section of ["docs", "guides", "tutorials", "knowledge-base", "blog", "release-notes", "support"]) {
+    assert.ok(eligible.some((page) => relative(content, page.path).startsWith(`${section}/`)),
+      `Missing article section: ${section}`);
+  }
   const ids = new Set();
   for (const page of eligible) {
     const id = page.metadata.match(/^podcast:\s*([a-z0-9-]+)\s*$/m)?.[1];
-    assert.ok(id, `Missing podcast: ${relative(hub, page.path)}`);
-    assert.ok(!ids.has(id), `Two Hub pages share ${id}`);
+    assert.ok(id, `Missing podcast: ${relative(content, page.path)}`);
+    assert.ok(!ids.has(id), `Two articles share ${id}`);
     ids.add(id);
     const episode = JSON.parse(await readFile(join(root, "episodes", `${id}.json`), "utf8"));
     validateEpisode(episode);
     assert.equal(episode.id, id);
     assert.equal(resolve(root, episode.sourcePath), page.path);
-    assertSourceMatches(episode, Buffer.from(page.source));
-    if (id.startsWith("hub-")) {
+    assert.equal(episode.sourceSha256, sha256(page.source), `${id}: review changed source before updating its checksum`);
+    if (id !== "organisations-v2") {
       assert.equal(episode.speakers.host.voice, "af_heart");
       assert.equal(episode.speakers.guide.voice, "am_puck");
     }
   }
 });
 
-test("the Hub overview is included while empty pages and unpublished drafts remain without podcasts", () => {
-  assert.ok(eligible.some((page) => page.path === join(hub, "_index.md")));
+test("product overviews are included while drafts, placeholders and navigation pages remain without podcasts", () => {
+  for (const product of ["agent", "factory", "vault", "hub"]) {
+    assert.ok(eligible.some((page) => page.path === join(content, "docs", product, "_index.md")));
+  }
   const excluded = pages.filter((page) => !eligible.includes(page));
   assert.ok(excluded.some((page) => page.path === join(hub, "workflows/anpr.md")));
+  for (const path of ["_index.md", "tutorials/_index.md", "blog/_index.md",
+    "release-notes/_index.md", "guides/code-style/go/rest/routing.md"]) {
+    assert.ok(excluded.some((page) => page.path === join(content, path)), `Expected exclusion: ${path}`);
+  }
   for (const page of excluded) assert.doesNotMatch(page.metadata, /^podcast:/m);
 });
 
-test("all enabled Hub podcasts publish matching metadata, audio and chapter times", async () => {
+test("all enabled Learn podcasts publish matching metadata, audio and chapter times", async () => {
   for (const page of eligible) {
     const id = page.metadata.match(/^podcast:\s*([a-z0-9-]+)\s*$/m)?.[1];
     assert.ok(id, `Missing podcast: ${page.path}`);

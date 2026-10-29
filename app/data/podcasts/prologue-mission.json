@@ -1,0 +1,19 @@
+{
+  "id": "prologue-mission",
+  "title": "Why this platform exists",
+  "description": "A short introduction to the project's accessibility and scaling goals.",
+  "duration": 64.2,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/prologue/mission/",
+  "sourceSha256": "98478a76814ec3897fa143573c2720c055775a84f2d7c6b7acc72c67ac8db9b8",
+  "scriptSha256": "b32aba7b3ac4ea4e15970a416b42c9d66e82770c5ece8fb7d9db3ed9c749a176",
+  "audioSha256": "c4469b34249d5c69fd575d7309289db24867e363c989273a6cc1bcb0cd6bcc6a",
+  "audio": "podcasts/prologue-mission/episode.mp3",
+  "chapters": [
+    {
+      "title": "Start small, leave room to grow",
+      "start": 0,
+      "sourceAnchor": "overview"
+    }
+  ]
+}

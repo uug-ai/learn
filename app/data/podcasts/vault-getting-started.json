@@ -1,0 +1,24 @@
+{
+  "id": "vault-getting-started",
+  "title": "Your first tour of Vault",
+  "description": "Learn how providers, integrations, accounts and media fit together.",
+  "duration": 80.424,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/getting-started/",
+  "sourceSha256": "2c15d49a9d1abf343857da647e72b61de9e956c188e45aaf3ae2413006d5d5cc",
+  "scriptSha256": "bd5c00420b2c962316b93772238c982992ad9f684021f59ba9df3924478a0c32",
+  "audioSha256": "275b475aede9941955c69886a2fd357ce6d06a5530b4bc8fbdba600bd2998557",
+  "audio": "podcasts/vault-getting-started/episode.mp3",
+  "chapters": [
+    {
+      "title": "Give recordings a destination",
+      "start": 0,
+      "sourceAnchor": "providers"
+    },
+    {
+      "title": "Connect an Agent safely",
+      "start": 38.54,
+      "sourceAnchor": "accounts"
+    }
+  ]
+}

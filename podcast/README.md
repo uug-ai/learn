@@ -4,14 +4,16 @@ Use one conversational episode format and one interactive player for any Learn
 documentation page. The first example is an adaptation of the
 [organisations and projects guide](https://learn.uug.ai/docs/hub/organisations/).
 Generation and review stay local. Approved episodes can be exported into Learn's
-static assets and enabled individually on documentation pages. All 36 published,
-content-bearing Hub pages now have their own overview, including the nested
-workflow guides and Hub landing page. The organisations guide keeps its second
-episode. The unpublished ANPR draft is intentionally excluded; documentation
-outside Hub is unchanged.
+static assets and enabled individually on articles. All 104 published,
+substantive Learn articles now have their own overview. This includes the 36 Hub
+guides and 68 additional articles across Agent, Factory, Vault, platform and CLI
+documentation, completed engineering guides, tutorials, the CORS knowledge-base
+article, blog posts, release notes, and support. The organisations guide keeps
+its second episode. Drafts, empty pages, "To be written" placeholders, catalogues,
+and navigation-only pages intentionally remain without podcasts.
 Nothing under `output/`, `.cache/`, or `node_modules/` is part of the site.
 
-## Hub episode coverage
+## Episode coverage
 
 The 35 additional scripts use `hub-<page-path>` IDs, with nested path segments
 joined by hyphens and `hub-overview` for the landing page, and live under
@@ -24,6 +26,16 @@ both at speed `0.98`. Warm questions and upbeat dialogue provide the delivery
 direction; Kokoro does not guarantee an emotional style. Existing organisations
 scripts and audio retain their voices. Short topics have fewer chapters rather
 than padded dialogue.
+
+Additional documentation episodes use their route after `docs/`, with path
+segments joined by hyphens; for example, `agent-installation` and
+`vault-api-signed-urls`. The documentation landing page uses `docs`. Articles
+outside documentation keep the section prefix, such as
+`tutorials-agent-connect-any-camera`, `guides-onboarding-dev-containers`, and
+`release-notes-2026-10-23`. Each page selects its own episode through front
+matter. Short guides have brief, focused episodes; release-note episodes are
+selected historical highlights, not current configuration references or
+exhaustive narrations.
 
 The scripts have source review dates and the exported audio is checked
 programmatically. Neither is a claim of human listening approval. Listen to the
@@ -229,9 +241,11 @@ checks establish file integrity and coverage, not perceptual voice quality.
 ## Publish an approved episode to Learn
 
 After listening review, add `podcast: organisations-v2` (or the selected episode
-ID) to the article's YAML front matter. The player currently integrates with
-the shared documentation layout, used by both leaf articles and section
-`_index.md` guides. Review the script against the source, update
+ID) to the article's YAML front matter. The player integrates with the shared documentation layout, general single and
+section article layouts, knowledge-base articles, blog posts, and individual
+release notes. Catalogue layouts remain unchanged. The shared
+`podcast/article-header.html` partial keeps the same control and conditional
+styles across these layouts. Review the script against the source, update
 its source checksum if the front matter changed, and regenerate before export:
 
 ```bash

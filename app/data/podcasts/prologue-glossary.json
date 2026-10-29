@@ -1,0 +1,24 @@
+{
+  "id": "prologue-glossary",
+  "title": "The platform names, explained",
+  "description": "Distinguish Agent, Factory, Vault, Hub and forwarding.",
+  "duration": 73.488,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/prologue/glossary/",
+  "sourceSha256": "3027fbf2f2b42d72dab327f9745e1897d87134bd0cc6ab6335ef8bd01f83b7b1",
+  "scriptSha256": "e3a1d6037992fd794d6b4d78db19021225b64d90793bd8a5192ca54447480a6d",
+  "audioSha256": "321198c487adfd89afa2b7a6f42545ed9c25dcf6cf181581fd017a52969c5480",
+  "audio": "podcasts/prologue-glossary/episode.mp3",
+  "chapters": [
+    {
+      "title": "Recording and management",
+      "start": 0,
+      "sourceAnchor": "agent"
+    },
+    {
+      "title": "A central view and a forwarding path",
+      "start": 38.14,
+      "sourceAnchor": "kerberos-hub"
+    }
+  ]
+}

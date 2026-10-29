@@ -1,0 +1,24 @@
+{
+  "id": "tutorials-hub-deploy-moq-relay-kubernetes",
+  "title": "Put a MoQ relay on the media path",
+  "description": "Understand UDP delivery, relay TLS and end-to-end playback validation.",
+  "duration": 86.664,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/tutorials/hub/deploy-moq-relay-kubernetes/",
+  "sourceSha256": "e37a3d7d0ed5084bdfb687aaa671aab4eb4f63497159ee7348cdcd6c9553b58c",
+  "scriptSha256": "e642afdfd068c03b11a2bc8986b2be98f80e67699d5a32115c0a155401120722",
+  "audioSha256": "1812ff9682d6498847013f91c16239c52e84baf2320ae9ee5f2874cf733f79df",
+  "audio": "podcasts/tutorials-hub-deploy-moq-relay-kubernetes/episode.mp3",
+  "chapters": [
+    {
+      "title": "The relay carries the video",
+      "start": 0,
+      "sourceAnchor": "understand-the-path"
+    },
+    {
+      "title": "Test every hand-off",
+      "start": 44.515,
+      "sourceAnchor": "verify-live-playback"
+    }
+  ]
+}

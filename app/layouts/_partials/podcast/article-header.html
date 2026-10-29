@@ -1,0 +1,19 @@
+{{- $page := .page -}}
+{{- $podcast := .podcast -}}
+{{- if $podcast -}}
+  {{- $css := resources.Get "css/podcast.css" | minify | fingerprint -}}
+  <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
+{{- end -}}
+{{- if $page.Title }}
+  <div class="hx:flex hx:flex-col hx:sm:flex-row hx:items-start hx:sm:items-center hx:sm:justify-between hx:gap-4 hx:mb-4{{ if $podcast }} learn-article-header{{ end }}">
+    <h1 class="{{ .titleClass | default "hx:mb-0" }}">{{ $page.Title }}</h1>
+    {{ if $podcast }}
+      <div class="learn-article-actions">
+        {{ partial "podcast/button.html" $podcast }}
+        {{ if ne .contextMenu false }}{{ partial "components/page-context-menu" $page }}{{ end }}
+      </div>
+    {{ else if ne .contextMenu false }}
+      {{ partial "components/page-context-menu" $page }}
+    {{ end }}
+  </div>
+{{ end -}}

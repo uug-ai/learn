@@ -1,4 +1,5 @@
 ---
+podcast: factory-installation
 title: "Installation"
 description: ""
 lead: ""

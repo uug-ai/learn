@@ -1,0 +1,24 @@
+{
+  "id": "guides-onboarding",
+  "title": "Getting ready to contribute",
+  "description": "Understand the local-machine and dev-container paths and the team's shared tools.",
+  "duration": 82.56,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/guides/onboarding/",
+  "sourceSha256": "856d134a00988bd9b07b2636ec37a9b353dd86018e05f012c9fa2974727ce36f",
+  "scriptSha256": "ed48491fd555939334554cd60a33f28da5245c01a260b5f9c821f349c1f3f866",
+  "audioSha256": "ba139cd080146cd25833b0163a00ef8db7f63170315d24f4da02f1637bf12f7a",
+  "audio": "podcasts/guides-onboarding/episode.mp3",
+  "chapters": [
+    {
+      "title": "Two setup paths",
+      "start": 0,
+      "sourceAnchor": "developer-setup"
+    },
+    {
+      "title": "Learn how the team works",
+      "start": 40.515,
+      "sourceAnchor": "supportive-tooling"
+    }
+  ]
+}

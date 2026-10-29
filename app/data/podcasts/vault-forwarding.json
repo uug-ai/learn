@@ -1,0 +1,24 @@
+{
+  "id": "vault-forwarding",
+  "title": "Keep footage local, forward what matters",
+  "description": "Compare continuous and on-demand forwarding between Vault installations.",
+  "duration": 82.776,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/forwarding/",
+  "sourceSha256": "780a62e9c207ab721164cfba8a73634182845f3ae4c8a090a6da1dca5cc9b1f2",
+  "scriptSha256": "549252007b6628a4880bf8c87d7fcd2765372a3561a7fba686f797fa88734c80",
+  "audioSha256": "a1b2aeb0079d51647e33172a7dea362ad991e2ac98080cef10d01b93e7ed494d",
+  "audio": "podcasts/vault-forwarding/episode.mp3",
+  "chapters": [
+    {
+      "title": "Copy everything or select",
+      "start": 0,
+      "sourceAnchor": "continuous-forwarding"
+    },
+    {
+      "title": "Connect both ends",
+      "start": 44.365,
+      "sourceAnchor": "configuration"
+    }
+  ]
+}

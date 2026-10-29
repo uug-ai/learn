@@ -1,4 +1,5 @@
 ---
+podcast: open-source-first-things-first
 title: "First things first"
 description: "Kerberos Enterprise Suite - A revolutionary design to scale your video landscape."
 lead: "Kerberos Enterprise Suite - A revolutionary design to scale your video landscape."

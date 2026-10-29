@@ -1,0 +1,19 @@
+{
+  "id": "agent-license",
+  "title": "Understanding Agent's license",
+  "description": "A short introduction to the MIT license and its conditions.",
+  "duration": 50.088,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/agent/license/",
+  "sourceSha256": "88227bcda3329c5b8e64cdfd9259c7975dddbb2fbef0bc42d85ad69d0afa3dbc",
+  "scriptSha256": "9ad9a671efa8007c1716aa03180651d1c91c6303e0bec822a7f07df25981c7e0",
+  "audioSha256": "0f2edd4b1cf4a3b005a51baf535dda7625edad4d7cd578f827ae07c45a48504e",
+  "audio": "podcasts/agent-license/episode.mp3",
+  "chapters": [
+    {
+      "title": "Open source with conditions",
+      "start": 0,
+      "sourceAnchor": "the-mit-license-mit"
+    }
+  ]
+}

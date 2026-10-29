@@ -1,0 +1,78 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "release-notes-2026-10-23",
+  "title": "Release highlights: October 23, 2026",
+  "description": "Review unified recordings, efficient previews, on-demand media and richer audit context.",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-10-23/",
+  "sourcePath": "../app/content/release-notes/2026-10-23.md",
+  "sourceSha256": "d628e134bf099200adb47375b2a70142a5f26139875aa3cd4158586412b1deac",
+  "reviewedOn": "2026-10-29",
+  "editorialStyle": {
+    "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
+    "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",
+    "humour": "Optional: one or two brief, relevant light moments are enough. Prefer a relatable analogy over a separate joke. Never pad the overview with banter.",
+    "reactions": "Use occasional short, natural responses such as 'Oh, that makes sense' or 'Wait, so...' followed by a real question. Avoid repetitive praise, canned agreement, and filler.",
+    "laughter": "Optional: at most one or two light reactions such as 'Ha, fair point.' Never insert [laughs], SSML, or repeated ha-ha strings. These are spoken reactions, not a guarantee of genuine laughter from the current speech engine.",
+    "intonation": "Write real questions with question marks, use contractions, alternate short and longer sentences, and make contrasts explicit. Let punctuation and sentence rhythm suggest curiosity, surprise, and emphasis. Avoid all-caps shouting, excessive exclamation marks, and artificial pause tags.",
+    "guardrails": "Keep technical claims source-backed. Never mock the listener, joke about real victims, minimize security or data-loss risks, or let humour replace an explanation. Personality is optional; accuracy and clarity are not."
+  },
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_puck",
+      "speed": 0.98
+    }
+  },
+  "chapters": [
+    {
+      "sourceAnchor": "hub-frontend",
+      "title": "One recordings experience",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "What should an operator notice in the October twenty-third release?"
+        },
+        {
+          "speaker": "guide",
+          "text": "The legacy Day Overview was replaced by a unified recordings player and timeline experience. Existing day links redirect while preserving context. Shared URLs can carry playback, filters and selections, and the interface received substantial mobile and accessibility work."
+        },
+        {
+          "speaker": "host",
+          "text": "How would a fictional investigator use that?"
+        },
+        {
+          "speaker": "guide",
+          "text": "They can return to a specific review context instead of rebuilding it manually. On-demand indicators also distinguish recordings that are known from those immediately available for playback."
+        }
+      ]
+    },
+    {
+      "sourceAnchor": "hub-api",
+      "title": "Load what the interface needs",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "What supports the faster review experience?"
+        },
+        {
+          "speaker": "guide",
+          "text": "A batch preview API can resolve selected media assets or return metadata without unnecessary signed URLs. Authentication, audit tracking and storage callback reliability also improved. Audit access was restricted to organisation owners in this release."
+        },
+        {
+          "speaker": "host",
+          "text": "What should the team check after upgrading?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Test old links, representative timeline filters, preview loading and authorised playback. Review the full service notes for the deployment. Historical compatibility remains important: older resources should stay usable without requiring a data migration as a condition of access."
+        }
+      ]
+    }
+  ]
+}

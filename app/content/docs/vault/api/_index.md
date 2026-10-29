@@ -1,4 +1,5 @@
 ---
+podcast: vault-api
 title: "API"
 description: "REST endpoints exposed by Vault for working with stored assets."
 lead: ""
@@ -12,6 +13,8 @@ menu:
 weight: 311
 toc: true
 ---
+
+## Overview
 
 Vault exposes a small REST surface for working with stored assets:
 

@@ -1,4 +1,5 @@
 ---
+podcast: guides-security-image-hardening
 title: Image hardening
 toc: true
 type: docs

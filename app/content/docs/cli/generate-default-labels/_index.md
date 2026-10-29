@@ -1,3 +1,5 @@
+---
+podcast: cli-generate-default-labels
 title: "Generate default labels"
 description: ""
 lead: ""

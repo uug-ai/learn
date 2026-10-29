@@ -1,4 +1,5 @@
 ---
+podcast: tutorials-hub-setup-hls-live-view
 title: 'Set up HLS live view'
 description: 'Configure firewall-friendly HLS and low-latency HLS live video between Kerberos Agents, Hub API and operator browsers.'
 date: '2026-08-19'

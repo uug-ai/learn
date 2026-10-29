@@ -1,4 +1,5 @@
 ---
+podcast: vault-first-things-first
 title: "First things first"
 description: ""
 lead: ""

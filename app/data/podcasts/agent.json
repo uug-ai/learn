@@ -1,0 +1,24 @@
+{
+  "id": "agent",
+  "title": "Meet Agent",
+  "description": "Understand the one-camera recording service and when to connect the wider platform.",
+  "duration": 82.08,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/agent/",
+  "sourceSha256": "104517dbb90a0f79c796693a717c11476c8fb6541e599ef97fe5cc23f672b231",
+  "scriptSha256": "564ffaa8083a11a937431ae6280d35167ced832b247dab5f8e59971f00505040",
+  "audioSha256": "407d5aeb976b0c8f71676a7f9956ec985e48d0710610670361543ca904a04f1a",
+  "audio": "podcasts/agent/episode.mp3",
+  "chapters": [
+    {
+      "title": "One camera, one Agent",
+      "start": 0,
+      "sourceAnchor": "how-agent-works"
+    },
+    {
+      "title": "Grow when you need to",
+      "start": 45.665,
+      "sourceAnchor": "where-to-start"
+    }
+  ]
+}

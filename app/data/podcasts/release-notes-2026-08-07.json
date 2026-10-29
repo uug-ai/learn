@@ -1,0 +1,24 @@
+{
+  "id": "release-notes-2026-08-07",
+  "title": "Release highlights: August 7, 2026",
+  "description": "A brief historical overview of live viewing, workflow isolation and frame-rate handling.",
+  "duration": 80.712,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-08-07/",
+  "sourceSha256": "f60ac38c2d479a71f69129bc102df239c9aa7b97aa931a12f4f4c5de63bb2bda",
+  "scriptSha256": "c0f9c2b98eccbcd736de9449438313244889d724c4508e8895d3013067876efe",
+  "audioSha256": "c6c9e924bbf0b8f3e4868b0637e5241a55dd0c21183639c448e64f900fdbe143",
+  "audio": "podcasts/release-notes-2026-08-07/episode.mp3",
+  "chapters": [
+    {
+      "title": "Live viewing and review",
+      "start": 0,
+      "sourceAnchor": "hub-frontend"
+    },
+    {
+      "title": "Preserve the source context",
+      "start": 41.94,
+      "sourceAnchor": "hub-workflows"
+    }
+  ]
+}

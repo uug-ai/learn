@@ -1,4 +1,5 @@
 ---
+podcast: vault-integrations
 title: "Integrations"
 description: ""
 lead: ""

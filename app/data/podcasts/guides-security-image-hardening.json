@@ -1,0 +1,24 @@
+{
+  "id": "guides-security-image-hardening",
+  "title": "What makes a production image trustworthy?",
+  "description": "Separate a minimal image, enforced release evidence and runtime responsibility.",
+  "duration": 85.08,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/guides/security/image-hardening/",
+  "sourceSha256": "de679277521fdf9beea444cc9b61d73ed8f4e624fcc98815d3028cb0e6155569",
+  "scriptSha256": "303d5539d615d86ee3ed5b9efa46ae7fb09e427a69e658e26769f2a79724b17d",
+  "audioSha256": "67bddad3b0db9876bab4e0e322bd0ac5d808d887750f3c317f5c58fa5db255a5",
+  "audio": "podcasts/guides-security-image-hardening/episode.mp3",
+  "chapters": [
+    {
+      "title": "Small is not the whole story",
+      "start": 0,
+      "sourceAnchor": "required-practices"
+    },
+    {
+      "title": "Evidence and enforcement",
+      "start": 42.265,
+      "sourceAnchor": "ci-and-release-controls"
+    }
+  ]
+}

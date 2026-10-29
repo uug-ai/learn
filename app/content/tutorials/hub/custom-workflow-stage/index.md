@@ -1,4 +1,5 @@
 ---
+podcast: tutorials-hub-custom-workflow-stage
 title: 'Set up your own workflow stage'
 description: 'Bring your own microservice into the Hub as a workflow stage — register it in the Helm chart, receive recordings, do the work, and ingest results back. A loitering / dwell-time stage serves as the worked example.'
 date: '2026-06-16'

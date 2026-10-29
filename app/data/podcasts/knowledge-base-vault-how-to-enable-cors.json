@@ -1,0 +1,19 @@
+{
+  "id": "knowledge-base-vault-how-to-enable-cors",
+  "title": "When the browser blocks media access",
+  "description": "Locate CORS configuration at the storage provider rather than guessing one Vault setting.",
+  "duration": 61.296,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/knowledge-base/vault/how-to-enable-cors/",
+  "sourceSha256": "081b3aca121bc2fe932c0e6dfbd2890439e9ca25be8417cf7416cdb71f3b97e6",
+  "scriptSha256": "cbb933ba4bdceb32f606e01f230a0f8ae21cfbe8cd1e19256a2e3ed099da1fde",
+  "audioSha256": "c14617e9f8b2ca68f64b778eb0c2575656e88bd3cb8302d9e199b2460a7bfa32",
+  "audio": "podcasts/knowledge-base-vault-how-to-enable-cors/episode.mp3",
+  "chapters": [
+    {
+      "title": "Find the origin of the response",
+      "start": 0,
+      "sourceAnchor": "answer"
+    }
+  ]
+}

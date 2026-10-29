@@ -1,0 +1,24 @@
+{
+  "id": "tutorials-hub-moq-vs-hls-vs-webrtc",
+  "title": "Choose a live-video transport",
+  "description": "Compare latency, browser support, network constraints and interaction.",
+  "duration": 87.984,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/tutorials/hub/moq-vs-hls-vs-webrtc/",
+  "sourceSha256": "29084d017ebf1f66d1ce0a48e80a39028256888c1055206f3630336173ece4be",
+  "scriptSha256": "881fb8368e1a0b167560e4c1e0623c78607d915b4eb52349c0a1c4a29c8c35bd",
+  "audioSha256": "5e2da2bcf1d581a25f4f3326085ad606e26abe71b269a805c484caa41d88bf33",
+  "audio": "podcasts/tutorials-hub-moq-vs-hls-vs-webrtc/episode.mp3",
+  "chapters": [
+    {
+      "title": "Three paths, different trade-offs",
+      "start": 0,
+      "sourceAnchor": "the-short-answer"
+    },
+    {
+      "title": "Test the constraints first",
+      "start": 47.515,
+      "sourceAnchor": "make-the-decision"
+    }
+  ]
+}

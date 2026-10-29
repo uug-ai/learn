@@ -1,0 +1,24 @@
+{
+  "id": "tutorials-hub-setup-webrtc-turn",
+  "title": "Prove the TURN fallback before you need it",
+  "description": "Understand signalling, direct media and relayed WebRTC connections.",
+  "duration": 81.096,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/tutorials/hub/setup-webrtc-turn/",
+  "sourceSha256": "97c0614160832e74552e713af2770d81765688c73cb7528f79ea1eea46dfa6ba",
+  "scriptSha256": "dfcb7169430bcc263b335943a6b047726fd6aee391da4cd862e194a366568f86",
+  "audioSha256": "ba4bdfb084be072c89038e571471f60b6445076938f7aa814aceadace0fd452a",
+  "audio": "podcasts/tutorials-hub-setup-webrtc-turn/episode.mp3",
+  "chapters": [
+    {
+      "title": "Signalling is not the media",
+      "start": 0,
+      "sourceAnchor": "understand-the-path"
+    },
+    {
+      "title": "Test the path deliberately",
+      "start": 42.315,
+      "sourceAnchor": "prove-turn-fallback"
+    }
+  ]
+}

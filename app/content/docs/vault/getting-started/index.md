@@ -1,4 +1,5 @@
 ---
+podcast: vault-getting-started
 title: "Getting Started"
 description: ""
 lead: ""

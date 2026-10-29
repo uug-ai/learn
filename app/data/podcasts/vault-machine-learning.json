@@ -1,0 +1,24 @@
+{
+  "id": "vault-machine-learning",
+  "title": "Decouple recordings from processing",
+  "description": "Understand the event-and-worker pattern for processing recorded video chunks.",
+  "duration": 84.624,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/machine-learning/",
+  "sourceSha256": "eed058902c778fa4e38c342486b4f37c10836ce9716faf6912f2b4c27130a883",
+  "scriptSha256": "550664fb4a66f7d0c61bf2f34d083f652e0432cb06803a62177b572ee57f30e5",
+  "audioSha256": "c6825c851621adbe5fcbd17692113aa12ef2f43f194393f8f7c41e50bf24a7a9",
+  "audio": "podcasts/vault-machine-learning/episode.mp3",
+  "chapters": [
+    {
+      "title": "A manageable unit of work",
+      "start": 0,
+      "sourceAnchor": "video-chunks"
+    },
+    {
+      "title": "Events connect storage to consumers",
+      "start": 42.365,
+      "sourceAnchor": "queueing-and-events"
+    }
+  ]
+}

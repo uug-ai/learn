@@ -1,0 +1,24 @@
+{
+  "id": "tutorials-hub-custom-workflow-stage",
+  "title": "Add your own workflow stage",
+  "description": "Understand the worker contract and verify a result all the way back into Hub.",
+  "duration": 86.016,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/tutorials/hub/custom-workflow-stage/",
+  "sourceSha256": "8a06d8c8c61662cac52d7eb03611bd12a81b032f860a66a289dbb3598ca6e7e6",
+  "scriptSha256": "01f7128a52d2d935cc2a6ecedee9918c7912a542d82cfde0bbccce463e6cf9d0",
+  "audioSha256": "09c8bc3f1511b8c1bcf15545ce0da485c29c28e890126a075a7fd1666e9c585f",
+  "audio": "podcasts/tutorials-hub-custom-workflow-stage/episode.mp3",
+  "chapters": [
+    {
+      "title": "A worker behind a stage",
+      "start": 0,
+      "sourceAnchor": "how-it-works"
+    },
+    {
+      "title": "A completed process needs a visible result",
+      "start": 47.09,
+      "sourceAnchor": "verify-end-to-end"
+    }
+  ]
+}

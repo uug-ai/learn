@@ -3,7 +3,7 @@ import { textContrast } from './utils/contrast';
 
 const accents = [
   { product: 'agent', rgb: [147, 55, 52] },
-  { product: 'factory', rgb: [86, 97, 143] },
+  { product: 'factory', rgb: [74, 120, 106] },
   { product: 'vault', rgb: [86, 97, 143] },
   { product: 'hub', rgb: [162, 57, 215] },
 ];

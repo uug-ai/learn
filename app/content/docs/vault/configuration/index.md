@@ -1,4 +1,5 @@
 ---
+podcast: vault-configuration
 title: "Configuration"
 description: ""
 lead: ""

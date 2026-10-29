@@ -1,0 +1,24 @@
+{
+  "id": "prologue-how",
+  "title": "How the platform fits together",
+  "description": "Follow the separate roles of recording, fleet management, storage and viewing.",
+  "duration": 80.76,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/prologue/how/",
+  "sourceSha256": "8bc0c6a6d3cfaa3774c3bada97fd3971d58327fa07182facc460065942138a1c",
+  "scriptSha256": "acd3a0152d1c8d0a9a859716599995f1282ecdd198c81656a387d82a714c7e1d",
+  "audioSha256": "3dd69747006ec6f6bd9876e9fb6a294886b18a5e3af1896e512a2bd3e499e669",
+  "audio": "podcasts/prologue-how/episode.mp3",
+  "chapters": [
+    {
+      "title": "Divide the responsibilities",
+      "start": 0,
+      "sourceAnchor": "an-overview"
+    },
+    {
+      "title": "Choose storage deliberately",
+      "start": 41.34,
+      "sourceAnchor": "storing-data-where-you-want"
+    }
+  ]
+}

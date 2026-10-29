@@ -1,0 +1,24 @@
+{
+  "id": "guides-onboarding-dev-machine",
+  "title": "Prepare a local development machine",
+  "description": "Keep repository setup, dependencies and secrets in their proper places.",
+  "duration": 91.872,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/guides/onboarding/dev-machine/",
+  "sourceSha256": "6732bf8f8a6fb49827565a5e22005e28aea1bba1e788448bcb4b2d79d792091d",
+  "scriptSha256": "ea7c71465240668bd222385489f73955952a38187eb8aa9b08854f921090ef73",
+  "audioSha256": "f50f95dbfac27f8f2411f6e85dbe3d4c80eebe79b2fe59a26bcdb96f87017b95",
+  "audio": "podcasts/guides-onboarding-dev-machine/episode.mp3",
+  "chapters": [
+    {
+      "title": "A workspace of independent repositories",
+      "start": 0,
+      "sourceAnchor": "prerequisites"
+    },
+    {
+      "title": "Configuration belongs to its consumer",
+      "start": 48.665,
+      "sourceAnchor": "configure-services"
+    }
+  ]
+}

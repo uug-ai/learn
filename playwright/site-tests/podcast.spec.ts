@@ -10,16 +10,16 @@ const data: {
   chapters: { title: string; start: number; sourceAnchor: string }[];
 } = JSON.parse(readFileSync(resolve(__dirname, '../../app/data/podcasts/organisations-v2.json'), 'utf8'));
 const topicSelector = (anchor: string) => `.learn-podcast-topic-heading:has(#${anchor})`;
-const episodesDirectory = resolve(__dirname, '../../podcast/episodes');
-const hubEpisodes: {
+const episodesDirectory = resolve(__dirname, '../../app/data/podcasts');
+const publishedEpisodes: {
   id: string;
   sourceUrl: string;
   chapters: { title: string; sourceAnchor: string }[];
 }[] = readdirSync(episodesDirectory)
-  .filter(filename => filename.startsWith('hub-') && filename.endsWith('.json'))
+  .filter(filename => filename.endsWith('.json'))
   .map(filename => JSON.parse(readFileSync(join(episodesDirectory, filename), 'utf8')));
 
-for (const episode of hubEpisodes) {
+for (const episode of publishedEpisodes) {
   const route = new URL(episode.sourceUrl).pathname;
   test(`offers a source-linked, lazy and playable overview on ${route}`, async ({ page, request }) => {
     const mediaRequests: string[] = [];
@@ -51,7 +51,8 @@ for (const episode of hubEpisodes) {
     await expect.poll(() => audio.evaluate(element => (element as HTMLAudioElement).duration))
       .toBeGreaterThan(0);
     await expect(chapters.last()).toHaveAttribute('aria-current', 'true');
-    await panel.getByRole('button', { name: 'Close podcast player' }).click();
+    await expect(page.locator('.learn-podcast-topic-heading[data-podcast-topic-state="current"]')).toHaveCount(1);
+    await page.keyboard.press('Escape');
     await expect(audio).toHaveJSProperty('paused', true);
     const ranged = await request.get(`/podcasts/${episode.id}/episode.mp3`, {
       headers: { Range: 'bytes=0-1023' },
@@ -179,17 +180,46 @@ test('reports audio failures without suggesting transcripts or downloads', async
   await expect(page.locator('[data-podcast-status]')).not.toContainText(/transcript|download/i);
 });
 
-test('keeps pages without a podcast unchanged', async ({ page }) => {
-  const podcastAssets: string[] = [];
-  page.on('request', request => {
-    if (/podcast[\w.-]*\.(css|js)/.test(request.url())) podcastAssets.push(request.url());
+for (const route of ['/tutorials/', '/guides/', '/blog/', '/release-notes/', '/knowledge-base/',
+  '/designer/', '/guides/code-style/go/rest/routing/']) {
+  test(`keeps navigation or placeholder page ${route} without podcast assets`, async ({ page }) => {
+    const podcastAssets: string[] = [];
+    page.on('request', request => {
+      if (/podcast[\w.-]*\.(css|js)/.test(request.url())) podcastAssets.push(request.url());
+    });
+    await page.goto(route);
+    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.locator('[data-podcast-toggle]')).toHaveCount(0);
+    await expect(page.locator('.learn-podcast-topic-heading, .learn-podcast-topic-badge')).toHaveCount(0);
+    await expect(page.locator('audio')).toHaveCount(0);
+    expect(podcastAssets).toEqual([]);
   });
-  await page.goto('/docs/vault/first-things-first/');
-  await expect(page.locator('h1')).toBeVisible();
-  await expect(page.locator('[data-podcast-toggle]')).toHaveCount(0);
-  await expect(page.locator('.learn-podcast-topic-heading, .learn-podcast-topic-badge')).toHaveCount(0);
-  await expect(page.locator('audio')).toHaveCount(0);
-  expect(podcastAssets).toEqual([]);
+}
+
+test('preserves article metadata and fits each non-Hub layout on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  for (const route of ['/docs/agent/', '/docs/factory/', '/docs/vault/',
+    '/guides/onboarding/', '/guides/onboarding/dev-containers/', '/tutorials/agent/connect-any-camera/',
+    '/knowledge-base/vault/how-to-enable-cors/', '/blog/2025-11-14-new-learning-platform/',
+    '/release-notes/2026-10-23/', '/support/']) {
+    await page.goto(route);
+    const listen = page.getByRole('button', { name: 'Listen to the overview', exact: true });
+    await expect(listen).toBeVisible();
+    await listen.click();
+    await expect(page.getByRole('region', { name: 'Article podcast' })).toBeVisible();
+    await expect(page.locator('#article-podcast audio')).toHaveJSProperty('paused', true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(376);
+    if (route.startsWith('/blog/')) {
+      await expect(page.locator('main a[title="Cedric Verstraeten"]')).toBeVisible();
+      await expect(page.locator('main')).toContainText('A new learning platform to consolidate');
+    }
+    if (route.startsWith('/release-notes/')) {
+      await expect(page.locator('.release-note-detail__summary')).toBeVisible();
+    }
+    if (route.startsWith('/knowledge-base/')) {
+      await expect(page.locator('#content')).toContainText('Enabling CORS on Vault depends on the storage provider');
+    }
+  }
 });
 
 test('fits a narrow screen and supports the dark palette', async ({ page }) => {

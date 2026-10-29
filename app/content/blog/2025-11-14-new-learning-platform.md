@@ -1,4 +1,5 @@
 ---
+podcast: blog-2025-11-14-new-learning-platform
 title: New learning platform
 date: 2025-11-14
 subtitle: A new learning platform to consolidate all the great stuff we are doing, going from documentation, a central knowledge base, tutorials and blogs.

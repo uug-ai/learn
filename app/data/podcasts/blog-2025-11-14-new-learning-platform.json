@@ -1,0 +1,24 @@
+{
+  "id": "blog-2025-11-14-new-learning-platform",
+  "title": "Why bring learning resources together?",
+  "description": "Understand the motivation behind the shared Learn platform.",
+  "duration": 86.688,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/blog/2025-11-14-new-learning-platform/",
+  "sourceSha256": "d96c748e4636a2fd19d9fc28f07772a2ce7038e508a9d9b092f629cd788a6757",
+  "scriptSha256": "570dce7c7a256fbcb1be357a8db0a8daf8f03b66e8bfb18ca394bc6c57575d26",
+  "audioSha256": "11fb54c8499a1d07a6d612a8f5df27d8fa4601621542c1bb030cfac2fa0b22e5",
+  "audio": "podcasts/blog-2025-11-14-new-learning-platform/episode.mp3",
+  "chapters": [
+    {
+      "title": "Reduce the search between sources",
+      "start": 0,
+      "sourceAnchor": "the-evolution-of-learning-why-we-built-this-unified-platform"
+    },
+    {
+      "title": "A direction, not a feature guarantee",
+      "start": 47.64,
+      "sourceAnchor": "looking-forward-the-future-of-learning"
+    }
+  ]
+}

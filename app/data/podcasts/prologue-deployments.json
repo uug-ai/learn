@@ -1,0 +1,24 @@
+{
+  "id": "prologue-deployments",
+  "title": "Choose a deployment around your needs",
+  "description": "Compare local, hybrid, cloud, hosted and chained arrangements.",
+  "duration": 81.168,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/prologue/deployments/",
+  "sourceSha256": "dccaa5326f3d57be1f72df3c65b1fa0ab4790eefaf546eb3f4ce46fc5314ee13",
+  "scriptSha256": "358a5f680ac36493d50678f0e887dd31c9b953e8bddb302ad39df0d9fa202e5b",
+  "audioSha256": "f8c40217e7363d6171b981519e9719d924522bfe94f35a0ebb432357e3e8ce6d",
+  "audio": "podcasts/prologue-deployments/episode.mp3",
+  "chapters": [
+    {
+      "title": "Start with a workable baseline",
+      "start": 0,
+      "sourceAnchor": "basic-setup"
+    },
+    {
+      "title": "Follow the bandwidth",
+      "start": 41.39,
+      "sourceAnchor": "cloud-setup"
+    }
+  ]
+}

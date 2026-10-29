@@ -1,0 +1,24 @@
+{
+  "id": "vault-installation",
+  "title": "Choosing a Vault installation",
+  "description": "Compare Docker Compose and Kubernetes, at the edge or in the cloud.",
+  "duration": 80.616,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/installation/",
+  "sourceSha256": "890159897937c59c3e8b672593eddd477a1e2091136f488f42636b9a4c266ca1",
+  "scriptSha256": "176023db8bf133e01b5e54e0848d0a9d21053170bd00c8a87ee9520b88d99f94",
+  "audioSha256": "0e89d42ad089fb5c773233e26420c8e7d2997e2d73aabc754d590452bc8e65de",
+  "audio": "podcasts/vault-installation/episode.mp3",
+  "chapters": [
+    {
+      "title": "Choose the operational fit",
+      "start": 0,
+      "sourceAnchor": "docker"
+    },
+    {
+      "title": "Plan storage and networking",
+      "start": 39.49,
+      "sourceAnchor": "self-hosted-kubernetes"
+    }
+  ]
+}

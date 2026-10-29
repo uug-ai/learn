@@ -1,4 +1,5 @@
 ---
+podcast: vault-api-signed-urls
 title: "Signed URLs"
 description: "How to call the Vault REST API to obtain signed URLs for media, thumbnails, sprites and other generated assets."
 lead: ""

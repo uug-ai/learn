@@ -1,0 +1,24 @@
+{
+  "id": "factory-installation",
+  "title": "Where to install Factory",
+  "description": "Compare managed and self-hosted Kubernetes requirements.",
+  "duration": 81.768,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/factory/installation/",
+  "sourceSha256": "f4790310e4a63e0e1b6f65ecb67e072eac4eb3a00ad0dfd3cf8744cb375a41ef",
+  "scriptSha256": "87cbee3bdb2f1dd68f816b3ed1308cc599131b65f2c0051f5baa6be6d6bbd9cf",
+  "audioSha256": "3d3dc242cbefede3adeb1c11cc641b978b6dcd1cae3e7ecb7b99a1568bd83c9c",
+  "audio": "podcasts/factory-installation/episode.mp3",
+  "chapters": [
+    {
+      "title": "Kubernetes is the starting point",
+      "start": 0,
+      "sourceAnchor": "managed-kubernetes"
+    },
+    {
+      "title": "Plan the supporting infrastructure",
+      "start": 42.79,
+      "sourceAnchor": "self-hosted-kubernetes"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "factory-configuration-and-engines",
+  "title": "Factory's two independent choices",
+  "description": "Separate configuration storage from the engine that runs Agents.",
+  "duration": 96.12,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/factory/configuration-and-engines/",
+  "sourceSha256": "2a099447bc949658a927b77546931d6c7d22162d37c69ed6bcce3631c2368822",
+  "scriptSha256": "0c0c2d0b874bdda14da4d292cbed17605bc7311bdd3c0e55af85aa82ec579426",
+  "audioSha256": "58f57dfb899059fb2f0fa67edd35158546e6778e544c20e3d6f183528d749d48",
+  "audio": "podcasts/factory-configuration-and-engines/episode.mp3",
+  "chapters": [
+    {
+      "title": "Where settings live",
+      "start": 0,
+      "sourceAnchor": "configuration-storage-factory_configuration"
+    },
+    {
+      "title": "What actually runs today",
+      "start": 53.39,
+      "sourceAnchor": "engine-factory_engine"
+    }
+  ]
+}

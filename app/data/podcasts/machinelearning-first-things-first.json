@@ -1,0 +1,24 @@
+{
+  "id": "machinelearning-first-things-first",
+  "title": "Separate camera streams from processing work",
+  "description": "Understand chunks, events and workers in the documented architecture.",
+  "duration": 81.192,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/machinelearning/first-things-first/",
+  "sourceSha256": "4bbdc71ec20d0ce303469edcfc96a84978d9b6e80262999b861e17ed61ec8254",
+  "scriptSha256": "358e82cc1ad617f9fa883ee0f347d74f93d6e2c80d5666a9798d38abff280aa2",
+  "audioSha256": "4348184272cba49fcb51c02e49233b2a12624d92141585a8a2f21e02e9a4e63a",
+  "audio": "podcasts/machinelearning-first-things-first/episode.mp3",
+  "chapters": [
+    {
+      "title": "A recording as a unit of work",
+      "start": 0,
+      "sourceAnchor": "video-chunks"
+    },
+    {
+      "title": "Connect workers through events",
+      "start": 39.715,
+      "sourceAnchor": "queueing-and-events"
+    }
+  ]
+}

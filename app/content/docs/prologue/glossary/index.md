@@ -1,4 +1,5 @@
 ---
+podcast: prologue-glossary
 title: "Glossary"
 description: "A better understanding of the Kerberos Ecosystem."
 lead: "A better understanding of the Kerberos Ecosystem."

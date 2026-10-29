@@ -1,0 +1,24 @@
+{
+  "id": "agent-getting-started",
+  "title": "Your first tour of Agent",
+  "description": "Find live views, recordings and settings without confusing their roles.",
+  "duration": 77.016,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/agent/getting-started/",
+  "sourceSha256": "7f72619c51c5f4b5e14b3dad3eadfabe39156605a6c2840e8ea150e30387eec0",
+  "scriptSha256": "75b8d27f451128be177c600e80a68fa3cafbf47c2f5543ebde6530dbf6d9eb7a",
+  "audioSha256": "b1ae63111059e846a9af9f294d5b11f79e5a374e5865e724cd42e76008a6ae4a",
+  "audio": "podcasts/agent-getting-started/episode.mp3",
+  "chapters": [
+    {
+      "title": "Enter your Agent",
+      "start": 0,
+      "sourceAnchor": "login-page"
+    },
+    {
+      "title": "Find footage, then tune recording",
+      "start": 38.69,
+      "sourceAnchor": "media"
+    }
+  ]
+}

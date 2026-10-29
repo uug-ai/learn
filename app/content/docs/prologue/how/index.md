@@ -1,4 +1,5 @@
 ---
+podcast: prologue-how
 title: "How it works"
 description: "From zero to a myriad of cameras"
 lead: "From zero to a myriad of cameras"

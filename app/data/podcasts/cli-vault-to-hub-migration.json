@@ -1,0 +1,24 @@
+{
+  "id": "cli-vault-to-hub-migration",
+  "title": "Plan a scoped Vault-to-Hub migration",
+  "description": "Understand preview mode, a bounded time window and end-to-end verification.",
+  "duration": 87.576,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/cli/vault-to-hub-migration/",
+  "sourceSha256": "27b848728932e9142771492509bdd89f8c18320ce2f638cf4fc5c1e4bbf16c29",
+  "scriptSha256": "5d1f1974da40fc333d4806dcb41b4cfda138784d9d16dca1928c714643b646f7",
+  "audioSha256": "a11e126a77a7fd0be945193079341dcc188b60daa6ab696a0747a98efe123e50",
+  "audio": "podcasts/cli-vault-to-hub-migration/episode.mp3",
+  "chapters": [
+    {
+      "title": "Move a defined set of data",
+      "start": 0,
+      "sourceAnchor": "overview"
+    },
+    {
+      "title": "Prove a small window first",
+      "start": 45.09,
+      "sourceAnchor": "notes"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 ---
+podcast: tutorials-hub-setup-webrtc-turn
 title: 'Set up WebRTC live view with TURN'
 description: 'Configure STUN and TURN for reliable Kerberos Hub WebRTC live video, then verify direct and relayed ICE paths.'
 date: '2026-08-19'

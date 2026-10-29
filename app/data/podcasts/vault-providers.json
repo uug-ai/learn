@@ -1,0 +1,24 @@
+{
+  "id": "vault-providers",
+  "title": "Choosing where Vault stores recordings",
+  "description": "Understand storage providers, validation and the two URL signing paths.",
+  "duration": 80.976,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/providers/",
+  "sourceSha256": "6784994e97323206af23f89b698dc49b8043a0c5b642ed0702b0ff8ed79e8802",
+  "scriptSha256": "9489dd9c7d135e84eb1b812b8bda4ff8296303df5a6d46f8ff0ba369fb2e20a9",
+  "audioSha256": "2f4ef01b9c737459dc3e586a8b7720789e1081ee77d67acebf85eb9c50785796",
+  "audio": "podcasts/vault-providers/episode.mp3",
+  "chapters": [
+    {
+      "title": "Bring your own storage",
+      "start": 0,
+      "sourceAnchor": "configuration-of-a-provider"
+    },
+    {
+      "title": "Where playback travels",
+      "start": 41.99,
+      "sourceAnchor": "url-signing"
+    }
+  ]
+}

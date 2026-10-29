@@ -1,0 +1,24 @@
+{
+  "id": "tutorials-agent-connect-any-camera",
+  "title": "Connect a camera and test both streams",
+  "description": "Understand RTSP connectivity and why a live view does not prove recording works.",
+  "duration": 81.792,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/tutorials/agent/connect-any-camera/",
+  "sourceSha256": "e19c2a166ed30be40448867044ee259695d9971894cac8df8557fce98ea91369",
+  "scriptSha256": "92ccdcc55dce04c600b8a395ec45bb2e9e1993d77455b52d3906ea75db82bf14",
+  "audioSha256": "c370c4b6a5a3914156a7873dcf516bfefe7b862feb4a4dec96a2e9d244848cb8",
+  "audio": "podcasts/tutorials-agent-connect-any-camera/episode.mp3",
+  "chapters": [
+    {
+      "title": "Agent connects to the camera",
+      "start": 0,
+      "sourceAnchor": "how-the-connection-works"
+    },
+    {
+      "title": "Verify two different outcomes",
+      "start": 44.165,
+      "sourceAnchor": "step-5-verify-live-view-and-recording"
+    }
+  ]
+}

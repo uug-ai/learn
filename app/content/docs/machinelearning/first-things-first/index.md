@@ -1,4 +1,5 @@
 ---
+podcast: machinelearning-first-things-first
 title: "First things first"
 description: "Machine learning without a UI, is just a model nobody can use."
 lead: "Machine learning without a UI, is just a model nobody can use."

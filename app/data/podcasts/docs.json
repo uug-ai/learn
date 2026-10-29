@@ -1,0 +1,24 @@
+{
+  "id": "docs",
+  "title": "Finding your way around the platform",
+  "description": "Understand the building blocks before choosing a deployment.",
+  "duration": 81.888,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/",
+  "sourceSha256": "fcac2b85674a81e0248ad7a848d13747cc269bcf3f02607d826e8c06cdb2eadd",
+  "scriptSha256": "71fdc28c819d1e7bf3b19059a25a08cdee36aab3b0182718bff7357b553eea3d",
+  "audioSha256": "49d041753a628ad9b39339a6cd3458453b26087dee330e21401b53bfa6ace296",
+  "audio": "podcasts/docs/episode.mp3",
+  "chapters": [
+    {
+      "title": "Start with the problem",
+      "start": 0,
+      "sourceAnchor": "what-is-kerberosio"
+    },
+    {
+      "title": "Choose where and how to connect",
+      "start": 44.415,
+      "sourceAnchor": "integration-and-extension"
+    }
+  ]
+}

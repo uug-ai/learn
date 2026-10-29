@@ -1,0 +1,24 @@
+{
+  "id": "release-notes-2026-09-18",
+  "title": "Release highlights: September 18, 2026",
+  "description": "Review declarative Vault configuration, playback reliability and recording-date processing.",
+  "duration": 81.192,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-09-18/",
+  "sourceSha256": "5bf02f6d12647599effd9d20b6fb11995f87230f2e923c0ea20fc693a2a719d4",
+  "scriptSha256": "8da6844777722b6eaa219e3a3302b469bd6771889d4e31de33a34459c427a3fb",
+  "audioSha256": "837ed7a357ce38ed9812585526f64158de7387aa243765168a3ac205a0a19f2b",
+  "audio": "podcasts/release-notes-2026-09-18/episode.mp3",
+  "chapters": [
+    {
+      "title": "Deployment-managed configuration",
+      "start": 0,
+      "sourceAnchor": "vault"
+    },
+    {
+      "title": "More reliable retrieval and dates",
+      "start": 39.39,
+      "sourceAnchor": "pipeline-sequence"
+    }
+  ]
+}

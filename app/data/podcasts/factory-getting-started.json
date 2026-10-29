@@ -1,0 +1,24 @@
+{
+  "id": "factory-getting-started",
+  "title": "Your first tour of Factory",
+  "description": "Understand the camera fleet, cluster resources and inherited configuration.",
+  "duration": 89.616,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/factory/getting-started/",
+  "sourceSha256": "c87788e8da159953e1c64e08649d60ad7f7567f4eb9e06d8118d7c32e8b14b46",
+  "scriptSha256": "6f4867db5048914f82f97d1abafd7c88fdf5f67bd9aef712b11f70fa9cce4d67",
+  "audioSha256": "80d99e9711a873d52b13ca164b6678d786a69f5bbbd4c64b84d7fee9be2274ee",
+  "audio": "podcasts/factory-getting-started/episode.mp3",
+  "chapters": [
+    {
+      "title": "Cameras and cluster resources",
+      "start": 0,
+      "sourceAnchor": "overview"
+    },
+    {
+      "title": "Shared defaults and individual changes",
+      "start": 44.715,
+      "sourceAnchor": "global-configuration"
+    }
+  ]
+}

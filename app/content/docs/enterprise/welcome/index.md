@@ -1,4 +1,5 @@
 ---
+podcast: enterprise-welcome
 title: "Welcome"
 description: "Configuring the Kerberos Enterprise Suite"
 lead: "Configuring the Kerberos Enterprise Suite"

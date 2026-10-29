@@ -1,0 +1,24 @@
+{
+  "id": "enterprise-first-things-first",
+  "title": "Meet the enterprise building blocks",
+  "description": "Connect Agents, Factory, Vault and Hub without confusing their responsibilities.",
+  "duration": 88.08,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/enterprise/first-things-first/",
+  "sourceSha256": "0e365eab474fdffa56154c7a3d496a4bad7c3c4794a9171e8f2f2b702e4a3b2a",
+  "scriptSha256": "32eeecc451612c98c329cfbc9a0a90fe077981d21c154879a60b2fc93ec08d00",
+  "audioSha256": "8c6d2decd64d036dfa39b2be552f5f80b4e50519597ffab86954d29c49be839d",
+  "audio": "podcasts/enterprise-first-things-first/episode.mp3",
+  "chapters": [
+    {
+      "title": "Different components, different jobs",
+      "start": 0,
+      "sourceAnchor": "the-solution-stack"
+    },
+    {
+      "title": "Keep choices explicit",
+      "start": 45.59,
+      "sourceAnchor": "bring-your-own-storage"
+    }
+  ]
+}

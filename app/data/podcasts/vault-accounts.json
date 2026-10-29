@@ -1,0 +1,24 @@
+{
+  "id": "vault-accounts",
+  "title": "What a Vault account connects",
+  "description": "Understand credentials, storage destinations, retention and analysis choices.",
+  "duration": 86.784,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/accounts/",
+  "sourceSha256": "0abf4135b03ecc6878b9860e608422cb3495fadb9defa522c6eb1a34e2949f2d",
+  "scriptSha256": "e769181500169c7b014d263a7539902d4ab7818b34a679e7d7a4fd1988cb0f56",
+  "audioSha256": "f6ee09f148dad7bc92bf6d1bd36b10f0d6d15eb9ccba72ffd1861d8ae365bf7e",
+  "audio": "podcasts/vault-accounts/episode.mp3",
+  "chapters": [
+    {
+      "title": "An account is a connection point",
+      "start": 0,
+      "sourceAnchor": "configuration-of-an-account"
+    },
+    {
+      "title": "Settings with real consequences",
+      "start": 43.365,
+      "sourceAnchor": "account-settings"
+    }
+  ]
+}

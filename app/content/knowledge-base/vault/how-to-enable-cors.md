@@ -1,4 +1,5 @@
 ---
+podcast: knowledge-base-vault-how-to-enable-cors
 date: '2025-11-08T10:29:28Z'
 title: 'How to enable CORS'
 weight: 3

@@ -1,0 +1,78 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "release-notes-2026-10-09",
+  "title": "Release highlights: October 9, 2026",
+  "description": "Review paginated timelines, configurable workflow contracts and processing efficiency.",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-10-09/",
+  "sourcePath": "../app/content/release-notes/2026-10-09.md",
+  "sourceSha256": "a1ce1063469e0e18ea54caf7a275856f92d372f01ca28c8df6a5bcd19cf5b613",
+  "reviewedOn": "2026-10-29",
+  "editorialStyle": {
+    "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
+    "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",
+    "humour": "Optional: one or two brief, relevant light moments are enough. Prefer a relatable analogy over a separate joke. Never pad the overview with banter.",
+    "reactions": "Use occasional short, natural responses such as 'Oh, that makes sense' or 'Wait, so...' followed by a real question. Avoid repetitive praise, canned agreement, and filler.",
+    "laughter": "Optional: at most one or two light reactions such as 'Ha, fair point.' Never insert [laughs], SSML, or repeated ha-ha strings. These are spoken reactions, not a guarantee of genuine laughter from the current speech engine.",
+    "intonation": "Write real questions with question marks, use contractions, alternate short and longer sentences, and make contrasts explicit. Let punctuation and sentence rhythm suggest curiosity, surprise, and emphasis. Avoid all-caps shouting, excessive exclamation marks, and artificial pause tags.",
+    "guardrails": "Keep technical claims source-backed. Never mock the listener, joke about real victims, minimize security or data-loss risks, or let humour replace an explanation. Personality is optional; accuracy and clarity are not."
+  },
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_puck",
+      "speed": 0.98
+    }
+  },
+  "chapters": [
+    {
+      "sourceAnchor": "hub-api",
+      "title": "Bound the result set",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "What changed for a fictional operator browsing a large recording history in the October ninth release?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Timeline media and marker APIs gained pagination with cursor metadata and configurable sizes. Live playback also reduced repeated permission-check work. These are improvements to how the application loads and handles information, not a reason to remove access checks."
+        },
+        {
+          "speaker": "host",
+          "text": "What else became more configurable?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Workflow authoring gained deployment-provided stage and Start contracts, with richer validation and safer handling of unavailable or sensitive settings."
+        }
+      ]
+    },
+    {
+      "sourceAnchor": "hub-workflows",
+      "title": "Keep each run's settings separate",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "What should teams running custom processing notice?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Workflow triggering became camera-group aware, while ANPR and vision-language nodes gained per-workflow settings with stronger isolation and validation. Other changes reduced unnecessary database work and improved retention handling."
+        },
+        {
+          "speaker": "host",
+          "text": "What's the practical next action?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Check timeline pagination and a representative configured workflow with the intended permissions. Compare run-specific behaviour without assuming one node's settings apply globally. Read the service entries for exact changes and use current guides for configuration."
+        }
+      ]
+    }
+  ]
+}

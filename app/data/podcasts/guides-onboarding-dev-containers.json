@@ -1,0 +1,24 @@
+{
+  "id": "guides-onboarding-dev-containers",
+  "title": "A consistent development container",
+  "description": "Understand the toolchain, first-start setup and safe local secret handling.",
+  "duration": 86.184,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/guides/onboarding/dev-containers/",
+  "sourceSha256": "bda4af5a53c636eb3ba8a83cd07f0cc6fd5377bf877e1dad216430b8f74f86dd",
+  "scriptSha256": "ee3ebbac5ab19ab9e50f3f2c86d17874832eede7165f397175779f32a9a223a4",
+  "audioSha256": "dfce7fcf8e622110d8e728fbb94df1799360302facfe5aa601a07c9326c470c7",
+  "audio": "podcasts/guides-onboarding-dev-containers/episode.mp3",
+  "chapters": [
+    {
+      "title": "A shared Linux toolchain",
+      "start": 0,
+      "sourceAnchor": "what-the-container-installs"
+    },
+    {
+      "title": "Check the setup, not just the container",
+      "start": 42.49,
+      "sourceAnchor": "first-start-initialization"
+    }
+  ]
+}

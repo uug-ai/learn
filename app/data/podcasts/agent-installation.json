@@ -1,0 +1,19 @@
+{
+  "id": "agent-installation",
+  "title": "Choosing an Agent deployment",
+  "description": "Choose a deployment method and plan persistent configuration and recordings.",
+  "duration": 70.056,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/agent/installation/",
+  "sourceSha256": "a7eca4cb8be0468acdc26acb395017d54dec0b7b8a4fefc376eb40f4b881bcc9",
+  "scriptSha256": "277e14a3c66ac3539a8341b238fedcf2eff9562d3856860916735935ba7b3ad4",
+  "audioSha256": "82c793e0504a3c6c950b4ff1f9ccf1b582702f737dca6a53c2d83df3a6c57044",
+  "audio": "podcasts/agent-installation/episode.mp3",
+  "chapters": [
+    {
+      "title": "A container with a home for its data",
+      "start": 0,
+      "sourceAnchor": "overview"
+    }
+  ]
+}

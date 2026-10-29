@@ -1,0 +1,24 @@
+{
+  "id": "vault-providers-azure-storage-account",
+  "title": "Planning Azure storage for Vault",
+  "description": "Understand storage accounts, containers, access tiers and a validated integration.",
+  "duration": 85.896,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/providers/azure-storage-account/",
+  "sourceSha256": "94790dedbd195945867a8f85cfb74a85e2c0106a486eca39d800c223db9d855f",
+  "scriptSha256": "dfaa38f6dd752d27f07878af916d03dd4c6d9e4dc21e1f26b8aefaaa1ccf3e80",
+  "audioSha256": "e9e7e9b639d8b81e2b5f05b360217ce8ffbecf80d45635c5f539e12c8dd5429d",
+  "audio": "podcasts/vault-providers-azure-storage-account/episode.mp3",
+  "chapters": [
+    {
+      "title": "Object storage with an access plan",
+      "start": 0,
+      "sourceAnchor": "introduction"
+    },
+    {
+      "title": "Retention and retrieval belong together",
+      "start": 44.715,
+      "sourceAnchor": "configuration-options"
+    }
+  ]
+}

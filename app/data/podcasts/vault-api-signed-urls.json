@@ -1,0 +1,24 @@
+{
+  "id": "vault-api-signed-urls",
+  "title": "Temporary links, private credentials",
+  "description": "Understand signed media access and the difference between Vault and provider signing.",
+  "duration": 90.744,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/api/signed-urls/",
+  "sourceSha256": "6aa14d958ede369a4bea55ebdd490c970c64422b95cba8bc347697f7107c92f6",
+  "scriptSha256": "021dbe18f8453dfa1d2f77d2fe66898cc7b1f48ed2fc02ed894316a7cab1078c",
+  "audioSha256": "26d164a4ea49bd15169345717d9e83d58f923318f9e8c20f90d346c5b0586e67",
+  "audio": "podcasts/vault-api-signed-urls/episode.mp3",
+  "chapters": [
+    {
+      "title": "Keep long-lived credentials on the server",
+      "start": 0,
+      "sourceAnchor": "authentication"
+    },
+    {
+      "title": "Choose the reachable path",
+      "start": 47.34,
+      "sourceAnchor": "3-two-signing-modes"
+    }
+  ]
+}

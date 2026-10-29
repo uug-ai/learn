@@ -1,0 +1,24 @@
+{
+  "id": "release-notes-2026-10-02",
+  "title": "Release highlights: October 2, 2026",
+  "description": "Review global and custom workflows, immutable execution snapshots and clearer media analysis.",
+  "duration": 82.2,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-10-02/",
+  "sourceSha256": "777436ae9c7c76b8633aff95745ff552d99bd4cfea98e0064f1adbc605503104",
+  "scriptSha256": "0dccdc8cd62d1d3086a21e015357b67f323c41158f5c4807177990cb41e50fac",
+  "audioSha256": "da21c852c322860a29b226b01ef95a4a05d029f5261bec4c192a67aa2048b31b",
+  "audio": "podcasts/release-notes-2026-10-02/episode.mp3",
+  "chapters": [
+    {
+      "title": "More deliberate workflow starts",
+      "start": 0,
+      "sourceAnchor": "hub-api"
+    },
+    {
+      "title": "Find analysed media and inspect results",
+      "start": 43.965,
+      "sourceAnchor": "hub-frontend"
+    }
+  ]
+}

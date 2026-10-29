@@ -1,0 +1,24 @@
+{
+  "id": "factory-first-things-first",
+  "title": "Why use Factory?",
+  "description": "Understand Kubernetes-based Agent management, discovery and shared settings.",
+  "duration": 84.024,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/factory/first-things-first/",
+  "sourceSha256": "dde2306044ef714b52edaf73edd293a6abc3eeec414dc9a3bc2b0b70ec4d8099",
+  "scriptSha256": "2e47d48d7a4e27d78cdba4ad7c0bdacb10ab992f1b2e1be10bb8d027812bd773",
+  "audioSha256": "b0950a6aff08f7ad5d92afdcb3e77f93a04e11d2ddfb21dd27c9f728452dc23b",
+  "audio": "podcasts/factory-first-things-first/episode.mp3",
+  "chapters": [
+    {
+      "title": "A camera-aware Kubernetes interface",
+      "start": 0,
+      "sourceAnchor": "factory-in-a-nutshell"
+    },
+    {
+      "title": "Separate configuration from scheduling",
+      "start": 39.34,
+      "sourceAnchor": "configuration-storage-and-engines"
+    }
+  ]
+}

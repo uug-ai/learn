@@ -1,0 +1,24 @@
+{
+  "id": "cli-check-indexes",
+  "title": "Check indexes before changing them",
+  "description": "Understand the report-only and live modes of the index checker.",
+  "duration": 77.304,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/cli/check-indexes/",
+  "sourceSha256": "7bcaca54b61d3a8ba7f61a27264ebba3c87a8f7ef7a1f2eafd68656a5d3f2ea7",
+  "scriptSha256": "021c2e6b7fd096c56a8eac0f76a6c0910dcec4f60d190260acfcf1b56d03ddd7",
+  "audioSha256": "3cf1be855804046b2ff27c13f251e20618e263f9e9f4ca9ce8dedf07100462b9",
+  "audio": "podcasts/cli-check-indexes/episode.mp3",
+  "chapters": [
+    {
+      "title": "Compare against a reference",
+      "start": 0,
+      "sourceAnchor": "overview"
+    },
+    {
+      "title": "Live mode is an operational change",
+      "start": 41.165,
+      "sourceAnchor": "notes"
+    }
+  ]
+}

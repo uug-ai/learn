@@ -1,4 +1,5 @@
 ---
+podcast: vault-installation
 title: "Installation"
 description: ""
 lead: ""

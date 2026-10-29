@@ -1,0 +1,24 @@
+{
+  "id": "factory",
+  "title": "Meet Factory",
+  "description": "Discover how Factory manages Agents while the Agents keep recording.",
+  "duration": 83.64,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/factory/",
+  "sourceSha256": "8ebb8bd6b88d6f75d8a9a14262733c75ad4e54176c3320499b66bbaae6a018bb",
+  "scriptSha256": "59ecfa546c12acfccc9ed93f29d5259cc207f9c47b0b49a06be32524dfb9f0fb",
+  "audioSha256": "69ea5dc611407089e7e103f50667ecd4efee0e92693e3e7904baeab808c71010",
+  "audio": "podcasts/factory/episode.mp3",
+  "chapters": [
+    {
+      "title": "Manage the fleet",
+      "start": 0,
+      "sourceAnchor": "how-factory-manages-your-agents"
+    },
+    {
+      "title": "Start with the environment",
+      "start": 43.615,
+      "sourceAnchor": "where-to-start"
+    }
+  ]
+}

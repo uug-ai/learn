@@ -1,0 +1,78 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "factory-installation",
+  "title": "Where to install Factory",
+  "description": "Compare managed and self-hosted Kubernetes requirements.",
+  "sourceUrl": "https://learn.uug.ai/docs/factory/installation/",
+  "sourcePath": "../app/content/docs/factory/installation/index.md",
+  "sourceSha256": "f4790310e4a63e0e1b6f65ecb67e072eac4eb3a00ad0dfd3cf8744cb375a41ef",
+  "reviewedOn": "2026-10-29",
+  "editorialStyle": {
+    "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
+    "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",
+    "humour": "Optional: one or two brief, relevant light moments are enough. Prefer a relatable analogy over a separate joke. Never pad the overview with banter.",
+    "reactions": "Use occasional short, natural responses such as 'Oh, that makes sense' or 'Wait, so...' followed by a real question. Avoid repetitive praise, canned agreement, and filler.",
+    "laughter": "Optional: at most one or two light reactions such as 'Ha, fair point.' Never insert [laughs], SSML, or repeated ha-ha strings. These are spoken reactions, not a guarantee of genuine laughter from the current speech engine.",
+    "intonation": "Write real questions with question marks, use contractions, alternate short and longer sentences, and make contrasts explicit. Let punctuation and sentence rhythm suggest curiosity, surprise, and emphasis. Avoid all-caps shouting, excessive exclamation marks, and artificial pause tags.",
+    "guardrails": "Keep technical claims source-backed. Never mock the listener, joke about real victims, minimize security or data-loss risks, or let humour replace an explanation. Personality is optional; accuracy and clarity are not."
+  },
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_puck",
+      "speed": 0.98
+    }
+  },
+  "chapters": [
+    {
+      "sourceAnchor": "managed-kubernetes",
+      "title": "Kubernetes is the starting point",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "A fictional team already runs cameras with Docker Compose. Can Factory simply become another Compose service?"
+        },
+        {
+          "speaker": "guide",
+          "text": "The installation guide says Factory needs Kubernetes because it provisions Agents through the Kubernetes API. It is not the management option for a Docker-only setup. Choose a cluster before following the Factory deployment examples."
+        },
+        {
+          "speaker": "host",
+          "text": "What does a managed cluster change?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Managed services commonly provide load balancers and automatic volume provisioning. That can reduce infrastructure setup, but you still need to understand the supplied deployment and your environment's access and storage requirements."
+        }
+      ]
+    },
+    {
+      "sourceAnchor": "self-hosted-kubernetes",
+      "title": "Plan the supporting infrastructure",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Could the same team keep Factory at the warehouse instead?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Yes, with a self-hosted Kubernetes cluster. The additional work includes cluster setup, a load-balancing solution, and persistent volumes and claims. Running close to cameras can support local operation, but does not remove those responsibilities."
+        },
+        {
+          "speaker": "host",
+          "text": "What's the safe next step?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Select managed or self-hosted Kubernetes based on the team's operational needs, then follow the matching linked installation guide. Confirm the cluster services and persistence before expanding the number of Agents."
+        }
+      ]
+    }
+  ]
+}

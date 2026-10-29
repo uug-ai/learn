@@ -1,0 +1,78 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "vault-installation",
+  "title": "Choosing a Vault installation",
+  "description": "Compare Docker Compose and Kubernetes, at the edge or in the cloud.",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/installation/",
+  "sourcePath": "../app/content/docs/vault/installation/index.md",
+  "sourceSha256": "890159897937c59c3e8b672593eddd477a1e2091136f488f42636b9a4c266ca1",
+  "reviewedOn": "2026-10-29",
+  "editorialStyle": {
+    "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
+    "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",
+    "humour": "Optional: one or two brief, relevant light moments are enough. Prefer a relatable analogy over a separate joke. Never pad the overview with banter.",
+    "reactions": "Use occasional short, natural responses such as 'Oh, that makes sense' or 'Wait, so...' followed by a real question. Avoid repetitive praise, canned agreement, and filler.",
+    "laughter": "Optional: at most one or two light reactions such as 'Ha, fair point.' Never insert [laughs], SSML, or repeated ha-ha strings. These are spoken reactions, not a guarantee of genuine laughter from the current speech engine.",
+    "intonation": "Write real questions with question marks, use contractions, alternate short and longer sentences, and make contrasts explicit. Let punctuation and sentence rhythm suggest curiosity, surprise, and emphasis. Avoid all-caps shouting, excessive exclamation marks, and artificial pause tags.",
+    "guardrails": "Keep technical claims source-backed. Never mock the listener, joke about real victims, minimize security or data-loss risks, or let humour replace an explanation. Personality is optional; accuracy and clarity are not."
+  },
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_puck",
+      "speed": 0.98
+    }
+  },
+  "chapters": [
+    {
+      "sourceAnchor": "docker",
+      "title": "Choose the operational fit",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "Imagine a fictional team trying Vault in a small lab. Must they build a full Kubernetes platform first?"
+        },
+        {
+          "speaker": "guide",
+          "text": "The guide offers Docker Compose as a quick starting point and Kubernetes for other deployment needs. Vault ships as a container image. Use the linked example that matches the environment rather than mixing instructions from different installation paths."
+        },
+        {
+          "speaker": "host",
+          "text": "Does cloud versus edge change the job Vault does?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Its storage role remains the same, but the surrounding infrastructure changes. Choose the location based on the recordings, network and storage the team needs."
+        }
+      ]
+    },
+    {
+      "sourceAnchor": "self-hosted-kubernetes",
+      "title": "Plan storage and networking",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "What is different when the team operates Kubernetes itself?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Managed clusters commonly provide load balancers and automatic volume provisioning. Self-hosted clusters need those pieces planned explicitly, including persistent volumes and claims. Running near cameras can reduce latency and bandwidth, but it does not supply the infrastructure automatically."
+        },
+        {
+          "speaker": "host",
+          "text": "What's the next step?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Choose Compose, managed Kubernetes or self-hosted Kubernetes, then follow its linked installation guide. Confirm access, persistence and a working storage path with a small test before expanding."
+        }
+      ]
+    }
+  ]
+}

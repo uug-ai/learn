@@ -1,4 +1,5 @@
 ---
+podcast: enterprise-self-signed
 title: "Self-signed certificates"
 description: "Using your own self-signed certifates."
 lead: "Using your own self-signed certifates."

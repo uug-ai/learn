@@ -1,0 +1,19 @@
+{
+  "id": "factory-license",
+  "title": "Understanding Factory's license",
+  "description": "Distinguish binary availability from source availability and read the license terms.",
+  "duration": 46.128,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/factory/license/",
+  "sourceSha256": "dc5c25a73dd8fa2bb6d1759df58b965c41e14ac784651ec9255040aece03fe24",
+  "scriptSha256": "2fb63317f4881eb744ef7532348e02dc7c996dcb987875a6fe5e1edaaf696a4a",
+  "audioSha256": "e2b5e3ef49add33c1f61b45c8124974e0878e7492086d789196db2db6b4e132c",
+  "audio": "podcasts/factory-license/episode.mp3",
+  "chapters": [
+    {
+      "title": "Availability and permission",
+      "start": 0,
+      "sourceAnchor": "the-mit-license-mit"
+    }
+  ]
+}

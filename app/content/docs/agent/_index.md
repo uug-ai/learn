@@ -1,4 +1,5 @@
 ---
+podcast: agent
 title: "Agent"
 description: "Record and manage a camera stream, right where it runs."
 lead: "Record and manage a camera stream, right where it runs."

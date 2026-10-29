@@ -1,0 +1,24 @@
+{
+  "id": "release-notes-2026-09-04",
+  "title": "Release highlights: September 4, 2026",
+  "description": "Review audit history, case and recording changes, project access and retention.",
+  "duration": 79.848,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-09-04/",
+  "sourceSha256": "1a4c19ab3c13a0e269014778b5fab899711ed0b78ff8b3d3d01c764a55ddcb38",
+  "scriptSha256": "770ef014405b1e89ec79a2fd62a0beedff0485978c00d3985e5099a8705c6064",
+  "audioSha256": "aa065fd4f2fbba2804b06a18438b88bc45f273162951fef1e2339ef2f8c5c0b0",
+  "audio": "podcasts/release-notes-2026-09-04/episode.mp3",
+  "chapters": [
+    {
+      "title": "See changes in context",
+      "start": 0,
+      "sourceAnchor": "audit-history"
+    },
+    {
+      "title": "Report failures instead of hiding them",
+      "start": 39.09,
+      "sourceAnchor": "workflow-reliability"
+    }
+  ]
+}

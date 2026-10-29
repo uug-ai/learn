@@ -1,0 +1,56 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "factory-license",
+  "title": "Understanding Factory's license",
+  "description": "Distinguish binary availability from source availability and read the license terms.",
+  "sourceUrl": "https://learn.uug.ai/docs/factory/license/",
+  "sourcePath": "../app/content/docs/factory/license/index.md",
+  "sourceSha256": "dc5c25a73dd8fa2bb6d1759df58b965c41e14ac784651ec9255040aece03fe24",
+  "reviewedOn": "2026-10-29",
+  "editorialStyle": {
+    "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
+    "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",
+    "humour": "Optional: one or two brief, relevant light moments are enough. Prefer a relatable analogy over a separate joke. Never pad the overview with banter.",
+    "reactions": "Use occasional short, natural responses such as 'Oh, that makes sense' or 'Wait, so...' followed by a real question. Avoid repetitive praise, canned agreement, and filler.",
+    "laughter": "Optional: at most one or two light reactions such as 'Ha, fair point.' Never insert [laughs], SSML, or repeated ha-ha strings. These are spoken reactions, not a guarantee of genuine laughter from the current speech engine.",
+    "intonation": "Write real questions with question marks, use contractions, alternate short and longer sentences, and make contrasts explicit. Let punctuation and sentence rhythm suggest curiosity, surprise, and emphasis. Avoid all-caps shouting, excessive exclamation marks, and artificial pause tags.",
+    "guardrails": "Keep technical claims source-backed. Never mock the listener, joke about real victims, minimize security or data-loss risks, or let humour replace an explanation. Personality is optional; accuracy and clarity are not."
+  },
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_puck",
+      "speed": 0.98
+    }
+  },
+  "chapters": [
+    {
+      "sourceAnchor": "the-mit-license-mit",
+      "title": "Availability and permission",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "A fictional team sees that Factory is free of charge. Does that also say its source is publicly available?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Not here. The page describes Factory as closed source, distributed as container binaries, and states that Factory and its binaries can be used under the MIT license. Price, source availability and usage terms are separate questions."
+        },
+        {
+          "speaker": "host",
+          "text": "What should the team retain from the license?"
+        },
+        {
+          "speaker": "guide",
+          "text": "The copyright and permission notice must accompany copies or substantial portions, and the software is supplied as is under the listed warranty disclaimer. Read the actual license before distribution or integration. This is a short orientation, not legal advice."
+        }
+      ]
+    }
+  ]
+}

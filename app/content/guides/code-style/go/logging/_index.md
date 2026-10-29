@@ -1,3 +1,5 @@
+---
+podcast: guides-code-style-go-logging
 title: Logging
 toc: false
 ---

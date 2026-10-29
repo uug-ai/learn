@@ -1,0 +1,78 @@
+{
+  "format": "learn-dialogue-v1",
+  "draft": false,
+  "id": "release-notes-2026-08-21",
+  "title": "Release highlights: August 21, 2026",
+  "description": "A historical overview of organisation and project controls and ownership-aware processing.",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-08-21/",
+  "sourcePath": "../app/content/release-notes/2026-08-21.md",
+  "sourceSha256": "fa4491053b1aa8c76b65df8f28138d41a88d719735db38d766639530f0ae3722",
+  "reviewedOn": "2026-10-29",
+  "editorialStyle": {
+    "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
+    "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",
+    "humour": "Optional: one or two brief, relevant light moments are enough. Prefer a relatable analogy over a separate joke. Never pad the overview with banter.",
+    "reactions": "Use occasional short, natural responses such as 'Oh, that makes sense' or 'Wait, so...' followed by a real question. Avoid repetitive praise, canned agreement, and filler.",
+    "laughter": "Optional: at most one or two light reactions such as 'Ha, fair point.' Never insert [laughs], SSML, or repeated ha-ha strings. These are spoken reactions, not a guarantee of genuine laughter from the current speech engine.",
+    "intonation": "Write real questions with question marks, use contractions, alternate short and longer sentences, and make contrasts explicit. Let punctuation and sentence rhythm suggest curiosity, surprise, and emphasis. Avoid all-caps shouting, excessive exclamation marks, and artificial pause tags.",
+    "guardrails": "Keep technical claims source-backed. Never mock the listener, joke about real victims, minimize security or data-loss risks, or let humour replace an explanation. Personality is optional; accuracy and clarity are not."
+  },
+  "speakers": {
+    "host": {
+      "name": "Host",
+      "voice": "af_heart",
+      "speed": 0.98
+    },
+    "guide": {
+      "name": "Guide",
+      "voice": "am_puck",
+      "speed": 0.98
+    }
+  },
+  "chapters": [
+    {
+      "sourceAnchor": "hub-frontend",
+      "title": "Workspace controls and rollout",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "What was a visible theme in the August twenty-first release?"
+        },
+        {
+          "speaker": "guide",
+          "text": "New feature flags and configuration supported markers, organisations and projects, including switcher and settings controls. The frontend stack was also modernised. Visibility depends on deployment configuration, not simply on a feature appearing in release notes."
+        },
+        {
+          "speaker": "host",
+          "text": "What would a fictional multi-site team need to remember?"
+        },
+        {
+          "speaker": "guide",
+          "text": "A workspace interface is only one part of project support. Review the current organisation and project guides before interpreting a switch as moving recordings or granting access."
+        }
+      ]
+    },
+    {
+      "sourceAnchor": "hub-workflows",
+      "title": "Carry ownership through processing",
+      "turns": [
+        {
+          "speaker": "host",
+          "text": "What happened beyond the interface?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Workflow runs and ingest paths gained project-aware handling, while monitor, sequence, analysis and other pipeline services strengthened ownership propagation and filtering. Several entries explicitly preserve compatibility with older data."
+        },
+        {
+          "speaker": "host",
+          "text": "What should an operator check?"
+        },
+        {
+          "speaker": "guide",
+          "text": "Review the affected services together and test existing resources as well as new recordings in their intended workspaces. Treat these notes as a dated change record, not a requirement to migrate historical data before it can remain usable."
+        }
+      ]
+    }
+  ]
+}

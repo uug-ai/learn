@@ -1,0 +1,24 @@
+{
+  "id": "tutorials-hub-setup-hls-live-view",
+  "title": "Understand the HLS live-view path",
+  "description": "Separate MQTT control messages from authenticated HTTPS media.",
+  "duration": 86.928,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/tutorials/hub/setup-hls-live-view/",
+  "sourceSha256": "b65820fe9687b105ffc40f528df8ea987707ad34efa9097b3f592cd883b82f4b",
+  "scriptSha256": "f2fe2f252910ef777965b8d6b702b020180165e966b842b1145b7876baafbc70",
+  "audioSha256": "2ceeb64eaf659239f43c9a1d4c1bc5688d2a44d881bde6e1111463702aa8a3dd",
+  "audio": "podcasts/tutorials-hub-setup-hls-live-view/episode.mp3",
+  "chapters": [
+    {
+      "title": "Control and media take different routes",
+      "start": 0,
+      "sourceAnchor": "understand-the-path"
+    },
+    {
+      "title": "Verify request, upload and playback",
+      "start": 45.715,
+      "sourceAnchor": "verify-the-stream"
+    }
+  ]
+}

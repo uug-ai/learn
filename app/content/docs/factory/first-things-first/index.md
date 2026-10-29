@@ -1,4 +1,5 @@
 ---
+podcast: factory-first-things-first
 title: "First things first"
 description: "A revolutionary design to scale your video analytics and video surveillance landscape."
 lead: "A revolutionary design to scale your video analytics and video surveillance landscape."

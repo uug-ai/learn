@@ -1,4 +1,5 @@
 ---
+podcast: agent-getting-started
 title: "Getting Started"
 description: ""
 lead: ""

@@ -1,0 +1,24 @@
+{
+  "id": "release-notes-2026-10-23",
+  "title": "Release highlights: October 23, 2026",
+  "description": "Review unified recordings, efficient previews, on-demand media and richer audit context.",
+  "duration": 85.056,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-10-23/",
+  "sourceSha256": "d628e134bf099200adb47375b2a70142a5f26139875aa3cd4158586412b1deac",
+  "scriptSha256": "79fc3a5f41c6b7175cca61dd47dfaacdff2e88b2ea7e395ca190d9928e490379",
+  "audioSha256": "19830d699d942e22a3181d93d5256f3538db677938b64d767b497b9e1b647a3f",
+  "audio": "podcasts/release-notes-2026-10-23/episode.mp3",
+  "chapters": [
+    {
+      "title": "One recordings experience",
+      "start": 0,
+      "sourceAnchor": "hub-frontend"
+    },
+    {
+      "title": "Load what the interface needs",
+      "start": 39.715,
+      "sourceAnchor": "hub-api"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 ---
+podcast: prologue-deployments
 title: "Deployments"
 description: "Kerberos.io deployments and examples"
 lead: "Kerberos.io deployments and examples"

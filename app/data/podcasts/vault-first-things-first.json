@@ -1,0 +1,24 @@
+{
+  "id": "vault-first-things-first",
+  "title": "Why introduce Vault?",
+  "description": "Understand bring-your-own storage, events and selective forwarding.",
+  "duration": 82.848,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/first-things-first/",
+  "sourceSha256": "ef41932e01b0ff94a785131014f2ec1d3f2c8b28fec5cbd3ec1d370b7f0fdc65",
+  "scriptSha256": "6d418832acbf3e778d0be03d66dcc363bbce4f1feb14f711fc6388bc9e8d99ac",
+  "audioSha256": "c1dd61048af521a997233561b1e7327ead901f215c475dd33a572a4ec31d1426",
+  "audio": "podcasts/vault-first-things-first/episode.mp3",
+  "chapters": [
+    {
+      "title": "Separate recording from storage",
+      "start": 0,
+      "sourceAnchor": "kerberos-vault-in-a-nutshell"
+    },
+    {
+      "title": "Let applications react",
+      "start": 43.115,
+      "sourceAnchor": "integration-and-events"
+    }
+  ]
+}

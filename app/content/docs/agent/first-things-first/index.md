@@ -1,4 +1,5 @@
 ---
+podcast: agent-first-things-first
 title: "First things first"
 description: "An agent with a mind for scale"
 lead: "An agent with a mind for scale"

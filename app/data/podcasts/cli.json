@@ -1,0 +1,24 @@
+{
+  "id": "cli",
+  "title": "Automating platform maintenance",
+  "description": "Find focused CLI jobs and choose the right execution environment.",
+  "duration": 73.92,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/cli/",
+  "sourceSha256": "36b2686187ce9121e71160fd82704300e45665e64632c5cbbdb0a7cd3b9705f5",
+  "scriptSha256": "341b2cca4be0ee2608ac690f5eb98363a1c9dc9732b4f436fa62779c258d7ac9",
+  "audioSha256": "a023602bdc2578e3b181f288fc746f42007bf0495106bf8d0137c19a850ce1cc",
+  "audio": "podcasts/cli/episode.mp3",
+  "chapters": [
+    {
+      "title": "A job with a specific purpose",
+      "start": 0,
+      "sourceAnchor": "run"
+    },
+    {
+      "title": "Inspect before execution",
+      "start": 37.615,
+      "sourceAnchor": "installation-and-contributing"
+    }
+  ]
+}

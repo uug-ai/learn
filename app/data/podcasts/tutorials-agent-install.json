@@ -1,0 +1,24 @@
+{
+  "id": "tutorials-agent-install",
+  "title": "Install your first Agent safely",
+  "description": "Choose a runtime, protect initial access and verify persistent recording.",
+  "duration": 79.584,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/tutorials/agent/install/",
+  "sourceSha256": "e1609cd00373f9be56472ab583b9d8055392744d9a4f1273f564e22ef322e7b0",
+  "scriptSha256": "8bcd186709127a45ce023940147b64f8ee72f05d40f3dd57998e654e1223dd64",
+  "audioSha256": "7072313eb629f3ef677d927cd04ceed8ff4d271ae94b4f3345b1c4dfd804e5a2",
+  "audio": "podcasts/tutorials-agent-install/episode.mp3",
+  "chapters": [
+    {
+      "title": "One camera, one installation",
+      "start": 0,
+      "sourceAnchor": "prerequisites"
+    },
+    {
+      "title": "Make the result durable",
+      "start": 38.965,
+      "sourceAnchor": "option-2--docker-with-persistent-volumes"
+    }
+  ]
+}

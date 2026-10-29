@@ -1,4 +1,5 @@
 ---
+podcast: tutorials-agent-connect-any-camera
 title: 'Connect any IP camera to Agent'
 description: 'Find and test a camera RTSP stream, connect it to Kerberos Agent, and verify live video and recordings.'
 date: '2026-08-20'

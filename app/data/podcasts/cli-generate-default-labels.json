@@ -1,0 +1,24 @@
+{
+  "id": "cli-generate-default-labels",
+  "title": "Add starter labels deliberately",
+  "description": "Preview missing labels for a scoped account before applying updates.",
+  "duration": 78.144,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/cli/generate-default-labels/",
+  "sourceSha256": "f6e7d4bf461a87381706ee06b17e82d9ee51e5a55c7d98dda995f2e7844fac12",
+  "scriptSha256": "48d59bbaaf37e2e2b9e2c90bccf8eb2d30da569e77f4be8434a1a916a7eae4bd",
+  "audioSha256": "1caa0dca973ed67743606b922e687c5699d9604034d1ed3f2ceb6971a2b8dca5",
+  "audio": "podcasts/cli-generate-default-labels/episode.mp3",
+  "chapters": [
+    {
+      "title": "A targeted addition",
+      "start": 0,
+      "sourceAnchor": "overview"
+    },
+    {
+      "title": "Confirm the scope and outcome",
+      "start": 37.89,
+      "sourceAnchor": "notes"
+    }
+  ]
+}

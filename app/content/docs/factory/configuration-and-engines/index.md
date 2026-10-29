@@ -1,4 +1,5 @@
 ---
+podcast: factory-configuration-and-engines
 title: "Configuration & engines"
 description: "How Factory stores its configuration and how it schedules your Agents."
 lead: "How Factory stores its configuration and how it schedules your Agents."

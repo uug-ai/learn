@@ -6,8 +6,8 @@
   "description": "Follow an event from an Agent through Hub to the people watching, then choose where to start.",
   "sourcePath": "../app/content/docs/hub/_index.md",
   "sourceUrl": "https://learn.uug.ai/docs/hub/",
-  "sourceSha256": "5523aec43f6eb1876a365ee816a3b9277ee4ab4eb062d323d602f3def0e0f86a",
-  "reviewedOn": "2026-10-28",
+  "sourceSha256": "9b8b7381ff3d9adbc1c1d7b6e34e09c5efd0d9197bbe434f7cbde6c6f0940275",
+  "reviewedOn": "2026-10-29",
   "speakers": {
     "host": {
       "name": "Host",

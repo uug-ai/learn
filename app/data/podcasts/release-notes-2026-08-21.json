@@ -1,0 +1,24 @@
+{
+  "id": "release-notes-2026-08-21",
+  "title": "Release highlights: August 21, 2026",
+  "description": "A historical overview of organisation and project controls and ownership-aware processing.",
+  "duration": 78.408,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/release-notes/2026-08-21/",
+  "sourceSha256": "fa4491053b1aa8c76b65df8f28138d41a88d719735db38d766639530f0ae3722",
+  "scriptSha256": "acb51ecd0ba92ad159e4b8119c95e12a7c44d960528c9da89fa8af72a92040db",
+  "audioSha256": "6840b537d56d98e2534b46257bd59142fdc298d24fd41eb4c46a678001739231",
+  "audio": "podcasts/release-notes-2026-08-21/episode.mp3",
+  "chapters": [
+    {
+      "title": "Workspace controls and rollout",
+      "start": 0,
+      "sourceAnchor": "hub-frontend"
+    },
+    {
+      "title": "Carry ownership through processing",
+      "start": 39.44,
+      "sourceAnchor": "hub-workflows"
+    }
+  ]
+}

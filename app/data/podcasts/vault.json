@@ -1,0 +1,24 @@
+{
+  "id": "vault",
+  "title": "Meet Vault",
+  "description": "Follow recordings from Agents into your own storage and applications.",
+  "duration": 77.592,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/docs/vault/",
+  "sourceSha256": "3c1aa80f8b73413e60db1e583b6663d3e3aecf55621199a4f25c4663a08e0c78",
+  "scriptSha256": "768af705753d1efcbdc41d0dd7aa0d709586b11950e44dc01ae859631c886680",
+  "audioSha256": "246e45c10dbef0bb47d4d10699cc43c13a5e11d21100709b2fd743c565176eed",
+  "audio": "podcasts/vault/episode.mp3",
+  "chapters": [
+    {
+      "title": "Storage and events",
+      "start": 0,
+      "sourceAnchor": "how-recordings-move-through-vault"
+    },
+    {
+      "title": "Choose the next guide",
+      "start": 42.215,
+      "sourceAnchor": "where-to-start"
+    }
+  ]
+}

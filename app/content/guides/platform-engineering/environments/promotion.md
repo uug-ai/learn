@@ -1,4 +1,5 @@
 ---
+podcast: guides-platform-engineering-environments-promotion
 title: Promotion
 toc: false
 type: docs

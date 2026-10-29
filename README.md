@@ -101,7 +101,7 @@ circles; the current-page sidebar highlight retains the product accent:
 | Product | Accent |
 | --- | --- |
 | Agent | Brick red `#933734` |
-| Factory | Slate blue `#56618f` |
+| Factory | Green `#4a786a` |
 | Vault | Slate blue `#56618f` |
 | Hub | Orchid `#a239d7` |
 
@@ -157,13 +157,14 @@ episodes for any documentation page, using a consistent conversational outline
 and shared interactive player. Generation and review remain local until an
 episode is approved. Approved episodes are exported into site assets and
 enabled with a page's `podcast` front matter.
-All 36 published, content-bearing Hub guides include an overview through a
-headphone **Listen to the overview** button with an estimated duration,
-including the Hub landing page and nested workflow and result-contract guides.
-The unpublished ANPR draft intentionally has none.
-The 35 new episodes use the existing female host and Kokoro's `am_puck` male
-guide with upbeat conversational wording; the original organisations overview
-is preserved.
+All 104 published, substantive articles include an overview through a headphone
+**Listen to the overview** button with an estimated duration. Coverage includes
+all product documentation and overviews, CLI and platform references, tutorials,
+completed engineering guides, the CORS knowledge-base article, blog posts,
+release notes, and support. The 68 episodes added beyond Hub use the existing
+female host and Kokoro's `am_puck` male guide; the organisations overview is
+preserved. Drafts, empty pages, "To be written" placeholders, catalogues, and
+navigation-only pages intentionally have no podcast.
 Episodes introduce the mental model and one everyday example rather than
 narrating setup details. The compact player offers playback and chapters,
 remembers progress in this browser, and keeps audio controls reachable while
@@ -174,11 +175,15 @@ updating as playback moves or seeks between topics.
 Playback scrolls to each new section below the fixed header; chapter selection
 also brings its section into view. It does not keep scrolling within a topic
 and respects reduced-motion preferences.
-Playback never starts automatically. Documentation outside Hub is unchanged.
+Playback never starts automatically. Documentation, general articles, blog posts,
+and release notes share the same header control and player while retaining their
+own layouts and metadata. Pages without a podcast do not load podcast assets.
 Source review and automated audio checks do not constitute human listening
 approval; listen before a production release.
 See the [publication workflow](podcast/README.md#publish-an-approved-episode-to-learn)
-and run `npm run podcast` in `playwright/` for the focused browser tests.
+and run `npm test` in `podcast/` for source, coverage, audio-integrity, and timing
+checks. Run `npm run podcast` in `playwright/` for playback and chapter-link tests
+on every published episode, plus the shared player's interaction tests.
 
 ## Google Analytics and calls to action
 

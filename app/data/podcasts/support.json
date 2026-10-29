@@ -1,0 +1,24 @@
+{
+  "id": "support",
+  "title": "Make a support request easier to solve",
+  "description": "Gather a clear problem description, context and impact before contacting support.",
+  "duration": 74.208,
+  "reviewedOn": "2026-10-29",
+  "sourceUrl": "https://learn.uug.ai/support/",
+  "sourceSha256": "7662abda4469a67853d35df0021399f5e66acb5f83c8f6eb0aa03de9f88bca5c",
+  "scriptSha256": "2a1e72a0af5f6cf47a98a72665760f9f760035a66bd2c9ec1f93d39f003b4faa",
+  "audioSha256": "ac5f2603cdb724779a5650b9cbf69313bc7b161fbde8818b55493898bc534cec",
+  "audio": "podcasts/support/episode.mp3",
+  "chapters": [
+    {
+      "title": "Evidence beats guesswork",
+      "start": 0,
+      "sourceAnchor": "how-to-get-the-best-support"
+    },
+    {
+      "title": "Explain the impact",
+      "start": 38.84,
+      "sourceAnchor": "emergency-support"
+    }
+  ]
+}

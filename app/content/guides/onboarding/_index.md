@@ -1,4 +1,5 @@
 ---
+podcast: guides-onboarding
 title: Onboarding
 toc: false
 description: Essential guide to getting started and integrating into your new team

@@ -1,4 +1,5 @@
 ---
+podcast: cli-check-indexes
 title: "Check indexes"
 description: ""
 lead: ""

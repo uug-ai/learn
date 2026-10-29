@@ -26,7 +26,7 @@ const products = [
   },
   {
     slug: 'factory',
-    accent: '#56618f',
+    accent: '#4a786a',
     article: 'getting-started',
     gettingStarted: 'Getting Started',
     topics: ['Configuration & engines', 'License'],
