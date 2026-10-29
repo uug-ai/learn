@@ -72,6 +72,84 @@ hugo server -D
 
 The site will automatically reload when you make changes to the content.
 
+### Product documentation navigation
+
+Agent, Factory, Vault, and Hub keep **First things first**, **Getting started**,
+and **Installation** at the top of their sidebars, followed by a collapsible
+**Topics** group. All other published, visible pages in each product appear
+there automatically, sorted A-Z by their navigation title. Nested guides
+retain their own weight-based order. The group opens on the product overview
+and when reading any topic or its nested guides. Page URLs and breadcrumbs
+do not change.
+
+The introductory pages and group label are configured in
+each product's `app/content/docs/<product>/_index.md` under `sidebar`.
+The shared `app/layouts/_partials/docs/topic-navigation.html` partial also
+keeps article footer links in the same order. Other documentation sections
+keep their existing navigation. The tracked vendored Hextra sidebar and
+pager templates use this partial; preserve those integrations when updating
+the theme.
+
+Run `npm run test:navigation` in `playwright/` to check desktop/mobile grouping,
+alphabetical ordering, nested guides, footer navigation, and product colors.
+
+Each product's content hyperlinks and hover/focus states use its product
+accent. Headings, idle menu links, breadcrumbs, page
+overview, and previous/next links stay neutral. Product names have no decorative
+circles; the current-page sidebar highlight retains the product accent:
+
+| Product | Accent |
+| --- | --- |
+| Agent | Brick red `#933734` |
+| Factory | Slate blue `#56618f` |
+| Vault | Slate blue `#56618f` |
+| Hub | Orchid `#a239d7` |
+
+The `sidebar.product` field on each product overview scopes these accents to
+that product's entire sidebar branch. The documentation article template also
+resolves this identity from the page's ancestors so every nested guide carries
+the same product color, without repeating front matter. The color rules live
+in `app/assets/css/custom.css`. Link text and highlights adapt to light/dark
+mode for at least 4.5:1 text contrast, which
+the navigation tests measure. The global navbar and non-product sections retain
+the UUG palette. Cross-product links within an article use the current article's
+color; sidebar branches always retain their own product colors.
+
+### Product overviews
+
+The Agent, Factory, Vault, and Hub landing pages at `/docs/<product>/` introduce
+the product, show an animated illustration, explain its workflow in three steps,
+and link to the next guides. Content lives in each product's
+`app/content/docs/<product>/_index.md`.
+
+Agent, Factory, and Vault temporarily reuse Hub's `iso-figure figure="hub"`
+illustration. When product-specific artwork is ready, add the SVG under
+`app/assets/iso/` and change the shortcode's `figure`, `alt`, and `caption` in
+the corresponding overview. The shared shortcode handles the animation styles
+and accessible description; no template changes are needed.
+
+The navigation tests also check these overviews, their illustrations, and
+getting-started links on desktop and mobile.
+
+### Code blocks
+
+Indented and fenced code use a single padded surface with a darkened product
+accent background. Pages outside product documentation use the UUG blue accent.
+Code inside a block has no inline-code chip, border, or extra padding; inline
+code in prose keeps its existing treatment. Long lines scroll horizontally and
+retain whitespace.
+
+Fenced blocks use a component-local dark theme in the tracked Hextra
+`app/_vendor/github.com/imfing/hextra/layouts/_markup/render-codeblock.html`
+hook, reusing the theme's dark syntax palette in either page theme. Preserve
+this class when updating Hextra. Filename headers stay above the code, and
+copy controls remain visible on touch devices and when keyboard-focused.
+Mermaid diagrams are not given a code surface.
+
+Run `npm run test:code-blocks` in `playwright/` for the focused desktop/mobile
+checks, including the draft Factory cloud-installation page from the UI report,
+product tint values, text contrast, scrolling, filename layout, and copying.
+
 ### Article podcasts
 
 The [podcast template](podcast/README.md) scaffolds source-linked, two-host

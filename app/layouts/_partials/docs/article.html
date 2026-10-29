@@ -3,7 +3,13 @@
     {{- $css := resources.Get "css/podcast.css" | minify | fingerprint -}}
     <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
   {{- end -}}
-  <div class='hx:mx-auto hx:flex hextra-max-page-width'>
+  {{- $product := .Params.sidebar.product | default "" -}}
+  {{- range .Ancestors -}}
+    {{- if not $product -}}
+      {{- $product = .Params.sidebar.product | default "" -}}
+    {{- end -}}
+  {{- end -}}
+  <div class="hx:mx-auto hx:flex hextra-max-page-width{{ if $product }} learn-product-page{{ end }}"{{ with $product }} data-product="{{ . }}"{{ end }}>
     {{ partial "sidebar.html" (dict "context" .) }}
     {{ partial "toc.html" . }}
     <article class="hx:w-full hx:break-words hx:flex hx:min-h-[calc(100vh-var(--navbar-height))] hx:min-w-0 hx:justify-center hx:pb-8 hx:pr-[calc(env(safe-area-inset-right)-1.5rem)]">

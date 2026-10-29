@@ -8,6 +8,13 @@ draft: false
 podcast: hub-overview
 images: []
 weight: 7
+sidebar:
+  product: hub
+  topicGroup: Topics
+  introductoryPages:
+    - first-things-first
+    - getting-started
+    - installation
 ---
 
 Kerberos Hub is the web application that brings all your Agents, sites and recordings together in one place. Agents keep doing the recording at the edge, close to the cameras. Hub adds what a single Agent can't: one overview across every site, live views and videowalls, searchable recordings with machine learning detections, and alerts for the people who need them.
