@@ -2,18 +2,20 @@
   const script = document.currentScript;
   if (!script || window.__uugLearnAnalytics) return;
   const { measurementId, productionHost, pagePath, contentSection, productId } = script.dataset;
-  if (location.protocol !== 'https:' || location.hostname !== productionHost) return;
+  // Debug builds run the consent flow anywhere but log to the console instead of loading Google.
+  const debug = script.dataset.debug === 'true';
+  if (!debug && (location.protocol !== 'https:' || location.hostname !== productionHost)) return;
 
   const banner = document.querySelector('#learn-cookie-banner');
-  const settings = document.querySelector('[data-cookie-settings]');
   const status = document.querySelector('[data-analytics-status]');
-  if (!banner || !settings || !status) {
+  if (!banner || !status) {
     console.error('Learn analytics is disabled because consent controls are missing.');
     return;
   }
   window.__uugLearnAnalytics = true;
+  // The footer animates with clip-path, which would clip this fixed banner; keep it outside.
+  document.body.append(banner);
   const consentKey = 'uug-analytics-consent';
-  const disabledKey = `ga-disable-${measurementId}`;
   const context = { site_area: 'learn', content_section: contentSection };
   if (productId) context.product_id = productId;
   let preference = null;
@@ -32,14 +34,19 @@
   try {
     preference = storedPreference(localStorage.getItem(consentKey));
   } catch (error) {
-    notify('Your cookie preference could not be read. Analytics stays off until you allow it.', error);
+    notify('Your cookie preference could not be read. Analytics cookies stay off until you accept them.', error);
   }
 
   function gtag() {
+    if (debug) {
+      console.info('[Learn analytics debug]', ...arguments);
+      return;
+    }
     window.dataLayer.push(arguments);
   }
+  // Consent Mode v2 advanced: without consent GA only sends cookieless pings.
   const send = (name, parameters = {}) => {
-    if (preference !== 'granted' || !started) return false;
+    if (!started) return false;
     gtag('event', name, { send_to: measurementId, ...context, ...parameters });
     return true;
   };
@@ -51,11 +58,6 @@
       : url.origin;
   };
   const start = () => {
-    window[disabledKey] = false;
-    if (started) {
-      gtag('consent', 'update', { analytics_storage: 'granted' });
-      return;
-    }
     started = true;
     window.dataLayer = window.dataLayer || [];
     gtag('consent', 'default', {
@@ -64,7 +66,7 @@
       ad_user_data: 'denied',
       ad_personalization: 'denied',
     });
-    gtag('consent', 'update', { analytics_storage: 'granted' });
+    if (preference === 'granted') gtag('consent', 'update', { analytics_storage: 'granted' });
     gtag('js', new Date());
     gtag('config', measurementId, {
       send_page_view: false,
@@ -79,6 +81,7 @@
       ...context,
     });
     send('page_view');
+    if (debug) return;
     const tag = document.createElement('script');
     tag.async = true;
     tag.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
@@ -87,9 +90,7 @@
     };
     document.head.append(tag);
   };
-  const stop = () => {
-    window[disabledKey] = true;
-    if (started) gtag('consent', 'update', { analytics_storage: 'denied' });
+  const clearCookies = () => {
     const names = document.cookie.split(';').map((cookie) => cookie.trim().split('=')[0])
       .filter((name) => /^learn_ga(?:_|$)/.test(name));
     names.forEach((name) => {
@@ -100,18 +101,12 @@
   };
   const showBanner = (visible) => {
     banner.hidden = !visible;
-    settings.setAttribute('aria-expanded', String(visible));
   };
   const applyPreference = () => {
-    if (preference === 'granted') start();
-    else stop();
+    gtag('consent', 'update', { analytics_storage: preference === 'granted' ? 'granted' : 'denied' });
+    if (preference !== 'granted') clearCookies();
     showBanner(preference === null);
   };
-  settings.hidden = false;
-  settings.addEventListener('click', () => {
-    showBanner(true);
-    banner.querySelector('button').focus();
-  });
   banner.querySelectorAll('[data-analytics-consent]').forEach((button) => {
     button.addEventListener('click', () => {
       preference = button.dataset.analyticsConsent;
@@ -123,7 +118,6 @@
         notify('Your cookie preference could not be saved. This choice applies only to this page.', error);
         showBanner(true);
       }
-      if (banner.hidden) settings.focus();
     });
   });
   window.addEventListener('storage', (event) => {
@@ -154,7 +148,7 @@
   };
   document.addEventListener('click', (event) => {
     const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
-    if (!link || preference !== 'granted') return;
+    if (!link) return;
     const url = new URL(link.href);
     const action = classify(link, url);
     if (!action) return;
@@ -177,5 +171,7 @@
     if (send('learn_podcast_start')) played.add(audio);
   }, true);
 
-  applyPreference();
+  start();
+  if (preference !== 'granted') clearCookies();
+  showBanner(preference === null);
 })();

@@ -1,4 +1,5 @@
-{{- if hugo.IsProduction -}}
+{{- $debug := and (not hugo.IsProduction) .Site.Params.analytics.debug -}}
+{{- if or hugo.IsProduction $debug -}}
   {{- with .Site.Config.Services.GoogleAnalytics.ID -}}
     {{- if not (findRE `^G-[A-Z0-9]+$` .) -}}
       {{- errorf "Learn requires a GA4 measurement ID, got %q" . -}}
@@ -19,8 +20,10 @@
       data-production-host="{{ $.Site.Params.analytics.productionHost }}"
       data-page-path="{{ $.RelPermalink }}"
       data-content-section="{{ $.Section | default "home" }}"
-      data-product-id="{{ $product }}"></script>
+      data-product-id="{{ $product }}"
+      {{- if $debug }} data-debug="true"{{ end }}></script>
   {{- end -}}
+  {{- if hugo.IsProduction -}}
   {{- with .Site.Params.analytics.umami -}}
     {{- partial "components/analytics/umami.html" $ -}}
   {{- end -}}
@@ -29,5 +32,6 @@
   {{- end -}}
   {{- with .Site.Params.analytics.goatCounter -}}
     {{- partial "components/analytics/goat-counter.html" $ -}}
+  {{- end -}}
   {{- end -}}
 {{- end -}}

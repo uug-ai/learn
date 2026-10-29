@@ -8,17 +8,15 @@
     <a class="learn-action-link" href="https://uug.ai/contact/" data-learn-cta="contact_sales">Talk to our team</a>
   </div>
 </div>
-{{- if and hugo.IsProduction .context.Site.Config.Services.GoogleAnalytics.ID -}}
-  <div class="learn-cookie-controls">
-    <button type="button" class="learn-cookie-settings" data-cookie-settings aria-controls="learn-cookie-banner" aria-expanded="false" hidden>Cookie settings</button>
-    <p class="learn-analytics-status" role="status" data-analytics-status hidden></p>
-  </div>
+{{- $debug := and (not hugo.IsProduction) .context.Site.Params.analytics.debug -}}
+{{- if and (or hugo.IsProduction $debug) .context.Site.Config.Services.GoogleAnalytics.ID -}}
+  <p class="learn-analytics-status" role="status" data-analytics-status hidden></p>
   <section id="learn-cookie-banner" class="learn-cookie-banner" aria-labelledby="learn-cookie-heading" hidden>
-    <h2 id="learn-cookie-heading">Analytics on UUG.AI Learn</h2>
-    <p>With your permission, we use Google Analytics to understand which guides are useful and how readers use our demos and resources. Advertising storage stays disabled. You can change your choice in Cookie settings.</p>
+    <h2 id="learn-cookie-heading">We use cookies</h2>
+    <p>Analytics cookies help us improve our guides, never for ads. If you reject them, we only collect cookieless usage data. <a href="https://uug.ai/privacy/">Privacy policy</a></p>
     <div class="learn-footer-buttons">
-      <button type="button" class="learn-action-link" data-analytics-consent="granted">Allow analytics</button>
-      <button type="button" class="learn-action-link" data-analytics-consent="denied">Reject analytics</button>
+      <button type="button" class="learn-action-link" data-analytics-consent="granted">Accept cookies</button>
+      <button type="button" class="learn-action-link" data-analytics-consent="denied">Reject cookies</button>
     </div>
   </section>
 {{- end -}}

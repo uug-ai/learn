@@ -34,25 +34,35 @@ async function events(page: Page) {
   });
 }
 
-test('loads no Google code or events until consent, and rejection survives navigation', async ({ context, page }) => {
+async function analyticsStorage(page: Page) {
+  return page.evaluate(() => {
+    const dataLayer: ArrayLike<unknown>[] = Reflect.get(window, 'dataLayer') || [];
+    return dataLayer.filter(entry => entry[0] === 'consent')
+      .map(entry => (entry[2] as { analytics_storage?: string }).analytics_storage)
+      .at(-1);
+  });
+}
+
+test('measures cookielessly before a choice, and rejection keeps cookies off across navigation', async ({ context, page }) => {
   const requests = await fixture(context);
   await page.goto(`${production}/docs/hub/organisations/`);
-  await expect(page.getByRole('region', { name: 'Analytics on UUG.AI Learn' })).toBeVisible();
-  expect(requests).toEqual([]);
-  expect(await events(page)).toEqual([]);
-  await page.getByRole('button', { name: 'Reject analytics', exact: true }).click();
+  await expect(page.getByRole('region', { name: 'We use cookies' })).toBeVisible();
+  await expect.poll(() => requests.length).toBe(1);
+  expect(await analyticsStorage(page)).toBe('denied');
+  expect((await events(page)).map(event => event.name)).toEqual(['page_view']);
+  await page.getByRole('button', { name: 'Reject cookies', exact: true }).click();
   await expect(page.locator('#learn-cookie-banner')).toBeHidden();
+  expect(await analyticsStorage(page)).toBe('denied');
   await page.goto(`${production}/docs/agent/getting-started/`);
   await expect(page.locator('#learn-cookie-banner')).toBeHidden();
-  expect(requests).toEqual([]);
-  expect(await events(page)).toEqual([]);
+  expect(await analyticsStorage(page)).toBe('denied');
   expect(await page.evaluate(key => localStorage.getItem(key), consentKey)).toBe('denied');
 });
 
 test('consent loads one tag and one sanitized contextual page view, with advertising disabled', async ({ context, page }) => {
   const requests = await fixture(context);
   await page.goto(`${production}/docs/hub/organisations/?q=private-search&email=private@example.com#private-fragment`);
-  await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
+  await page.getByRole('button', { name: 'Accept cookies', exact: true }).click();
   await expect.poll(() => requests.length).toBe(1);
   expect(requests[0]).toBe(`https://www.googletagmanager.com/gtag/js?id=${measurementId}`);
   const commands = await page.evaluate(() => {
@@ -77,8 +87,8 @@ test('consent loads one tag and one sanitized contextual page view, with adverti
     parameters: { send_to: measurementId, site_area: 'learn', content_section: 'docs', product_id: 'hub' },
   }]);
   expect(JSON.stringify(commands)).not.toMatch(/private-search|private@example|private-fragment/);
-  await page.getByRole('button', { name: 'Cookie settings', exact: true }).click();
-  await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
+  expect(await analyticsStorage(page)).toBe('granted');
+  await expect(page.locator('#learn-cookie-banner')).toBeHidden();
   expect(requests).toHaveLength(1);
   expect((await events(page)).filter(event => event.name === 'page_view')).toHaveLength(1);
 });
@@ -86,7 +96,7 @@ test('consent loads one tag and one sanitized contextual page view, with adverti
 test('tracks footer demo and sales intent with bounded CTA context, without submitting anything', async ({ context, page }) => {
   await fixture(context);
   await page.goto(`${production}/docs/vault/first-things-first/`);
-  await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
+  await page.getByRole('button', { name: 'Accept cookies', exact: true }).click();
   const popupPromise = page.waitForEvent('popup');
   await page.getByRole('link', { name: 'View demo', exact: true }).click();
   const popup = await popupPromise;
@@ -118,7 +128,7 @@ test('tracks footer demo and sales intent with bounded CTA context, without subm
 test('tracks existing navigation and onboarding links without link text or query contents', async ({ context, page }) => {
   await fixture(context);
   await page.goto(`${production}/docs/agent/first-things-first/`);
-  await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
+  await page.getByRole('button', { name: 'Accept cookies', exact: true }).click();
   await page.evaluate(() => {
     const urls = [
       '/support/', '/docs/agent/getting-started/',
@@ -147,10 +157,9 @@ test('tracks existing navigation and onboarding links without link text or query
   expect(JSON.stringify(resourceEvents)).not.toMatch(/private|token|support@/i);
 });
 
-test('revocation stops custom events and removes only Learn cookies, preserving public website cookies', async ({ context, page }) => {
+test('rejection keeps cookieless measurement and removes only Learn cookies, preserving public website cookies', async ({ context, page }) => {
   await fixture(context);
   await page.goto(`${production}/`);
-  await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
   await context.addCookies([
     { name: '_ga', value: 'public-website', domain: '.uug.ai', path: '/', secure: true },
     { name: '_ga_PLRKXEQ42W', value: 'public-website', domain: '.uug.ai', path: '/', secure: true },
@@ -158,14 +167,13 @@ test('revocation stops custom events and removes only Learn cookies, preserving 
     { name: 'learn_ga_ZW744GSN4M', value: 'test', domain: '.learn.uug.ai', path: '/', secure: true },
     { name: 'unrelated', value: 'keep', domain: 'learn.uug.ai', path: '/', secure: true },
   ]);
-  await page.getByRole('button', { name: 'Cookie settings', exact: true }).click();
-  await page.getByRole('button', { name: 'Reject analytics', exact: true }).click();
-  expect(await page.evaluate(id => Reflect.get(window, `ga-disable-${id}`), measurementId)).toBe(true);
+  await page.getByRole('button', { name: 'Reject cookies', exact: true }).click();
+  expect(await analyticsStorage(page)).toBe('denied');
   await page.getByRole('link', { name: 'View demo', exact: true }).evaluate(link => {
     link.addEventListener('click', event => event.preventDefault());
     link.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   });
-  expect((await events(page)).filter(event => event.name === 'view_demo')).toEqual([]);
+  expect((await events(page)).filter(event => event.name === 'view_demo')).toHaveLength(1);
   const cookies = await context.cookies(production);
   expect(cookies.some(cookie => cookie.name.startsWith('learn_ga'))).toBe(false);
   expect(cookies.filter(cookie => cookie.name.startsWith('_ga'))).toHaveLength(2);
@@ -175,14 +183,14 @@ test('revocation stops custom events and removes only Learn cookies, preserving 
 test('cross-tab withdrawal is respected and granting again does not duplicate page views', async ({ context, page }) => {
   await fixture(context);
   await page.goto(`${production}/`);
-  await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
+  await page.getByRole('button', { name: 'Accept cookies', exact: true }).click();
   const second = await context.newPage();
   await second.goto(`${production}/docs/`);
-  await second.getByRole('button', { name: 'Cookie settings', exact: true }).click();
-  await second.getByRole('button', { name: 'Reject analytics', exact: true }).click();
-  await expect.poll(() => page.evaluate(id => Reflect.get(window, `ga-disable-${id}`), measurementId)).toBe(true);
-  await page.getByRole('button', { name: 'Cookie settings', exact: true }).click();
-  await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
+  await expect(second.locator('#learn-cookie-banner')).toBeHidden();
+  await second.evaluate(key => localStorage.setItem(key, 'denied'), consentKey);
+  await expect.poll(() => analyticsStorage(page)).toBe('denied');
+  await second.evaluate(key => localStorage.setItem(key, 'granted'), consentKey);
+  await expect.poll(() => analyticsStorage(page)).toBe('granted');
   expect((await events(page)).filter(event => event.name === 'page_view')).toHaveLength(1);
 });
 
@@ -194,16 +202,17 @@ test('blocked storage is reported and does not prevent an explicit in-page choic
   });
   await page.goto(`${production}/`);
   await expect(page.locator('[data-analytics-status]')).toContainText('could not be read');
-  expect(await events(page)).toEqual([]);
-  await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
+  expect(await analyticsStorage(page)).toBe('denied');
+  await page.getByRole('button', { name: 'Accept cookies', exact: true }).click();
   await expect(page.locator('[data-analytics-status]')).toContainText('could not be saved');
+  expect(await analyticsStorage(page)).toBe('granted');
   expect((await events(page)).filter(event => event.name === 'page_view')).toHaveLength(1);
 });
 
 test('podcast starts are counted once per audio element after consent, not on opening the player', async ({ context, page }) => {
   await fixture(context);
   await page.goto(`${production}/docs/hub/organisations/`);
-  await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
+  await page.getByRole('button', { name: 'Accept cookies', exact: true }).click();
   await page.getByRole('button', { name: 'Listen to the overview', exact: true }).click();
   expect((await events(page)).filter(event => event.name === 'learn_podcast_start')).toEqual([]);
   await page.locator('#article-podcast audio').evaluate(audio => {
@@ -216,7 +225,6 @@ test('podcast starts are counted once per audio element after consent, not on op
 test('production output on localhost or an unapproved host never initializes analytics', async ({ context, page }) => {
   const requests = await fixture(context);
   await page.goto(local);
-  await expect(page.locator('[data-cookie-settings]')).toBeHidden();
   await expect(page.locator('#learn-cookie-banner')).toBeHidden();
   expect(requests).toEqual([]);
   expect(await events(page)).toEqual([]);
@@ -226,7 +234,6 @@ for (const origin of ['https://preview.learn.example', 'https://learn.uug.ai.exa
   test(`never initializes production analytics on ${origin}`, async ({ context, page }) => {
     const requests = await fixture(context, new URL(origin).hostname);
     await page.goto(`${origin}/`);
-    await expect(page.locator('[data-cookie-settings]')).toBeHidden();
     await expect(page.locator('#learn-cookie-banner')).toBeHidden();
     expect(requests).toEqual([]);
     expect(await events(page)).toEqual([]);
@@ -234,24 +241,23 @@ for (const origin of ['https://preview.learn.example', 'https://learn.uug.ai.exa
 }
 
 test('CTA navigation still works without analytics consent', async ({ context, page }) => {
-  const requests = await fixture(context);
+  await fixture(context);
   await page.goto(`${production}/`);
-  await page.getByRole('button', { name: 'Reject analytics', exact: true }).click();
+  await page.getByRole('button', { name: 'Reject cookies', exact: true }).click();
   const popupPromise = page.waitForEvent('popup');
   await page.getByRole('link', { name: 'View demo', exact: true }).click();
   const popup = await popupPromise;
   await popup.waitForLoadState();
   expect(popup.url()).toBe('https://app-demo.kerberos.io/');
   await popup.close();
-  expect(requests).toEqual([]);
-  expect(await events(page)).toEqual([]);
+  expect(await analyticsStorage(page)).toBe('denied');
 });
 
 test('tag load failures are reported without blocking the documentation', async ({ context, page }) => {
   await fixture(context);
   await context.route('https://www.googletagmanager.com/gtag/js?*', route => route.abort());
   await page.goto(`${production}/`);
-  await page.getByRole('button', { name: 'Allow analytics', exact: true }).click();
+  await page.getByRole('button', { name: 'Accept cookies', exact: true }).click();
   await expect(page.locator('[data-analytics-status]')).toContainText('could not be loaded');
   await expect(page.getByRole('heading', { name: 'Learning hub', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'View demo', exact: true })).toHaveAttribute('href', 'https://app-demo.kerberos.io/');
@@ -263,11 +269,11 @@ test('mobile consent controls and CTA buttons fit the viewport in dark mode', as
   await page.addInitScript(() => localStorage.setItem('color-theme', 'dark'));
   await page.goto(`${production}/`);
   await expect(page.locator('html')).toHaveClass(/dark/);
-  const banner = page.getByRole('region', { name: 'Analytics on UUG.AI Learn' });
+  const banner = page.getByRole('region', { name: 'We use cookies' });
   await expect(banner).toBeVisible();
   for (const control of [
-    page.getByRole('button', { name: 'Allow analytics', exact: true }),
-    page.getByRole('button', { name: 'Reject analytics', exact: true }),
+    page.getByRole('button', { name: 'Accept cookies', exact: true }),
+    page.getByRole('button', { name: 'Reject cookies', exact: true }),
   ]) {
     const bounds = await control.boundingBox();
     expect(bounds).not.toBeNull();
@@ -276,7 +282,7 @@ test('mobile consent controls and CTA buttons fit the viewport in dark mode', as
     expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(844);
     expect(bounds!.height).toBeGreaterThanOrEqual(44);
   }
-  await page.getByRole('button', { name: 'Reject analytics', exact: true }).click();
+  await page.getByRole('button', { name: 'Reject cookies', exact: true }).click();
   await page.getByRole('link', { name: 'View demo', exact: true }).scrollIntoViewIfNeeded();
   for (const label of ['View demo', 'Talk to our team']) {
     const bounds = await page.getByRole('link', { name: label, exact: true }).boundingBox();

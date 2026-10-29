@@ -126,6 +126,8 @@ for (const mobile of [false, true]) {
     }
 
     test('limits product colors to content links and interaction states in light and dark modes', async ({ page }) => {
+      // The page overview starts collapsed; open it so its links can be checked.
+      await page.addInitScript(() => localStorage.setItem('hextra-toc-collapsed', '0'));
       await page.goto('/docs/');
       for (const theme of ['light', 'dark']) {
         if (theme === 'dark') {

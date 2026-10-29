@@ -2,15 +2,42 @@
 <script>document.documentElement.classList.add('is-home');</script>
 {{- end -}}
 <script>
+  // Slide the footer panel up once as the reader nears the end of the page.
+  document.addEventListener('DOMContentLoaded', function () {
+    'use strict';
+    var footer = document.querySelector('.hextra-footer');
+    if (!footer || !footer.querySelector('.learn-footer-actions')) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    footer.classList.add('learn-reveal');
+    // Measured on scroll: IntersectionObserver counts the clipped footer as never visible.
+    var pending = false;
+    function check() {
+      pending = false;
+      if (footer.getBoundingClientRect().top > window.innerHeight - 80) return;
+      footer.classList.add('is-visible');
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    }
+    function onScroll() {
+      if (!pending) {
+        pending = true;
+        requestAnimationFrame(check);
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    check();
+  });
+</script>
+<script>
   // Apply the "page overview" (right TOC) collapsed state before paint so the
-  // layout doesn't flash open then snap shut on load. Tutorials start collapsed
+  // layout doesn't flash open then snap shut on load. Every page starts collapsed
   // by default; an explicit reader choice (stored "0"/"1") always wins.
   (function () {
     'use strict';
     try {
       var pref = localStorage.getItem('hextra-toc-collapsed');
-      var defaultCollapsed = {{ if eq .Section "tutorials" }}true{{ else }}false{{ end }};
-      if (pref === '1' || (defaultCollapsed && pref !== '0')) {
+      if (pref !== '0') {
         document.documentElement.classList.add('toc-collapsed');
       }
     } catch (e) {}
