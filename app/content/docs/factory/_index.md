@@ -19,7 +19,7 @@ sidebar:
 
 Factory is the web application for deploying and managing [Kerberos Agents]({{< relref "/docs/agent" >}}) on Kubernetes. Instead of creating and maintaining every Agent by hand, you add camera streams, apply shared settings and manage deployments from one interface. The Agents keep doing the recording; Factory helps you run them as your camera estate grows.
 
-{{< iso-figure figure="hub" alt="Isometric illustration of Kerberos Hub. Three cameras on a site are wired to an Agent, which sends each event to Hub. Hub's ingest, analyse and notify stages light up in turn, then the detection appears on the operators' videowall and as an alert on a phone." caption="How an event moves from a camera on site, through Hub, to the people watching." >}}
+{{< iso-figure figure="factory" alt="Isometric illustration of Kerberos Factory. Four cameras of different kinds stand on a site. Factory finds each camera in turn and builds that camera's own Agent; a press stamps the global settings onto it and a conveyor takes it to one of three cluster nodes. There the Agent runs as a pod and the camera's stream runs to it." caption="How Factory gives every camera its own Agent and runs it on your cluster." >}}
 
 ## How Factory manages your Agents
 
