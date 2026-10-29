@@ -6,8 +6,8 @@
   "description": "Understand how to organise several locations, switch workspaces, and keep each location's recordings in the right place.",
   "sourceUrl": "https://learn.uug.ai/docs/hub/organisations/",
   "sourcePath": "../app/content/docs/hub/organisations/index.md",
-  "sourceSha256": "b765d09f6359b8c1ceab5ebdf3f6b92771d91e846bb6be843b2b6253ac012e07",
-  "reviewedOn": "2026-10-28",
+  "sourceSha256": "788e9f1963c9e5a0991f45f84296941bc43c2f5c8badc083f9a02adea43e51f2",
+  "reviewedOn": "2026-10-29",
   "editorialStyle": {
     "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
     "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",

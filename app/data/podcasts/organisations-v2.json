@@ -3,10 +3,10 @@
   "title": "Organisations and projects, simply explained",
   "description": "Understand how to organise several locations, switch workspaces, and keep each location's recordings in the right place.",
   "duration": 230.04,
-  "reviewedOn": "2026-10-28",
+  "reviewedOn": "2026-10-29",
   "sourceUrl": "https://learn.uug.ai/docs/hub/organisations/",
-  "sourceSha256": "b765d09f6359b8c1ceab5ebdf3f6b92771d91e846bb6be843b2b6253ac012e07",
-  "scriptSha256": "b44dbd67bbbcc8f7f9847781741dc65ab82cd3521095a13d5699f19d0acb93f2",
+  "sourceSha256": "788e9f1963c9e5a0991f45f84296941bc43c2f5c8badc083f9a02adea43e51f2",
+  "scriptSha256": "abbfe83a11a4a2c58ae8751982b200fafdda071fe7242651b0c1fcf2f221f42b",
   "audioSha256": "d4f881ba968151aa218235c4cba8513effcba2a381cfa3561a67f3fda434f906",
   "audio": "podcasts/organisations-v2/episode.mp3",
   "chapters": [

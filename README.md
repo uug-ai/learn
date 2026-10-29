@@ -122,8 +122,8 @@ the product, show an animated illustration, explain its workflow in three steps,
 and link to the next guides. Content lives in each product's
 `app/content/docs/<product>/_index.md`.
 
-Agent, Factory, and Vault temporarily reuse Hub's `iso-figure figure="hub"`
-illustration. When product-specific artwork is ready, add the SVG under
+Agent and Factory temporarily reuse Hub's `iso-figure figure="hub"`
+illustration; Vault has its own artwork. When product-specific artwork is ready, add the SVG under
 `app/assets/iso/` and change the shortcode's `figure`, `alt`, and `caption` in
 the corresponding overview. The shared shortcode handles the animation styles
 and accessible description; no template changes are needed.

@@ -6,8 +6,8 @@
   "description": "A two-host walkthrough of ownership, workspaces, access, and safe rollout.",
   "sourceUrl": "https://learn.uug.ai/docs/hub/organisations/",
   "sourcePath": "../app/content/docs/hub/organisations/index.md",
-  "sourceSha256": "b765d09f6359b8c1ceab5ebdf3f6b92771d91e846bb6be843b2b6253ac012e07",
-  "reviewedOn": "2026-10-28",
+  "sourceSha256": "788e9f1963c9e5a0991f45f84296941bc43c2f5c8badc083f9a02adea43e51f2",
+  "reviewedOn": "2026-10-29",
   "speakers": {
     "host": {
       "name": "Host",

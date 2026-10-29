@@ -50,7 +50,7 @@ for (const mobile of [false, true]) {
     });
 
     for (const product of products) {
-      test(`${product.slug}: renders a product overview with the shared illustration and getting-started links`, async ({ page }) => {
+      test(`${product.slug}: renders a product overview with an illustration and getting-started links`, async ({ page }) => {
         await page.goto(`/docs/${product.slug}/`);
         await expect(page.locator('.learn-product-page')).toHaveAttribute('data-product', product.slug);
         await expect(page.locator('#content h1')).toHaveText(new RegExp(`^${product.slug}$`, 'i'));
@@ -62,7 +62,8 @@ for (const mobile of [false, true]) {
 
         const figure = content.locator('.iso-illustration-figure');
         await expect(figure).toBeVisible();
-        await expect(figure.locator('.iso-illustration')).toHaveAttribute('aria-label', /Kerberos Hub/);
+        await expect(figure.locator('.iso-illustration')).toHaveAttribute('aria-label',
+          product.slug === 'vault' ? /Kerberos Vault/ : /Kerberos Hub/);
         await expect(figure.locator('svg')).toBeVisible();
         await expect(page.locator('link[rel="stylesheet"][href*="iso-illustration"]')).toHaveCount(1);
         const figureBounds = await figure.boundingBox();
