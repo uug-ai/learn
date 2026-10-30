@@ -21,6 +21,21 @@ html.dark .iso-illustration-figure {
   --iso-accent: #b46cf2;
 }
 
+/* On a product page (docs/article.html sets data-product), the illustration
+   takes that product's accent from custom.css and tints its surfaces with it,
+   so it matches the page's links and sidebar. */
+.learn-product-page .iso-illustration-figure {
+  --surface: color-mix(in srgb, var(--learn-product-accent) 5%, #ffffff);
+  --surface-strong: color-mix(in srgb, var(--learn-product-accent) 11%, #ffffff);
+  --iso-accent: var(--learn-product-accent);
+}
+
+html.dark .learn-product-page .iso-illustration-figure {
+  --surface: color-mix(in srgb, var(--learn-product-accent) 5%, #19191c);
+  --surface-strong: color-mix(in srgb, var(--learn-product-accent) 9%, #222226);
+  --iso-accent: color-mix(in srgb, var(--learn-product-accent) 78%, #ffffff);
+}
+
 /* Parts that replay their moment when clicked (assets/js/iso-figure.js); the
    rest of the illustration ignores the pointer. */
 .iso-illustration-figure [data-iso-at] {
