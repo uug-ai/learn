@@ -21,6 +21,21 @@ html.dark .iso-illustration-figure {
   --iso-accent: #b46cf2;
 }
 
+/* On a product page (docs/article.html sets data-product), the illustration
+   takes that product's accent from custom.css and tints its surfaces with it,
+   so it matches the page's links and sidebar. */
+.learn-product-page .iso-illustration-figure {
+  --surface: color-mix(in srgb, var(--learn-product-accent) 5%, #ffffff);
+  --surface-strong: color-mix(in srgb, var(--learn-product-accent) 11%, #ffffff);
+  --iso-accent: var(--learn-product-accent);
+}
+
+html.dark .learn-product-page .iso-illustration-figure {
+  --surface: color-mix(in srgb, var(--learn-product-accent) 5%, #19191c);
+  --surface-strong: color-mix(in srgb, var(--learn-product-accent) 9%, #222226);
+  --iso-accent: color-mix(in srgb, var(--learn-product-accent) 78%, #ffffff);
+}
+
 /* Parts that replay their moment when clicked (assets/js/iso-figure.js); the
    rest of the illustration ignores the pointer. */
 .iso-illustration-figure [data-iso-at] {
@@ -1392,6 +1407,111 @@ html.dark .iso-illustration-figure {
   }
 }
 
+/* Agent link: a 12s round. Each camera kind shows for 3s (delays 0, 3, 6,
+   9s) and each machine for 3s, starting 1.5s later; a device fades out and the
+   next rises in while a ring of light sweeps up its turntable. The stream runs
+   every second and the recording light blinks throughout. */
+.iso-figure--agent-link .iso-pulse {
+  vector-effect: none;
+  stroke-width: 1.2;
+  stroke-dasharray: 90 2000;
+  stroke-dashoffset: 100;
+}
+
+.iso-figure--agent-link .iso-agentlink-stream {
+  animation: iso-agentlink-stream 1s linear infinite;
+}
+
+.iso-figure--agent-link .iso-agentlink-variant {
+  opacity: 0;
+  animation: iso-agentlink-variant 12s ease-in-out infinite;
+}
+
+.iso-figure--agent-link .iso-agentlink-ring {
+  opacity: 0;
+  animation: iso-agentlink-ring 3s ease-in infinite;
+}
+
+.iso-figure--agent-link .iso-agentlink-ring-line {
+  fill: color-mix(in srgb, var(--iso-color) 14%, transparent);
+  stroke: var(--iso-color);
+  stroke-width: 1.2;
+}
+
+.iso-figure--agent-link .iso-agentlink-rec {
+  animation: iso-agentlink-rec 1s steps(1) infinite;
+}
+
+@keyframes iso-agentlink-stream {
+  0% {
+    stroke-dashoffset: 100;
+  }
+
+  70%,
+  100% {
+    stroke-dashoffset: -1100;
+  }
+}
+
+@keyframes iso-agentlink-variant {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  3%,
+  22% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  25%,
+  100% {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+
+/* The ring sweeps up as a device leaves (the last 0.45s of its 3s) and fades
+   at the top as the next one rises in. */
+@keyframes iso-agentlink-ring {
+  0% {
+    opacity: 1;
+    transform: translateY(-36px);
+  }
+
+  8% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+
+  85% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  88% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(-36px);
+  }
+}
+
+@keyframes iso-agentlink-rec {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+}
+
 /* Reduced motion: hold the lit state and drop the travelling pulses. */
 @media (prefers-reduced-motion: reduce) {
   .iso-illustration :is(.iso-pane, .iso-halo, .iso-beacon, .iso-beacon-halo, .iso-led, .iso-radar, .iso-hub-reveal) {
@@ -1429,6 +1549,14 @@ html.dark .iso-illustration-figure {
   }
 
   .iso-figure--factory :is(.iso-factory-found, .iso-factory-agent-led, .iso-factory-beacon, .iso-factory-pod) {
+    opacity: 1;
+  }
+
+  .iso-figure--agent-link :is(.iso-agentlink-variant, .iso-agentlink-ring, .iso-agentlink-rec) {
+    animation: none;
+  }
+
+  .iso-figure--agent-link .iso-agentlink-variant--first {
     opacity: 1;
   }
 
