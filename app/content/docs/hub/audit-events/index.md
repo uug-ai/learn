@@ -162,7 +162,7 @@ Settings shared by both types:
 | `batchSize` | Events per batch, at most 1000. | `100` |
 | `maxAttempts` | Attempts before a batch is dead-lettered. | `10` |
 | `startAt` | `latest` or `beginning`, only for a new `id`. | `latest` |
-| `filters` | Only send matching events: `organisationIds`, `projectIds`, `actions`, `categories` and `outcomes` (`success`, `failure`). Lists are optional. | All events |
+| `filters` | Only send matching events. The lists are `organisationIds`, `projectIds`, `actions`, `categories` and `outcomes` (`success`, `failure`). Every list is optional; an event must match all lists you set, and it matches a list when its value is one of the entries. With `projectIds`, events that belong to no project are never sent. | All events |
 
 ### Webhook destination
 
@@ -263,9 +263,9 @@ kerberoshub:
 | `s3` setting | Value |
 | --- | --- |
 | `bucket` | Bucket name. Required. |
-| `region` | Bucket region. Required, also for S3-compatible stores. |
+| `region` | Bucket region. Required, also for S3-compatible stores; see [S3 providers](#s3-providers) for the value to use. |
 | `prefix` | Optional key prefix. |
-| `endpoint` | URL of an S3-compatible store. Leave empty for AWS S3. |
+| `endpoint` | Base URL of an S3-compatible store, including `https://` or `http://`, without the bucket name. Leave empty for AWS S3. |
 | `forcePathStyle` | `true` for stores that need path-style URLs (`<endpoint>/<bucket>/<key>`). |
 | `allowUnlockedBucket` | `true` skips the Object Lock check. See below. |
 
@@ -273,7 +273,8 @@ kerberoshub:
 from that Secret (keys `access-key-id` and `secret-access-key` unless you set
 `accessKeyIdKey` and `secretAccessKeyKey`), and rotated keys are picked up within
 a minute. Without it, `hub-audit` uses the pod's AWS identity: the default AWS
-chain, such as an instance profile, or IRSA through a ServiceAccount of its own:
+chain, such as an instance profile, or IRSA through a ServiceAccount of its own.
+That only works for AWS S3; every other store needs `credentialsSecret`.
 
 ```yaml
 kerberoshub:
@@ -304,6 +305,44 @@ s3:
   allowUnlockedBucket: true
 ```
 
+### S3 providers
+
+Any store with the S3 API works. For an immutable archive, it must support Object
+Lock in `COMPLIANCE` mode.
+
+| Store | Object Lock | `region` | `endpoint` | `forcePathStyle` |
+| --- | --- | --- | --- | --- |
+| AWS S3 | Yes | Bucket region, for example `eu-west-1` | Leave empty | `false` |
+| Wasabi | Yes | Bucket region, for example `eu-central-1` | `https://s3.<region>.wasabisys.com` | `false` |
+| Backblaze B2 | Yes | Region from the bucket's S3 endpoint, for example `eu-central-003` | `https://s3.<region>.backblazeb2.com` | `false` |
+| Ceph Object Gateway (RGW) | Yes | Any value, for example `default` | Your gateway URL | `true`, unless bucket subdomains resolve |
+| MinIO | Yes | `us-east-1`, unless the server sets another region | Your MinIO URL | `true` |
+| Garage | No: needs `allowUnlockedBucket` | Garage's `s3_region`, often `garage` | Your Garage S3 URL (port `3900` by default) | `true` |
+
+Give `hub-audit` its own key with the least access the store allows. It only
+uploads objects and, without `allowUnlockedBucket`, reads the bucket's Object Lock
+configuration:
+
+- **AWS S3, Wasabi, MinIO, Ceph:** a user or policy that allows
+  `s3:PutObject` on the prefix and `s3:GetBucketObjectLockConfiguration` on the
+  bucket.
+- **Backblaze B2:** an application key restricted to the bucket that can write
+  files and read the bucket's retention settings.
+- **Garage:** a key with write access to the bucket
+  (`garage bucket allow --write <bucket> --key <key>`).
+
+Create the bucket with Object Lock from the start: on most stores, including
+MinIO (`mc mb --with-lock`) and Ceph, it can't be turned on later.
+
+On a self-hosted store, `COMPLIANCE` mode blocks deletion through the S3 API, but
+whoever runs the store can still remove data underneath it. For example, Ceph
+administrators can with `radosgw-admin`. If the archive must also be protected
+from your own administrators, use a hosted store.
+
+Every upload carries an `x-amz-checksum-sha256` header. Stores that don't check
+it, such as Ceph before v20, ignore it. Before you rely on a store, deliver a
+test batch to a bucket with a short retention and read it back.
+
 ### Read an exported archive
 
 Each object is a gzipped file with one JSON audit event per line, so standard
@@ -322,8 +361,11 @@ For an S3-compatible store, add `--endpoint-url <endpoint>`.
 `kerberoshub.audit.serviceMonitor.enabled` is `true` (the default). Use
 `hub_audit_dispatcher_config_reload_failures_total` to catch an invalid
 destination list and `hub_audit_dispatcher_configured_destinations` to confirm the
-number of destinations loaded. Check `audit_dispatch_dead_letters` for batches
-that gave up, and the `hub-audit` logs for the reason a destination fails.
+number of destinations loaded. `hub_audit_dispatcher_cycles_total` counts
+delivery cycles per `destination`, with `result` set to `success` or `error`; a
+rising `error` count shows which destination is failing. Check
+`audit_dispatch_dead_letters` for batches that gave up, and the `hub-audit` logs
+for the reason a destination fails.
 
 ## Troubleshooting
 
