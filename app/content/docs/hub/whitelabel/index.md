@@ -3,7 +3,7 @@ title: "White-label"
 description: "Brand Kerberos Hub as you wish."
 lead: "Use Kerberos Hub with your own style guide and marketing branding."
 date: 2020-10-06T08:49:31+00:00
-lastmod: 2026-10-21T00:00:00+00:00
+lastmod: 2026-10-30T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -245,21 +245,35 @@ Sent when a camera goes online, offline or idle. The subject is the `deviceTitle
 | --- | --- |
 | `{{user}}` | Username of the account the camera belongs to. |
 | `{{title}}` | The email subject. |
-| `{{text}}` | The status change, for example "`<camera>` is online, but the camera stream is not connected." |
+| `{{text}}` | The change, worded from the previous status (see below the table). |
 | `{{status}}` | The new status: `active` (online), `inactive` (offline) or `idle` (online, camera stream not connected). |
 | `{{devicename}}`, `{{deviceid}}` | Camera name and camera key. |
 | `{{eventdate}}`, `{{eventtime}}`, `{{eventdatetime}}` | When the status changed, in the server's timezone (normally UTC), not the account's. |
 | `{{link}}` | Not set; replaced with an empty value. |
 
+`{{text}}` per change:
+
+| Change | `{{text}}` |
+| --- | --- |
+| Goes offline | "`<camera>` is offline, it hasn't responded for 5 minutes." |
+| Loses its camera stream while online | "`<camera>` is online, but the camera stream is not connected." |
+| Comes back from offline without its camera stream | "`<camera>` is back online, but the camera stream is not connected." |
+| Gets its camera stream back | "`<camera>`'s camera stream is connected again." |
+| Comes back from offline | "`<camera>` is back online." |
+
+Webhooks and IFTTT receive the same text in their message body.
+
 **Grouped device status email (`device_group`)**
 
-Sent instead of `device` when an account has **Group notifications** switched on (Alerts → Devices) and **several** of its cameras change status at the same time. Each change is held for one scan of the device monitor (`kerberoshub.monitordevice.scanIntervalSeconds`, default 60 seconds), so the cameras of one outage end up in one email. When only one camera changed, the usual `device` email is sent. The subject is the `deviceGroupTitle` value.
+Sent instead of `device` when an account has **Group notifications** switched on (Alerts → Devices) and **several** of its cameras change status at the same time. The device monitor detects changes on every scan (`kerberoshub.monitordevice.scanIntervalSeconds`, default 60 seconds). With grouping on, a change is then held for 20 seconds, and the account is checked again: everything that changed in the meantime is sent together, so the cameras of one outage end up in one email. When only one camera changed, the usual `device` email is sent. The subject is the `deviceGroupTitle` value.
+
+Releases of `hub-monitor-device` before v1.4.10 hold changes until the next scan instead (one minute by default). The 20-second hold is set by the `DEVICE_GROUPING_HOLD_SECONDS` environment variable of the device monitor; `0`, or a value of at least the scan interval, restores the one-scan hold.
 
 | Variable | Value |
 | --- | --- |
 | `{{user}}` | Name of the account the cameras belong to: first and last name, or the username when both are empty. |
 | `{{title}}` | The email subject. |
-| `{{text}}` | One-line summary, for example "6 cameras changed status: 4 offline, 1 lost their camera stream, 1 back online." |
+| `{{text}}` | One-line summary, for example "6 cameras changed status: 4 offline, 1 lost their camera stream, 1 back online." The other changes read "back online without camera stream" and "camera stream reconnected". |
 | `{{count}}` | Number of cameras in the email. |
 | `{{status}}` | `active`, `inactive` or `idle` when all cameras have the same new status, otherwise `mixed`. |
 | `{{sections}}` | The cameras as HTML, grouped in sections (see below). |
@@ -269,10 +283,11 @@ Sent instead of `device` when an account has **Group notifications** switched on
 
 How cameras are split into sections:
 
-- There is one section per status and per site, group or "Other cameras". Sections are ordered by status (offline, camera stream lost, back online), then sites, groups and "Other cameras".
+- There is one section per change and per site, group or "Other cameras". Sections are ordered by change (offline, camera stream lost, back online without camera stream, camera stream back, back online), then sites, groups and "Other cameras".
 - Each camera is listed once: under the site or group that holds the most cameras of the email with the same status. A site wins a tie with a group. Cameras in no site or group are listed under "Other cameras".
-- A section title reads, for example, `Site Gate · Offline · all 3 cameras`, `Group Perimeter · Back online · 2 cameras` or `Other cameras · Camera stream lost · 1 camera`. "all" is added when every camera of the site or group is in the section.
-- Each camera line shows its name and a detail: `no response for 12 min`, `agent online, camera stream not connected` or `online`.
+- A section title reads, for example, `Site Gate · Offline · all 3 cameras`, `Group Perimeter · Back online without camera stream · 2 cameras` or `Other cameras · Camera stream back · 1 camera`. The change labels are `Offline`, `Camera stream lost`, `Back online without camera stream`, `Camera stream back` and `Back online`. "all" is added when a section of two or more cameras holds every camera of the site or group.
+- Each camera line shows its name and a detail: `no response for 12 min`, `agent online, camera stream not connected`, `agent back online, camera stream not connected`, `camera stream connected` or `online`.
+- A camera that changes again during the hold keeps the status it had before its first change. One that went offline and came back is listed as `back online after a brief interruption` instead of being dropped; the other reversals read `offline again after briefly coming back, no response for 4 min` and `camera stream lost again after briefly reconnecting`.
 
 `{{sections}}` is generated HTML with inline styles, because email clients ignore stylesheets: per section a `<p>` with the title, followed by a `<table role="presentation" width="100%">` with one row per camera (name on the left, detail on the right). Put it where the camera list should appear in your template; its look can't be changed from the template. Camera, site and group names are HTML-escaped. If you need full control over the layout, use `{{sectionsText}}` instead.
 

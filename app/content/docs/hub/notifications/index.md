@@ -3,7 +3,7 @@ title: "Notifications"
 description: "Review alerts in the Watchlist and deliver them through configured channels."
 lead: "Turn matching events into an operator inbox and timely outbound messages."
 date: 2026-09-09T00:00:00+00:00
-lastmod: 2026-09-09T00:00:00+00:00
+lastmod: 2026-10-30T00:00:00+00:00
 draft: false
 images: []
 tags: [Notifications]
@@ -67,11 +67,15 @@ When configuring an alert:
 - select at least one recipient or outbound channel for the intended delivery.
 
 The generic device alert sends one notification per camera that goes offline,
-loses its camera stream or comes back online. Switch on **Group
-notifications** in its panel to receive one notification when several cameras
-change status at the same time, with the cameras listed by site and group. Changes are
-then held for one scan of the device monitor (one minute by default) before
-they are sent. Grouping applies to email, Slack, Telegram, Pushover,
+loses its camera stream, comes back online or gets its camera stream back. The
+message names the change, for example "back online, but the camera stream is
+not connected" for a camera that returns from offline without its stream.
+Switch on **Group notifications** in its panel to receive one notification when
+several cameras change status at the same time, with the cameras listed by
+change and by site and group. Changes are then held for about 20 seconds (one
+scan of the device monitor, one minute by default, before `hub-monitor-device`
+v1.4.10) to collect the other cameras of the same outage. Grouping applies to
+email, Slack, Telegram, Pushover,
 Pushbullet, SMS and Alexa; webhooks and IFTTT keep receiving one notification
 per camera, unchanged, so existing integrations keep working. See
 [White-label]({{< ref "/docs/hub/whitelabel" >}}) for the grouped email template.
