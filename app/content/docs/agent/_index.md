@@ -19,7 +19,7 @@ sidebar:
 
 Kerberos Agent is the recording service that runs next to, or on, your camera. Each Agent handles one camera stream, records motion or continuous footage, and gives you a web interface for live views, recordings and settings. Start with a single Agent and add the other Kerberos products when you need central management, shared storage or an overview across sites.
 
-{{< iso-figure figure="hub" alt="Isometric illustration of Kerberos Hub. Three cameras on a site are wired to an Agent, which sends each event to Hub. Hub's ingest, analyse and notify stages light up in turn, then the detection appears on the operators' videowall and as an alert on a phone." caption="How an event moves from a camera on site, through Hub, to the people watching." >}}
+{{< iso-figure figure="agent-link" alt="Isometric illustration of Kerberos Agent. A camera streams RTSP to the machine that runs its Agent. The camera turns through bullet, dome, PTZ and turret models, and the machine through a Raspberry Pi, a mini PC with Docker, a laptop with Docker and a server with Kubernetes." caption="One Agent per camera stream, on whichever camera and machine you choose." >}}
 
 ## How Agent works
 
