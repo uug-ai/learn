@@ -12,6 +12,13 @@ menu:
     parent: "prologue"
 weight: 100
 toc: true
+# The Enterprise section was removed; send its old addresses here.
+aliases:
+  - /docs/enterprise/
+  - /docs/enterprise/first-things-first/
+  - /docs/enterprise/welcome/
+  - /docs/enterprise/self-signed/
+  - /docs/enterprise/usecases/
 ---
 
 The **Kerberos.io** project, pronounced as `/kuh buh ruhs dot ai o/`, is a video analytics and video management platform, which was initiated back in 2014. Over the years it has evolved into a stable and feature-rich video platform, which is used for video management and analytics such as machine learning.
@@ -38,11 +45,11 @@ The backbone of the Kerberos.io ecosystem is the [Agent](/docs/agent/first-thing
 
 {{< figure src="introduction-kerberos-io.svg" alt="An Agent is monitoring a single camera stream." caption="An Agent is monitoring a single camera stream." class="stretch">}}
 
-With [Kerberos.io](/docs/prologue/how) you start small, with just one or more [Agents](/docs/agent/first-things-first), and grow over time while introducing more and more components like [Factory](/docs/factory/first-things-first), [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/hub/first-things-first), which we refer to as the [Kerberos Enterprise Suite](/docs/enterprise/first-things-first). Each solution is shipped through the concept of containers and can be leveraged by using Docker, Docker Compose, Kubernetes, OpenShift, Terraform, Ansible, and many more.
+With [Kerberos.io](/docs/prologue/how) you start small, with just one or more [Agents](/docs/agent/first-things-first), and grow over time while introducing more and more components like [Factory](/docs/factory/first-things-first), [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/hub/first-things-first), which we refer to as the Kerberos Enterprise Suite. Each solution is shipped through the concept of containers and can be leveraged by using Docker, Docker Compose, Kubernetes, OpenShift, Terraform, Ansible, and many more.
 
 {{< figure src="./introduction-enterprise.svg" alt="A scalable video platform for an ever-growing video landscape." caption="A scalable video platform for an ever-growing video landscape." class="stretch">}}
 
-As previously mentioned, the [Kerberos Enterprise Suite](/docs/enterprise/first-things-first) brings additional components into the picture which help you build a more scalable and resilient video landscape through concepts such as Kubernetes, bring your own storage, bring your own cloud, single pane of glass, live streaming, machine learning, etc.
+As previously mentioned, the Kerberos Enterprise Suite brings additional components into the picture which help you build a more scalable and resilient video landscape through concepts such as Kubernetes, bring your own storage, bring your own cloud, single pane of glass, live streaming, machine learning, etc.
 
 ## Why Kerberos.io
 

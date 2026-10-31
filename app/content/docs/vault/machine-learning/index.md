@@ -32,7 +32,7 @@ Especially in the video analytics space, where we apply machine learning to vide
 4. What happens if you add more video streams? Do you need to add more GPUs?
 
 The previous challenges are where we at Kerberos.io bring value through 
-[the Kerberos Enterprise Suite](/docs/enterprise/first-things-first). We provide an elegant and scalable design for supporting your ever-growing machine learning use cases. Read more below.
+the Kerberos Enterprise Suite. We provide an elegant and scalable design for supporting your ever-growing machine learning use cases. Read more below.
 
 ## Video chunks
 
