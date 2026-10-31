@@ -49,6 +49,8 @@ New to the platform? The [Prologue](/docs/prologue/) explains where it comes fro
 
 ## The products
 
+{{< iso-figure figure="ecosystem" alt="The platform's four products. Factory deploys an Agent for every camera; the Agents upload their recordings to Vault and send their events to Hub, and Hub plays recordings back from Vault. Each product links to its documentation." caption="Click a product to jump to its documentation." >}}
+
 Each product has its own section. Start with **First things first** to learn what the product does, then follow its installation and configuration pages.
 
 ### Agent
