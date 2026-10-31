@@ -164,7 +164,7 @@ curl -s -X POST "http://localhost:8085/api/storage/bulk" \
   ]' | jq -r '.data | fromjson'
 ```
 
-A complete `.http` reference is shipped with the repository at [`vault/examples/get_signed_urls.http`](https://github.com/uug-ai/vault/blob/main/examples/get_signed_urls.http).
+A complete `.http` reference ships with the Vault source code as `examples/get_signed_urls.http`.
 
 ## 3. Two signing modes
 
@@ -219,7 +219,7 @@ GET http://localhost:8085/api/storage/signed
 
 The recommended pattern when you need *all* assets for a recording (player + scrubber thumbnails + share link to the redacted version, etc.):
 
-1. Start from the recording filename you already have, e.g. from a Hub pipeline event payload (`payload.key`).
+1. Start from the recording filename you already have, e.g. from a [Hub pipeline](/docs/hub/pipeline) event payload (`payload.key`).
 2. Derive the asset filenames using the suffix convention (`_thumbnail.jpg`, `_sprite.jpg`, `_redacted.mp4`, …).
 3. Call `POST /api/storage/bulk` once with the full list.
 4. Use the URLs from the response directly — no further auth needed for the lifetime of `uriExpiryTime`.

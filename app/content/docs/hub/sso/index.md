@@ -153,17 +153,17 @@ Another possibility to provide SSO domains is by defining them in the database. 
         "map" : {
             "uug.ai" : {
                 "domain" : "uug.ai", 
-                "redirect_url" : "httpd://xxxx/sso/callback/uug.ai",
+                "redirect_url" : "https://xxxx/sso/callback/uug.ai",
                 "force_sso": "false",
                 "issuer" : "https://uugai.xxx.com/", 
                 "claim_id" : "email",
                 "client_id" : "xxxx", 
                 "client_secret" : "xxxx", 
-                "client_verification_id" : "xxxx", 
+                "client_verification_id" : "xxxx"
             },
             "kerberos.io" : {
                 "domain" : "kerberos.io", 
-                "redirect_url" : "httpd://xxxx/sso/callback/kerberos.io",
+                "redirect_url" : "https://xxxx/sso/callback/kerberos.io",
                 "force_sso": "false",
                 "issuer" : "https://kerberosio.xxx.com/", 
                 "claim_id" : "email",

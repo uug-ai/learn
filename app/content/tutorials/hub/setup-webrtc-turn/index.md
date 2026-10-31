@@ -53,7 +53,7 @@ MQTT carries WebRTC signalling, not media. The browser sends an SDP offer and IC
     { "id": "turn", "kind": "turn", "x": 535, "y": 340, "w": 240, "h": 130,
       "header": "STUN / TURN", "title": "coturn", "subtitle": "Relay fallback", "groupId": "services" },
     { "id": "browser", "kind": "frontend", "x": 940, "y": 200, "w": 240, "h": 130,
-      "header": "HUB FRONTEND", "title": "WebRTC peer", "subtitle": "Video + talk", "groupId": "operator" }
+      "header": "HUB FRONTEND", "title": "WebRTC peer", "subtitle": "Live video", "groupId": "operator" }
   ],
   "connections": [
     { "from": "camera", "to": "agent", "fromSide": "right", "toSide": "left", "label": "RTSP" },
@@ -273,7 +273,7 @@ With WebRTC video connected:
 3. Confirm audio reaches the camera speaker without stopping video.
 4. Check the Agent logs for backchannel codec or camera-write errors if it does not.
 
-Talk is a separate camera capability. A healthy WebRTC video path does not guarantee that the camera accepts backchannel audio.
+Talk is a separate camera capability. A healthy WebRTC video path does not guarantee that the camera accepts backchannel audio. The talk audio itself travels to the Agent over MQTT, not over the WebRTC connection, so TURN does not affect it.
 
 ## Troubleshoot common failures
 

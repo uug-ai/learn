@@ -17,8 +17,9 @@ connects:
   - page: /docs/vault/forwarding#on-demand-forwarding
     title: On-demand forwarding
     why: Keep video at an edge Vault and forward it when requested.
-  - page: /docs/agent
-    why: Where every recording starts.
+  - page: /docs/agent/connect-to-hub#choose-where-recordings-go
+    title: Choose where recordings go
+    why: Send an Agent's recordings to Hub directly or through your Vault.
 ---
 
 The **Recordings** page is the main starting point for reviewing footage in
@@ -41,8 +42,9 @@ or open its dedicated detail page at `/media/<id>`.
 
 ## How recordings become available
 
-An [Agent](/docs/agent) sends recordings, or recording metadata, through the configured
-[media pipeline](/docs/hub/media-processing). Hub stores the information needed to find each recording and resolves
+An [Agent](/docs/agent/connect-to-hub#choose-where-recordings-go) sends recordings, or recording metadata, to Hub:
+directly, or through your own Kerberos Vault and its [Hub integration](/docs/vault/integrations#kerberos-hub).
+Each recording then goes through the configured [media pipeline](/docs/hub/media-processing). Hub stores the information needed to find each recording and resolves
 the video from its storage provider when you play it.
 
 Thumbnails, sprite previews, detections, counting results, and other analysis
@@ -293,7 +295,7 @@ deployment-configured; if the selection exceeds it, narrow the time window or
 device filters before trying again.
 
 Creating a case queues the recordings for archiving to the configured Vault
-archive provider. Follow the export progress on the **Cases** page before
+[archive provider](/docs/vault/providers). Follow the export progress on the **Cases** page before
 assuming the evidence has been preserved. Case lifetime and archived-video
 retention are separate settings.
 

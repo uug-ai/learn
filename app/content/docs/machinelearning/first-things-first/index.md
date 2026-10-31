@@ -40,7 +40,7 @@ Agents are responsible for recording video streams into small chunks, mp4s, of w
 
 ## Queueing and events
 
-Video chunks prepared by one or more Agents are sent to Kerberos Vault where they are persisted in one or more storage providers. The key thing is that they are stored through a central application, Kerberos Vault, which has the ability to trigger integrations such as a Kafka broker.
+Video chunks prepared by one or more Agents are sent to Kerberos Vault where they are persisted in one or more storage providers. The key thing is that they are stored through a central application, Kerberos Vault, which has the ability to trigger [integrations such as a Kafka broker](/docs/vault/integrations#kafka).
 
 ## Consuming and inference
 

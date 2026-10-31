@@ -18,6 +18,9 @@ connects:
   - page: /docs/agent/connect-to-vault#using-vault-together-with-hub
     title: Using Vault with Hub
     why: Set the Agent directory to the Hub username, so Hub can match recordings.
+  - page: /docs/hub/configuration#connect-kerberos-vault
+    title: Connect Kerberos Vault
+    why: Enter this Vault's URL and account keys in Hub, so Hub can play the recordings.
 ---
 
 One of the key differentiators is the ability to extend and integrate. Next to uploading and persisting recordings on your preferred storage providers, Kerberos Vault can trigger events and be configured through APIs.
@@ -118,13 +121,15 @@ The Kerberos Hub integration allows you to visualise your recordings, stored in 
 
 - Integration name: this is a preferred name for the integration.
 - Kerberos Hub Url: the URL to the API of Kerberos Hub, `https://api.your.hub.com`
-- Hub Key: this is the cloud key that is assigned to your user (owner accounts), by default this is `AKIAxxxxxxG5Q`.
+- Hub Key: the **Public key** of your Hub account, for example `AKIAxxxxxxG5Q`. Hub shows it under **Plans & integrations** (see [Assign an Agent](/docs/hub/configuration#assign-an-agent)).
+
+Then open the [account](/docs/vault/accounts) your Agents upload with and select the integration on its **Integrations** tab. Vault only sends the recordings of accounts that use the integration.
 
 #### Kerberos Hub username
 
 When creating a Kerberos Hub account and linking it to your own Kerberos Vault, you have to make sure the Kerberos Hub username matches the Agent destination directory. If this does not match, your recordings will not be shown in the Kerberos Hub interface.
 
-Once you have logged in, or created an account, you will see your Kerberos Hub username at the top left of the navigation. You have to make sure this username equals the [directory field of the Agent](/docs/agent/connect-to-vault#using-vault-together-with-hub) (or Factory settings).
+Once you have logged in, or created an account, you will see your Kerberos Hub username at the top left of the navigation. You have to make sure this username equals the [directory field of the Agent](/docs/agent/connect-to-vault#using-vault-together-with-hub) (or Factory settings). Vault only uses the Agent's directory when the account's directory is `*`; otherwise the recordings are stored in the [account's directory](/docs/vault/accounts#directory), and that is the one that must equal the Hub username.
 
 ![Kerberos Hub Account](./hub-integration-account-1.png)
 
@@ -134,7 +139,7 @@ Make sure the `directory` field of your Agents or Factory is configured with the
 
 #### Kerberos Vault credentials
 
-Once you have added the integration to Kerberos Vault, and made sure the Kerberos Hub account name matches the Agent directory field, you should see some recordings landing in your Kerberos Hub account. However, to view your recordings in Kerberos Hub, you'll need to add your Kerberos Vault credentials to your Kerberos Hub account (or installation).
+Once you have added the integration to Kerberos Vault, and made sure the Kerberos Hub account name matches the Agent directory field, you should see some recordings landing in your Kerberos Hub account. However, to view your recordings in Kerberos Hub, you'll need to add your Kerberos Vault credentials to your Kerberos Hub account (or installation). [Connect Kerberos Vault](/docs/hub/configuration#connect-kerberos-vault) shows where.
 
 As you are the owner of the Kerberos Vault, you'll need to make Kerberos Hub (SaaS or self-hosted) aware of where your Kerberos Vault is located (DNS name) and the Kerberos Vault account you have used.
 

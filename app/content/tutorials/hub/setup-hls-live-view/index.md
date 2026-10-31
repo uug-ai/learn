@@ -99,7 +99,7 @@ kerberoshub:
         moqEnabled: "false"
 ```
 
-`liveStreamMode` controls what the **Live** button opens. `hlsEnabled` keeps HLS selectable if another transport is the default. You can leave WebRTC or MoQ enabled alongside it and let operators switch per stream.
+`liveStreamMode` controls what the **Live** button opens. `hlsEnabled` keeps HLS selectable if another transport is the default. WebRTC stays available, and you can leave MoQ enabled alongside it, so operators can switch per stream.
 
 ### Apply the Hub release
 
@@ -123,7 +123,7 @@ After the rollout, log out and back in or hard-refresh Hub. Open a camera and co
 
 ## Configure the Agent
 
-HLS uses the existing Hub identity rather than HLS-specific credentials. A containerised Agent needs the equivalent of:
+HLS uses the existing Hub identity rather than HLS-specific credentials. A containerised Agent needs the equivalent of the following ([Connect to Hub](/docs/agent/connect-to-hub#configure-with-environment-variables) lists every Hub variable):
 
 ```yaml
 env:

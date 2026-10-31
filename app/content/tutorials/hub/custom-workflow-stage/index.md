@@ -297,7 +297,7 @@ func envOr(name, fallback string) string {
 
 ### Do the work
 
-This is the one step that's truly yours: whatever your stage actually does. Your microservice is a stateless consumer — pull a run, read (or fetch) what it needs, compute, and return. The run tells you **which** recording it is (`key`), **how** to fetch the media if you need it (`storage`), and carries the upstream `classify` result you can build on.
+This is the one step that's truly yours: whatever your stage actually does. Your microservice is a stateless consumer — pull a run, read (or fetch) what it needs, compute, and return. The run tells you **which** recording it is (`key`), **how** to fetch the media if you need it (`storage`; see [Fetching the media](/docs/hub/workflows/stages/#fetching-the-media)), and carries the upstream `classify` result you can build on.
 
 In our example the work is loitering — *how long the longest-lingering subject stays in frame.* The classifier has already tracked every subject, so this stage needs no model and no media download: it measures the dwell span straight from the `classify` trajectory on the run and turns it into a **marker**. Whatever your stage does, this is where it slots in.
 

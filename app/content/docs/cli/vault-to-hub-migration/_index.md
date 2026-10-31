@@ -42,8 +42,8 @@ go run main.go -action vault-to-hub-migration \
       -mongodb-destination-database Kerberos \
       -queue rabbitmq-default \
       -username alice \
-      -start-timestamp "2024-04-01T08:47:40" \
-      -end-timestamp "2025-04-06T17:41:00" \
+      -start-timestamp 1711961260 \
+      -end-timestamp 1743961260 \
       -timezone UTC \
       -pipeline "monitor,sequence" \
       -batch-size 100 \
@@ -60,8 +60,8 @@ go run main.go -action vault-to-hub-migration \
       -mongodb-destination-database Kerberos \
       -queue rabbitmq-default \
       -username alice \
-      -start-timestamp "2024-04-01T08:47:40" \
-      -end-timestamp "2025-04-06T17:41:00" \
+      -start-timestamp 1711961260 \
+      -end-timestamp 1743961260 \
       -timezone UTC \
       -pipeline "monitor,sequence,analysis" \
       -batch-size 100 \

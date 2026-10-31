@@ -59,7 +59,7 @@ When running a managed Kubernetes cluster, such as [GKE](https://cloud.google.co
 
 Installing Factory in a managed Kubernetes cluster (Azure, GCP, AWS) is straightforward, as you create Kubernetes clusters in a few clicks, get access to public load balancers, volumes and more. Running Factory in a managed Kubernetes cluster is just a matter of copy-pasting some configuration (yaml) files, and executing `kubectl apply` commands.
 
-> Install Factory in a managed Kubernetes cluster by [following this step-by-step installation guide](https://github.com/kerberos-io/factory/tree/master/kubernetes#b-managed-kubernetes-1).
+> Install Factory in a managed Kubernetes cluster with [the Factory deployment manifests](https://github.com/uug-ai/deployment/tree/main/base/factory).
 
 {{< rete caption="Factory managed cluster" alt="Factory managed cluster" height="540" >}}
 {
@@ -100,7 +100,7 @@ There is no need to install Factory on a Kubernetes Service Provider; it can be 
 
 In contrast to the Kubernetes Service Provider, there will be more work required: setting up a Kubernetes cluster, configuring a load balancer, and creating persistent volumes and claims.
 
-> Install Factory on a private cloud or at the edge by [following this step-by-step installation guide](https://github.com/kerberos-io/factory/tree/master/kubernetes#a-self-hosted-kubernetes-1).
+> Install Factory on a private cloud or at the edge by [following this step-by-step installation guide](https://github.com/uug-ai/deployment/blob/main/README.k8s.md#create-agents-through-factory).
 
 {{< rete caption="Factory self-hosted cluster" alt="Factory self-hosted cluster" height="780" >}}
 {

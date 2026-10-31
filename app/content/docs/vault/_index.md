@@ -25,7 +25,7 @@ Kerberos Vault is the bring-your-own-storage layer for your recordings. [Agents]
 
 1. **Choose your storage.** Configure a [provider](/docs/vault/providers) such as S3, Google Cloud Storage, Storj, MinIO or Ceph. Keep your recordings on your own infrastructure, in a cloud environment, or across both.
 2. **Connect your Agents.** Create an [account](/docs/vault/accounts) with credentials and a storage provider, then [configure your Agents](/docs/agent/connect-to-vault) to upload recordings to Vault. Accounts also control settings such as retention.
-3. **Use your recordings.** Configure [integrations](/docs/vault/integrations) to notify [Hub](/docs/hub/pipeline) or your own consumers when footage arrives. With [forwarding](/docs/vault/forwarding), you can keep recordings at the edge and send selected footage to another Vault.
+3. **Use your recordings.** Configure [integrations](/docs/vault/integrations) to notify the [Hub pipeline](/docs/hub/pipeline) or your own consumers when footage arrives. With [forwarding](/docs/vault/forwarding), you can keep recordings at the edge and send selected footage to another Vault.
 
 The [API](/docs/vault/api) gives your applications access to Vault's storage and integration capabilities without tying them to a particular user interface.
 

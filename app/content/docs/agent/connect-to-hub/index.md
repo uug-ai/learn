@@ -41,6 +41,8 @@ From Hub you need:
 - the **public key** and **private key** that link Agents to your Hub account. [Assign an Agent](/docs/hub/configuration#assign-an-agent) shows where Hub displays them;
 - optionally, the ID of the **site** the Agent belongs to. See [Sites](/docs/hub/configuration#sites).
 
+Hub can also write the configuration for you: the **Add Agent** dialog on its **Devices** page asks for a site and the keys, and copies a `docker run` command or Kubernetes manifest with every `AGENT_HUB_*` value below filled in. See [Assign an Agent](/docs/hub/configuration#assign-an-agent).
+
 ## Configure the Hub connection
 
 Open the Agent's web interface and go to **Settings → Persistence**.
@@ -74,6 +76,12 @@ Hub doesn't receive recordings over the Hub connection. Choose how they reach Hu
 | `AGENT_STUN_URI`, `AGENT_TURN_URI`, `AGENT_TURN_USERNAME`, `AGENT_TURN_PASSWORD` | WebRTC servers for live view |
 
 Every Agent connected to the same broker needs its own `AGENT_KEY`. The Agent uses it as its MQTT client ID, and two Agents with the same key keep disconnecting each other. The [Agent repository](https://github.com/kerberos-io/agent#configure-with-environment-variables) lists every variable.
+
+## Sign recordings for verification
+
+The Agent signs a fingerprint of every MP4 it records, so Hub can later [verify](/docs/hub/mp4-verification) that the file hasn't changed since. Signing is on by default (`AGENT_SIGNING`).
+
+Without a key of your own, the Agent signs with a built-in default key whose private half is public in the Agent repository, so anyone can produce a valid signature with it. To prove which of your Agents recorded a file, set `AGENT_SIGNING_PRIVATE_KEY` to your own RSA private key in PKCS#8 PEM format (write the line breaks as `\n`), and make sure Hub verifies with the matching public key. A key in any other format is ignored, and the recordings get no signature.
 
 ## What you can do in Hub
 

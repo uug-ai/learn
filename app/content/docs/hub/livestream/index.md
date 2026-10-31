@@ -420,8 +420,10 @@ sign-in and applied to every tile on the page.
 If a tile stays black or never leaves the *Connecting* state:
 
 1. Confirm that the Agent is shown as **online** on the **Devices**
-   page. A red dot there means the MQTT connection to Hub is broken and
-   Live view cannot work either.
+   page. A red dot there means Hub hasn't received a heartbeat from the
+   Agent for three minutes, so check the Agent's
+   [Hub connection](/docs/agent/connect-to-hub#troubleshooting) first. An
+   Agent can be online while its MQTT connection is down; step 2 checks that.
 2. Switch the tile to **Preview** to check whether MQTT alone works. If
    Preview works but Live does not, the issue is on the WebRTC path
    (firewall, STUN/TURN reachability).

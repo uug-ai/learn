@@ -17,7 +17,7 @@ connects:
     why: Agents sign every recording they write.
 ---
 
-Video evidence is only useful if you can trust that it has not been altered between the moment it was recorded and the moment it is reviewed. Kerberos Hub addresses this with a built-in **fingerprint and signature** mechanism: every fragmented MP4 written by Agent is signed with a private key at the moment it is closed, and the resulting signature is embedded directly inside the file. Anyone with the matching public key can later verify — entirely offline — that the recording is authentic and bit-perfect.
+Video evidence is only useful if you can trust that it has not been altered between the moment it was recorded and the moment it is reviewed. Kerberos Hub addresses this with a built-in **fingerprint and signature** mechanism: every fragmented MP4 written by Agent is signed with a private key at the moment it is closed, and the resulting signature is embedded directly inside the file. Anyone with the matching public key can later verify — entirely offline — that the recording is authentic and that its signed structure has not changed.
 
 > **Note:** MP4 verification is available for recordings produced by Agent. Recordings produced by other software, or files that have been re-encoded, transcoded, or trimmed by an external tool, will not pass verification because their internal structure no longer matches the signed fingerprint.
 
@@ -50,7 +50,7 @@ The signature travels with the file. There is no separate sidecar file to lose o
 The fingerprint is intentionally derived from **structural** properties rather than the raw video bitstream, for two reasons:
 
 - It is **fast to compute and verify**, even for multi-hour recordings — verification only needs to parse the MP4 box structure, not decode the video.
-- Any tampering that matters in practice (cutting, splicing, re-encoding, re-muxing, replacing fragments, or adding/removing frames) **necessarily changes** at least one of these values: a different number of `moof` boxes, a different fragment size, a different total duration, or a different `creationTime`. The signature will no longer match and verification will fail.
+- Common tampering (cutting, splicing, re-encoding, re-muxing, replacing fragments, or adding/removing frames) changes at least one of these values in practice: a different number of `moof` boxes, a different fragment size, a different total duration, or a different `creationTime`. The signature will no longer match and verification will fail.
 
 Because the Agent version is part of the fingerprint, you also get a tamper-evident record of *which* Agent produced the file.
 
@@ -92,7 +92,7 @@ Fingerprint verification turns a regular MP4 into a piece of evidence you can de
 
 ### Police, legal, and insurance hand-overs
 
-When footage is exported from Hub and handed over to a third party (police investigation, legal counsel, insurance claim), the receiving party usually needs to demonstrate that what they reviewed is exactly what the camera recorded. By archiving the original MP4 in a [case](/docs/hub/cases) and providing the verification URL alongside it, the recipient can prove on their own machine — without trusting Hub or the camera owner — that the file is intact.
+When footage is exported from Hub and handed over to a third party (police investigation, legal counsel, insurance claim), the receiving party usually needs to demonstrate that what they reviewed is exactly what the camera recorded. By archiving the original MP4 in a [case](/docs/hub/cases) and providing the verification URL alongside it, the recipient can prove on their own machine — without trusting Hub or the camera owner — that the file's signed structure is intact.
 
 ### Compliance and regulated environments
 
@@ -100,7 +100,7 @@ In regulated industries (banking, critical infrastructure, healthcare, public tr
 
 ### Chain of custody for incidents
 
-When an incident is opened in [Cases](/docs/hub/cases), the associated recording is copied to a long-term storage provider in Vault. Re-running verification at any point in the case lifecycle (initial triage, legal review, court submission) confirms that the archived copy is byte-identical (in its signed structural fields) to the file the Agent originally produced. Each verification can be screenshotted or logged, building an explicit chain of custody.
+When an incident is opened in [Cases](/docs/hub/cases), the associated recording is copied to a long-term [storage provider in Vault](/docs/vault/providers). Re-running verification at any point in the case lifecycle (initial triage, legal review, court submission) confirms that the archived copy is byte-identical (in its signed structural fields) to the file the Agent originally produced. Each verification can be screenshotted or logged, building an explicit chain of custody.
 
 ### Detecting re-encoded or "improved" footage
 
@@ -116,7 +116,7 @@ As generative video tooling becomes more accessible, the ability to prove that a
 
 ## Operational notes
 
-- **Key management.** The Agent signs with the private key in `config.Signing.PrivateKey` (environment variable `AGENT_SIGNING_PRIVATE_KEY`), an RSA key in PKCS#8 PEM format. A key in another format is silently ignored and the MP4 gets no signature box, so verification reports `invalid`. Hub verifies against the public key bundled with the Hub frontend and served at `/public_key.pem`. Treat the private key as you would any other production secret, and keep earlier public keys so that recordings signed before a rotation can still be checked.
-- **The default key.** If no signing key is configured, the Agent signs with a built-in default key, and the public key bundled with Hub matches it, so verification reports `valid`. Because that default private key is published in the open-source [Agent](/docs/agent) repository, a valid result only shows that the file has not changed since it was signed, not which device signed it. For the authenticity guarantees above, sign with your own key and make sure Hub serves the matching public key.
+- **Key management.** The Agent signs with the private key in `config.Signing.PrivateKey` (environment variable `AGENT_SIGNING_PRIVATE_KEY`), an RSA key in PKCS#8 PEM format. A key in another format is silently ignored and the MP4 gets no signature box, so verification reports `invalid`. Hub verifies against the public key bundled with the Hub frontend and served at `/public_key.pem`. [Sign recordings for verification](/docs/agent/connect-to-hub#sign-recordings-for-verification) shows how to set it on the Agent. Treat the private key as you would any other production secret, and keep earlier public keys so that recordings signed before a rotation can still be checked.
+- **The default key.** If no signing key is configured, the Agent signs with a built-in default key, and the public key bundled with Hub matches it, so verification reports `valid`. Because that default private key is published in the open-source [Agent repository](https://github.com/kerberos-io/agent), a valid result only shows that the file has not changed since it was signed, not which device signed it. For the authenticity guarantees above, sign with your own key and make sure Hub serves the matching public key.
 - **What is *not* covered.** The fingerprint protects the structural identity of the file. It does not encrypt the video content, and it does not protect against an attacker who has access to the Agent's private key. Combine MP4 verification with end-to-end encryption and proper key handling for the strongest guarantees.
 - **Performance.** Verification is fast — typically a few hundred milliseconds for a multi-minute fragmented MP4 — because only the box structure is parsed, not the video samples themselves.

@@ -27,7 +27,7 @@ Kerberos Hub is the web application that brings all your Agents, sites and recor
 2. **In Hub.** Hub picks up the event and runs it through its [pipeline](/docs/hub/pipeline): it groups recordings into sequences, analyses them with machine learning (for example to detect a person or a vehicle) and decides whether anyone should be told. With [workflows](/docs/hub/workflows) you choose which cameras, models and time windows apply.
 3. **For operators.** The result shows up where people work: on livestreams and videowalls, in the recordings overview, and as [notifications](/docs/hub/notifications) in the Watchlist or through channels such as email, Slack or webhooks.
 
-Agents connect to Hub with your account's keys; [Connect to Hub](/docs/agent/connect-to-hub) in the Agent docs shows how.
+Agents connect to Hub with [your account's keys](/docs/hub/configuration#assign-an-agent); [Connect to Hub](/docs/agent/connect-to-hub) in the Agent docs shows how.
 
 Sign in using a password, 2FA, a passkey, or OIDC single sign-on; the [Authentication guide](/docs/hub/authentication) explains the options. Who sees what is managed per [organisation and project](/docs/hub/organisations), with roles for each member.
 

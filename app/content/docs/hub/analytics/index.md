@@ -32,10 +32,10 @@ serves the route `/analytics`.
 Analytics is not a separate ingestion path: it is a read-only view on
 top of the data the [Hub pipeline](/docs/hub/pipeline/) already produces.
 
-- **Recordings** are uploaded to [Vault](/docs/vault/) by the Agent and
+- **Recordings** are uploaded to [Vault](/docs/vault/) by the [Agent](/docs/agent/connect-to-vault) and
   registered in the Hub database by `hub-api`.
 - **Counts and region detections** are produced by the
-  [`hub-pipeline-analysis`](https://github.com/uug-ai/hub-pipeline-analysis)
+  `hub-pipeline-analysis`
   service when an [alert](/docs/hub/configuration#alerts) of type `counting_line`,
   `counting_region` or `multi` matches an object track on a recording.
 - The Analytics page aggregates those rows for the selected day, sites

@@ -27,7 +27,7 @@ For an overview of every deployment option, see the [Agent installation docs](/d
 Before you start, make sure you have:
 
 - An **IP camera** that supports an RTSP H264 or H265 stream. USB / Raspberry Pi cameras can be used through the [`camera-to-rtsp`](https://github.com/kerberos-io/camera-to-rtsp) sidecar.
-- A machine with one of the supported architectures: ARMv6, ARMv7, ARM64 or AMD64. Examples: Raspberry Pi, NVIDIA Jetson, Intel NUC, a VM, bare metal or a Kubernetes cluster.
+- A machine with one of the supported architectures: ARM64 or AMD64. Releases ship images and binaries for these two only. Examples: Raspberry Pi, NVIDIA Jetson, Intel NUC, a VM, bare metal or a Kubernetes cluster.
 - One of the following runtimes installed (depending on the option you pick below):
   - [Docker](https://docs.docker.com/get-docker/) (≥ 20.10)
   - [Docker Compose](https://docs.docker.com/compose/install/) (v2)
@@ -65,7 +65,7 @@ By default, configuration and recordings live inside the container. To persist t
 ```bash
 mkdir -p agent/config agent/recordings
 chmod -R 755 agent/
-chown 100:101 agent/ -R   # required by the non-root user inside the container
+chown 999:999 agent/ -R   # the non-root agent user inside current images
 
 docker run -p 80:80 --name mycamera \
   -v $(pwd)/agent/config:/home/agent/data/config \
@@ -109,9 +109,11 @@ services:
       - ./garage/recordings:/home/agent/data/recordings
 ```
 
-Start the stack:
+Create the host directories and give them to the container's non-root user, as in Option 2, then start the stack:
 
 ```bash
+mkdir -p frontdoor/config frontdoor/recordings garage/config garage/recordings
+chown -R 999:999 frontdoor garage
 docker compose up -d
 ```
 
@@ -186,11 +188,12 @@ Configuration lives at `/var/snap/kerberosio/common`.
 
 ## Option 6 — Static binary
 
-Each release publishes pre-built binaries on the [releases page](https://github.com/kerberos-io/agent/releases). Download the archive matching your OS / architecture, extract it, and run:
+Each release publishes pre-built Linux binaries for AMD64 and ARM64 on the [releases page](https://github.com/kerberos-io/agent/releases), as `agent-amd64.tar` and `agent-arm64.tar`. The files sit at the root of the archive, so extract it into an empty directory and run:
 
 ```bash
-tar -xzf kerberos-agent-*.tar.gz
-cd kerberos-agent
+mkdir kerberos-agent && cd kerberos-agent
+curl -LO https://github.com/kerberos-io/agent/releases/latest/download/agent-amd64.tar   # or agent-arm64.tar
+tar -xf agent-amd64.tar
 ./main -action run -port 80
 ```
 
@@ -233,7 +236,7 @@ The full list lives in the [Agent README](https://github.com/kerberos-io/agent#c
 ## Troubleshooting
 
 - **No live view / black screen:** verify the RTSP URL with `ffplay rtsp://...` from the same host. WebRTC requires H264 — H265 sub-streams will not preview.
-- **Permission errors on the volume:** make sure the host directory is owned by `100:101` and is mode `755` (see [Option 2](#option-2--docker-with-persistent-volumes)).
+- **Permission errors on the volume:** make sure the host directory is owned by `999:999` and is mode `755` (see [Option 2](#option-2--docker-with-persistent-volumes)).
 - **Port `80` already in use:** map another host port, e.g. `-p 8080:80`.
 - **Behind a firewall / NAT for live streaming:** review the `AGENT_STUN_URI`, `AGENT_TURN_URI`, `AGENT_TURN_USERNAME` and `AGENT_TURN_PASSWORD` variables. [Set up WebRTC live view with TURN](/tutorials/hub/setup-webrtc-turn/) walks through them.
 - **Logs:** `docker logs -f mycamera` (or `kubectl logs -f deploy/...`).

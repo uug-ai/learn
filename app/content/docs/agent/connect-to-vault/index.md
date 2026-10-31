@@ -82,10 +82,11 @@ The [Agent repository](https://github.com/kerberos-io/agent#configure-with-envir
 
 ## Using Vault together with Hub
 
-Self-hosted [Kerberos Hub](/docs/hub/first-things-first) reads recordings from your Vault. Two things connect the three products:
+[Kerberos Hub](/docs/hub/first-things-first) can show the recordings your Agent stores in Vault. Three things connect the three products:
 
-- The Agent's **Directory** must equal the Hub username of the account the recordings belong to. Otherwise Hub can't match the recordings to that account. See [Kerberos Hub username](/docs/vault/integrations#kerberos-hub-username).
+- The Agent's **Directory** must equal the Hub username of the account the recordings belong to. Otherwise Hub can't match the recordings to that account. Vault only uses the Agent's directory when the Vault account's directory is `*`. See [Kerberos Hub username](/docs/vault/integrations#kerberos-hub-username).
 - Vault needs the [Kerberos Hub integration](/docs/vault/integrations#kerberos-hub), so every new recording is sent on to the [Hub pipeline](/docs/hub/pipeline).
+- Hub needs the Vault URL and account keys, so it can play the recordings. See [Connect Kerberos Vault](/docs/hub/configuration#connect-kerberos-vault).
 
 The Agent also connects to Hub directly, for status, live view and camera control. That is a separate setting, described in [Connect to Hub](/docs/agent/connect-to-hub).
 

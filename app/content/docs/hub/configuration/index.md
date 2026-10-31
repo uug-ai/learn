@@ -17,6 +17,9 @@ connects:
     why: Enter the Hub API URL, keys and site on the Agent.
   - page: /docs/factory/getting-started
     why: Deploy many Agents on Kubernetes with the Hub settings applied.
+  - page: /docs/vault/integrations#kerberos-hub
+    title: Kerberos Hub integration
+    why: Let Vault tell Hub about every new recording it stores.
 ---
 
 Once you have installed the Kerberos Hub Helm chart and confirmed that all microservices are running properly, you should be able to access the Kerberos Hub login screen and sign in through the default username and password [which was defined during the installation step](https://github.com/kerberos-io/hub#post-installation).
@@ -63,11 +66,11 @@ You can create a new group by navigating to the groups page and clicking the `(+
 
 ## Cameras
 
-On the cameras page you will have an overview of all the cameras (Agents) your (sub) account has access to. This means that if your account only has access to a couple of sites or groups, the cameras page will only show the Agents that belong to the related groups and sites.
+On the **Devices** page you will have an overview of all the cameras (Agents) your (sub) account has access to. This means that if your account only has access to a couple of sites or groups, the page will only show the Agents that belong to the related groups and sites.
 
 {{< figure src="hub-cameras.gif" alt="The cameras page lists every Agent your account has access to." caption="The cameras page lists every Agent your account has access to." class="stretch">}}
 
-By clicking on the `(+ Add Camera)` button, you will see a modal explaining how to connect an Agent to Kerberos Hub, and the different deployments which are available.
+The **Add Agent** button opens a dialog that writes the Agent's configuration for you. Enter an Agent name, select a site, paste the **Hub key** and **Hub private key**, then choose **Docker command** or **Kubernetes manifest** and select **Copy configuration**. The copied command has the Agent's Hub settings filled in.
 
 ### Assign an Agent
 
@@ -75,11 +78,21 @@ As explained in the modal, there are [different possibilities to set up and run 
 
 Regardless of how you deployed an Agent, to connect the Agent to Kerberos Hub you will require the account credentials from your Kerberos Hub account to be shared with your Agents. By sharing those credentials you are linking your Agents to the relevant Kerberos Hub account. [Connect to Hub](/docs/agent/connect-to-hub) shows where they go on the Agent; [Factory](/docs/factory/getting-started) sets them for every Agent it deploys.
 
-By navigating to the profile page and selecting your plan, you will find the required credentials for your Agents. When [organisations and projects](/docs/hub/organisations#creating-and-managing-projects) are enabled, the credentials belong to the project instead: open **Project settings** and copy the **Agent public key** and **Agent private key**.
+Open **Plans & integrations** to find the **Public key** and **Private key** for your Agents. When [organisations and projects](/docs/hub/organisations#creating-and-managing-projects) are enabled, the credentials belong to the project instead: open **Project settings** and copy the **Agent public key** and **Agent private key**.
 
-Please note that when you are using the Kerberos Hub SaaS offering you will need both an access and secret key. If you are using Kerberos Hub self-hosted you will only need an access key.
+The Agent needs both keys, whether you use Kerberos Hub SaaS or a self-hosted installation.
 
 {{< figure src="hub-link-agent.gif" alt="Get your credentials to link your Agents." caption="Get your credentials to link your Agents." class="stretch">}}
+
+## Connect Kerberos Vault
+
+When your Agents store recordings in your own [Kerberos Vault](/docs/vault), Hub needs to reach that Vault: each time someone opens a recording, Hub asks Vault for a signed URL. Give Hub the Vault API URL and the access key and secret key of a [Vault account](/docs/vault/accounts):
+
+- **For your whole account**: open **Plans & integrations** and fill in **Kerberos Vault settings**. The block is shown on Enterprise plans.
+- **For one site**: open the site and fill in **Connect to dedicated Vault**, for example to use a Vault in the same region as that site's cameras. **Test connection** checks the URL and keys.
+- **On a self-hosted installation**: set the `kerberosvault` values of the Helm chart (`uri`, `provider`, `accesskey` and `secretkey`).
+
+These settings only let Hub read recordings. For new recordings to show up in Hub, Vault also needs its [Kerberos Hub integration](/docs/vault/integrations#kerberos-hub).
 
 ## Integrations
 
@@ -142,7 +155,7 @@ To easily verify whether the POST request is happening, you can use a public web
 
 ## Media proxy
 
-By default Kerberos Hub hands the URLs it receives from Kerberos Vault straight to the browser. Depending on the Vault configuration these point to Vault (vault-signed URLs) or directly to the storage provider (S3, MinIO, GCS, Azure presigned URLs).
+By default Kerberos Hub hands the URLs it receives from Kerberos Vault straight to the browser. Depending on the Vault configuration these point to Vault ([vault-signed URLs](/docs/vault/providers#url-signing)) or directly to the storage provider (S3, MinIO, GCS, Azure presigned URLs).
 
 Enable the media proxy to hide both. The Hub API then asks Vault for the signed URL as usual, seals it into an opaque, encrypted token and returns a Hub API URL instead:
 

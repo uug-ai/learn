@@ -51,10 +51,10 @@ There are a couple of interesting configurations you can enable on account level
 
 #### Details
 
- - Account name: a random name identifying the account.
- - Main provider: the default provider the account is linked to.
- - Day limit: the number of days recordings stored through this account are kept before they expire.
- - Integrations: all the integrations which will be executed each time a recording is stored in a storage provider.
+ - Account name (**General** tab): a name identifying the account. The same tab holds the access key and secret key.
+ - Providers (**Storage** tab): the storage providers of the account. The first one you select is the default provider.
+ - Day limit (**Storage** tab): the number of days recordings stored through this account are kept before they expire.
+ - Integrations (**Integrations** tab): all the integrations which will be executed each time a recording is stored in a storage provider.
 
 #### Directory
 
@@ -62,13 +62,15 @@ By defining a `directory` you force an account, and all its producing Agents, to
 
 By defining the `asterisk` (*) value, you will provide more flexibility and delegate the subdirectory to the connected Agents. This means that different Agents can store in different subdirectories, although they are connected to the same `account`.
 
+If you use Kerberos Hub, the directory the recordings end up in (the account's, or the Agent's when the account uses `*`) must equal the Hub username. See [Kerberos Hub username](/docs/vault/integrations#kerberos-hub-username).
+
 #### Credentials
 
 These credentials are shared with Agents, Kerberos Vaults (chained/forwarding) and/or Kerberos Hub. It's the authentication information needed to push recordings or retrieve recordings from Kerberos Vault.
 
-#### Cloud analysis
+#### Hub pipeline
 
-When connecting Kerberos Vault to Kerberos Hub through the integration, an event is forwarded [to the Kerberos Hub pipeline](/docs/hub/pipeline). By enabling or disabling the cloud analysis you will enable or disable any cloud computing done on the Kerberos Hub.
+When connecting Kerberos Vault to Kerberos Hub through the integration, an event is forwarded [to the Kerberos Hub pipeline](/docs/hub/pipeline). On the **Integrations** tab, with **Default routing** selected, the **Hub pipeline** toggle enables or disables the cloud analysis Hub runs for this account, such as thumbnails, machine learning and dominant colours.
 
 Disable it if you only want to store recordings and avoid any analysis in the cloud, and thus reduce bandwidth from Kerberos Vault to the Kerberos Hub microservices.
 

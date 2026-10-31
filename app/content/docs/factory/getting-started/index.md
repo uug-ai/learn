@@ -18,9 +18,10 @@ connects:
   - page: /docs/hub/configuration#assign-an-agent
     title: Assign an Agent
     why: Find the Hub keys and site your Agents connect with.
-  - page: /docs/agent/getting-started#settings
-    title: Agent settings
-    why: What each Agent setting does.
+  - page: /docs/agent/connect-to-vault
+    why: What each Vault setting does on an Agent.
+  - page: /docs/agent/connect-to-hub
+    why: What each Hub setting does on an Agent.
 ---
 
 Once you've installed Factory, you will have the web application running inside your cluster. This web application allows you to administrate and automate the creation of your Agents through the concept of [Kubernetes deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) and pods.
@@ -33,12 +34,12 @@ Once you open a browser, and navigate to the web application (see installation f
 
 {{< figure src="login.gif" alt="Log in to the Factory interface." caption="Log in to the Factory interface." class="stretch">}}
 
-The default username and password, specified in the [`deployment.yaml`](https://github.com/kerberos-io/enterprise/blob/master/yaml/factory/deployment.yaml#L54) is:
+The default username and password, specified in the [Factory deployment manifest](https://github.com/uug-ai/deployment/blob/main/base/factory/kerberos-factory-deployment.yaml#L36-L39), are:
 
 - username: **root**
 - password: **kerberos**
 
-> The username and password [can be changed in the `deployment.yaml` file](https://github.com/kerberos-io/factory/blob/master/yaml/deployment.yaml#L34-L37).
+> Change them through the `KERBEROS_LOGIN_USERNAME` and `KERBEROS_LOGIN_PASSWORD` environment variables of [the deployment](https://github.com/uug-ai/deployment/blob/main/base/factory/kerberos-factory-deployment.yaml#L36-L39).
 
 ## Overview
 
@@ -80,7 +81,7 @@ Instead of creating a new Agent through an RTSP stream, you can discover streams
 
 {{< figure src="add-through-onvif.gif" alt="Deploy an Agent with ONVIF capabilities." caption="Deploy an Agent with ONVIF capabilities." class="stretch">}}
 
-Once the Agent is added, PTZ and other ONVIF capabilities will be enabled through Kerberos Hub.
+Once the Agent is added, PTZ and other ONVIF capabilities will be enabled through [Kerberos Hub](/docs/hub/onvif).
 
 {{< figure src="ptz-onvif.gif" alt="Moving a camera through ONVIF PTZ." caption="Moving a camera through ONVIF PTZ." class="stretch">}}
 
@@ -96,7 +97,7 @@ The following settings can be changed:
 - Time-based conditions
 - Pre- and post-recording
 - Continuous recording
-- Linking to [Kerberos Hub SaaS](/docs/hub/first-things-first) or [Kerberos Vault](/docs/vault/first-things-first)
+- Linking to Kerberos Hub or Kerberos Vault (see [Storage and video management](#storage-and-video-management))
 
 {{< callout type="info" >}}
 Before the configuration screen opens, Factory runs a quick **reachability check** (a ping) against the Agent. If an Agent is temporarily unreachable you get a fast, friendly message instead of a long hang, and any unsaved changes are confirmed before you close the screen.
@@ -160,21 +161,12 @@ Agents store their recordings locally for a short period. This means that long-t
 
 [Kerberos Vault](/docs/vault/first-things-first) is a solution which makes it possible to store recordings from Agents (across different clusters) at a central place, on the storage provider you want. You can store your recordings in the cloud (AWS S3, Google Cloud Storage, Azure Blob storage) or at the edge (MinIO, Ceph).
 
-On the other hand it's an open platform, as it allows you to build extensions and integrations (web apps, mobile apps, machine learning services and much more). Kerberos Vault ships with the ability of real-time messaging (Kafka), and a REST API (documented as Swagger).
-
 {{< figure src="vault-cloud-storage.svg" alt="Kerberos Vault allows you to centralise your recordings and build integrations." caption="Kerberos Vault allows you to centralise your recordings and build integrations." class="stretch">}}
 
-To connect one or more Agents to your Kerberos Vault instance, you should open the configuration option and navigate to the `cloud` tab. Once selected, you need to fill in the credentials from your [Kerberos Vault account](/docs/vault/accounts).
+Factory uses the same Vault settings as an Agent. Open **Settings**, select **Vault** in the **Persistence** block, and fill in the **Vault API URL**, **Provider**, **Directory**, **Access key** and **Secret key** of a [Kerberos Vault account](/docs/vault/accounts). Select **Verify Connection**, then **Save**. Every Agent that Factory deploys uses these values, and a camera's **Persistence** tab can override them for that Agent. [Connect to Vault](/docs/agent/connect-to-vault#configure-the-agent) explains each field.
 
-- Kerberos Vault URI: this is the API endpoint of your Kerberos Vault instance. Usually this is in the following format: `http(s)://yourdomain.com/api`, where `yourdomain.com` should match your Kerberos Vault endpoint. If you are deploying Kerberos Vault at the edge, in the same cluster, you can use the internal DNS name, as follows: `http://vault.kerberos-vault/api`, where `vault` is the `service name` and `kerberos-vault` is the `namespace`.
-
-- Provider: the name of the provider, which you created on the Kerberos Vault [providers page](/docs/vault/providers), to which you want to send your recordings.
-
-- Directory: this is the subdirectory in which your files will be stored. At the time of writing this should also equal your Kerberos Hub username, if you plan to upload to Kerberos Hub.
-
-- Access Key: this should match the access key of one of your Kerberos Vault accounts.
-
-- Secret Key: this should match the secret key of one of your Kerberos Vault accounts.
+- Vault API URL: usually `http(s)://yourdomain.com/api`. If Kerberos Vault runs in the same cluster, you can use its internal DNS name instead, for example `http://vault.kerberos-vault/api`, where `vault` is the service name and `kerberos-vault` the namespace.
+- Directory: if you also use Kerberos Hub, this must equal your Kerberos Hub username, unless the Vault account sets its own directory. See [Kerberos Hub username](/docs/vault/integrations#kerberos-hub-username).
 
 {{< figure src="kerberos-factory-kerberos-vault.gif" alt="Using Kerberos Vault you can bring your own storage, and store the recordings of your Agents in your own storage provider." caption="Using Kerberos Vault you can bring your own storage, and store the recordings of your Agents in your own storage provider." class="stretch">}}
 
@@ -184,22 +176,14 @@ For the visualisation part Kerberos Hub comes into the picture. Kerberos Hub is 
 
 You have two choices when using Kerberos Hub: either you send your recordings from your Agents directly to Kerberos Hub, or you send your recordings to Kerberos Vault, and connect Kerberos Vault to Kerberos Hub. The latter is explained in the [Kerberos Hub integration](/docs/vault/integrations#kerberos-hub) of Kerberos Vault.
 
-Select the Kerberos Hub option, and copy-paste the credentials from your Kerberos Hub subscription.
+To send recordings directly to Kerberos Hub, select **Hub** in the **Persistence** block and choose the **Region**.
 
 {{< figure src="kerberos-factory-kerberos-hub.gif" alt="By linking the Agent to Kerberos Hub, your recordings and livestreams will become available online." caption="By linking your Agent to Kerberos Hub, your recordings and livestreams will become available online." class="stretch">}}
 
-- Proxy URI: this is a proxy service which moves the recording in the Kerberos Hub SaaS version. By default `http://proxy.kerberos.io`.
+Whichever persistence you choose, fill in the **Hub** block to connect the Agents to Kerberos Hub for status, live view and camera control:
 
-- Region: this is the region where your recordings will be stored. Only `eu-west-1` for now (will change, on the roadmap).
+- API url: the URL of the Kerberos Hub API. By default `https://api.cloud.kerberos.io`, the Kerberos Hub SaaS version.
+- Public key and Private key: the keys Hub shows under **Plans & integrations**. See [Assign an Agent](/docs/hub/configuration#assign-an-agent).
+- Site: optionally, the ID of the Hub site the Agents belong to.
 
-- Bucket: the name of the Kerberos Hub bucket. Only `kerberosaccept` for now (will change, on the roadmap).
-
-- Directory: this is your personal directory, and matches your Kerberos Hub username.
-
-In the Kerberos Hub section (next to persistence) provide the following information:
-
-- API url: the URL of the Kerberos Hub endpoint. By default `https://api.cloud.kerberos.io` for our Kerberos Hub SaaS version.
-
-- Public Key: this should match the public key of your Kerberos Hub subscription.
-
-- Private Key: this should match the private key of your Kerberos Hub subscription.
+[Connect to Hub](/docs/agent/connect-to-hub) explains what each setting does.

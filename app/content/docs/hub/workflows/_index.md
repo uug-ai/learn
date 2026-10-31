@@ -25,7 +25,7 @@ Where the pipeline is the same for everyone, a workflow is yours: pick the camer
 
 ## Why workflows?
 
-The default Hub pipeline is intentionally opinionated: a recording arrives from an [Agent](/docs/agent), is classified, throttled and turned into a notification. That's a great starting point, but real deployments have very different needs:
+The default Hub pipeline is intentionally opinionated: a recording arrives from an [Agent](/docs/agent/connect-to-hub), is classified, throttled and turned into a notification. That's a great starting point, but real deployments have very different needs:
 
 - A retail store only needs people detection during opening hours.
 - A logistics site wants vehicle detection on the parking camera, but a no-helmet model on the warehouse camera.

@@ -17,5 +17,5 @@ Hands-on tutorials for [Hub](https://github.com/kerberos-io/hub) — the central
 ### Coming soon
 
 - Install Hub (self-hosted)
-- Connect an Agent to Hub
+- Connect an Agent to Hub (until then, see [Connect to Hub](/docs/agent/connect-to-hub) in the Agent docs)
 - Onboard your first site and users

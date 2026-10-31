@@ -37,7 +37,7 @@ By the end, you will know:
 |---|---|---|---|
 | **MoQ** | Low-latency viewing through a shared relay, especially with several viewers | Combines real-time delivery with publish/subscribe fan-out | Newer ecosystem; Hub currently targets Chromium and H.264 video |
 | **HLS** | Locked-down networks, broad playback compatibility and large audiences | Uses familiar HTTPS delivery and scales well through shared infrastructure | Segment buffering adds latency and the path is one-way |
-| **WebRTC** | Interactive monitoring, direct camera viewing and two-way talk | Mature sub-second media with congestion control and bidirectional tracks | ICE/TURN adds operational complexity; each viewer needs a media session |
+| **WebRTC** | Interactive monitoring, direct camera viewing and two-way talk | Mature sub-second media with congestion control | ICE/TURN adds operational complexity; each viewer needs a media session |
 
 {{< callout type="important" >}}
 The latency labels are goals, not guarantees. Camera encoding, keyframe interval, relay distance, packet loss, player buffering and overloaded links can matter more than the protocol name.
@@ -88,7 +88,7 @@ The important benefits are:
 - **Live-edge behaviour.** A real-time player can skip data that is already too old instead of making delay grow without bound.
 - **Independent delivery.** QUIC avoids TCP head-of-line blocking between independent streams, although loss and congestion still affect playback.
 
-In the current Kerberos implementation, the Agent publishes separate high- and low-quality H.264 broadcasts only while they are being watched. Hub playback uses WebTransport and WebCodecs and currently targets Chromium-based browsers. The initial path is video-only, so it does not replace WebRTC's talk channel.
+In the current Kerberos implementation, the Agent publishes separate high- and low-quality H.264 broadcasts. It sends the full video only while a broadcast is watched; an idle broadcast only refreshes its keyframes. Hub playback uses WebTransport and WebCodecs and currently targets Chromium-based browsers. The initial path is video-only, so it does not replace WebRTC's talk channel.
 
 MoQ is the strongest candidate when you need near-real-time video for multiple viewers and control the browser environment. Its costs are a relay, a newer operational toolchain, HTTP/3/UDP network access and a less mature browser ecosystem.
 
@@ -157,7 +157,7 @@ WebRTC is designed for live, bidirectional communication. In Hub, the Agent and 
     { "id": "webrtc-turn", "kind": "turn", "x": 530, "y": 340, "w": 230, "h": 130,
       "header": "STUN / TURN", "title": "TURN relay", "subtitle": "Fallback media path", "groupId": "services" },
     { "id": "webrtc-viewer", "kind": "frontend", "x": 930, "y": 200, "w": 240, "h": 130,
-      "header": "HUB FRONTEND", "title": "WebRTC peer", "subtitle": "Video + talk", "groupId": "operators" }
+      "header": "HUB FRONTEND", "title": "WebRTC peer", "subtitle": "Live video", "groupId": "operators" }
   ],
   "connections": [
     { "from": "webrtc-camera", "to": "webrtc-agent", "fromSide": "right", "toSide": "left", "label": "RTSP" },
@@ -241,7 +241,7 @@ WebRTC uses MQTT for signalling, then ICE chooses either a direct media path or 
 |---|---|---|---|
 | Agent and operator browser networks | Configured STUN/TURN host | Outbound UDP on the configured listener port | Discover NAT mappings and establish the preferred media path |
 | Agent and operator browser networks | Configured TURN host | Outbound TCP on the configured listener port, when TURN-over-TCP is enabled | Relay fallback where direct UDP is blocked |
-| Agent and operator browser networks | Negotiated peer addresses | Outbound UDP on dynamic ICE ports | Direct video and talk media when peer-to-peer succeeds |
+| Agent and operator browser networks | Negotiated peer addresses | Outbound UDP on dynamic ICE ports | Direct video when peer-to-peer succeeds |
 
 There is no universal TURN port in Kerberos configuration. The Helm example uses `turn.yourdomain.com:8443`; the Agent defaults reference `3478`. Use the actual configured value, and include the transport requested by the TURN URI or server policy.
 
@@ -336,7 +336,7 @@ The Agent and frontend must use the same relay and broadcast prefix. Production 
 
 To run the relay yourself, follow [Deploy a MoQ relay on Kubernetes](/tutorials/hub/deploy-moq-relay-kubernetes/). It covers TLS, the UDP LoadBalancer, Hub values, Agent variables and end-to-end verification.
 
-For the other production paths, follow [Set up WebRTC live view with TURN](/tutorials/hub/setup-webrtc-turn/) or [Set up HLS live view](/tutorials/hub/setup-hls-live-view/). Both guides cover Hub values, Agent requirements, firewall rules, diagnostics and a complete fallback-path test.
+For the other production paths, follow [Set up WebRTC live view with TURN](/tutorials/hub/setup-webrtc-turn/) or [Set up HLS live view](/tutorials/hub/setup-hls-live-view/). Both guides cover Hub values, Agent requirements, firewall rules and diagnostics; the WebRTC guide also tests the TURN fallback path.
 
 For the complete Hub live-view flow and troubleshooting steps, continue with [Live view](/docs/hub/livestream/).
 

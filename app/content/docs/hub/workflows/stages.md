@@ -386,7 +386,7 @@ Your microservice does **not** receive the pipeline's internal `PipelineEvent`. 
 
 **`storage` — media-fetch credentials**
 
-The credentials your microservice uses to fetch the recording. The base trio is always set; the `vaultOverride*` quartet appears when the recording lives on its own (per-tenant) backend — **prefer the override when present**, otherwise use the base.
+The credentials your microservice uses to fetch the recording: the keys of a [Vault account](/docs/vault/accounts). The base trio is always set; the `vaultOverride*` quartet appears when the recording lives on its own (per-tenant) backend — **prefer the override when present**, otherwise use the base.
 
 | Field | Type | What it is |
 |---|---|---|

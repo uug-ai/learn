@@ -45,7 +45,7 @@ When installing Kerberos Vault in a cloud environment, the following architectur
 
 {{< figure src="vault-cloud-storage.svg" alt="Bring your own storage using Kerberos Vault" caption="Bring your own storage using Kerberos Vault" class="stretch">}}
 
-On the other hand you could also have Kerberos Vault running at the edge, next to your Kubernetes Enterprise Agents. This could be useful if you want to do processing or video analytics such as computer vision or machine learning at the edge. Find more information about storage providers [on the providers page](/docs/vault/providers).
+On the other hand you could also have Kerberos Vault running at the edge, next to your Kubernetes Enterprise Agents, for example the ones [Factory](/docs/factory/first-things-first) deploys. This could be useful if you want to do processing or video analytics such as computer vision or machine learning at the edge. Find more information about storage providers [on the providers page](/docs/vault/providers).
 
 {{< figure src="vault-edge-storage.svg" alt="Store your recordings at the edge with Kerberos Vault" caption="Store your recordings at the edge with Kerberos Vault" class="stretch">}}
 

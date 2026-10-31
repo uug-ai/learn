@@ -21,6 +21,7 @@ Refer to your specific storage provider's documentation for detailed CORS config
 
 ### Related articles
 
+- [URL signing](/docs/vault/providers#url-signing)
 - [Google Cloud Storage](/docs/vault/providers/google-cloud-storage/)
 - [Amazon S3](/docs/vault/providers/amazon-s3/)
 - [Azure Storage Account](/docs/vault/providers/azure-storage-account/)

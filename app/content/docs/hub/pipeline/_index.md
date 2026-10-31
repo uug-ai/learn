@@ -16,9 +16,9 @@ connects:
   - page: /docs/vault/integrations#kerberos-hub
     title: Kerberos Hub integration
     why: Send an event to Hub for every recording Vault stores.
-  - page: /docs/vault/accounts#cloud-analysis
-    title: Cloud analysis
-    why: Turn cloud analysis on or off per Vault account.
+  - page: /docs/vault/accounts#hub-pipeline
+    title: Hub pipeline toggle
+    why: Turn Hub analysis on or off per Vault account.
 ---
 
 > [!WARNING] Workflows are the future direction
@@ -98,7 +98,7 @@ Each microservice in the Hub pipeline owns a single responsibility. Together the
 
 ## How it works
 
-When Vault stores a new recording, its [Hub integration](/docs/vault/integrations#kerberos-hub) publishes an event to the broker. Hub consumes that event and starts a pipeline run for it. From there messages flow through the services either sequentially (Monitor → Sequence → Analysis → Throttler → Notification) or in parallel (everything fanning out from Analysis), depending on the configuration. Once every service involved in the run has acknowledged its message, the pipeline goes idle until the next event arrives.
+When Vault stores a new recording, its [Hub integration](/docs/vault/integrations#kerberos-hub) sends an event to the Hub API, which publishes it to the broker. Hub consumes that event and starts a pipeline run for it. From there messages flow through the services either sequentially (Monitor → Sequence → Analysis → Throttler → Notification) or in parallel (everything fanning out from Analysis), depending on the configuration. Once every service involved in the run has acknowledged its message, the pipeline goes idle until the next event arrives.
 
 Message distribution is handled by a message broker — Kafka, AMQP/RabbitMQ, or any other supported broker — using queues (or topics, depending on the broker). Each service consumes from its own queue, does its work, and hands off to the next stage. This loose coupling is what makes the pipeline easy to extend: adding a new capability is just a matter of adding a new consumer on a new queue.
 

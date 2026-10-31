@@ -86,7 +86,8 @@ actions use the site's existing edit permissions.
 
 - **The image is rejected.** Use a PNG or JPEG no larger than 10 MiB.
 - **The image uploads but the canvas is blank.** Check the Vault or object-store
-  CORS policy and confirm that it permits the Hub origin.
+  CORS policy and confirm that it permits the Hub origin. See
+  [How to enable CORS](/knowledge-base/vault/how-to-enable-cors).
 - **A device cannot be added.** Confirm that it belongs to the current site and
   is not already placed on this floor plan.
 - **Markers moved after replacing the image.** Reposition them against the new
