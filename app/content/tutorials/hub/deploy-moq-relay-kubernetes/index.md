@@ -9,11 +9,12 @@ product: 'Hub'
 level: 'Intermediate'
 duration: '30 min'
 tags: ['MoQ', 'Kubernetes', 'Networking']
+illustration: 'tutorial-hub-moq-relay'
 ---
 
 {{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
 
-{{< tutorial-header alt="Abstract media relay fanning one luminous stream across a cloud cluster" >}}
+{{< tutorial-header alt="One stream from an Agent enters MoQ relay pods on a three-node Kubernetes cluster, which fan it out to a monitor, a laptop and a phone." >}}
 
 A self-hosted Media over QUIC (MoQ) relay gives Kerberos Agents and Hub viewers one low-latency meeting point. The Agent publishes each live camera broadcast to the relay; browsers subscribe to the same broadcast without opening a peer-to-peer connection to the Agent.
 

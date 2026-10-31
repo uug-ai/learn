@@ -9,7 +9,10 @@ product: 'Agent'
 level: 'Beginner'
 duration: '15 min'
 tags: ['Installation', 'Docker', 'Kubernetes']
+illustration: 'tutorial-agent-install'
 ---
+
+{{< tutorial-header alt="A camera streams to its Agent, running as a container on a small Docker machine, and the Agent web UI opens on a laptop at port 80." >}}
 
 This tutorial walks you through installing an [Agent](https://github.com/kerberos-io/agent) — one container (or binary) per camera — and reaching its web UI for the first time.
 

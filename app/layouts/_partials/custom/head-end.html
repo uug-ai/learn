@@ -378,8 +378,9 @@
     }
   })();
 </script>
-{{- /* Iso illustrations: their stylesheet and click script, on pages that use them. */ -}}
-{{- if .HasShortcode "iso-figure" -}}
+{{- /* Iso illustrations: their stylesheet and click script, on pages that use
+     them: iso figures, tutorial banners and the tutorial cards' lists. */ -}}
+{{- if or (.HasShortcode "iso-figure") (.HasShortcode "tutorial-header") (and (eq .Section "tutorials") .IsNode) -}}
   {{- with resources.Get "css/iso-illustration.css" -}}
     {{- $css := . | minify | fingerprint -}}
     <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />

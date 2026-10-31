@@ -9,11 +9,12 @@ product: 'Hub'
 level: 'Beginner'
 duration: '15 min'
 tags: ['Live video', 'Networking', 'Architecture']
+illustration: 'tutorial-hub-transports'
 ---
 
 {{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
 
-{{< tutorial-header alt="Abstract luminous paths representing three live-video transports" >}}
+{{< tutorial-header alt="One camera reaches the same viewer over three lanes: WebRTC fastest, MoQ close behind and HLS slower, in segments." >}}
 
 Live video has no single best transport. The right choice depends on what you are optimising: the shortest delay, the largest audience, the strictest corporate network, or interactive audio.
 

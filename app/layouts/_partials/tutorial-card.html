@@ -14,15 +14,25 @@
   data-tags="{{ delimit $page.Params.tags "|" | lower }}"
   data-search="{{ $searchText }}"
 >
-  <a class="tutorial-card__media" href="{{ $page.RelPermalink }}" aria-label="Open tutorial: {{ $page.Title }}">
-    {{- with $image }}
-      {{- $thumbnail := . -}}
-      {{- if ne .MediaType.SubType "png" -}}
-        {{- $thumbnail = .Resize "800x webp q82" -}}
-      {{- end -}}
-      <img src="{{ $thumbnail.RelPermalink }}" width="{{ $thumbnail.Width }}" height="{{ $thumbnail.Height }}" alt="" loading="lazy" />
+  {{- $illustration := "" -}}
+  {{- with $page.Params.illustration -}}
+    {{- with resources.Get (printf "iso/%s.svg" .) -}}
+      {{- $illustration = replace .Content "ISO_ID" (printf "iso-%s-card-%s" $page.Params.illustration $variant) -}}
+    {{- end -}}
+  {{- end -}}
+  <a class="tutorial-card__media{{ with $illustration }} tutorial-card__media--iso{{ end }}" href="{{ $page.RelPermalink }}" aria-label="Open tutorial: {{ $page.Title }}">
+    {{- if $illustration }}
+      <span class="iso-illustration iso-illustration--glow-auto" aria-hidden="true">{{ $illustration | safeHTML }}</span>
     {{- else }}
-      <span class="tutorial-card__fallback" aria-hidden="true"><span>{{ $page.Params.product }}</span></span>
+      {{- with $image }}
+        {{- $thumbnail := . -}}
+        {{- if ne .MediaType.SubType "png" -}}
+          {{- $thumbnail = .Resize "800x webp q82" -}}
+        {{- end -}}
+        <img src="{{ $thumbnail.RelPermalink }}" width="{{ $thumbnail.Width }}" height="{{ $thumbnail.Height }}" alt="" loading="lazy" />
+      {{- else }}
+        <span class="tutorial-card__fallback" aria-hidden="true"><span>{{ $page.Params.product }}</span></span>
+      {{- end }}
     {{- end }}
     <span class="tutorial-card__product">{{ $page.Params.product }}</span>
   </a>

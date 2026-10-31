@@ -9,11 +9,12 @@ product: 'Agent'
 level: 'Beginner'
 duration: '15 min'
 tags: ['Camera', 'RTSP', 'ONVIF']
+illustration: 'tutorial-agent-camera'
 ---
 
 {{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 20, 2026" updated="Aug 20, 2026" >}}
 
-{{< tutorial-header alt="An IP camera sending main and sub RTSP streams over a local network into verified Kerberos Agent camera settings" >}}
+{{< tutorial-header alt="Bullet, dome, PTZ and turret cameras each send a main and a sub RTSP stream through a network switch to an Agent that shows them as verified." >}}
 
 You do not need a camera-specific Kerberos integration. If your IP camera exposes an **RTSP stream with H264 or H265 video**, Agent can usually connect to it directly.
 

@@ -9,11 +9,12 @@ product: 'Hub'
 level: 'Intermediate'
 duration: '30 min'
 tags: ['WebRTC', 'TURN', 'Networking']
+illustration: 'tutorial-hub-webrtc-turn'
 ---
 
 {{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
 
-{{< tutorial-header alt="WebRTC architecture showing an IP camera, Kerberos Agent, Hub signalling, coturn relay fallback and Hub live viewer" >}}
+{{< tutorial-header alt="The Agent and the viewer each sit behind a firewall. Hub signals the session and the video is relayed through a coturn server." >}}
 
 WebRTC gives Kerberos Hub its most interactive live path: low-latency H.264 video, camera audio and the two-way talk backchannel. It prefers a direct Agent-to-browser connection, but NAT and enterprise firewalls often make a TURN relay the only reliable path.
 

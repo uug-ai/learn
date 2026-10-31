@@ -46,6 +46,44 @@ html.dark .iso-illustration-figure [data-iso-zone] {
   --iso-zone-accent: color-mix(in srgb, var(--learn-product-accent) 78%, #ffffff);
 }
 
+/* Tutorial banners in the tutorial header and on its card (front matter
+   illustration): the product's accent and tinted surfaces, as on the product
+   pages, over the photo headers' dark background (hence the doubled classes,
+   which outrank custom.css and tutorials.css). The card is 16:9 and the banner
+   10:3; its floor grid runs past the banner's edges, so the bands above and
+   below stay filled. */
+:is(.tutorial-header.tutorial-header--iso, .tutorial-card__media.tutorial-card__media--iso) {
+  --background: #ffffff;
+  --surface: color-mix(in srgb, var(--learn-product-accent, #a239d7) 5%, #ffffff);
+  --surface-strong: color-mix(in srgb, var(--learn-product-accent, #a239d7) 11%, #ffffff);
+  --text-primary: #111827;
+  --iso-accent: var(--learn-product-accent, #a239d7);
+
+  background: var(--background);
+}
+
+html.dark :is(.tutorial-header.tutorial-header--iso, .tutorial-card__media.tutorial-card__media--iso) {
+  --background: #111111;
+  --surface: color-mix(in srgb, var(--learn-product-accent, #a239d7) 5%, #19191c);
+  --surface-strong: color-mix(in srgb, var(--learn-product-accent, #a239d7) 9%, #222226);
+  --text-primary: #f3f4f6;
+  --iso-accent: color-mix(in srgb, var(--learn-product-accent, #a239d7) 78%, #ffffff);
+}
+
+:is(.tutorial-header--iso, .tutorial-card__media--iso) .iso-illustration,
+:is(.tutorial-header--iso, .tutorial-card__media--iso) .iso-illustration svg {
+  width: 100%;
+  height: 100%;
+}
+
+.tutorial-card__media--iso .iso-illustration {
+  transition: transform 300ms ease;
+}
+
+.tutorial-card:hover .tutorial-card__media--iso .iso-illustration {
+  transform: scale(1.03);
+}
+
 /* Click hint on figures whose zones are links (assets/js/iso-figure.js): an
    arrow cursor that clicks each zone in turn, its tip on the zone's centre. */
 .iso-illustration-figure {
@@ -1802,6 +1840,82 @@ html.dark .iso-illustration-figure [data-iso-zone] {
   }
 }
 
+/* Tutorial banners (.iso-figure--tutorial): wide scenes on a 6s round. A
+   pulse crosses its wire in the first 1.5s after its delay; a flash or blink
+   lights as a pulse arrives (1.5-2.3s after its delay). Lanes can run faster
+   or slower (.iso-tut-fast, .iso-tut-slow, the latter in chunks). */
+.iso-figure--tutorial .iso-pulse {
+  vector-effect: none;
+  stroke-width: 2;
+  stroke-dasharray: 60 2000;
+  stroke-dashoffset: 70;
+  animation: iso-tut-pulse 6s linear infinite;
+}
+
+.iso-figure--tutorial .iso-pulse.iso-tut-sub {
+  stroke-width: 1.2;
+  stroke-dasharray: 26 2000;
+}
+
+.iso-figure--tutorial .iso-pulse.iso-tut-fast {
+  animation-duration: 3s;
+}
+
+.iso-figure--tutorial .iso-pulse.iso-tut-slow {
+  stroke-dasharray: 14 10 14 10 14 2000;
+  animation-duration: 9s;
+}
+
+.iso-figure--tutorial .iso-tut-flash {
+  animation: iso-tut-flash 6s ease-in-out infinite;
+}
+
+.iso-figure--tutorial .iso-tut-blink {
+  opacity: 0.3;
+  animation: iso-tut-blink 6s ease-out infinite;
+}
+
+@keyframes iso-tut-pulse {
+  0% {
+    stroke-dashoffset: 70;
+  }
+
+  25%,
+  100% {
+    stroke-dashoffset: -1010;
+  }
+}
+
+@keyframes iso-tut-flash {
+  0%,
+  22%,
+  45%,
+  100% {
+    fill: var(--iso-pane);
+  }
+
+  27%,
+  38% {
+    fill: var(--iso-pane-on);
+  }
+}
+
+@keyframes iso-tut-blink {
+  0%,
+  22%,
+  100% {
+    opacity: 0.3;
+  }
+
+  26% {
+    opacity: 1;
+  }
+
+  45% {
+    opacity: 0.3;
+  }
+}
+
 /* Reduced motion: hold the lit state and drop the travelling pulses. */
 @media (prefers-reduced-motion: reduce) {
   .iso-illustration :is(.iso-pane, .iso-halo, .iso-beacon, .iso-beacon-halo, .iso-led, .iso-radar, .iso-hub-reveal) {
@@ -1852,6 +1966,14 @@ html.dark .iso-illustration-figure [data-iso-zone] {
 
   .iso-figure--ecosystem :is(.iso-eco-flash, .iso-eco-blink, .iso-eco-agent-led, .iso-eco-halo, .iso-vault-ring, .iso-vault-wheel) {
     animation: none;
+  }
+
+  .iso-figure--tutorial :is(.iso-tut-flash, .iso-tut-blink) {
+    animation: none;
+  }
+
+  .iso-figure--tutorial .iso-tut-blink {
+    opacity: 1;
   }
 
   .iso-figure--ecosystem :is(.iso-eco-blink, .iso-eco-agent-led) {
