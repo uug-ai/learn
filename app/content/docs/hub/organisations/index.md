@@ -16,10 +16,10 @@ podcast: organisations-v2
 
 An **organisation** is the tenant boundary for shared resources. A **project** separates operational resources inside that organisation. A **workspace** is the organisation/project pair selected for a session; it is not a separate stored entity.
 
-A user can own or belong to more than one organisation without creating another login. Membership, resource ownership, authorisation, and the currently selected workspace are separate concerns: selecting a workspace does not grant access to it.
+A user can own or belong to more than one organisation without creating another login. Membership, resource ownership, authorization, and the currently selected workspace are separate concerns: selecting a workspace does not grant access to it.
 
 > [!NOTE] Feature flags
-> Organisation and project controls are opt-in and hierarchical. The organisation umbrella can override both families; otherwise their group and child flags apply independently. See [Feature flags](/docs/hub/feature-flags#organisations-and-projects) before enabling switching, creation, or settings.
+> Organisation and project controls are opt-in and hierarchical. The organisation umbrella can override both families; otherwise their group and child flags apply independently. See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#organisations-and-projects) before enabling switching, creation, or settings.
 
 ## Core concepts
 
@@ -32,7 +32,7 @@ A user can own or belong to more than one organisation without creating another 
 | Current project | Selects the project context used by project-aware Hub activity. It is navigation state, not proof that the user may access the project. |
 | Owner | A member holding the Owner role, which grants every permission in every project. An organisation has at least one owner; `ownerId` names the primary owner. |
 | Role | A named set of permissions, defined once per organisation. A role is assignable at one level: organisation roles administer the organisation, project roles act on project resources. Roles never carry resources. |
-| Role assignment | Grants one role to a principal with an explicit scope, and optionally a time window and expiry. See [Authorisation and rollout](#authorisation-and-rollout) for the live authorisation path. |
+| Role assignment | Grants one role to a principal with an explicit scope, and optionally a time window and expiry. See [Authorization and rollout](#authorization-and-rollout) for the live authorization path. |
 
 ## Organisation and project structure
 
@@ -47,7 +47,7 @@ flowchart TB
     P2 --> R2["Sites, groups and devices<br/>Recordings and derived results"]
 ```
 
-The same user identity can be a member of several organisations. In the shared assignment model, a project role is granted inside one project; a member who works in several projects holds one assignment per project. Organisation roles grant nothing inside projects. The current API does not yet resolve those assignments for authorisation. Hub does not create a separate user account for each project.
+The same user identity can be a member of several organisations. In the shared assignment model, a project role is granted inside one project; a member who works in several projects holds one assignment per project. Organisation roles grant nothing inside projects. The current API does not yet resolve those assignments for authorization. Hub does not create a separate user account for each project.
 
 The records have separate responsibilities:
 
@@ -60,7 +60,7 @@ The records have separate responsibilities:
 | Role assignment | Principal + organisation + role + scope | Grants a role to a member and says where, and optionally when, that grant applies. |
 | Operational resource | Resource + organisation + project | Places a site, group, device, recording, or derived result inside one project boundary. |
 
-Organisation memberships and role assignments are sibling records joined by the same user and organisation identifiers. Assignments are not embedded in the membership, so membership lifecycle and authorisation lifecycle can be managed independently.
+Organisation memberships and role assignments are sibling records joined by the same user and organisation identifiers. Assignments are not embedded in the membership, so membership lifecycle and authorization lifecycle can be managed independently.
 
 ## Model diagram
 
@@ -76,10 +76,10 @@ The overview below combines the twelve organisation/project-related types from t
 
 The diagram is a snapshot of the Go definitions. Only identity and selection fields are shown for `User`; supporting company, settings, audit, and operational resource types are not expanded, and methods are hidden. Go field names and types are shown, not JSON/BSON field spellings or an API response schema. Credential fields identify model fields only; no credential values are included.
 
-Every organisation has at least one **logical** project: its deterministic default. The `1..*` relationship includes that project even before its metadata document is materialised. Principals, scopes, and time windows are embedded values, not references to shared documents; an invitation embeds the same scope and time-window types for each assignment it will create.
+Every organisation has at least one **logical** project: its deterministic default. The `1..*` relationship includes that project even before its metadata document is materialized. Principals, scopes, and time windows are embedded values, not references to shared documents; an invitation embeds the same scope and time-window types for each assignment it will create.
 
 > [!NOTE] Model versus runtime
-> This diagram describes the shared model, not complete runtime authorisation enforcement. Canonical scoped assignments and the invitation model are not yet an end-to-end access-management workflow. See [Authorisation and rollout](#authorisation-and-rollout).
+> This diagram describes the shared model, not complete runtime authorization enforcement. Canonical scoped assignments and the invitation model are not yet an end-to-end access-management workflow. See [Authorization and rollout](#authorization-and-rollout).
 
 The following smaller diagrams split ownership and access for readability. `ProjectResource` represents project-owned models such as `Site`, `Group`, `Device`, and `Media`; there is no collection with that name. Embedded company, settings, subscription, and audit fields are omitted from these smaller views.
 
@@ -188,7 +188,7 @@ Use the declared field types when integrating with MongoDB. Core organisation, p
 
 ### Role levels and permissions
 
-Permissions come from a versioned catalogue in the shared models, such as `devices.read`, `live.stream`, or `members.invite`. Every permission has a level, and a role holds permissions of its own `assignableAt` level only:
+Permissions come from a versioned catalog in the shared models, such as `devices.read`, `live.stream`, or `members.invite`. Every permission has a level, and a role holds permissions of its own `assignableAt` level only:
 
 | Level | Examples | Effective |
 | --- | --- | --- |
@@ -202,15 +202,15 @@ Every role states explicitly what it grants in `grants`:
 | `grants` | Meaning |
 | --- | --- |
 | `selected` | Exactly the permissions listed in `permissions`. An empty list grants nothing. |
-| `all` | Every permission, including ones added to the catalogue later. Only the Owner role uses it, and it lists no permissions. |
+| `all` | Every permission, including ones added to the catalog later. Only the Owner role uses it, and it lists no permissions. |
 
 A role without `grants` is invalid, so an empty permission list never means "everything".
 
-Organisation permissions that affect the whole organisation, such as billing, storage, the role catalogue, removing members, or updating organisation settings, are **tenant-wide**. A role holding any tenant-wide permission can only be assigned to cover all projects.
+Organisation permissions that affect the whole organisation, such as billing, storage, the role catalog, removing members, or updating organisation settings, are **tenant-wide**. A role holding any tenant-wide permission can only be assigned to cover all projects.
 
 The platform defines two families of read-only roles, copied into every organisation under a stable key:
 
-- **System roles** such as Owner, Organisation manager, Billing admin, Project admin, Editor, and Viewer. Owner is the one role that spans every project: it has `grants: all`, so it holds every permission, including ones added to the catalogue later. It is assigned to users only, always covers all projects, and has no time window or expiry.
+- **System roles** such as Owner, Organisation manager, Billing admin, Project admin, Editor, and Viewer. Owner is the one role that spans every project: it has `grants: all`, so it holds every permission, including ones added to the catalog later. It is assigned to users only, always covers all projects, and has no time window or expiry.
 - **Legacy roles** that reproduce the access of the existing guest, editor, and admin tiers exactly. They let existing accounts move to the new model without gaining or losing access, and can be replaced by system or custom roles afterwards.
 
 ### Assignment scope
@@ -277,11 +277,11 @@ Pipeline intake resolves the stored device's organisation and project and propag
 
 The distinction is important: an interactive user can switch to Project B while a recording from Project A is still being processed. That switch must not cause the result to be stored in Project B.
 
-## Authorisation and rollout
+## Authorization and rollout
 
 The shared models describe the organisation-scoped RBAC design, but **the current Hub API does not use canonical `RoleAssignment` records as its live permission source**.
 
-| Layer | Current behaviour |
+| Layer | Current behavior |
 | --- | --- |
 | Organisation selection | Resolves accessible organisations using ownership, current context, and active, unexpired memberships. |
 | Project selection | Validates the project against the selected organisation and its active state; supports the logical default even before its document exists. It does not evaluate role assignment scopes. |
@@ -293,11 +293,11 @@ Project **data isolation** is implemented through ownership filters and session 
 
 The assignment design separates **what** a member may do (the role) from **where** (the scope). It can represent a security-operator role in Project A and a viewer role in Project B as separate assignments for the same user and organisation. A future live assignment resolver must retain that role/scope association and require valid membership; flattening permissions and project IDs separately would incorrectly combine grants.
 
-Sites and groups organise operational resources, not people. They must remain within the appropriate organisation/project boundary. There is no separate project membership collection: a member is in a project when they hold an assignment there.
+Sites and groups organize operational resources, not people. They must remain within the appropriate organisation/project boundary. There is no separate project membership collection: a member is in a project when they hold an assignment there.
 
 Assignments name a principal so that groups of people can be added later without changing assignments. Only users are supported today. Teams, managed in Hub or synced from an identity provider, are planned as a second principal type; the identity provider would decide who belongs to a team, and assignments in Hub would decide what the team can do.
 
-For the currently available account and custom-role controls, see [Roles](/docs/hub/roles). The workspace users pane continues to lead to that existing account-management flow.
+For the currently available account and custom-role controls, see [Roles]({{< ref "/docs/hub/roles" >}}). The workspace users pane continues to lead to that existing account-management flow.
 
 ## Ownership and isolation
 
@@ -315,7 +315,7 @@ initial name = "Project 1"
 reserved slug = "project-1"
 ```
 
-The default project is a real project identity, not a wildcard meaning "all projects". Its document can be materialised lazily with that ID. Its display name can change; its reserved slug and identity are not an invitation to create a second default. Other projects have their own IDs.
+The default project is a real project identity, not a wildcard meaning "all projects". Its document can be materialized lazily with that ID. Its display name can change; its reserved slug and identity are not an invitation to create a second default. Other projects have their own IDs.
 
 ### Legacy compatibility without a required migration
 
@@ -338,11 +338,11 @@ The default project's compatibility reads include unstamped project records. A d
 
 Legacy field names and BSON types vary by collection. Creator, actor, recipient, and payer fields are provenance, not alternate ownership once a higher-precedence canonical or tenant field exists. Changing a user's current workspace must not move their historical resources.
 
-Backfills are optional normalisation for eventual removal of compatibility paths. They are **not a prerequisite for visibility, isolation, authorisation, or correct processing**. If an unmigrated resource disappears from its valid owner's default project, investigate the runtime ownership resolver rather than treating a backfill as the fix.
+Backfills are optional normalization for eventual removal of compatibility paths. They are **not a prerequisite for visibility, isolation, authorization, or correct processing**. If an unmigrated resource disappears from its valid owner's default project, investigate the runtime ownership resolver rather than treating a backfill as the fix.
 
 ## Creating an organisation
 
-When organisation creation is enabled, open the workspace menu below the Hub logo and select **Create organisation**. The API requires authentication; frontend flags control whether the action is shown, not whether an API request is authorised. The creator becomes the owner and receives an active membership.
+When organisation creation is enabled, open the workspace menu below the Hub logo and select **Create organisation**. The API requires authentication; frontend flags control whether the action is shown, not whether an API request is authorized. The creator becomes the owner and receives an active membership.
 
 The form is divided into three tabs:
 
@@ -352,7 +352,7 @@ The form is divided into three tabs:
 
 All fields except the organisation name are optional. After creation, the frontend selects the new organisation, stores the refreshed session token, and reloads the application.
 
-The optional organisation domain is metadata stored on the organisation. It does not configure the subdomain-based login feature described in [Domains](/docs/hub/domains).
+The optional organisation domain is metadata stored on the organisation. It does not configure the subdomain-based login feature described in [Domains]({{< ref "/docs/hub/domains" >}}).
 
 ## Switching organisations and projects
 
@@ -381,11 +381,11 @@ Ownership, membership, and roles answer different access questions:
 
 - **Ownership** is the Owner role. Creating an organisation makes the creator its primary owner. Several members can be owners, and an organisation always keeps at least one; only owners can grant or revoke Owner, and never to themselves.
 - **Membership** allows a non-owner to select an organisation. Only active memberships that have not expired are included in the organisation switcher, and membership alone grants no capabilities.
-- **Roles and permissions** currently come from the existing account role and resource allow-lists. Organisation-scoped roles and assignments are the target authorisation model, not the live authority in this phase.
+- **Roles and permissions** currently come from the existing account role and resource allow-lists. Organisation-scoped roles and assignments are the target authorization model, not the live authority in this phase.
 
 The organisation model supports pending, active, suspended, and revoked memberships, as well as an optional expiry date. Invitation and membership-management screens are not part of the initial organisation-switcher rollout. Existing account and subaccount administration remains the way to manage user access during this phase.
 
-For permission details, see [Roles](/docs/hub/roles).
+For permission details, see [Roles]({{< ref "/docs/hub/roles" >}}).
 
 ## Organisation settings
 
@@ -406,7 +406,7 @@ A login domain and an organisation solve different multi-tenancy problems:
 
 A domain does not automatically combine its users into one organisation. Existing domain-prefixed users keep their login namespace when organisations are introduced. Likewise, setting the domain field on an organisation does not create DNS records or enable domain-based login.
 
-For login-domain configuration, see [Domains](/docs/hub/domains).
+For login-domain configuration, see [Domains]({{< ref "/docs/hub/domains" >}}).
 
 ## Configuration and rollout
 
@@ -428,13 +428,13 @@ kerberoshub:
         settingsEnabled: "true"
 ```
 
-An explicit organisation umbrella overrides both feature families; when it is empty, the project group and individual flags apply. Creation needs the corresponding switching UI. See [Feature flags](/docs/hub/feature-flags#organisations-and-projects) for the complete hierarchy and environment-variable mappings.
+An explicit organisation umbrella overrides both feature families; when it is empty, the project group and individual flags apply. Creation needs the corresponding switching UI. See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#organisations-and-projects) for the complete hierarchy and environment-variable mappings.
 
 These flags control the interface. They neither grant backend permissions nor select the database ownership contract.
 
 ## Migrating existing accounts
 
-Keep identity materialisation separate from resource normalisation. Bootstrap or lazy creation can materialise the deterministic organisation/default-project records and preserve legacy owner/sub-user relationships. It must not combine unrelated owner accounts, overwrite valid selections, or invent new ownership for historical resources.
+Keep identity materialization separate from resource normalization. Bootstrap or lazy creation can materialize the deterministic organisation/default-project records and preserve legacy owner/sub-user relationships. It must not combine unrelated owner accounts, overwrite valid selections, or invent new ownership for historical resources.
 
 The shared tenancy helpers distinguish three storage contracts:
 
@@ -452,7 +452,7 @@ Existing login domains are preserved. They remain sign-in namespaces and are not
 
 ### The current organisation is visible but cannot be selected
 
-Check the effective organisation/project flag hierarchy. A disabled umbrella overrides enabled child controls. See [Feature flags](/docs/hub/feature-flags#organisations-and-projects).
+Check the effective organisation/project flag hierarchy. A disabled umbrella overrides enabled child controls. See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#organisations-and-projects).
 
 ### The create action is missing
 
@@ -460,7 +460,7 @@ Enable creation and switching for the corresponding feature family. For projects
 
 ### Hub shows "No organisation"
 
-Check identity resolution and organisation/membership availability. An owner should resolve to an organisation they own; a member needs an active, unexpired relationship. Investigate errors in lazy identity materialisation rather than assuming that every installation requires a manual resource migration.
+Check identity resolution and organisation/membership availability. An owner should resolve to an organisation they own; a member needs an active, unexpired relationship. Investigate errors in lazy identity materialization rather than assuming that every installation requires a manual resource migration.
 
 ### The organisation list is unavailable
 
@@ -468,7 +468,7 @@ The list request failed rather than returning an empty list. Check that the vers
 
 ### Switching fails or returns to the previous organisation
 
-Confirm organisation access, membership status/expiry where applicable, project activity, and project authorisation. A workspace switch must return a refreshed token and the frontend must use it. Updating only the user's stored project preference is not equivalent to switching a session.
+Confirm organisation access, membership status/expiry where applicable, project activity, and project authorization. A workspace switch must return a refreshed token and the frontend must use it. Updating only the user's stored project preference is not equivalent to switching a session.
 
 ### Resources are missing after switching
 
