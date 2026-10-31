@@ -1,6 +1,6 @@
 ---
 title : "Prologue"
-description: "Augment Vision, the company behind Kerberos.io, and how the platform grew from one open source Agent."
+description: "Augment Vision and its platform, and how it grew from the open source Kerberos.io project."
 lead: "And so it began."
 date: 2020-10-06T08:48:45+00:00
 lastmod: 2020-10-06T08:48:45+00:00
@@ -9,19 +9,19 @@ images: []
 weight: 1
 ---
 
-**Kerberos.io** is developed by **Augment Vision** (UUG.AI), the company behind the project. It started as a single open source application and has grown into a platform to deploy, monitor and scale video and vision AI, from one camera to thousands.
+**Augment Vision** (UUG.AI) provides a single control layer to deploy, monitor and scale vision AI across camera fleets, from one camera to thousands. The platform is built from four products, Agent, Factory, Vault and Hub, and grew out of **Kerberos.io**, the open source project where it all began.
 
 ## Where it started
 
-Kerberos.io began in 2014 as an open source project: the [Kerberos Agent](/docs/agent/). An Agent connects to one IP camera, records its stream and detects what happens in front of it, on whichever machine you choose. The Agent is still open source today, and it is still the foundation of every deployment: one Agent per camera.
+Augment Vision's platform started in 2014 with Kerberos.io, an open source project around a single application: the [Kerberos Agent](/docs/agent/). An Agent connects to one IP camera, records its stream and detects what happens in front of it, on whichever machine you choose. The Agent is still open source today, and it is still the foundation of every deployment: one Agent per camera.
 
-## Who is behind it
+## From project to platform
 
-As more people and organisations ran Agents, often hundreds or thousands at a time, they needed tools to deploy them, keep their recordings and watch over them in one place. Augment Vision now backs Kerberos.io: it maintains the open source Agent and builds the products that grow around it.
+As more people and organisations ran Agents, often hundreds or thousands at a time, they needed to deploy them, keep their recordings and watch over them in one place. Augment Vision built that platform around the Agent: it maintains the open source Agent and develops Factory, Vault and Hub, which turn a fleet of Agents into one system you control.
 
 ## The platform
 
-{{< iso-figure figure="ecosystem" alt="The Kerberos.io platform. Factory deploys an Agent for every camera; the Agents upload their recordings to Vault and send their events to Hub, and Hub plays recordings back from Vault. Each product links to its documentation." caption="Click a product to open its documentation." >}}
+{{< iso-figure figure="ecosystem" alt="The Augment Vision platform. Factory deploys an Agent for every camera; the Agents upload their recordings to Vault and send their events to Hub, and Hub plays recordings back from Vault. Each product links to its documentation." caption="Click a product to open its documentation." >}}
 
 - **[Agent](/docs/agent/)** records and analyses one camera stream, on the machine you choose.
 - **[Factory](/docs/factory/)** deploys an Agent for every camera onto your Kubernetes cluster and manages them with shared settings.
