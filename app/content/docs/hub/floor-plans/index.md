@@ -57,7 +57,7 @@ or disconnect the device.
 
 You can rename an existing floor plan or replace its image. A name-only update
 keeps the current image and placements. When replacing an image, review every
-camera position afterward because the new plan may use a different crop,
+camera position afterwards because the new plan may use a different crop,
 orientation, or aspect ratio.
 
 Deleting a floor plan also removes its saved placements. It does not delete the

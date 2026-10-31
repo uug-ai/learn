@@ -18,7 +18,7 @@ Multiple Kerberos Vaults can be installed in your video landscape. You may have 
 
 Kerberos Vaults can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by requesting a forward from Kerberos Hub or building your own forwarding application code.
 
-{{< rete caption="Synchronise recordings between multiple Kerberos Vault" alt="Synchronise recordings between multiple Kerberos Vault" height="520" >}}
+{{< rete caption="Synchronise recordings between multiple Kerberos Vaults" alt="Synchronise recordings between multiple Kerberos Vaults" height="520" >}}
 {
   "groups": [
     { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 320, "h": 540 },
@@ -48,9 +48,9 @@ Kerberos Vaults can be chained and configured in forwarding mode. This configura
     { "from": "agent-3", "to": "edge-vault", "fromSide": "left", "toSide": "right" }
   ]
 }
-{{< /rete >}}f
+{{< /rete >}}
 
-Forwarding can be configured in two modes: continuous forwarding and on-demand recording.
+Forwarding can be configured in two modes: continuous forwarding and on-demand forwarding.
 
 ## Continuous forwarding
 

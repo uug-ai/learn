@@ -16,25 +16,25 @@ toc: true
 
 Accounts can be managed in the Vault interface or supplied through
 `VAULT_ACCOUNTS` for immutable deployments. Environment-managed accounts are
-shown grayed out and cannot be edited or deleted in the interface. See
+shown greyed out and cannot be edited or deleted in the interface. See
 [Database and environment configuration](/docs/vault/configuration/#database-and-environment-configuration)
 for the JSON contract, precedence, and secret-handling guidance.
 
-Having setup `Providers` and `Integrations`, you need a secure way to interact with them through the creation of an account.
+Having set up `Providers` and `Integrations`, you need a secure way to interact with them through the creation of an account.
 
 By creating an account you will receive credentials that give access to the Kerberos Vault's providers, integrations and APIs. Account credentials are being used by an Agent to send recordings, and/or through custom code by API calls to download and/or forward recordings.
 
 ## Prerequisites
 
-Before you can configure a provider, make sure [you have installed a Kerberos Vault](/docs/vault/installation) inside a Kubernetes cluster.
+Before you can configure an account, make sure [you have installed a Kerberos Vault](/docs/vault/installation) inside a Kubernetes cluster.
 
 ## Configuration of an account
 
-Once you have set up your Kerberos Vault instance, and have successfully login to the application, you should see the account navigation item on the left.
+Once you have set up your Kerberos Vault instance, and have successfully logged in to the application, you should see the account navigation item on the left.
 
 {{< figure src="account.gif" alt="One or more accounts can be created to secure your storage access." caption="One or more accounts can be created to secure your storage access." class="stretch">}}
 
-When selecting the `+ Add Account` button, a modal will open that allows you to configure a specific account. Go a head and select one from the list.
+When selecting the `+ Add Account` button, a modal will open that allows you to configure a specific account. Go ahead and select one from the list.
 
 {{< figure src="add-account.gif" alt="Create a secure account." caption="Create a secure account" class="stretch">}}
 
@@ -47,7 +47,7 @@ There are a couple of interesting configurations you can enable on account level
 #### Details
 
  - Account name: a random name identifying the account.
- - Main provider: the default provider the account is linked too.
+ - Main provider: the default provider the account is linked to.
  - Day limit: the expiry date of all recordings stored through this account.
  - Integrations: all the integrations which will be executed each time a recording was stored in a storage provider.
 
@@ -55,7 +55,7 @@ There are a couple of interesting configurations you can enable on account level
 
 By defining a `directory` you force an account, and all its producing Agents, to store all recordings in a specific subdirectory on the selected storage provider. 
 
-By defining the `asteriks` (*) value, you will provide more flexibility and deligate the subdirectory to the connected Agents. This means that different Agents can store in different subdirectories, although they are connected to the same `account`.
+By defining the `asterisk` (*) value, you will provide more flexibility and delegate the subdirectory to the connected Agents. This means that different Agents can store in different subdirectories, although they are connected to the same `account`.
 
 #### Credentials
 

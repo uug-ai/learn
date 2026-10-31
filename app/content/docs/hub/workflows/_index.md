@@ -106,12 +106,12 @@ The nodes above are the **no-code** side of workflows. If you want a workflow to
 Use **[Stages](stages/)** when your microservice runs inside the Hub deployment
 and can consume its stage queue directly. Use **[External stages](external-stages/)**
 when the service runs in a customer environment: the workflow forwarder sends a
-sanitized invocation to the customer's queue or API, and the service returns
+sanitised invocation to the customer's queue or API, and the service returns
 its result through an authenticated Hub callback.
 
 Your microservice hands its result back as a **block envelope** — a small JSON list of typed *blocks* (a detection, a marker, …), set on the run's `payload`. The **[Ingest](ingest/)** core is the shared layer on the platform side that receives it — from either the queue or the API — and runs the right actions for each block's type: validate it, store it, and trigger any follow-up side-effects.
 
-A workflow does not have to wait for a recording to flow through the pipeline: **[Triggers](triggers/)** specs how a workflow is *activated* — automatically by analysis on every matching recording, or **manually** on demand from a surface such as a [case](../cases/), where a user runs a chosen workflow over the media they selected.
+A workflow does not have to wait for a recording to flow through the pipeline: **[Triggers](triggers/)** specifies how a workflow is *activated* — automatically by analysis on every matching recording, or **manually** on demand from a surface such as a [case](/docs/hub/cases/), where a user runs a chosen workflow over the media they selected.
 
 When something doesn't behave, **[Observability](observability/)** documents the structured log lines and distributed trace the workflows engine emits for every run — so a deployer can see why a recording did or did not reach a stage, and send us logs precise enough to act on.
 
@@ -278,7 +278,7 @@ A user workflow carries its compiled stages **on the run**, so any engine replic
 ### What a deployment must provide
 
 1. **Turn the engine on.** It is off by default: set `kerberoshub.workflows.enabled: true` (the engine switch, *not* the unrelated `kerberoshub.…features.workflows.enabled` front-end flag).
-2. **Deploy a worker for every stage operation.** A workflow references a stage by its `operation`; the service is a separate `kerberoshub.services.<operation>` deployment. Crucially, **a user can only wire operations whose workers you have already deployed** — the catalog of stage operations is deployment-defined.
+2. **Deploy a worker for every stage operation.** A workflow references a stage by its `operation`; the service is a separate `kerberoshub.services.<operation>` deployment. Crucially, **a user can only wire operations whose workers you have already deployed** — the catalogue of stage operations is deployment-defined.
 3. **Line up the queue name.** The engine dispatches a stage to the queue set on it, defaulting to `kcloud-<operation>-queue.fifo` when none is set. A **user** workflow compiled from the graph has no explicit queue, so its stages use that default — make sure the worker for any operation a user workflow can reach consumes `kcloud-<operation>-queue.fifo`.
 
 ### Good to know

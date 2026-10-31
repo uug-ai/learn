@@ -16,9 +16,9 @@ toc: true
 
 Factory is shipped as a container image and is required to be installed inside a Kubernetes cluster. Factory integrates with the Kubernetes API server to automatically provision Agents on its behalf. This means that Factory is out-of-scope if you are planning to use a `docker` or `docker compose` setup.
 
-You can run Factory wherever you can run a Kubernetes cluster, so it can run at the edge, or in the cloud. Although you might except that Kubernetes at the edge or Kubernetes in the cloud is the same installation, you will notice that there are a few differences.
+You can run Factory wherever you can run a Kubernetes cluster, so it can run at the edge, or in the cloud. Although you might expect that Kubernetes at the edge or Kubernetes in the cloud is the same installation, you will notice that there are a few differences.
 
-When running a managed Kubernetes cluster, such as [GKE](https://cloud.google.com/kubernetes-engine), [EKS](https://aws.amazon.com/eks/) or  or [AKS](https://azure.microsoft.com/en-us/products/kubernetes-service/), you will have a wide range of superpowers such as a `LoadBalancer` service, automatic `Volume` creation, etc. The latter is something what is missing in an self-hosted deployment, where you will have to prepare the volumes yourself and install an edge load balancer like `MetalLB`.
+When running a managed Kubernetes cluster, such as [GKE](https://cloud.google.com/kubernetes-engine), [EKS](https://aws.amazon.com/eks/) or [AKS](https://azure.microsoft.com/en-us/products/kubernetes-service/), you will have a wide range of superpowers such as a `LoadBalancer` service, automatic `Volume` creation, etc. The latter is something that is missing in a self-hosted deployment, where you will have to prepare the volumes yourself and install an edge load balancer like `MetalLB`.
 
 {{< rete caption="Factory can be installed everywhere your Kubernetes cluster can be installed." alt="Factory can be installed everywhere your Kubernetes cluster can be installed." height="780" >}}
 {
@@ -57,7 +57,7 @@ When running a managed Kubernetes cluster, such as [GKE](https://cloud.google.co
 
 ## Managed Kubernetes
 
-Installing Factory in a managed Kubernetes cluster (Azure, GCP, AWS) is straight forward, as you create Kubernetes clusters in a few clicks, get access to public load balancers, volumes and more. Running Factory in a managed Kubernetes cluster is just a matter of copy-pasting some configuration (yaml) files, and execution of `kubectl apply` commands.
+Installing Factory in a managed Kubernetes cluster (Azure, GCP, AWS) is straightforward, as you create Kubernetes clusters in a few clicks, get access to public load balancers, volumes and more. Running Factory in a managed Kubernetes cluster is just a matter of copy-pasting some configuration (yaml) files, and execution of `kubectl apply` commands.
 
 > Install Factory in a managed Kubernetes cluster by [following this step-by-step installation guide](https://github.com/kerberos-io/factory/tree/master/kubernetes#b-managed-kubernetes-1).
 
@@ -98,7 +98,7 @@ Installing Factory in a managed Kubernetes cluster (Azure, GCP, AWS) is straight
 
 No need to install Factory on a Kubernetes Service Provider, it can be installed on your own Kubernetes cluster in your private cloud, or at the edge. The closer you bring Kerberos Vault to your video streams, and Agents, the more benefits you will experience (low latency, low bandwidth, etc).
 
-In contradiction to the Kubernetes Service Provider, there will be more work required. Setting up a Kubernetes Cluster, configure a load balancer, create persistent bolumes and claims.
+In contrast to the Kubernetes Service Provider, there will be more work required. Setting up a Kubernetes Cluster, configure a load balancer, create persistent volumes and claims.
 
 > Install Factory on a private cloud or at the edge by [following this step-by-step installation guide](https://github.com/kerberos-io/factory/tree/master/kubernetes#a-self-hosted-kubernetes-1).
 

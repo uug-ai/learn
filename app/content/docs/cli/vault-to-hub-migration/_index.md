@@ -109,4 +109,3 @@ go run main.go -action vault-to-hub-migration \
 - Prefer running `live` during low traffic windows to reduce impact.
 - Validate with a short time window and a single user before broader runs.
 - Ensure appropriate roles/permissions on both source and destination databases and access to the queue integration.
-      2024/12/12 09:38:26   | xxxxxxxx/1733990683_6-967003_gb-frontdoor_200-200-400-400_177_769.mp4                 | 1966309         | 1733990701      | lQtymLrehWpHkTavfcNTFgwfDMoSfg      |

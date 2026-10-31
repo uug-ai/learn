@@ -1,6 +1,6 @@
 ---
 title: "Recordings"
-description: "Find, review, organize, and process recordings in Kerberos Hub."
+description: "Find, review, organise, and process recordings in Kerberos Hub."
 lead: "Find the footage that matters and move from playback to investigation."
 date: 2026-09-09T00:00:00+00:00
 lastmod: 2026-10-17T00:00:00+00:00

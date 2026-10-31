@@ -233,6 +233,6 @@ Delivery is **at-least-once**, so the write is an **idempotent upsert** keyed by
 ## See also
 
 - [Blocks](../) — the full catalogue of block types and how a block envelope is shaped.
-- [Detection](../detection/) — the other built-in block type: geometric tracks rather than timeline labels.
+- [Detection](../detection/) — another built-in block type: geometric tracks rather than timeline labels.
 - [Ingest](../../) — how the core routes a block envelope.
 - [Stages](../../../stages/) — how a microservice connects and hands a result back.

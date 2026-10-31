@@ -15,7 +15,7 @@ tags: ['Live video', 'Networking', 'Architecture']
 
 {{< tutorial-header alt="Abstract luminous paths representing three live-video transports" >}}
 
-Live video has no single best transport. The right choice depends on what you are optimizing: the shortest delay, the largest audience, the strictest corporate network, or interactive audio.
+Live video has no single best transport. The right choice depends on what you are optimising: the shortest delay, the largest audience, the strictest corporate network, or interactive audio.
 
 This tutorial compares **Media over QUIC (MoQ)**, **HTTP Live Streaming (HLS)** and **WebRTC** as they are used by Kerberos Hub. You will turn product requirements into a transport choice, then validate that choice on the network where it will run.
 
@@ -45,7 +45,7 @@ The latency labels are goals, not guarantees. Camera encoding, keyframe interval
 
 ## Understand the three paths
 
-All three options deliver the same camera video, but they organize the path differently. Each diagram below is interactive and can be opened in the [architecture designer](/designer/) with **Edit**.
+All three options deliver the same camera video, but they organise the path differently. Each diagram below is interactive and can be opened in the [architecture designer](/designer/) with **Edit**.
 
 ### MoQ: real-time publish and subscribe
 
@@ -85,7 +85,7 @@ The important benefits are:
 
 - **Low delay without a peer-to-peer topology.** Media remains frame-oriented rather than waiting for complete HLS segments.
 - **Efficient fan-out.** Adding viewers is primarily a relay concern instead of adding one direct Agent-to-browser path per viewer.
-- **Live-edge behavior.** A real-time player can skip data that is already too old instead of making delay grow without bound.
+- **Live-edge behaviour.** A real-time player can skip data that is already too old instead of making delay grow without bound.
 - **Independent delivery.** QUIC avoids TCP head-of-line blocking between independent streams, although loss and congestion still affect playback.
 
 In the current Kerberos implementation, the Agent publishes separate high- and low-quality H.264 broadcasts only while they are being watched. Hub playback uses WebTransport and WebCodecs and currently targets Chromium-based browsers. The initial path is video-only, so it does not replace WebRTC's talk channel.
@@ -194,7 +194,7 @@ Choose WebRTC when interaction matters, viewer counts per camera are modest, or 
 | **Failure isolation** | Relay is a shared dependency | Hub/API path is a shared dependency | Direct failures can fall back to TURN |
 | **Troubleshooting focus** | Relay session, WebTransport, decode cadence | Playlist, segment upload and HTTP requests | Signalling, ICE candidates, DTLS and RTP stats |
 
-No transport removes the need for capacity planning. MoQ and HLS centralize fan-out, so their relay or Hub egress must be sized for all viewers. WebRTC can distribute that load across direct paths, but TURN becomes the central bottleneck whenever direct connectivity fails.
+No transport removes the need for capacity planning. MoQ and HLS centralise fan-out, so their relay or Hub egress must be sized for all viewers. WebRTC can distribute that load across direct paths, but TURN becomes the central bottleneck whenever direct connectivity fails.
 
 ## Give the firewall team the transport rules
 
@@ -296,7 +296,7 @@ Run the same camera through every viable transport and record:
 1. **Glass-to-glass latency:** show a millisecond clock in the camera view and compare it with the player.
 2. **Time to first frame:** measure from opening Live mode until decoded video appears.
 3. **Recovery time:** interrupt the Agent's network for five seconds and measure how long playback takes to return.
-4. **Packet-loss behavior:** test on a shaped or naturally weak link and watch for freezes, quality reduction and growing delay.
+4. **Packet-loss behaviour:** test on a shaped or naturally weak link and watch for freezes, quality reduction and growing delay.
 5. **Fan-out cost:** add viewers while measuring Agent upload, relay/API egress, CPU and memory.
 6. **Compatibility:** repeat from the browsers, VPNs, proxies and office networks operators actually use.
 
@@ -330,7 +330,7 @@ AGENT_LIVE_MOQ_URL=https://relay.example.com
 AGENT_LIVE_MOQ_BROADCAST_PREFIX=devices
 ```
 
-The Agent and frontend must use the same relay and broadcast prefix. Production relays should issue short-lived, subscriber-scoped credentials; do not treat an anonymous relay endpoint as an authorization boundary.
+The Agent and frontend must use the same relay and broadcast prefix. Production relays should issue short-lived, subscriber-scoped credentials; do not treat an anonymous relay endpoint as an authorisation boundary.
 
 To run the relay yourself, follow [Deploy a MoQ relay on Kubernetes](/tutorials/hub/deploy-moq-relay-kubernetes/). It covers TLS, the UDP LoadBalancer, Hub values, Agent variables and end-to-end verification.
 

@@ -21,9 +21,9 @@ Before we can start installing the different deployments in our cluster, we need
 
 ## Prerequisites
 
-Kerberos Vault is the storage component of the Kerberos Enterprise Suite. It is used to store your recordings at a central place, on the storage system you prefer. Next to that it can be used for extension and integration capabilities. Learn more about [Kerberos Vault here](/vault).
+Kerberos Vault is the storage component of the Kerberos Enterprise Suite. It is used to store your recordings at a central place, on the storage system you prefer. Next to that it can be used for extension and integration capabilities. Learn more about [Kerberos Vault here](/docs/vault).
 
-To use Kerberos Vault, you will need to have one or more Agents installed. Independent of that one can also use the Kerberos Vault API `/swagger/index.html` to send recordings from a custom build VMS. Nothing stops you from developing a custom agent.
+To use Kerberos Vault, you will need to have one or more Agents installed. Independent of that one can also use the Kerberos Vault API `/swagger/index.html` to send recordings from a custom-built VMS. Nothing stops you from developing a custom agent.
 
 ## Installation
 
@@ -31,7 +31,7 @@ Kerberos Vault requires some initial components to be installed. If you run Kerb
 
 {{< figure src="vault-edge-storage.svg" alt="Store your recordings at the edge with Kerberos Vault" caption="Store your recordings at the edge with Kerberos Vault" class="stretch">}}
 
-If you plan to run Kerberos Vault in a different cluster (which is perfectly possible), you will need to make sure you complete the initial setup of [Factory Edge](/docs/enterprise/installation-edge) installation. To be more specific you will need the following components running:
+If you plan to run Kerberos Vault in a different cluster (which is perfectly possible), you will need to make sure you complete the initial setup of [Factory Edge](/docs/factory/installation-edge) installation. To be more specific you will need the following components running:
 
 - Helm
 - Calico
@@ -39,7 +39,7 @@ If you plan to run Kerberos Vault in a different cluster (which is perfectly pos
 - MongoDB
 - Traefik (or alternatively Nginx ingress)
 
-Once this is done start by cloning the configurations from our [Github repo](https://github.com/kerberos-io/vault).
+Once this is done start by cloning the configurations from our [GitHub repo](https://github.com/kerberos-io/vault).
 
     git clone https://github.com/kerberos-io/vault
 
@@ -47,7 +47,7 @@ Once this is done start by cloning the configurations from our [Github repo](htt
 
 Before installing Kerberos Vault, open the `./vault/yaml/deployment.yaml` configuration file. At the bottom of the file you will find two endpoints, similar to the Traefik configuration file below.
 
-Update the domain names to your own domain, and add these to your DNS server or `/etc/hosts` file . Make sure to point to the DNS name to the same IP as the Traefik service `EXTERNAL-IP`.
+Update the domain names to your own domain, and add these to your DNS server or `/etc/hosts` file. Make sure to point the DNS name to the same IP as the Traefik service `EXTERNAL-IP`.
 
     spec:
       rules:
@@ -72,7 +72,7 @@ Update the domain names to your own domain, and add these to your DNS server or 
                 port:
                   number: 8081
 
-If you are using Ingress Nginx, do not forgot to comment `Traefik` and uncomment `Ingress Nginx`. Also note the extra argument `proxy-body-size`, which is required for overcoming the default 1MB body size limit; if you do not enable this, you might experience `413` errors in your Agents.
+If you are using Ingress Nginx, do not forget to comment `Traefik` and uncomment `Ingress Nginx`. Also note the extra argument `proxy-body-size`, which is required for overcoming the default 1MB body size limit; if you do not enable this, you might experience `413` errors in your Agents.
 
     apiVersion: extensions/v1beta1
     kind: Ingress
@@ -83,7 +83,7 @@ If you are using Ingress Nginx, do not forgot to comment `Traefik` and uncomment
         kubernetes.io/ingress.class: nginx
         nginx.ingress.kubernetes.io/proxy-body-size: 200m
 
-Kerberos Vault requires a MongoDB instance to be running, it uses it to store media, configurations, etc. To specify those credentials a configmap is created and injected into the Factory deployment.
+Kerberos Vault requires a MongoDB instance to be running, it uses it to store media, configurations, etc. To specify those credentials a configmap is created and injected into the Kerberos Vault deployment.
 
 Modify the MongoDB credentials in the configmap `./vault/yaml/mongodb.config.yaml`, and make sure they match the credentials of your MongoDB instance.
 
@@ -108,7 +108,7 @@ Once you have corrected the DNS names and MongoDB credentials, install Kerberos 
 
 ## Test out configuration
 
-If everything worked out as expected, you should now have following services in your cluster:
+If everything worked out as expected, you should now have the following services in your cluster:
 
 - MongoDB
 - Traefik
@@ -125,6 +125,6 @@ It should look like this.
 
 ## Access the system
 
-Once everything is configured correctly your cluster and DNS or `/etc/hosts` file, you should be able to access the Kerberos Vault application. By navigating to the domain `vault.domain.com` in your browser you will see the Kerberos Vault login page showing up.
+Once everything is configured correctly in your cluster and DNS or `/etc/hosts` file, you should be able to access the Kerberos Vault application. By navigating to the domain `vault.domain.com` in your browser you will see the Kerberos Vault login page showing up.
 
 {{< figure src="login.gif" alt="Once successfully installed Kerberos Vault, it will show you the login page." caption="Once successfully installed Kerberos Vault, it will show you the login page." class="stretch">}}

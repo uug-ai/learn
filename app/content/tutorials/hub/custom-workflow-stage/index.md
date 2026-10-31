@@ -292,7 +292,7 @@ func envOr(name, fallback string) string {
 ```
 
 {{< callout type="info" >}}
-**Any language works.** The contract is just JSON: consume a `WorkflowRun` from your queue, and return one to `WORKFLOWS_QUEUE` with your result as a **block envelope** on `payload` (its shape is shown below). The [envelope reference](/docs/hub/workflows/stages/#envelope) lists every field you receive.
+**Any language works.** The contract is just JSON: consume a `WorkflowRun` from your queue, and return one to `WORKFLOWS_QUEUE` with your result as a **block envelope** on `payload` (its shape is shown below). The [envelope reference](/docs/hub/workflows/stages/#the-workflow-run) lists every field you receive.
 {{< /callout >}}
 
 ### Do the work

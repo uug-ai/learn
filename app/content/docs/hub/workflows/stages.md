@@ -29,7 +29,7 @@ This page is the **contract your microservice codes against** — the queue it l
 {{< callout type="info" >}}
 Does the worker run outside the Hub deployment? Use the
 [workflow forwarder for external stages](../external-stages/) instead. It sends
-a sanitized invocation to a customer RabbitMQ broker or HTTPS endpoint and
+a sanitised invocation to a customer RabbitMQ broker or HTTPS endpoint and
 accepts the result through a project-scoped API callback.
 {{< /callout >}}
 
@@ -439,7 +439,7 @@ Every custom stage is **asynchronous**: nothing blocks on it. The analysis servi
 
 Whichever [sink](#sending-a-result-back) you use, your microservice routes the run back to the workflows engine — its `WORKFLOWS_QUEUE` — once the work is durably done. The engine records the **stage** as resolved on the run (`$addToSet resolvedoperations`), which keeps the run's provenance complete and stops a re-run from redoing the work. An own-collection stage's returned run carries just its routing values under `results.<operation>`; a delegated stage carries the typed `payload`. A run that never hears back from a stage still completes on the engine's own rules (with a safety timeout as a backstop), so a crashed microservice can't wedge the pipeline.
 
-> **Following a run.** The engine logs and traces every run from open to finalize — including the timeout backstop above — under the recording's `mediaKey` and `traceId`. See [Observability](/docs/hub/workflows/observability/) for the log lines it emits and how to follow one recording end-to-end.
+> **Following a run.** The engine logs and traces every run from open to finalise — including the timeout backstop above — under the recording's `mediaKey` and `traceId`. See [Observability](/docs/hub/workflows/observability/) for the log lines it emits and how to follow one recording end-to-end.
 
 ## Failure modes & gotchas
 

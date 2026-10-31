@@ -156,7 +156,7 @@ Describes the source media the boxes were authored against. Required when `coord
 |---|---|---|---|
 | `width` | int > 0 | required for `pixel` | Oriented frame width. |
 | `height` | int > 0 | required for `pixel` | Oriented frame height. |
-| `fps` | number > 0 | no | When supplied alongside per-box `timestampMs`, the server validates `|timestampMs − frame * 1000 / fps| ≤ 1000 / fps`. Mismatches emit a `TIMESTAMP_FRAME_MISMATCH` warning but do not reject the box. |
+| `fps` | number > 0 | no | When supplied alongside per-box `timestampMs`, the server validates `\|timestampMs − frame * 1000 / fps\| ≤ 1000 / fps`. Mismatches emit a `TIMESTAMP_FRAME_MISMATCH` warning but do not reject the box. |
 | `frameCount` | int ≥ 0 | no | Used to range-check `frame` values. A box whose `frame ≥ frameCount` is still stored but contributes a `FRAME_OUT_OF_RANGE` warning. |
 | `rotation` | int | no | `0` \| `90` \| `180` \| `270` — documentation only. |
 
@@ -185,7 +185,7 @@ Send a stable `source.runId` per logical run so retries are idempotent. Omit it 
 
 ### Tracks
 
-A **track** represents one subject (a face, a license plate, a person) followed across multiple frames. Its fields are listed below.
+A **track** represents one subject (a face, a licence plate, a person) followed across multiple frames. Its fields are listed below.
 
 ```json
 {
@@ -281,7 +281,7 @@ A **box** is one detection of the subject at one frame.
 
 - `(x, y)` is the **top-left** corner of the box — not the centre. This matches COCO, MediaPipe, CVAT, Roboflow and DeepStream.
 - For pixel coordinates, supply the values in source-frame pixels and include `media.width/height` so the server can normalise.
-- For normalized coordinates, every value satisfies `0 ≤ x, y, x+w, y+h ≤ 1` (with a 0.01 tolerance for float rounding). A box within that tolerance is **clamped** to `[0, 1]` on write; a box beyond it is rejected and reported back.
+- For normalised coordinates, every value satisfies `0 ≤ x, y, x+w, y+h ≤ 1` (with a 0.01 tolerance for float rounding). A box within that tolerance is **clamped** to `[0, 1]` on write; a box beyond it is rejected and reported back.
 - The server also accepts the legacy `{x1, y1, x2, y2}` corner form. On write it is converted as `x = x1, y = y1, w = x2 − x1, h = y2 − y1`.
 
 ### Validation warnings
@@ -302,14 +302,14 @@ The run is stored in a dedicated **`detections` collection keyed by the recordin
 
 - **Collection.** Each run is one document in `detections`, carrying the recording `key`, the owning organisation, the `source`, the normalised `tracks`, and audit fields.
 - **Keyed by the recording.** Documents are addressed by the recording `key` (the stable identity that survives re-analysis), so a recording accumulates runs without ever bloating its analysis document. A unique `(key, source.runId)` index guarantees one document per run and makes the upsert atomic.
-- **On disk.** Coordinates are always `"normalized"` and boxes are stored in normalized `TrackBox` form. The producer's originals are preserved for audit (`originalCoordinateSpace`, `originalBoxForm`), as are per-box `confidence`, `classId` and `label`.
+- **On disk.** Coordinates are always `"normalized"` and boxes are stored in normalised `TrackBox` form. The producer's originals are preserved for audit (`originalCoordinateSpace`, `originalBoxForm`), as are per-box `confidence`, `classId` and `label`.
 - **Audit fields.** The server sets `createdAt` once on insert and `updatedAt` on every write (epoch millis), and defaults `task` to `"detection"`. It also denormalises the recording's start time into `recordingTimestamp` so a run is expired by cleanup on the same retention clock as its recording rather than by its (possibly much later) delivery time.
 
 ### Search enrichment
 
 Storing a run feeds the recording's detection boxes into the media-side region-search index, so detection-sourced objects are findable without reading the `detections` collection:
 
-- **Centroids.** Each track's box centers are projected into the `100×100` space the spatial query uses (`(x1+x2)/2, (y1+y2)/2`, scaled). A long track is compressed to at most 10 centroids and written to `media.metadata.classifications.centroids` (the field the media-document region query reads), one entry per track keyed by its label (or `object` when unlabeled).
+- **Centroids.** Each track's box centres are projected into the `100×100` space the spatial query uses (`(x1+x2)/2, (y1+y2)/2`, scaled). A long track is compressed to at most 10 centroids and written to `media.metadata.classifications.centroids` (the field the media-document region query reads), one entry per track keyed by its label (or `object` when unlabelled).
 - **Spatial only — no facet.** Only region-search geometry is written. The entry's `key` is never surfaced as a classification chip or filter; the real facet field (`classificationSummary`) is intentionally left untouched, and no timeline markers are created, so detections stay spatially discoverable without masquerading as motion classifications.
 - **Additive and best-effort.** The write uses `$addToSet`, so it never clobbers analysis-derived points and a re-delivered run contributes the same points idempotently. The enrichment is best-effort: if it fails, the run is still stored and the call still succeeds.
 
@@ -318,7 +318,7 @@ Storing a run feeds the recording's detection boxes into the media-side region-s
 These are properties Kerberos Hub commits to maintaining across minor versions of the schema. Build integrations against them, regardless of delivery method.
 
 1. **Coordinate space.** Producers may send `"pixel"` or `"normalized"`. The server always stores `"normalized"` and preserves the original in `originalCoordinateSpace`.
-2. **Box geometry.** Producers may send `{x, y, w, h}` (preferred) or `{x1, y1, x2, y2}`. Stored in normalized `TrackBox` shape.
+2. **Box geometry.** Producers may send `{x, y, w, h}` (preferred) or `{x1, y1, x2, y2}`. Stored in normalised `TrackBox` shape.
 3. **Separation of stores.** Detections are written only to the `detections` collection. The server stores them verbatim and never mutates other documents.
 4. **Idempotency.** A run is upserted on `(recording key, source.runId)`. A stable `runId` makes any retry safe.
 5. **Runs are independent.** A run is keyed by `source.runId`; re-delivering that id replaces the run, a new id adds another. Runs from different sources coexist and the server never merges them.

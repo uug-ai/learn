@@ -18,6 +18,6 @@ toc: true
 
 Vault exposes a small REST surface for working with stored assets:
 
-- **[Signed URLs](signed-urls/)** — obtain temporary, time-limited URLs
+- **[Signed URLs](/docs/vault/api/signed-urls/)** — obtain temporary, time-limited URLs
   for recordings, thumbnails, sprites, redacted versions and other
   generated files.

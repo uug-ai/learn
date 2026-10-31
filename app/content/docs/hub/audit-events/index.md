@@ -17,7 +17,7 @@ podcast: hub-audit-events
 
 The **Audit events** page provides a read-only history of security,
 configuration, and data operations in the current organisation. Use it to
-answer questions such as who changed a device, whether an authorization check
+answer questions such as who changed a device, whether an authorisation check
 succeeded, or which resource an action affected.
 
 Open **Management > Audit events** in the Hub sidebar. The page is available at
@@ -36,7 +36,7 @@ feed:
 - **Operation** separates reads, writes, creates, deletes, and authentication.
 - **Category** groups identity, data, and configuration activity.
 - **Outcome** separates successful and failed operations.
-- **Permission** finds authorization checks for a specific permission.
+- **Permission** finds authorisation checks for a specific permission.
 
 Changing a filter returns to the first page. Use **Clear** to remove every
 filter or **Refresh** to request the latest events without changing the current
@@ -55,7 +55,7 @@ the complete value.
 Select the details control at the end of a row to inspect the evidence captured
 with the event. Depending on the action, this can include:
 
-- the authorization decision and evaluated permission;
+- the authorisation decision and evaluated permission;
 - request information such as the source IP address and user agent;
 - identifiers for the affected device, recording, alert, or user;
 - structured metadata supplied by the action; and

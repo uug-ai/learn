@@ -105,7 +105,7 @@ The default queues and the services that consume them are:
 - Analyser - `kcloud-analysis-queue`
 - Thumbnail - `kcloud-thumby-queue.fifo`
 - Sprite - `kcloud-sprite-queue.fifo`
-- Dominant color - `kcloud-dominantcolor-queue.fifo`
+- Dominant colour - `kcloud-dominantcolor-queue.fifo`
 - Classification - `kcloud-classify-queue.fifo`
 - Throttler - `kcloud-throttler-queue`
 - Notification - `kcloud-notification-queue`
@@ -141,7 +141,7 @@ It is built to be resilient: even if recordings arrive late or an Agent's connec
 
 > kcloud-analysis-queue
 
-Once recordings are sequenced, the analyser orchestrates the post-processing stage. It fans out the event in parallel to the enrichment services — thumbnail, sprite and dominant color (when enabled), classification, counting, and any custom services you've added. Each of those services runs independently and reports back asynchronously. As soon as the analysis stage as a whole completes, the pipeline continues to the next sequential step.
+Once recordings are sequenced, the analyser orchestrates the post-processing stage. It fans out the event in parallel to the enrichment services — thumbnail, sprite and dominant colour (when enabled), classification, counting, and any custom services you've added. Each of those services runs independently and reports back asynchronously. As soon as the analysis stage as a whole completes, the pipeline continues to the next sequential step.
 
 ## Thumbnail
 
@@ -155,11 +155,11 @@ The thumbnail service generates a poster image for each recording by extracting 
 
 The sprite service builds a video timelapse — a single image strip composed of frames sampled at regular intervals across the recording. The Hub player uses this sprite to power its hover-to-scrub preview, so users can see what is happening at any point in the timeline without seeking through the underlying video.
 
-## Dominant color
+## Dominant colour
 
 > kcloud-dominantcolor-queue.fifo
 
-The dominant color service computes the most prevalent colors in a recording and stores the resulting palette alongside the event metadata. Hub shows the palette on the recording's detail page.
+The dominant colour service computes the most prevalent colours in a recording and stores the resulting palette alongside the event metadata. Hub shows the palette on the recording's detail page.
 
 This stage is optional and off by default. Set `kerberospipeline.dominantColor.enabled: true` in the Hub Helm values to deploy the service and have the analyser schedule it. The same value controls both, so the analyser never publishes to a queue without a consumer. When it is off, recordings have no palette and the rest of the pipeline is unaffected.
 

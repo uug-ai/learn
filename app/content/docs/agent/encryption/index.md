@@ -13,7 +13,7 @@ weight: 204
 toc: true
 ---
 
-Agent main goal is to make recordings and store them somewhere so you can access them. Next to "just" storing them, storing them securely is even more important, due to these we have integrated different levels of security in the Kerberos.io stack.
+The Agent's main goal is to make recordings and store them somewhere so you can access them. Next to "just" storing them, storing them securely is even more important, which is why we have integrated different levels of security in the Kerberos.io stack.
 
 ![Encryption diagram](./encryption.svg)
 

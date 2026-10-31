@@ -83,7 +83,7 @@ dead-letter routing separately. Never use Hub's internal failed-dispatch queue,
 which may contain internal credentials, as the external dead-letter destination.
 
 If the block is absent, the administrator must enable the forwarder service
-and expose its operation in the workflow catalog. Deployment-managed workflows
+and expose its operation in the workflow catalogue. Deployment-managed workflows
 are read-only; duplicate one to make an editable copy. The Hub callback base
 URL is configured on the forwarder service, not with a bearer token in the
 workflow designer.
@@ -307,7 +307,7 @@ must return exactly one output channel:
   The object becomes that operation's entry in the workflow run's results and
   can be read by downstream conditions.
 - `payload` contains a workflow
-  [block envelope](ingest/blocks/) for Hub to validate and persist.
+  [block envelope](/docs/hub/workflows/ingest/blocks/) for Hub to validate and persist.
 
 For example, a stage can ask Hub to persist a marker:
 
@@ -361,7 +361,7 @@ Callback processing is **first result wins**. Concurrent duplicate messages
 cannot overwrite the accepted result or dispatch downstream stages twice.
 Retried callbacks should send the same JSON output. A `202` confirms durable
 queue acceptance, not that an ingest block has already been persisted; block
-processing happens asynchronously in the workflow engine.
+processing happens asynchronously in the workflows engine.
 
 ## Configure the deployment
 

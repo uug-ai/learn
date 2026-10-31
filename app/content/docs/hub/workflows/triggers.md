@@ -254,7 +254,7 @@ dispatched/resolved operations) never appears on the queue.
 ## Manual trigger on a case
 
 The first manual surface is the **case**. A user selects recordings on a
-[case](../cases/), picks a workflow and presses *Run*. A run's natural unit is
+[case](/docs/hub/cases/), picks a workflow and presses *Run*. A run's natural unit is
 one recording, so the trigger **fans out one `WorkflowRun` per selected media
 key** — the same hand-off analysis makes automatically, just originated by the
 user.
@@ -275,7 +275,7 @@ flowchart TD
 Each seed carries the workflow to run, `origin: "manual"` and the case id
 alongside the usual media key, signed URL and device context — reusing the
 existing case-media enqueue pattern. Every run reports progress independently,
-and its results — detection and marker [blocks](ingest/blocks/) — are mirrored
+and its results — detection and marker [blocks](/docs/hub/workflows/ingest/blocks/) — are mirrored
 back onto the recording just like an automatic run's, so they appear on the
 timeline and in the case.
 
@@ -342,10 +342,10 @@ Workflows have two layers:
 
 | Layer | What it is | Owned by |
 |-------|-----------|----------|
-| **Stage catalog** | The available stages (`WorkflowStage`: image, queue, resources) — each maps to a deployed worker. | Ops (Helm) |
+| **Stage catalogue** | The available stages (`WorkflowStage`: image, queue, resources) — each maps to a deployed worker. | Ops (Helm) |
 | **Workflow definitions** | Which stages run, wired and triggered how (`Workflow`). | Ops (Helm), plus organisation-scoped definitions from the frontend/API |
 
-A workflow is a graph over the deployed stage catalog — users compose existing
+A workflow is a graph over the deployed stage catalogue — users compose existing
 stages, they don't add new worker images. Ops-provided workflows are config
 definitions rendered into `WORKFLOW_DEFINITIONS`; they are not seeded into the
 database. Config and stored organisation workflows still converge on the same

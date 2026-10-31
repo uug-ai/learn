@@ -15,7 +15,7 @@ toc: true
 podcast: hub-cleanup
 ---
 
-[![Go Version](https://img.shields.io/badge/Go-1.24.12%2B-blue.svg)](https://go.dev/)
+[![Go Version](https://img.shields.io/badge/Go-1.25.8%2B-blue.svg)](https://go.dev/)
 
 The `hub-cleanup` service is a background worker that enforces retention policies for Kerberos Hub data. It continuously scans MongoDB for data that exceeded retention and removes it safely.
 
@@ -109,7 +109,7 @@ docker run --rm \
 
 The container exposes Prometheus metrics on `:8080` when `PROMETHEUS_ADDRESS=:8080`.
 
-## Core behavior
+## Core behaviour
 
 ### Retention strategy
 
@@ -242,9 +242,9 @@ http://localhost:8080/metrics
 ## Validation and error handling
 
 - Invalid integer/boolean config values fall back to safe defaults.
-- Non-positive batch and interval values are normalized.
+- Non-positive batch and interval values are normalised.
 - Startup includes MongoDB ping verification.
-- Subscription lookup errors are isolated at user-level and reported.
+- Subscription lookup errors are isolated at user level and reported.
 - Non-timeout delete errors abort the current collection pass.
 
 ## Preflight checklist

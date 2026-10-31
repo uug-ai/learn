@@ -44,7 +44,7 @@ The envelope replaces the single typed body the old per-kind entry point took, s
 
 ## Block types
 
-The core ships a small, closed set of block types — `detection` and `marker` today. A producer stamps each block's `type` with one of them, and that `type` names the **result shape**, not the stage that produced it: a stage that finds bounding boxes emits a `detection` block whatever it is detecting, and one envelope may carry several blocks of different types.
+The core ships a small, closed set of block types — `detection`, `marker` and `media-patch` today. A producer stamps each block's `type` with one of them, and that `type` names the **result shape**, not the stage that produced it: a stage that finds bounding boxes emits a `detection` block whatever it is detecting, and one envelope may carry several blocks of different types.
 
 The full catalogue — each type's `data` contract, where it is stored, and which transports may emit it — lives under **[Blocks](blocks/)**.
 
@@ -130,7 +130,7 @@ The same package sits behind both transports; only the adapter around it differs
 
 The workflows engine wires the core to the run it already owns:
 
-- The **target** is the run's *own* recording — its `key`, organisation and device, plus the recording timestamp persisted when the run opened, so a derived artifact expires on the recording's retention clock rather than the post time. A `data` body that carries its own recording reference (e.g. a `PostDetectionsRequest` `mediaKey`) is **ignored** on the queue path; the run decides the target.
+- The **target** is the run's *own* recording — its `key`, organisation and device, plus the recording timestamp persisted when the run opened, so a derived artefact expires on the recording's retention clock rather than the post time. A `data` body that carries its own recording reference (e.g. a `PostDetectionsRequest` `mediaKey`) is **ignored** on the queue path; the run decides the target.
 - After a successful ingest the engine **mirrors the blocks into `results[<operation>]`, grouped by block type** (`results.<operation>.detections`, `…markers`, one array per type that occurred) so the stage resolves and any conditional stage waiting on it can fire. The block bodies are decoded, so a downstream condition can branch on what the stage produced — including element-wise with a `*` wildcard (`results.<operation>.detections.*.score`). See [Matching inside arrays](/docs/hub/workflows/stages/#matching-inside-arrays).
 
 ### Over the API (`POST /ingest`)
@@ -139,7 +139,7 @@ The public endpoint is the same core behind an HTTP door. It takes a single `{op
 
 ## Where it lives
 
-The core is `ingest/pkg/ingest`, a deliberately **infra-free** library: it depends only on the model types and on the **sink interfaces** it declares (`DetectionStore`, `MarkerStore`, `RegionPromoter`). Each app supplies the concrete Mongo implementation when it builds the `Scope` it passes in, so the routing has one implementation while persistence stays in each app's repository layer. Adding a block type is a new handler plus its ordered actions — the dispatcher never grows a case.
+The core is `ingest/pkg/ingest`, a deliberately **infra-free** library: it depends only on the model types and on the **sink interfaces** it declares (`DetectionStore`, `MarkerStore`, `RegionPromoter`, `MediaPatcher`). Each app supplies the concrete Mongo implementation when it builds the `Scope` it passes in, so the routing has one implementation while persistence stays in each app's repository layer. Adding a block type is a new handler plus its ordered actions — the dispatcher never grows a case.
 
 ## See also
 

@@ -32,7 +32,7 @@ serves the route `/analytics`.
 Analytics is not a separate ingestion path: it is a read-only view on
 top of the data the [Hub pipeline](/docs/hub/pipeline/) already produces.
 
-- **Recordings** are uploaded to the [Vault](/docs/vault/) by the agent and
+- **Recordings** are uploaded to [Vault](/docs/vault/) by the Agent and
   registered in the Hub database by `hub-api`.
 - **Counts and region detections** are produced by the
   [`hub-pipeline-analysis`](https://github.com/uug-ai/hub-pipeline-analysis)
@@ -70,7 +70,7 @@ triggered.
 
 A 5-card strip summarises the selected day:
 
-- **Devices online** — the number of agents that were connected during
+- **Devices online** — the number of Agents that were connected during
   the day.
 - **Total recordings** — the number of recordings uploaded for the
   selected scope.
@@ -123,9 +123,9 @@ triggered the count.
 
 The final block plots the number of recordings uploaded per hour for
 the selected scope. Use it to correlate spikes in analytics with the
-volume of footage your agents actually pushed up.
+volume of footage your Agents actually pushed up.
 
-{{< figure src="hub-analytics-recordings-chart.png" alt="The Recordings per hour chart at the bottom of the Analytics page." caption="Recordings per hour reflects what the agents uploaded, regardless of whether an alert matched. A flat line here usually means the cameras were offline, not that the analytics are broken." class="stretch">}}
+{{< figure src="hub-analytics-recordings-chart.png" alt="The Recordings per hour chart at the bottom of the Analytics page." caption="Recordings per hour reflects what the Agents uploaded, regardless of whether an alert matched. A flat line here usually means the cameras were offline, not that the analytics are broken." class="stretch">}}
 
 ## Permissions and roles
 

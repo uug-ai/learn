@@ -81,7 +81,7 @@ per camera, unchanged, so existing integrations keep working. See
 [White-label]({{< ref "/docs/hub/whitelabel" >}}) for the grouped email template.
 
 Alert management is restricted to users with the relevant administrative page
-permission. See [Configuration]({{< ref "/docs/hub/configuration" >}}#alerts--channels)
+permission. See [Configuration]({{< ref "/docs/hub/configuration" >}}#alerts)
 for the existing alert setup reference.
 
 ## Configure channels

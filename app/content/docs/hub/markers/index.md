@@ -53,7 +53,7 @@ action to open the complete recording detail page.
 
 ## Use markers on recordings
 
-Recording cards show up to five marker icons and summarize additional markers
+Recording cards show up to five marker icons and summarise additional markers
 with an overflow count. Select an icon to start playback at that marker. Hover
 states can highlight the marker's time range on the recording timeline.
 

@@ -28,7 +28,7 @@ By the end, you will have:
 - Agent-to-Hub live CMAF uploads over HTTPS
 - Authenticated browser playback over the same HTTPS endpoint
 - LL-HLS parts and idle prewarming enabled for faster startup
-- Quality selection between camera main and sub streams
+- Quality selection between camera main and sub-streams
 - Hub diagnostics for request, playlist and buffering phases
 {{< /tutorial-panel >}}
 
@@ -123,7 +123,7 @@ After the rollout, log out and back in or hard-refresh Hub. Open a camera and co
 
 ## Configure the Agent
 
-HLS uses the existing Hub identity rather than HLS-specific credentials. A containerized Agent needs the equivalent of:
+HLS uses the existing Hub identity rather than HLS-specific credentials. A containerised Agent needs the equivalent of:
 
 ```yaml
 env:
@@ -145,7 +145,7 @@ Factory-managed Agents already receive these values from their assigned Hub acco
 
 ### Keep the low-latency defaults
 
-The current Agent enables both optimizations unless they are set to the exact string `false`:
+The current Agent enables both optimisations unless they are set to the exact string `false`:
 
 | Agent variable | Default | Effect |
 |---|---|---|
@@ -162,7 +162,7 @@ env:
     value: "true"
 ```
 
-Disable low latency only to diagnose a client or proxy that mishandles LL-HLS parts. Disable prewarming only when minimizing idle CPU is more important than startup speed.
+Disable low latency only to diagnose a client or proxy that mishandles LL-HLS parts. Disable prewarming only when minimising idle CPU is more important than startup speed.
 
 {{< tutorial-panel tone="neutral" icon="clipboard-check" title="Live HLS uses its own segmenter" >}}
 Current Agents always write recordings as fragmented MP4. Live HLS independently packages camera frames into short-lived CMAF parts and segments for Hub, so no recording-format setting is needed for this tutorial.
@@ -234,13 +234,13 @@ The Agent should log a prewarmed session, activate uploads for the viewer, and a
 
 ## Verify quality selection
 
-If the camera has both main and sub streams configured, change the HLS quality control between **High** and **Low**. Each change requests a fresh session because resolution and codec initialization belong to that session.
+If the camera has both main and sub-streams configured, change the HLS quality control between **High** and **Low**. Each change requests a fresh session because resolution and codec initialisation belong to that session.
 
 - **High** selects the camera main stream.
-- **Low** selects the camera sub stream.
+- **Low** selects the camera sub-stream.
 - **Auto** lets the Agent apply its configured stream-selection policy.
 
-Use H.264 for both streams. A lower-resolution sub stream is useful on constrained uplinks because each active viewer causes the Agent to upload one selected live rendition to Hub.
+Use H.264 for both streams. A lower-resolution sub-stream is useful on constrained uplinks because each active viewer causes the Agent to upload one selected live rendition to Hub.
 
 ## Measure latency and load
 

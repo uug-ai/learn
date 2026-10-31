@@ -16,7 +16,7 @@ podcast: hub-workflows-observability
 
 [Stages](/docs/hub/workflows/stages/) is the contract a microservice codes against; [Ingest](/docs/hub/workflows/ingest/) is how a result is stored. This page is for whoever **runs** the platform: it documents what the **workflows engine** (`hub-workflows`) writes to its logs and traces as it drives a run, so you can answer the questions that come up in practice — *did this recording open a run? did it reach a stage? why not? did a stage time out?* — and so the logs you forward to us are precise enough to act on.
 
-The engine is deliberately chatty about its **routing decisions**: every run leaves a trace from the moment it opens to the moment it finalizes, even when it dispatches **no** stage at all. That is the case that used to be invisible ("a run was created but never reached a stage") and is now explicit.
+The engine is deliberately chatty about its **routing decisions**: every run leaves a trace from the moment it opens to the moment it finalises, even when it dispatches **no** stage at all. That is the case that used to be invisible ("a run was created but never reached a stage") and is now explicit.
 
 ## Where the logs come from
 
@@ -65,7 +65,7 @@ A healthy run emits these, in order — they are your "happy path" trace. Seeing
 | `workflow run started` | A new run document was seeded for this recording. | — |
 | `workflow stage dispatched` | A stage was published to its queue — the run reached a stage. One per dispatched stage. | `operation`, `queue`, `runId` |
 | `workflow upstream operation resolved` | A stage's result came back and was recorded on the run. | `operation` |
-| `workflow run completed` | The run was finalized cleanly — every dispatched stage resolved. | `runId`, `dispatchedStages`, `resolvedStages`, `timedOut` (`false`) |
+| `workflow run completed` | The run was finalised cleanly — every dispatched stage resolved. | `runId`, `dispatchedStages`, `resolvedStages`, `timedOut` (`false`) |
 
 `dispatchedStages` / `resolvedStages` on the completion line let you confirm at a glance how much the run did: `dispatchedStages: 0` is the explicit *never reached a stage* outcome.
 
@@ -88,7 +88,7 @@ These are the lines to **alert on** and the ones most useful to send us. All car
 
 | Level | `msg` | What happened / what to check |
 |---|---|---|
-| `warning` | `workflow run timed out with stages outstanding` | The watchdog finalized a run because a dispatched stage **never returned** (a stuck or crashed microservice). `dispatchedStages` > `resolvedStages`; `unresolvedStages` is the count abandoned. Check that the named stage's microservice is up and acking. |
+| `warning` | `workflow run timed out with stages outstanding` | The watchdog finalised a run because a dispatched stage **never returned** (a stuck or crashed microservice). `dispatchedStages` > `resolvedStages`; `unresolvedStages` is the count abandoned. Check that the named stage's microservice is up and acking. |
 | `warning` | `workflow event dropped` | An inbound message was discarded before it could open or advance a run. `reason` says why (e.g. `empty media key`); `operation` is the message's op. A steady stream means a malformed upstream producer. |
 | `error` | `workflow stage dispatch failed` | The engine could **not** enqueue a stage — the run never reached it. `operation` names the stage; `error` is the cause (queue publish error, or the dispatch payload failed to marshal). Check broker connectivity and the stage's `queue`. |
 | `error` | `workflow stage dispatched but recording it failed` | The stage **was** published, but the engine couldn't record it on the run's dispatched tier. The worker will still run; the run's bookkeeping may be slightly off. Usually a transient database blip. |
@@ -150,9 +150,9 @@ The engine exposes Prometheus metrics on **`:8080/metrics`** — the hook your m
 | Metric | Type | What it counts |
 |---|---|---|
 | `workflow_runs_started_total` | counter | Runs opened (a run document was seeded). |
-| `workflow_runs_completed_total` | counter | Runs finalized cleanly (every dispatched stage resolved). |
+| `workflow_runs_completed_total` | counter | Runs finalised cleanly (every dispatched stage resolved). |
 | `workflow_runs_timed_out_total` | counter | Runs the watchdog forced shut with a stage still outstanding (a stage never returned). |
-| `workflow_runs_no_stage_total` | counter | Runs that finalized **without ever dispatching a stage** (created but never reached a stage). A subset of `…completed_total`. |
+| `workflow_runs_no_stage_total` | counter | Runs that finalised **without ever dispatching a stage** (created but never reached a stage). A subset of `…completed_total`. |
 | `workflow_stages_dispatched_total` | counter | Stages successfully published to their queue. |
 | `workflow_stage_dispatch_failures_total` | counter | Stage dispatch attempts that failed (the stage never reached its worker). |
 | `workflow_stage_ingest_failures_total` | counter (`reason`) | Stage-result ingest failures, labelled `reason` = `transient_persistence` \| `permanent_rejection` \| `malformed_envelope` \| `run_load`. |

@@ -12,7 +12,7 @@ weight: 3
 
 Enabling CORS on Vault depends on the storage provider you are using. Each cloud provider has its own method for configuring CORS:
 
-- **GCP (Google Cloud Storage)**: Use `gsutil cors set` command or configure through Cloud Console
+- **GCP (Google Cloud Storage)**: Use the `gsutil cors set` command or configure through Cloud Console
 - **AWS (S3)**: Configure CORS rules in the bucket permissions settings
 - **Azure (Blob Storage)**: Set CORS rules via Azure Portal or Azure CLI
 - **MinIO**: Configure CORS using the MinIO client or API

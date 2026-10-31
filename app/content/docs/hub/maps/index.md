@@ -36,7 +36,7 @@ origin for geolocation to work outside local development.
 > [!NOTE]
 > The address field depends on the Google Maps JavaScript and Places APIs. A
 > deployer must configure a browser API key before address suggestions and
-> reverse geocoding are available. See [Installation]({{< ref "/docs/hub/installation" >}}#google-maps-and-address-search).
+> reverse geocoding are available. See [Installation]({{< ref "/docs/hub/installation" >}}#google-places-address-autocomplete).
 
 ## Use the sites map
 

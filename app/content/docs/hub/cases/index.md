@@ -15,7 +15,7 @@ toc: true
 podcast: hub-cases
 ---
 
-By default, recordings are persisted for a limited amount of time. Within Hub you define a retention period per subscription and assign it to a user. The retention period can be set to 30, 60, 90 days or any custom value. It determines how many days of footage are visible to the end-user after login, and controls when the associated recordings metadata are removed from the database.
+By default, recordings are persisted for a limited amount of time. Within Hub you define a retention period per subscription and assign it to a user. The retention period can be set to 30, 60, 90 days or any custom value. It determines how many days of footage are visible to the end user after login, and controls when the associated recording metadata is removed from the database.
 
 Cases are the mechanism in Hub to keep important recordings beyond that window. Creating a case copies its recordings from the current storage provider to a dedicated archive provider in Vault, which has its own (typically longer or non-expiring) retention period — for example, 3 years or more.
 
@@ -43,7 +43,7 @@ without leaving the page.
 Every case has one of three statuses, shown as an icon at the start of the
 row in the overview:
 
-- **Open** — the default status of a freshly-created case. Use it for cases
+- **Open** — the default status of a freshly created case. Use it for cases
   that still require follow-up.
 - **Approved** — the case has been reviewed and confirmed (for example a
   real incident).
@@ -140,7 +140,7 @@ before creating the case.
 Once all required fields are filled in and at least one recording is
 attached, click **New case** in the bottom-right of the modal to create it.
 The recording is then queued for archiving to the Vault archive provider you
-configured below.
+configure below.
 
 The same *New case* modal is also reachable from two other places: the
 **Recordings** page header (for bulk creation from the active filters) and
@@ -447,7 +447,7 @@ the next bundle reflects the new selection.
 
 > **Legacy cases:** cases created before per-row selection was introduced
 > show every **E** checkbox checked and disabled. Their export keeps the
-> previous "include everything" behavior; no migration step is needed.
+> previous "include everything" behaviour; no migration step is needed.
 
 ### Triggering a build
 
@@ -536,7 +536,7 @@ snapshot.
 
 ## Configuration
 
-To start using cases some configurations need to be enabled on Vault and Hub, before you can use it.
+To start using cases, some configuration needs to be enabled in Vault and Hub.
 
 ### Create archive storage provider in Vault
 
@@ -569,4 +569,4 @@ Now that your Vault instance is configured for archiving, you need to tell Hub w
         secretkey: "xxx"
         provider: "an-archive-provider"
 
-Set the `accesskey` and `secretkey` of your newly created Vault account, and specify the name of the archive `provider`. Then apply the updated helm chart.
+Set the `accesskey` and `secretkey` of your newly created Vault account, and specify the name of the archive `provider`. Then apply the updated Helm chart.

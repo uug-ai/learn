@@ -19,7 +19,7 @@ As [explained before](/docs/prologue/how/), there is no need to install all thos
 
 ## Introduction
 
-So by now you'll understand that Kerberos.io [applies the concept of agents](/docs/prologue/how/). An agent is running next to (or on) your camera, and is processing a single camera feed. It applies motion based or continuous recording and make those recordings available through a user friendly web interface. An Agent allows you to connect to other cloud services or integrates with custom applications.
+So by now you'll understand that Kerberos.io [applies the concept of agents](/docs/prologue/how/). An Agent is running next to (or on) your camera, and is processing a single camera feed. It applies motion-based or continuous recording and makes those recordings available through a user-friendly web interface. An Agent allows you to connect to other cloud services or integrate with custom applications.
 
 ![Agent overview](kerberos-agent-overview.gif)
 

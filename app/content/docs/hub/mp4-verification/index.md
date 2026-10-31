@@ -20,7 +20,7 @@ Video evidence is only useful if you can trust that it has not been altered betw
 
 ## How a recording is fingerprinted
 
-When the agent finalises an MP4 recording (in `machinery/src/video/mp4.go`, see [`mp4.go#L721-L740`](https://github.com/kerberos-io/agent/blob/master/machinery/src/video/mp4.go#L721-L740)), it builds a deterministic fingerprint from a small set of structural fields that uniquely describe the file:
+When the Agent finalises an MP4 recording (in `machinery/src/video/mp4.go`, see [`mp4.go#L979-L1039`](https://github.com/kerberos-io/agent/blob/master/machinery/src/video/mp4.go#L979-L1039)), it builds a deterministic fingerprint from a small set of structural fields that uniquely describe the file:
 
 - `Moov.Mvhd.CreationTime` — the moment the file was created (Mac HFS epoch).
 - `Moov.Mvhd.Duration` — the total duration of the recording.
@@ -34,9 +34,9 @@ These values are concatenated into a single underscore-separated string, for exa
 3826543210_45000_agent v3.0.0_15_18324_18112_18420_…_18301
 ```
 
-The agent then:
+The Agent then:
 
-1. Loads the RSA private key from the agent configuration (`config.Signing.PrivateKey`).
+1. Loads the RSA private key from the Agent configuration (`config.Signing.PrivateKey`).
 2. Signs the fingerprint string with **RSASSA-PKCS1-v1_5 / SHA-256**.
 3. Stores the resulting signature in a custom `uuid` box (UUID `6b0c1f8e-3d2a-4f5b-9c7d-8f1e2b3c4d5e`) inside the `moov` atom of the MP4 file.
 
@@ -49,7 +49,7 @@ The fingerprint is intentionally derived from **structural** properties rather t
 - It is **fast to compute and verify**, even for multi-hour recordings — verification only needs to parse the MP4 box structure, not decode the video.
 - Any tampering that matters in practice (cutting, splicing, re-encoding, re-muxing, replacing fragments, or adding/removing frames) **necessarily changes** at least one of these values: a different number of `moof` boxes, a different fragment size, a different total duration, or a different `creationTime`. The signature will no longer match and verification will fail.
 
-Because the agent version is part of the fingerprint, you also get a tamper-evident record of *which* agent produced the file.
+Because the Agent version is part of the fingerprint, you also get a tamper-evident record of *which* Agent produced the file.
 
 ## Verifying a recording in Hub
 
@@ -65,21 +65,21 @@ https://<your-hub>/verification?url=…&autoVerify=false
 ### What the page does
 
 1. **Loads the MP4** either from a local file picker or from a remote URL.
-2. **Parses the box structure** to extract `mvhd` (creation time, duration), the `hdlr` name (agent version), and the size of every `moof` box.
-3. **Rebuilds the fingerprint string** using the exact same algorithm as the agent.
+2. **Parses the box structure** to extract `mvhd` (creation time, duration), the `hdlr` name (Agent version), and the size of every `moof` box.
+3. **Rebuilds the fingerprint string** using the exact same algorithm as the Agent.
 4. **Reads the embedded signature** from the custom `uuid` box.
 5. **Fetches the public key** (`/public_key.pem`) served by Hub and imports it as an `RSASSA-PKCS1-v1_5` verification key.
 6. **Verifies the signature** against the locally rebuilt fingerprint.
 
-The result is a clear `valid` or `invalid` status, along with the recovered metadata: agent version, creation time (in both Mac HFS and Unix epochs), duration, fragment sizes, the SHA-256 hash of the fingerprint, the raw signature, and the public key that was used. All of these are visible in the UI so an auditor can attach them to a report.
+The result is a clear `valid` or `invalid` status, along with the recovered metadata: Agent version, creation time (in both Mac HFS and Unix epochs), duration, fragment sizes, the SHA-256 hash of the fingerprint, the raw signature, and the public key that was used. All of these are visible in the UI so an auditor can attach them to a report.
 
 ### What "valid" actually proves
 
 A valid result proves three things at once:
 
-1. **Authenticity** — the recording was produced by an agent that holds the matching private key.
-2. **Integrity** — not a single byte that contributes to the fingerprint (creation time, duration, agent identity, fragment count, fragment sizes) has been altered since the file was closed.
-3. **Provenance** — the embedded handler name tells you which agent version produced the file.
+1. **Authenticity** — the recording was produced by an Agent that holds the matching private key.
+2. **Integrity** — not a single byte that contributes to the fingerprint (creation time, duration, Agent identity, fragment count, fragment sizes) has been altered since the file was closed.
+3. **Provenance** — the embedded handler name tells you which Agent version produced the file.
 
 A failed verification means at least one of those guarantees is broken: the file has been re-encoded, fragments have been added/removed/replaced, the `moov` atom has been rewritten, or the signature was produced with a different key.
 
@@ -89,7 +89,7 @@ Fingerprint verification turns a regular MP4 into a piece of evidence you can de
 
 ### Police, legal, and insurance hand-overs
 
-When footage is exported from Hub and handed over to a third party (police investigation, legal counsel, insurance claim), the receiving party usually needs to demonstrate that what they reviewed is exactly what the camera recorded. By archiving the original MP4 in a [case](../cases/) and providing the verification URL alongside it, the recipient can prove on their own machine — without trusting Hub or the camera owner — that the file is intact.
+When footage is exported from Hub and handed over to a third party (police investigation, legal counsel, insurance claim), the receiving party usually needs to demonstrate that what they reviewed is exactly what the camera recorded. By archiving the original MP4 in a [case]({{< ref "/docs/hub/cases" >}}) and providing the verification URL alongside it, the recipient can prove on their own machine — without trusting Hub or the camera owner — that the file is intact.
 
 ### Compliance and regulated environments
 
@@ -97,7 +97,7 @@ In regulated industries (banking, critical infrastructure, healthcare, public tr
 
 ### Chain of custody for incidents
 
-When an incident is opened in [Cases](../cases/), the associated recording is copied to a long-term storage provider in Vault. Re-running verification at any point in the case lifecycle (initial triage, legal review, court submission) confirms that the archived copy is byte-identical (in its signed structural fields) to the file the agent originally produced. Each verification can be screenshotted or logged, building an explicit chain of custody.
+When an incident is opened in [Cases]({{< ref "/docs/hub/cases" >}}), the associated recording is copied to a long-term storage provider in Vault. Re-running verification at any point in the case lifecycle (initial triage, legal review, court submission) confirms that the archived copy is byte-identical (in its signed structural fields) to the file the Agent originally produced. Each verification can be screenshotted or logged, building an explicit chain of custody.
 
 ### Detecting re-encoded or "improved" footage
 
@@ -109,11 +109,11 @@ Because the signature is embedded inside the MP4, verification works on any copy
 
 ### Deep-fake and synthetic-video defence
 
-As generative video tooling becomes more accessible, the ability to prove that a clip was produced by a specific physical device — and not generated or modified after the fact — becomes a baseline requirement for evidentiary video. The agent-side signing step ties every MP4 to the private key held by the agent, giving you a strong cryptographic anchor against synthetic or substituted footage.
+As generative video tooling becomes more accessible, the ability to prove that a clip was produced by a specific physical device — and not generated or modified after the fact — becomes a baseline requirement for evidentiary video. The Agent-side signing step ties every MP4 to the private key held by the Agent, giving you a strong cryptographic anchor against synthetic or substituted footage.
 
 ## Operational notes
 
-- **Key management.** The agent signs with a private key configured under `config.Signing.PrivateKey`. Hub serves the matching public key at `/public_key.pem`. Treat the private key as you would any other production secret: rotate it deliberately, and keep historical public keys available so that older recordings can still be verified.
-- **No private key, no signature.** If the agent is started without a signing key configured, the MP4 will still be playable but it will not contain the `uuid` signature box. Verification of such a file will report `invalid`.
-- **What is *not* covered.** The fingerprint protects the structural identity of the file. It does not encrypt the video content, and it does not protect against an attacker who has access to the agent's private key. Combine MP4 verification with end-to-end encryption and proper key handling for the strongest guarantees.
+- **Key management.** The Agent signs with a private key configured under `config.Signing.PrivateKey`. Hub serves the matching public key at `/public_key.pem`. Treat the private key as you would any other production secret: rotate it deliberately, and keep historical public keys available so that older recordings can still be verified.
+- **No private key, no signature.** If the Agent is started without a signing key configured, the MP4 will still be playable but it will not contain the `uuid` signature box. Verification of such a file will report `invalid`.
+- **What is *not* covered.** The fingerprint protects the structural identity of the file. It does not encrypt the video content, and it does not protect against an attacker who has access to the Agent's private key. Combine MP4 verification with end-to-end encryption and proper key handling for the strongest guarantees.
 - **Performance.** Verification is fast — typically a few hundred milliseconds for a multi-minute fragmented MP4 — because only the box structure is parsed, not the video samples themselves.

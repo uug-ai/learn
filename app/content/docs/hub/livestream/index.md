@@ -17,7 +17,7 @@ podcast: hub-livestream
 
 The **Live view** page in the Hub streams the cameras connected to
 your account directly in the browser. It is the page you land on most
-often during day-to-day monitoring: every connected agent shows up as a
+often during day-to-day monitoring: every connected Agent shows up as a
 tile, every tile streams its camera at the resolution your subscription
 allows, and a handful of controls let you talk back, switch quality,
 filter by site and pop a stream out to fullscreen.
@@ -36,7 +36,7 @@ The Hub never asks you to open ports on the network where your
 cameras live. Every tile exposes the same Preview/Live toggle, and the
 mode you pick selects how the video reaches the browser:
 
-- **Preview — MQTT snapshots.** The agent encodes a low-resolution JPEG
+- **Preview — MQTT snapshots.** The Agent encodes a low-resolution JPEG
   and publishes it over MQTT (TCP). The browser subscribes over secure
   WebSockets (WSS), so no port forwarding is required.
 - **Live — WebRTC** *(default).* The full-resolution video is sent over
@@ -46,7 +46,7 @@ mode you pick selects how the video reaches the browser:
   two-way talk.
 - **Live — HLS** *(firewall-friendly alternative).* The full-resolution
   video is packaged as a rolling HLS playlist (fMP4/CMAF segments) that
-  the agent pushes to the Hub; the browser plays it back over plain
+  the Agent pushes to the Hub; the browser plays it back over plain
   HTTPS. There is no peer-to-peer connection, no UDP and no STUN/TURN,
   so it works through even the strictest proxies — at the cost of a few
   seconds of extra latency compared with WebRTC.
@@ -58,7 +58,7 @@ toggle itself behaves identically either way — when you flip a tile from
 Preview to Live, only the underlying stream component changes; the rest
 of the UI (camera name, controls, badges) stays in place.
 
-{{< rete caption="The building blocks behind Live view. The agent publishes to the MQTT broker, streams live media over WebRTC (with TURN as a relay fallback) or HLS, and the browser frontend plays back whichever transport the deployment is configured for." alt="Building-block overview of Live view: the agent feeds the MQTT broker, WebRTC, TURN and HLS, all consumed by the browser frontend" height="600" >}}
+{{< rete caption="The building blocks behind Live view. The Agent publishes to the MQTT broker, streams live media over WebRTC (with TURN as a relay fallback) or HLS, and the browser frontend plays back whichever transport the deployment is configured for." alt="Building-block overview of Live view: the Agent feeds the MQTT broker, WebRTC, TURN and HLS, all consumed by the browser frontend" height="600" >}}
 {
   "groups": [],
   "nodes": [
@@ -88,7 +88,7 @@ of the UI (camera name, controls, badges) stays in place.
 {{< /rete >}}
 
 All three paths share one rule: the camera network never needs an
-inbound port. The agent only ever makes outbound connections — to the
+inbound port. The Agent only ever makes outbound connections — to the
 MQTT broker, to its WebRTC peer (or the TURN relay) and to the Hub API —
 so Live view works behind NAT and restrictive firewalls. Each mechanism
 is broken down below.
@@ -96,7 +96,7 @@ is broken down below.
 ### Preview — MQTT snapshots
 
 Preview is the default, always-available mode and the lightest on
-bandwidth. The agent encodes a low-resolution JPEG of each camera and
+bandwidth. The Agent encodes a low-resolution JPEG of each camera and
 publishes it to the MQTT broker over an outbound TCP connection; the
 browser subscribes to the same topic over secure WebSockets (WSS) and
 swaps the image as new snapshots arrive. There is no media session to
@@ -105,7 +105,7 @@ so Preview works on every plan and through virtually any firewall. It is
 also the mode the grid falls back to whenever Live is unavailable or your
 subscription does not include the HD transports.
 
-{{< rete caption="Preview: the agent encodes low-resolution JPEG snapshots and publishes them to the MQTT broker over TCP; the browser subscribes over secure WebSockets (WSS) and swaps the image as new frames arrive. No media session, no UDP and no peer connection." alt="Preview transport: the agent publishes JPEG snapshots to the MQTT broker over TCP and the browser subscribes over secure WebSockets" height="500" >}}
+{{< rete caption="Preview: the Agent encodes low-resolution JPEG snapshots and publishes them to the MQTT broker over TCP; the browser subscribes over secure WebSockets (WSS) and swaps the image as new frames arrive. No media session, no UDP and no peer connection." alt="Preview transport: the Agent publishes JPEG snapshots to the MQTT broker over TCP and the browser subscribes over secure WebSockets" height="500" >}}
 {
   "groups": [
     { "id": "edge",    "label": "On-premise site", "x":    0, "y":  20, "w": 460, "h": 420 },
@@ -133,14 +133,14 @@ subscription does not include the HD transports.
 ### Live over WebRTC
 
 WebRTC is the default Live transport and the lowest-latency option. The
-agent and the browser use the MQTT broker as a signalling channel to
+Agent and the browser use the MQTT broker as a signalling channel to
 exchange SDP offers and ICE candidates, after which the full-resolution
 media flows **peer-to-peer** between them. When a direct peer connection
 cannot be established (symmetric NAT, restrictive firewalls), the media
 is automatically relayed through the Kerberos-hosted TURN servers. WebRTC
 is also the only mode that carries a back-channel for two-way **talk**.
 
-{{< rete caption="Live over WebRTC: the agent and browser exchange SDP/ICE through the MQTT broker, then stream media peer-to-peer. A Kerberos-hosted TURN server relays the media only when a direct connection cannot be established." alt="WebRTC live transport: SDP/ICE signalling over MQTT, peer-to-peer media, and a TURN relay used only as a fallback" height="600" >}}
+{{< rete caption="Live over WebRTC: the Agent and browser exchange SDP/ICE through the MQTT broker, then stream media peer-to-peer. A Kerberos-hosted TURN server relays the media only when a direct connection cannot be established." alt="WebRTC live transport: SDP/ICE signalling over MQTT, peer-to-peer media, and a TURN relay used only as a fallback" height="600" >}}
 {
   "groups": [
     { "id": "edge",    "label": "On-premise site", "x":    0, "y":  20, "w": 460, "h": 560 },
@@ -198,10 +198,10 @@ Under the hood the HLS path is still driven over MQTT, exactly like the
 Preview and WebRTC modes:
 
 1. While a Live tile is on screen it periodically publishes a
-   `request-hls-stream` keepalive to the agent. The agent only produces
+   `request-hls-stream` keepalive to the Agent. The Agent only produces
    and ships the live stream while at least one viewer is asking, so idle
    cameras cost nothing.
-2. Once the agent's first segment has landed at the Hub it announces
+2. Once the Agent's first segment has landed at the Hub it announces
    `receive-hls-ready` over MQTT with a session id.
 3. The browser then loads the rolling playlist
    (`/storage/live/{device}/{session}/index.m3u8`) into the player and
@@ -209,7 +209,7 @@ Preview and WebRTC modes:
    segment request carries the viewer's bearer token and is only served
    to users who own the device.
 
-{{< rete caption="Live over HLS: the browser heartbeats a keepalive to the agent through the MQTT broker (request-hls-stream) and the agent announces readiness back the same way (receive-hls-ready). Only then does the agent push fMP4/CMAF segments to the Hub API, which serves the authenticated rolling playlist to the browser over HTTPS — MQTT never carries the media itself." alt="HLS live transport: the browser keepalives the agent through the MQTT broker and the agent announces readiness back through it, while media segments flow from the agent to the Hub API and on to the browser over HTTPS" height="600" >}}
+{{< rete caption="Live over HLS: the browser heartbeats a keepalive to the Agent through the MQTT broker (request-hls-stream) and the Agent announces readiness back the same way (receive-hls-ready). Only then does the Agent push fMP4/CMAF segments to the Hub API, which serves the authenticated rolling playlist to the browser over HTTPS — MQTT never carries the media itself." alt="HLS live transport: the browser keepalives the Agent through the MQTT broker and the Agent announces readiness back through it, while media segments flow from the Agent to the Hub API and on to the browser over HTTPS" height="600" >}}
 {
   "groups": [
     { "id": "edge",    "label": "On-premise site", "x":    0, "y":  20, "w": 460, "h": 560 },
@@ -305,16 +305,16 @@ that appears on hover.
 ### Status badges
 
 The badge to the right of the device name is driven by the messages the
-agent publishes over MQTT:
+Agent publishes over MQTT:
 
-- **Active** *(green)* — the agent is connected and is currently
+- **Active** *(green)* — the Agent is connected and is currently
   streaming or processing motion.
-- **Idle** *(neutral)* — the agent is connected but the device is
+- **Idle** *(neutral)* — the Agent is connected but the device is
   configured as inactive (for example outside of its schedule).
 - **Alert** *(red)* — motion was detected on this device in the last 30
   seconds. The badge automatically returns to *Active* once the motion
   window expires.
-- **Updating / Reconnecting** *(blue)* — the agent has lost its MQTT
+- **Updating / Reconnecting** *(blue)* — the Agent has lost its MQTT
   connection. Click the badge to jump to the device's detail page and
   troubleshoot the connection.
 
@@ -336,7 +336,7 @@ interacting with the tile so they don't obscure the picture.
   live statistics: the full WebRTC set (resolution, FPS, bitrate, codec,
   RTT, jitter, packets lost, …) on WebRTC deployments, or resolution,
   bitrate and codec on HLS.
-- **Talk** — only shown when the agent reports a back-channel (ONVIF
+- **Talk** — only shown when the Agent reports a back-channel (ONVIF
   audio output or a compatible camera) and the tile is in Live over
   WebRTC. Press and hold to send your microphone audio to the camera's
   speaker. The surrounding volume bar visualises the level you're
@@ -344,8 +344,8 @@ interacting with the tile so they don't obscure the picture.
   when the Hub is configured for HLS.
 - **Mute / Unmute** — only shown in Live. Toggles the audio track of
   the incoming stream.
-- **Fullscreen** — pops the tile out to a fullscreen overlay. Double
-  clicking the tile is a shortcut for the same action. Press *Escape* or
+- **Fullscreen** — pops the tile out to a fullscreen overlay.
+  Double-clicking the tile is a shortcut for the same action. Press *Escape* or
   click the *Exit fullscreen* button to return to the grid.
 
 ### PTZ overlay
@@ -371,8 +371,8 @@ configuration page (see the [roles documentation]({{< ref "/docs/hub/roles" >}})
 A tile that cannot show a video falls back to a friendly placeholder
 explaining why:
 
-- **Camera offline** — the agent reports the camera as disconnected.
-  The tile links to the device detail page so you can review the agent
+- **Camera offline** — the Agent reports the camera as disconnected.
+  The tile links to the device detail page so you can review the Agent
   configuration.
 - **Live view disabled** — your role (or the device's role override)
   does not grant the *Live view* permission. The tile shows a lock icon
@@ -383,7 +383,7 @@ explaining why:
 
 When the whole account has no connected device yet, the page collapses
 to a single placeholder that walks you through connecting your first
-agent.
+Agent.
 
 ## Subscription requirements
 
@@ -407,7 +407,7 @@ sign-in and applied to every tile on the page.
 
 If a tile stays black or never leaves the *Connecting* state:
 
-1. Confirm that the agent is shown as **online** on the **Devices**
+1. Confirm that the Agent is shown as **online** on the **Devices**
    page. A red dot there means the MQTT connection to Hub is broken and
    Live view cannot work either.
 2. Switch the tile to **Preview** to check whether MQTT alone works. If
@@ -415,7 +415,7 @@ If a tile stays black or never leaves the *Connecting* state:
    (firewall, STUN/TURN reachability).
 3. Hover the blinking dot on a Live tile to read the live WebRTC stats.
    A persistent high *Packets Lost* or *RTT* indicates a network issue
-   between the agent and the TURN server.
+   between the Agent and the TURN server.
 4. Reload the page. The component will renegotiate every running
    stream, which often resolves transient MQTT or WebRTC glitches.
 

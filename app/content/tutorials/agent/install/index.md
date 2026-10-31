@@ -48,9 +48,9 @@ Open [http://localhost](http://localhost) and log in with the default credential
 - **Username:** `root`
 - **Password:** `root`
 
-> Change these credentials before exposing the agent to anything that isn't `localhost` (see [Configure with environment variables](#configure-with-environment-variables)).
+> Change these credentials before exposing the Agent to anything that isn't `localhost` (see [Configure with environment variables](#configure-with-environment-variables)).
 
-If you intend to connect to a USB / Raspberry Pi camera through the [`camera-to-rtsp`](https://github.com/kerberos-io/camera-to-rtsp) sidecar, run the agent in the host network so it can reach the local RTSP stream:
+If you intend to connect to a USB / Raspberry Pi camera through the [`camera-to-rtsp`](https://github.com/kerberos-io/camera-to-rtsp) sidecar, run the Agent in the host network so it can reach the local RTSP stream:
 
 ```bash
 docker run --network=host --name mycamera -d --restart=always kerberos/agent:latest
@@ -117,7 +117,7 @@ Each camera is reachable on its own host port (`8080`, `8081`, ...).
 
 ## Option 4 — Kubernetes
 
-For production or multi-node deployments, use the Kubernetes manifests provided in the [`deployments/kubernetes`](https://github.com/kerberos-io/agent/tree/master/deployments/kubernetes) folder of the agent repo.
+For production or multi-node deployments, use the Kubernetes manifests provided in the [`deployments/kubernetes`](https://github.com/kerberos-io/agent/tree/master/deployments/kubernetes) folder of the Agent repo.
 
 A minimal `Deployment` + `Service` looks like:
 
@@ -211,7 +211,7 @@ A few of the most common variables:
 
 | Variable | Description | Default |
 | --- | --- | --- |
-| `AGENT_NAME` | Friendly name of the agent. | `agent` |
+| `AGENT_NAME` | Friendly name of the Agent. | `agent` |
 | `AGENT_USERNAME` / `AGENT_PASSWORD` | Web UI credentials. | `root` / `root` |
 | `AGENT_TIMEZONE` | Timezone used for timestamps. | `Africa/Ceuta` |
 | `AGENT_CAPTURE_IPCAMERA_RTSP` | Main RTSP stream of your camera. | *(empty)* |
@@ -238,6 +238,6 @@ The full list lives in the [Agent README](https://github.com/kerberos-io/agent#c
 
 ## Next steps
 
-- Connect this agent to **Hub** for centralized monitoring — see the upcoming [Hub tutorial](../../hub/).
-- Forward recordings to **Vault** — see the upcoming [Vault tutorial](../../vault/).
-- Review the in-depth [agent installation docs](/docs/agent/installation/) for advanced deployment patterns (Ansible, Terraform, Balena, ...).
+- Connect this Agent to **Hub** for centralised monitoring — see the upcoming [Hub tutorial](/tutorials/hub/).
+- Forward recordings to **Vault** — see the upcoming [Vault tutorial](/tutorials/vault/).
+- Review the in-depth [Agent installation docs](/docs/agent/installation/) for advanced deployment patterns (Ansible, Terraform, Balena, ...).
