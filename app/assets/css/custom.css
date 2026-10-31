@@ -112,12 +112,6 @@
   outline-offset: 3px;
 }
 
-/* Links into another product's docs (set by the render-link hook) carry that
-   product's colour, so crossing a product boundary is visible. */
-.content a.learn-xlink {
-  color: var(--learn-product-text);
-}
-
 .learn-sr-only {
   position: absolute;
   width: 1px;

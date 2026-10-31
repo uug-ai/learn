@@ -1,6 +1,6 @@
-{{- /* Hextra's link render hook, extended to mark links that leave the current
-     product's docs. Such links take the destination product's accent colour
-     (see .learn-xlink in custom.css) so readers notice the boundary. */ -}}
+{{- /* Hextra's link render hook, extended to name the destination product on
+     links that leave the current product's docs (a title and screen-reader
+     text). Links keep the colour of the section they appear in. */ -}}
 {{- $dest := .Destination -}}
 {{- $url := urls.Parse $dest -}}
 {{- $xproduct := "" -}}
@@ -35,7 +35,6 @@
 {{- $productName := index hugo.Data.products $xproduct -}}
 <a href="{{ $dest | safeURL }}"
    {{- with .Title }} title="{{ . }}"{{ else }}{{ with $productName }} title="{{ . }} documentation"{{ end }}{{ end -}}
-   {{- with $xproduct }} class="learn-xlink" data-product="{{ . }}"{{ end -}}
    {{- if $isExternal }} target="_blank" rel="noopener"{{ end -}}
 >
   {{- .Text | safeHTML -}}
