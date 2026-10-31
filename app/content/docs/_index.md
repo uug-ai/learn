@@ -12,13 +12,15 @@ menu:
     parent: "prologue"
 weight: 100
 toc: true
-# The Enterprise section was removed; send its old addresses here.
+# The Enterprise and Open source sections were removed; send their old addresses here.
 aliases:
   - /docs/enterprise/
   - /docs/enterprise/first-things-first/
   - /docs/enterprise/welcome/
   - /docs/enterprise/self-signed/
   - /docs/enterprise/usecases/
+  - /docs/open-source/
+  - /docs/open-source/first-things-first/
 ---
 
 The **Kerberos.io** project, pronounced as `/kuh buh ruhs dot ai o/`, is a video analytics and video management platform, which was initiated back in 2014. Over the years it has evolved into a stable and feature-rich video platform, which is used for video management and analytics such as machine learning.
