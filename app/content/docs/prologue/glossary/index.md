@@ -113,7 +113,7 @@ The words you'll meet across Agent, Factory, Vault and Hub, from A to Z. Each te
 : HTTP Live Streaming. A [live view](#live-view) transport that carries video over ordinary HTTPS, with low-latency HLS (LL-HLS) enabled by default. It is the most predictable option across corporate firewalls, VPNs and mobile networks. [Read more](/tutorials/hub/setup-hls-live-view/).
 
 <span id="hub"></span>Hub
-: The Kerberos Hub web application that brings all your Agents, sites and recordings together: one overview across every site, live views and videowalls, searchable recordings with machine learning detections, and alerts. [Read more](/docs/hub/).
+: The Hub web application that brings all your Agents, sites and recordings together: one overview across every site, live views and videowalls, searchable recordings with machine learning detections, and alerts. [Read more](/docs/hub/).
 
 ## I
 
@@ -126,7 +126,7 @@ The words you'll meet across Agent, Factory, Vault and Hub, from A to Z. Each te
 ## K
 
 <span id="kerberosio"></span>Kerberos.io
-: The open source project, started in 2014 around the [Agent](#agent), that Augment Vision's platform grew out of. The products keep its name, as in Kerberos Agent, Kerberos Vault and Kerberos Hub. [Read more](/docs/).
+: The open source project, started in 2014 around the [Agent](#agent), that Augment Vision's platform grew out of. The products keep its name, as in Kerberos Agent, Vault and Hub. [Read more](/docs/).
 
 ## L
 
@@ -231,7 +231,7 @@ The words you'll meet across Agent, Factory, Vault and Hub, from A to Z. Each te
 ## V
 
 <span id="vault"></span>Vault
-: Kerberos Vault: the bring-your-own-storage layer for recordings. Agents upload to Vault, which stores recordings on the [providers](#provider) you choose and connects them to Hub and your own applications through events, integrations and APIs. [Read more](/docs/vault/).
+: Vault: the bring-your-own-storage layer for recordings. Agents upload to Vault, which stores recordings on the [providers](#provider) you choose and connects them to Hub and your own applications through events, integrations and APIs. [Read more](/docs/vault/).
 
 <span id="videowall"></span>Videowall
 : A Hub view that shows many live streams side by side, for operators who watch several cameras at once. [Read more](/docs/hub/livestream/).

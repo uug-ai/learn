@@ -13,13 +13,13 @@ toc: true
 
 The Agent is an isolated and scalable video management agent with a strong focus on user experience, scalability, resilience, extension and integration. It is the backbone of the entire Kerberos.io ecosystem, and is used as a foundation for everything from small deployments to production-level deployments with thousands of cameras.
 
-Next to the Agent, Kerberos.io provides many other tools such as [Factory](/docs/factory/first-things-first), [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/hub/first-things-first) to provide additional capabilities: bring your own cloud, bring your own storage, central overview, live streaming, machine learning etc.
+Next to the Agent, Kerberos.io provides many other tools such as [Factory](/docs/factory/first-things-first), [Vault](/docs/vault/first-things-first) and [Hub](/docs/hub/first-things-first) to provide additional capabilities: bring your own cloud, bring your own storage, central overview, live streaming, machine learning etc.
 
 As [explained before](/docs/prologue/how/), there is no need to install all those components from the start. Usually you just start with a few Agents, scale over time, and add additional components to support additional use cases.
 
 ## Introduction
 
-So by now you'll understand that Kerberos.io [applies the concept of agents](/docs/prologue/how/). An Agent is running next to (or on) your camera, and is processing a single camera feed. It applies motion-based or continuous recording and makes those recordings available through a user-friendly web interface. An Agent allows you to connect to other cloud services, such as [Kerberos Vault](/docs/agent/connect-to-vault) and [Kerberos Hub](/docs/agent/connect-to-hub), or integrate with custom applications.
+So by now you'll understand that Kerberos.io [applies the concept of agents](/docs/prologue/how/). An Agent is running next to (or on) your camera, and is processing a single camera feed. It applies motion-based or continuous recording and makes those recordings available through a user-friendly web interface. An Agent allows you to connect to other cloud services, such as [Vault](/docs/agent/connect-to-vault) and [Hub](/docs/agent/connect-to-hub), or integrate with custom applications.
 
 ![Agent overview](kerberos-agent-overview.gif)
 

@@ -52,6 +52,6 @@ The settings page allows you to modify the Agent configuration. The settings are
 - **Recording**: continuous or motion-based recording, the pre- and post-recording time and the maximum length of a recording.
 - **Streaming**: the STUN/TURN servers and MQTT broker that [live view in Hub](/docs/hub/livestream) uses.
 - **Conditions**: when and where the Agent records, such as time and regions of interest.
-- **Persistence**: where recordings are uploaded, to [Kerberos Vault](/docs/agent/connect-to-vault), [Kerberos Hub](/docs/agent/connect-to-hub) or Dropbox, and the connection to Hub.
+- **Persistence**: where recordings are uploaded, to [Vault](/docs/agent/connect-to-vault), [Hub](/docs/agent/connect-to-hub) or Dropbox, and the connection to Hub.
 
 {{< figure src="settings.gif" alt="Configure your Agent." caption="Configure your Agent." class="stretch">}}

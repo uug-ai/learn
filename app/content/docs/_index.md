@@ -47,7 +47,7 @@ The backbone of the Kerberos.io ecosystem is the [Agent](/docs/agent/first-thing
 
 {{< figure src="introduction-kerberos-io.svg" alt="An Agent is monitoring a single camera stream." caption="An Agent is monitoring a single camera stream." class="stretch">}}
 
-With [Kerberos.io](/docs/prologue/how) you start small, with just one or more [Agents](/docs/agent/first-things-first), and grow over time while introducing more and more components like [Factory](/docs/factory/first-things-first), [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/hub/first-things-first), which we refer to as the Kerberos Enterprise Suite. Each solution is shipped through the concept of containers and can be leveraged by using Docker, Docker Compose, Kubernetes, OpenShift, Terraform, Ansible, and many more.
+With [Kerberos.io](/docs/prologue/how) you start small, with just one or more [Agents](/docs/agent/first-things-first), and grow over time while introducing more and more components like [Factory](/docs/factory/first-things-first), [Vault](/docs/vault/first-things-first) and [Hub](/docs/hub/first-things-first), which we refer to as the Kerberos Enterprise Suite. Each solution is shipped through the concept of containers and can be leveraged by using Docker, Docker Compose, Kubernetes, OpenShift, Terraform, Ansible, and many more.
 
 {{< figure src="./introduction-enterprise.svg" alt="A scalable video platform for an ever-growing video landscape." caption="A scalable video platform for an ever-growing video landscape." class="stretch">}}
 
@@ -73,4 +73,4 @@ You decide where (cloud, self-hosted) and how (Docker, Kubernetes, OpenShift, Te
 
 ## Machine learning
 
-Machine learning and artificial intelligence are a critical component of the Kerberos.io ecosystem. Within Kerberos Vault you can integrate your own machine learning models, and run them at scale. [Learn more about how we support machine learning use cases](/docs/vault/machine-learning).
+Machine learning and artificial intelligence are a critical component of the Kerberos.io ecosystem. Within Vault you can integrate your own machine learning models, and run them at scale. [Learn more about how we support machine learning use cases](/docs/vault/machine-learning).

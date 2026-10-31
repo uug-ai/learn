@@ -1,6 +1,6 @@
 ---
 title: "Audit events"
-description: "Review security, access, and configuration activity in Kerberos Hub."
+description: "Review security, access, and configuration activity in Hub."
 lead: "Review who performed an action, what changed, and whether it succeeded."
 date: 2026-09-09T00:00:00+00:00
 lastmod: 2026-10-30T00:00:00+00:00

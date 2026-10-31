@@ -41,7 +41,7 @@ HLS separates control traffic from media traffic. The browser repeatedly request
 {
   "groups": [
     { "id": "edge", "label": "Camera site", "x": 0, "y": 20, "w": 410, "h": 520 },
-    { "id": "hub", "label": "Kerberos Hub", "x": 490, "y": 20, "w": 330, "h": 520 },
+    { "id": "hub", "label": "Hub", "x": 490, "y": 20, "w": 330, "h": 520 },
     { "id": "operator", "label": "Operator network", "x": 900, "y": 20, "w": 320, "h": 520 }
   ],
   "nodes": [

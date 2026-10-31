@@ -14,17 +14,17 @@ weight: 301
 toc: true
 ---
 
-Once you've installed Kerberos Vault, you should have access to the Kerberos Vault application. The application allows you to administer Kerberos Vault, and more specifically create storage providers, integrations and accounts, through a single interface. Isn't that great?
+Once you've installed Vault, you should have access to the Vault application. The application allows you to administer Vault, and more specifically create storage providers, integrations and accounts, through a single interface. Isn't that great?
 
-Next to the UI, it is important to note that Kerberos Vault also ships numerous APIs that allow you to automate the configurations. The APIs are exposed as Swagger documentation, and can be used for configuration of Kerberos Vault but also [integration](/docs/vault/integrations) and development of custom applications or business logic.
+Next to the UI, it is important to note that Vault also ships numerous APIs that allow you to automate the configurations. The APIs are exposed as Swagger documentation, and can be used for configuration of Vault but also [integration](/docs/vault/integrations) and development of custom applications or business logic.
 
 ## Login page
 
-Once you open a browser, and navigate to the Kerberos Vault web app (see [Installation](/docs/vault/installation) for the URL), you will land on the login page.
+Once you open a browser, and navigate to the Vault web app (see [Installation](/docs/vault/installation) for the URL), you will land on the login page.
 
 {{< figure src="login.gif" alt="After successful installation you should be able to access the login page." caption="After successful installation you should be able to access the login page." class="stretch">}}
 
-The default username and password of the Kerberos Vault app is:
+The default username and password of the Vault app is:
 
 - username: **root**
 - password: **kerberos**
@@ -33,7 +33,7 @@ The default username and password of the Kerberos Vault app is:
 
 ## Providers
 
-Providers are the persistence layers, where you will store your recordings at the edge or in a cloud environment. By adding a specific provider, credentials have to be provided to allow Kerberos Vault to store recordings in that specific provider. The following providers are currently supported. You can choose from:
+Providers are the persistence layers, where you will store your recordings at the edge or in a cloud environment. By adding a specific provider, credentials have to be provided to allow Vault to store recordings in that specific provider. The following providers are currently supported. You can choose from:
 
 - [Google Cloud Platform Storage](https://cloud.google.com/storage)
 - [Azure Blob Storage](https://azure.microsoft.com/products/storage/blobs/)
@@ -48,17 +48,17 @@ As explained before, for each provider, the appropriate security settings have t
 
 ## Integrations
 
-Events or messages are generated each time a recording is uploaded to Kerberos Vault, and are sent to one or more integrations. Those integrations are configured through the Kerberos Vault application. Each time an Agent sends a recording to Kerberos Vault, it is persisted on a storage provider, and an event is triggered through one of the following integrations. 
+Events or messages are generated each time a recording is uploaded to Vault, and are sent to one or more integrations. Those integrations are configured through the Vault application. Each time an Agent sends a recording to Vault, it is persisted on a storage provider, and an event is triggered through one of the following integrations. 
 
 - [Apache Kafka](https://kafka.apache.org/)
 - [Amazon Web Services SQS](https://aws.amazon.com/sqs/)
 - [RabbitMQ](https://www.rabbitmq.com/)
-- [Kerberos Hub](/docs/hub/first-things-first/)
-- Kerberos Vault (remote forwarding)
+- [Hub](/docs/hub/first-things-first/)
+- Vault (remote forwarding)
 
-{{< figure src="integrations.gif" alt="Kerberos Vault can be configured to send events to message brokers to create real-time apps or ML models." caption="Kerberos Vault can be configured to send events to message brokers to create real-time apps or ML models." class="stretch">}}
+{{< figure src="integrations.gif" alt="Vault can be configured to send events to message brokers to create real-time apps or ML models." caption="Vault can be configured to send events to message brokers to create real-time apps or ML models." class="stretch">}}
 
-The idea of an integration is that you can build your own applications and define custom business logic. Agents and Kerberos Vault will make sure you have a scalable and highly available backend, so you can focus on the business case and bring your own technologies (Python, Golang, etc). Examples of integrations are, but of course not limited to:
+The idea of an integration is that you can build your own applications and define custom business logic. Agents and Vault will make sure you have a scalable and highly available backend, so you can focus on the business case and bring your own technologies (Python, Golang, etc). Examples of integrations are, but of course not limited to:
 
 - Metadata storage in MongoDB,
 - Notifications,
@@ -72,7 +72,7 @@ Find more information about events and integrations on [the integrations page](/
 
 Having set up `Providers` and `Integrations`, you need a secure way to interact with them through the creation of an account. 
 
-By creating an account you will receive credentials that give access to the Kerberos Vault's providers, integrations and APIs. Account credentials are used by an Agent to [send recordings](/docs/agent/connect-to-vault), and are used through API calls to download or forward recordings.
+By creating an account you will receive credentials that give access to the Vault's providers, integrations and APIs. Account credentials are used by an Agent to [send recordings](/docs/agent/connect-to-vault), and are used through API calls to download or forward recordings.
 
 Next to credentials, there are a couple of other fields which are specified on account level.
 
@@ -102,4 +102,4 @@ Storing recordings in a `Provider` is one thing; making sure you manage the stor
 - due to security or compliance,
 - reducing costs, etc.
 
-To make this possible Kerberos Vault comes with a configurable recycle deployment, which you can run next to your Kerberos Vault deployment.
+To make this possible Vault comes with a configurable recycle deployment, which you can run next to your Vault deployment.

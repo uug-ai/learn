@@ -18,7 +18,7 @@ As described on the [introduction page](/docs/) and [mission statement](/docs/pr
 
 ## An overview
 
-As shown below there are 3 critical steps in setting up a video management solution: camera processing, persisting recordings and analysing. Instead of building a single solution, which many other vendors have built, which covers those 3 functions, we have divided and conquered each role and responsibility in a stand-alone solution: [Agents](/docs/agent/first-things-first/), [Factory](/docs/factory/first-things-first/), [Kerberos Vault](/docs/vault/first-things-first/) and [Kerberos Hub](/docs/hub/first-things-first/).
+As shown below there are 3 critical steps in setting up a video management solution: camera processing, persisting recordings and analysing. Instead of building a single solution, which many other vendors have built, which covers those 3 functions, we have divided and conquered each role and responsibility in a stand-alone solution: [Agents](/docs/agent/first-things-first/), [Factory](/docs/factory/first-things-first/), [Vault](/docs/vault/first-things-first/) and [Hub](/docs/hub/first-things-first/).
 
 {{< figure src="overview.svg" alt="The Kerberos.io solution stack" caption="The Kerberos.io solution stack" class="stretch">}}
 
@@ -58,28 +58,28 @@ Whatever you choose, you can always migrate from one option to the other; it's j
 
 Agents are responsible for storing recordings and triggering events. By default all recordings are stored within the Agent container. This means that if the container stops, all your data will be lost. Luckily [there are a couple of techniques to persist](https://github.com/kerberos-io/agent#configure-and-persist-with-volume-mounts) the data outside the container, without losing any information.
 
-In most cases, especially with a growing video landscape, it's more convenient to have a central storage system in place that scales, like Ceph, MinIO, or cloud storage like S3 and other blob storage. This is exactly where Kerberos Vault comes into the picture.
+In most cases, especially with a growing video landscape, it's more convenient to have a central storage system in place that scales, like Ceph, MinIO, or cloud storage like S3 and other blob storage. This is exactly where Vault comes into the picture.
 
-{{< figure src="agents-to-vault.svg" alt="Bring your own storage using Kerberos Vault" caption="Bring your own storage using Kerberos Vault" class="stretch">}}
+{{< figure src="agents-to-vault.svg" alt="Bring your own storage using Vault" caption="Bring your own storage using Vault" class="stretch">}}
 
-[Kerberos Vault](/docs/vault/first-things-first/) acts as an interface between your Agents and your storage system. It is responsible for receiving recordings from your Agents, and storing them in the storage system you've configured. By decoupling your Agents from [Kerberos Vault](/docs/vault/first-things-first/), you can switch the underlying storage system on the fly, without having to reconfigure all your Agents.
+[Vault](/docs/vault/first-things-first/) acts as an interface between your Agents and your storage system. It is responsible for receiving recordings from your Agents, and storing them in the storage system you've configured. By decoupling your Agents from [Vault](/docs/vault/first-things-first/), you can switch the underlying storage system on the fly, without having to reconfigure all your Agents.
 
-Next to persisting your data in your storage system, [Kerberos Vault](/docs/vault/first-things-first/) also acts as an event producer. Each time a recording is successfully stored in your storage system, it will send a message to the configured [Integration](/docs/vault/integrations/), such as Kafka, RabbitMQ, SQS, etc.
+Next to persisting your data in your storage system, [Vault](/docs/vault/first-things-first/) also acts as an event producer. Each time a recording is successfully stored in your storage system, it will send a message to the configured [Integration](/docs/vault/integrations/), such as Kafka, RabbitMQ, SQS, etc.
 
 ## Centralise and governance
 
-Scaling your [Agents](/docs/agent/first-things-first/) and having a scalable and flexible storage system with [Kerberos Vault](/docs/vault/first-things-first/) is a strong foundation. However, data that is just stored in your storage system doesn't bring any value.
+Scaling your [Agents](/docs/agent/first-things-first/) and having a scalable and flexible storage system with [Vault](/docs/vault/first-things-first/) is a strong foundation. However, data that is just stored in your storage system doesn't bring any value.
 
 Utilising that data to give your stakeholders insights through analytics, providing them with decent data governance and combining it with live data is where the magic starts.
 
-{{< figure src="introduction-hub.svg" alt="Kerberos Vault connected to Kerberos Hub." caption="Kerberos Vault connected to Kerberos Hub." class="stretch">}}
+{{< figure src="introduction-hub.svg" alt="Vault connected to Hub." caption="Vault connected to Hub." class="stretch">}}
 
-[Kerberos Hub](/docs/hub/first-things-first/) is our answer. It's a highly scalable platform to connect stakeholders to sites and groups of cameras. It comes with all the features you would imagine: live streaming, object detection, fine-grained user access, alerts and more.
+[Hub](/docs/hub/first-things-first/) is our answer. It's a highly scalable platform to connect stakeholders to sites and groups of cameras. It comes with all the features you would imagine: live streaming, object detection, fine-grained user access, alerts and more.
 
-[Kerberos Hub](/docs/hub/first-things-first/) is built on top of Kubernetes and can be deployed, just like all the other components, where you want. It's composed of a series of microservices that can independently scale towards any demand, and utilises Open Source components such as Kafka, RabbitMQ, SQS, and others for high throughput messaging.
+[Hub](/docs/hub/first-things-first/) is built on top of Kubernetes and can be deployed, just like all the other components, where you want. It's composed of a series of microservices that can independently scale towards any demand, and utilises Open Source components such as Kafka, RabbitMQ, SQS, and others for high throughput messaging.
 
 ## Takeaways
 
-Kerberos.io comes with different components which you only install when required; there is no need to set up a sophisticated system from the beginning. Each component works on its own and is open and extensible through APIs. Our vision is to start small, with just a few [Agents](/docs/agent/first-things-first/), scaling up and introducing more components such as [Kerberos Vault](/docs/vault/first-things-first/) and [Kerberos Hub](/docs/hub/first-things-first/) when required for your use case.
+Kerberos.io comes with different components which you only install when required; there is no need to set up a sophisticated system from the beginning. Each component works on its own and is open and extensible through APIs. Our vision is to start small, with just a few [Agents](/docs/agent/first-things-first/), scaling up and introducing more components such as [Vault](/docs/vault/first-things-first/) and [Hub](/docs/hub/first-things-first/) when required for your use case.
 
 If you need some help on possible deployments, have [a look at the deployment page](/docs/prologue/deployments/) where we illustrate some examples.

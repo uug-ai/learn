@@ -25,8 +25,8 @@ In this section we will explain the most common use cases and best practices, wh
 Starting something new is not easy; there is always a steep learning curve. While setting up the different Kerberos.io components, you might ask yourself:
 
 - How should I deploy these so-called [Agents](/docs/agent/first-things-first/)?
-- Do I set up a [Kerberos Vault](/docs/vault/first-things-first/) next to my [Agents](/docs/agent/first-things-first/) or in a managed cloud?
-- Can I self-host [Kerberos Hub](/docs/hub/first-things-first/) or do I need to install it in a managed cloud?
+- Do I set up a [Vault](/docs/vault/first-things-first/) next to my [Agents](/docs/agent/first-things-first/) or in a managed cloud?
+- Can I self-host [Hub](/docs/hub/first-things-first/) or do I need to install it in a managed cloud?
 - And probably many more questions...
 
 We will discuss some of the most common setups we have seen; however, this doesn't mean that your setup will not work if it's not shown as identical in the sections below.
@@ -106,10 +106,10 @@ In a home setup you'll probably rely on [`docker`](https://github.com/kerberos-i
 
 ## Extended setup
 
-[Agents](/docs/agent/first-things-first) store recordings on the host system. You might want to have a more elegant and centralised storage setup. Run [Kerberos Vault](/docs/vault/first-things-first/) next to your
+[Agents](/docs/agent/first-things-first) store recordings on the host system. You might want to have a more elegant and centralised storage setup. Run [Vault](/docs/vault/first-things-first/) next to your
 [Agents](/docs/agent/first-things-first) and connect to an edge or cloud storage system such as S3, MinIO, etc.
 
-{{< rete caption="Extended setup: a Kerberos Vault at the edge centralises storage for the Agents" alt="Extended Kerberos setup" height="540" >}}
+{{< rete caption="Extended setup: a Vault at the edge centralises storage for the Agents" alt="Extended Kerberos setup" height="540" >}}
 {
   "groups": [
     { "id": "edge", "label": "Edge", "x": 0, "y": 20, "w": 1400, "h": 760 }
@@ -150,9 +150,9 @@ In a home setup you'll probably rely on [`docker`](https://github.com/kerberos-i
 }
 {{< /rete >}}
 
-Similar to the basic installation, Kerberos Vault can be installed through [`docker`](https://github.com/kerberos-io/vault/tree/master/docker) and [`kubernetes`](https://github.com/kerberos-io/vault/tree/master/kubernetes). In this setup, [Agents](/docs/agent/first-things-first) are installed on a compute at the edge, next to a [Kerberos Vault](/docs/vault/first-things-first/).
+Similar to the basic installation, Vault can be installed through [`docker`](https://github.com/kerberos-io/vault/tree/master/docker) and [`kubernetes`](https://github.com/kerberos-io/vault/tree/master/kubernetes). In this setup, [Agents](/docs/agent/first-things-first) are installed on a compute at the edge, next to a [Vault](/docs/vault/first-things-first/).
 
-The advantage with [Kerberos Vault](/docs/vault/first-things-first/) is that even if it's deployed at the edge, you can still target a cloud storage system like S3, Google Cloud Storage, etc. Next to that, the main advantage is speed: you typically set up an [Agent](/docs/agent/first-things-first) within 5 minutes, and a [Kerberos Vault](/docs/vault/first-things-first/) installation within 30 minutes using `docker compose`.
+The advantage with [Vault](/docs/vault/first-things-first/) is that even if it's deployed at the edge, you can still target a cloud storage system like S3, Google Cloud Storage, etc. Next to that, the main advantage is speed: you typically set up an [Agent](/docs/agent/first-things-first) within 5 minutes, and a [Vault](/docs/vault/first-things-first/) installation within 30 minutes using `docker compose`.
 
 When leveraging [Kubernetes](https://github.com/kerberos-io/vault/tree/master/kubernetes) it might take you a bit more time, as you'll need to create the relevant Kubernetes resources in the cluster.
 
@@ -162,7 +162,7 @@ One of the most common setups is a hybrid setup, where you install the majority 
 
 The huge benefit of this approach is that your [Agents](/docs/agent/first-things-first) are installed next to the camera infrastructure, and ideally in the same network. This will bring latency and data transfer to a minimum.
 
-{{< rete caption="Hybrid setup: Agents at the edge connect to a Kerberos Vault and Kerberos Hub running in the cloud" alt="Hybrid Kerberos setup" height="540" >}}
+{{< rete caption="Hybrid setup: Agents at the edge connect to a Vault and Hub running in the cloud" alt="Hybrid Kerberos setup" height="540" >}}
 {
   "groups": [
     { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 360, "h": 760 },
@@ -207,11 +207,11 @@ The huge benefit of this approach is that your [Agents](/docs/agent/first-things
 }
 {{< /rete >}}
 
-The [Kerberos Vault](/docs/vault/first-things-first/) is installed in the cloud together with some scalable cloud storage. The [Kerberos Hub](/docs/hub/first-things-first/) is installed in the same or other cloud as the [Kerberos Vault](/docs/vault/first-things-first/).
+The [Vault](/docs/vault/first-things-first/) is installed in the cloud together with some scalable cloud storage. The [Hub](/docs/hub/first-things-first/) is installed in the same or other cloud as the [Vault](/docs/vault/first-things-first/).
 
-The benefit of this deployment is that you only need to install [Kerberos Vault](/docs/vault/first-things-first/) and [Kerberos Hub](/docs/hub/first-things-first/) once. Most of the work is setting up the [Agents](/docs/agent/first-things-first) at your customers and/or sites.
+The benefit of this deployment is that you only need to install [Vault](/docs/vault/first-things-first/) and [Hub](/docs/hub/first-things-first/) once. Most of the work is setting up the [Agents](/docs/agent/first-things-first) at your customers and/or sites.
 
-Another benefit is low latency and bandwidth consumption, as we have compute running at the edge for the [Agents](/docs/agent/first-things-first). Only data (recordings) that are relevant will be sent over the network to [Kerberos Vault](/docs/vault/first-things-first/). A possible disadvantage of this setup is that you will require some hardware at the site. Although the maintenance is low, it does come with a cost; have a look at [Cloud setup](/docs/prologue/deployments/#cloud-setup) instead.
+Another benefit is low latency and bandwidth consumption, as we have compute running at the edge for the [Agents](/docs/agent/first-things-first). Only data (recordings) that are relevant will be sent over the network to [Vault](/docs/vault/first-things-first/). A possible disadvantage of this setup is that you will require some hardware at the site. Although the maintenance is low, it does come with a cost; have a look at [Cloud setup](/docs/prologue/deployments/#cloud-setup) instead.
 
 ## Cloud setup
 
@@ -270,9 +270,9 @@ A noticeable disadvantage is that a continuous stream of data is sent over the n
 
 ## SAAS setup
 
-As described above you might mix a Hybrid and Cloud setup; in the end you decide where to host your [Agents](/docs/agent/first-things-first). Within the SAAS setup, you'll utilise our [Kerberos Hub SAAS](/docs/hub/first-things-first/) edition, and connect your [Agents](/docs/agent/first-things-first) and [Kerberos Vault](/docs/vault/first-things-first/).
+As described above you might mix a Hybrid and Cloud setup; in the end you decide where to host your [Agents](/docs/agent/first-things-first). Within the SAAS setup, you'll utilise our [Hub SAAS](/docs/hub/first-things-first/) edition, and connect your [Agents](/docs/agent/first-things-first) and [Vault](/docs/vault/first-things-first/).
 
-{{< rete caption="SAAS setup: Kerberos Hub is operated by us, while you keep ownership of the cameras, Agents and Vault" alt="SAAS Kerberos setup" height="540" >}}
+{{< rete caption="SAAS setup: Hub is operated by us, while you keep ownership of the cameras, Agents and Vault" alt="SAAS Kerberos setup" height="540" >}}
 {
   "groups": [
     { "id": "saas",        "label": "SAAS (managed)", "x":    0, "y":  20, "w": 320, "h": 760 },
@@ -316,15 +316,15 @@ As described above you might mix a Hybrid and Cloud setup; in the end you decide
 }
 {{< /rete >}}
 
-The main advantage of this setup is that you have full control over your [Agents](/docs/agent/first-things-first) and [Kerberos Vault](/docs/vault/first-things-first/), but rely on the Kerberos.io team for visualising your video landscape through [our Kerberos Hub SAAS](/docs/hub/first-things-first/) edition.
+The main advantage of this setup is that you have full control over your [Agents](/docs/agent/first-things-first) and [Vault](/docs/vault/first-things-first/), but rely on the Kerberos.io team for visualising your video landscape through [our Hub SAAS](/docs/hub/first-things-first/) edition.
 
-This means that you, and only you, own the data and at the same time don't have to maintain, install and configure [Kerberos Hub](/docs/hub/first-things-first/).
+This means that you, and only you, own the data and at the same time don't have to maintain, install and configure [Hub](/docs/hub/first-things-first/).
 
 ## Chained setup
 
-If you need more and better redundancy then the Chained setup might be of interest. In this setup we move data (recordings) from one [Kerberos Vault](/docs/vault/first-things-first/) to another [Kerberos Vault](/docs/vault/first-things-first/).
+If you need more and better redundancy then the Chained setup might be of interest. In this setup we move data (recordings) from one [Vault](/docs/vault/first-things-first/) to another [Vault](/docs/vault/first-things-first/).
 
-{{< rete caption="Kerberos Vault chaining" alt="Kerberos Vault chaining" height="640" >}}
+{{< rete caption="Vault chaining" alt="Vault chaining" height="640" >}}
 {
   "groups": [
     { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 320, "h": 700 },
@@ -360,6 +360,6 @@ If you need more and better redundancy then the Chained setup might be of intere
 }
 {{< /rete >}}
 
-The advantage of [chaining (or forwarding)](/docs/vault/forwarding/) is that you create a cache between two environments. As shown in the architecture above, data is first stored at an edge [Kerberos Vault](/docs/vault/first-things-first/), and synchronised with a cloud [Kerberos Vault](/docs/vault/first-things-first/). When the connection goes down between the two [Kerberos Vaults](/docs/vault/first-things-first/), the data will still be stored in the edge [Kerberos Vault](/docs/vault/first-things-first/), and synced to the cloud [Kerberos Vault](/docs/vault/first-things-first/) once the connection is back up.
+The advantage of [chaining (or forwarding)](/docs/vault/forwarding/) is that you create a cache between two environments. As shown in the architecture above, data is first stored at an edge [Vault](/docs/vault/first-things-first/), and synchronised with a cloud [Vault](/docs/vault/first-things-first/). When the connection goes down between the two [Vaults](/docs/vault/first-things-first/), the data will still be stored in the edge [Vault](/docs/vault/first-things-first/), and synced to the cloud [Vault](/docs/vault/first-things-first/) once the connection is back up.
 
-Another advantage is that [chaining (or forwarding)](/docs/vault/forwarding/) can be configured in different modes. Whereas the previously mentioned advantage illustrates `continuous` forwarding, it's also possible to have `ondemand` forwarding. In the latter, the user or administrators can decide programmatically or through our [Kerberos Hub](/docs/hub/first-things-first/) which recordings need to be synchronised to the cloud [Kerberos Vault](/docs/vault/first-things-first/). This allows us to only send the information we prefer to our cloud [Kerberos Vault](/docs/vault/first-things-first/).
+Another advantage is that [chaining (or forwarding)](/docs/vault/forwarding/) can be configured in different modes. Whereas the previously mentioned advantage illustrates `continuous` forwarding, it's also possible to have `ondemand` forwarding. In the latter, the user or administrators can decide programmatically or through our [Hub](/docs/hub/first-things-first/) which recordings need to be synchronised to the cloud [Vault](/docs/vault/first-things-first/). This allows us to only send the information we prefer to our cloud [Vault](/docs/vault/first-things-first/).

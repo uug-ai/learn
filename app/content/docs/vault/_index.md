@@ -17,9 +17,9 @@ sidebar:
     - installation
 ---
 
-Kerberos Vault is the bring-your-own-storage layer for your recordings. [Agents](/docs/agent) upload footage to Vault, which stores it on the providers you choose, at the edge or in the cloud. Vault also connects those recordings to [Kerberos Hub](/docs/hub) and your own applications through events, integrations and APIs.
+Vault is the bring-your-own-storage layer for your recordings. [Agents](/docs/agent) upload footage to Vault, which stores it on the providers you choose, at the edge or in the cloud. Vault also connects those recordings to [Hub](/docs/hub) and your own applications through events, integrations and APIs.
 
-{{< iso-figure figure="vault" alt="Isometric illustration of Kerberos Vault. Four Agents upload recordings to a vault. Each recording leaves the vault as a crate on a conveyor, and a crane drops it into the S3, Azure or Ceph bucket its account uses. Hub then reads a recording straight from its bucket." caption="How a recording moves from an Agent, through Vault, into your own storage and out to Hub." >}}
+{{< iso-figure figure="vault" alt="Isometric illustration of Vault. Four Agents upload recordings to a vault. Each recording leaves the vault as a crate on a conveyor, and a crane drops it into the S3, Azure or Ceph bucket its account uses. Hub then reads a recording straight from its bucket." caption="How a recording moves from an Agent, through Vault, into your own storage and out to Hub." >}}
 
 ## How recordings move through Vault
 

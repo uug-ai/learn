@@ -81,7 +81,7 @@ Instead of creating a new Agent through an RTSP stream, you can discover streams
 
 {{< figure src="add-through-onvif.gif" alt="Deploy an Agent with ONVIF capabilities." caption="Deploy an Agent with ONVIF capabilities." class="stretch">}}
 
-Once the Agent is added, PTZ and other ONVIF capabilities will be enabled through [Kerberos Hub](/docs/hub/onvif).
+Once the Agent is added, PTZ and other ONVIF capabilities will be enabled through [Hub](/docs/hub/onvif).
 
 {{< figure src="ptz-onvif.gif" alt="Moving a camera through ONVIF PTZ." caption="Moving a camera through ONVIF PTZ." class="stretch">}}
 
@@ -97,7 +97,7 @@ The following settings can be changed:
 - Time-based conditions
 - Pre- and post-recording
 - Continuous recording
-- Linking to Kerberos Hub or Kerberos Vault (see [Storage and video management](#storage-and-video-management))
+- Linking to Hub or Vault (see [Storage and video management](#storage-and-video-management))
 
 {{< callout type="info" >}}
 Before the configuration screen opens, Factory runs a quick **reachability check** (a ping) against the Agent. If an Agent is temporarily unreachable you get a fast, friendly message instead of a long hang, and any unsaved changes are confirmed before you close the screen.
@@ -155,34 +155,34 @@ This page is most useful when Factory uses the `configmap` or `secret` configura
 
 Factory allows you to scale your video landscape horizontally, using the concept of Kubernetes, and brings a strong backbone for stability and performance. It allows you to avoid reinventing the wheel and getting stuck in the numerous challenges of developing a scalable video platform.
 
-Agents store their recordings locally for a short period. This means that long-term storage is not included in the solution. On top of that it also does not have a visual component, which allows you to review dashboards or recordings. To overcome these two challenges, long-term storage with extensibility/integration capabilities and visualisation features, the following solutions were developed: [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/hub/first-things-first).
+Agents store their recordings locally for a short period. This means that long-term storage is not included in the solution. On top of that it also does not have a visual component, which allows you to review dashboards or recordings. To overcome these two challenges, long-term storage with extensibility/integration capabilities and visualisation features, the following solutions were developed: [Vault](/docs/vault/first-things-first) and [Hub](/docs/hub/first-things-first).
 
-### Kerberos Vault
+### Vault
 
-[Kerberos Vault](/docs/vault/first-things-first) is a solution which makes it possible to store recordings from Agents (across different clusters) at a central place, on the storage provider you want. You can store your recordings in the cloud (AWS S3, Google Cloud Storage, Azure Blob storage) or at the edge (MinIO, Ceph).
+[Vault](/docs/vault/first-things-first) is a solution which makes it possible to store recordings from Agents (across different clusters) at a central place, on the storage provider you want. You can store your recordings in the cloud (AWS S3, Google Cloud Storage, Azure Blob storage) or at the edge (MinIO, Ceph).
 
-{{< figure src="vault-cloud-storage.svg" alt="Kerberos Vault allows you to centralise your recordings and build integrations." caption="Kerberos Vault allows you to centralise your recordings and build integrations." class="stretch">}}
+{{< figure src="vault-cloud-storage.svg" alt="Vault allows you to centralise your recordings and build integrations." caption="Vault allows you to centralise your recordings and build integrations." class="stretch">}}
 
-Factory uses the same Vault settings as an Agent. Open **Settings**, select **Vault** in the **Persistence** block, and fill in the **Vault API URL**, **Provider**, **Directory**, **Access key** and **Secret key** of a [Kerberos Vault account](/docs/vault/accounts). Select **Verify Connection**, then **Save**. Every Agent that Factory deploys uses these values, and a camera's **Persistence** tab can override them for that Agent. [Connect to Vault](/docs/agent/connect-to-vault#configure-the-agent) explains each field.
+Factory uses the same Vault settings as an Agent. Open **Settings**, select **Vault** in the **Persistence** block, and fill in the **Vault API URL**, **Provider**, **Directory**, **Access key** and **Secret key** of a [Vault account](/docs/vault/accounts). Select **Verify Connection**, then **Save**. Every Agent that Factory deploys uses these values, and a camera's **Persistence** tab can override them for that Agent. [Connect to Vault](/docs/agent/connect-to-vault#configure-the-agent) explains each field.
 
-- Vault API URL: usually `http(s)://yourdomain.com/api`. If Kerberos Vault runs in the same cluster, you can use its internal DNS name instead, for example `http://vault.kerberos-vault/api`, where `vault` is the service name and `kerberos-vault` the namespace.
-- Directory: if you also use Kerberos Hub, this must equal your Kerberos Hub username, unless the Vault account sets its own directory. See [Kerberos Hub username](/docs/vault/integrations#kerberos-hub-username).
+- Vault API URL: usually `http(s)://yourdomain.com/api`. If Vault runs in the same cluster, you can use its internal DNS name instead, for example `http://vault.kerberos-vault/api`, where `vault` is the service name and `kerberos-vault` the namespace.
+- Directory: if you also use Hub, this must equal your Hub username, unless the Vault account sets its own directory. See [Hub username](/docs/vault/integrations#kerberos-hub-username).
 
-{{< figure src="kerberos-factory-kerberos-vault.gif" alt="Using Kerberos Vault you can bring your own storage, and store the recordings of your Agents in your own storage provider." caption="Using Kerberos Vault you can bring your own storage, and store the recordings of your Agents in your own storage provider." class="stretch">}}
+{{< figure src="kerberos-factory-kerberos-vault.gif" alt="Using Vault you can bring your own storage, and store the recordings of your Agents in your own storage provider." caption="Using Vault you can bring your own storage, and store the recordings of your Agents in your own storage provider." class="stretch">}}
 
-### Kerberos Hub
+### Hub
 
-For the visualisation part Kerberos Hub comes into the picture. Kerberos Hub is a web app, backed by a number of microservices, that shows dashboards and live streams, lets you filter recordings and much more. Learn more about [the features and functions of Kerberos Hub](/docs/hub/first-things-first).
+For the visualisation part Hub comes into the picture. Hub is a web app, backed by a number of microservices, that shows dashboards and live streams, lets you filter recordings and much more. Learn more about [the features and functions of Hub](/docs/hub/first-things-first).
 
-You have two choices when using Kerberos Hub: either you send your recordings from your Agents directly to Kerberos Hub, or you send your recordings to Kerberos Vault, and connect Kerberos Vault to Kerberos Hub. The latter is explained in the [Kerberos Hub integration](/docs/vault/integrations#kerberos-hub) of Kerberos Vault.
+You have two choices when using Hub: either you send your recordings from your Agents directly to Hub, or you send your recordings to Vault, and connect Vault to Hub. The latter is explained in the [Hub integration](/docs/vault/integrations#kerberos-hub) of Vault.
 
-To send recordings directly to Kerberos Hub, select **Hub** in the **Persistence** block and choose the **Region**.
+To send recordings directly to Hub, select **Hub** in the **Persistence** block and choose the **Region**.
 
-{{< figure src="kerberos-factory-kerberos-hub.gif" alt="By linking the Agent to Kerberos Hub, your recordings and livestreams will become available online." caption="By linking your Agent to Kerberos Hub, your recordings and livestreams will become available online." class="stretch">}}
+{{< figure src="kerberos-factory-kerberos-hub.gif" alt="By linking the Agent to Hub, your recordings and livestreams will become available online." caption="By linking your Agent to Hub, your recordings and livestreams will become available online." class="stretch">}}
 
-Whichever persistence you choose, fill in the **Hub** block to connect the Agents to Kerberos Hub for status, live view and camera control:
+Whichever persistence you choose, fill in the **Hub** block to connect the Agents to Hub for status, live view and camera control:
 
-- API url: the URL of the Kerberos Hub API. By default `https://api.cloud.kerberos.io`, the Kerberos Hub SaaS version.
+- API url: the URL of the Hub API. By default `https://api.cloud.kerberos.io`, the Hub SaaS version.
 - Public key and Private key: the keys Hub shows under **Plans & integrations**. See [Assign an Agent](/docs/hub/configuration#assign-an-agent).
 - Site: optionally, the ID of the Hub site the Agents belong to.
 
