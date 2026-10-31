@@ -455,7 +455,7 @@ Also add production controls appropriate to your environment:
 - Test certificate rotation. Relay `v0.14.7` watches certificate files for new connections, while existing QUIC sessions keep their original identity.
 - Keep HLS enabled as the operational fallback for networks that block HTTP/3 or UDP.
 
-For the transport tradeoffs and complete firewall comparison, read [Choose a live-stream transport: MoQ vs HLS vs WebRTC](/tutorials/hub/moq-vs-hls-vs-webrtc/).
+For how MoQ fits next to the other transports on the Live view page, see [Live view](/docs/hub/livestream/). For the transport tradeoffs and complete firewall comparison, read [Choose a live-stream transport: MoQ vs HLS vs WebRTC](/tutorials/hub/moq-vs-hls-vs-webrtc/).
 
 {{< tutorial-panel tone="success" icon="badge-check" title="The path is complete" >}}
 Your Agent and Hub frontend now share the same `https://moq.example.com/anon` relay URL and `devices` broadcast prefix. The Agent publishes H.264 over UDP 443, the relay fans the broadcast out, and the browser subscribes without a direct connection to the Agent.

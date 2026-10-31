@@ -12,6 +12,15 @@ menu:
     parent: "factory"
 weight: 301
 toc: true
+connects:
+  - page: /docs/vault/accounts
+    why: Create the Vault account whose keys your Agents upload with.
+  - page: /docs/hub/configuration#assign-an-agent
+    title: Assign an Agent
+    why: Find the Hub keys and site your Agents connect with.
+  - page: /docs/agent/getting-started#settings
+    title: Agent settings
+    why: What each Agent setting does.
 ---
 
 Once you've installed Factory, you will have the web application running inside your cluster. This web application allows you to administrate and automate the creation of your Agents through the concept of [Kubernetes deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) and pods.
@@ -155,11 +164,11 @@ On the other hand it's an open platform, as it allows you to build extensions an
 
 {{< figure src="vault-cloud-storage.svg" alt="Kerberos Vault allows you to centralise your recordings and build integrations." caption="Kerberos Vault allows you to centralise your recordings and build integrations." class="stretch">}}
 
-To connect one or more Agents to your Kerberos Vault instance, you should open the configuration option and navigate to the `cloud` tab. Once selected, you need to fill in the credentials from your Kerberos Vault account.
+To connect one or more Agents to your Kerberos Vault instance, you should open the configuration option and navigate to the `cloud` tab. Once selected, you need to fill in the credentials from your [Kerberos Vault account](/docs/vault/accounts).
 
 - Kerberos Vault URI: this is the API endpoint of your Kerberos Vault instance. Usually this is in the following format: `http(s)://yourdomain.com/api`. Where `yourdomain.com` should match your Kerberos Vault endpoint. If you are deploying Kerberos Vault at the edge, in the same cluster, you can use the internal DNS name, as follows: `http://vault.kerberos-vault/api`. Where `vault` is the `service name` and `kerberos-vault` is the `namespace`.
 
-- Provider: the name of the provider, which you created on the Kerberos Vault providers page, to which you want to send your recordings.
+- Provider: the name of the provider, which you created on the Kerberos Vault [providers page](/docs/vault/providers), to which you want to send your recordings.
 
 - Directory: this is the subdirectory in which your files will be stored. At the time of writing this should also equal your Kerberos Hub username, if you plan to upload to Kerberos Hub.
 
@@ -173,7 +182,7 @@ To connect one or more Agents to your Kerberos Vault instance, you should open t
 
 For the visualisation part Kerberos Hub comes into the picture. Kerberos Hub is a web app, backed up with a number of microservices, that shows dashboards, live streams, filter recordings and much more. Learn more [about the features and functions here](/docs/hub/first-things-first).
 
-You have two choices when using Kerberos Hub, either you send your recordings from your Agents directly to Kerberos Hub, or you send your recordings to Kerberos Vault, and connect Kerberos Vault to Kerberos Hub. About the latter more is explained on the [Kerberos Vault page](/docs/vault/getting-started).
+You have two choices when using Kerberos Hub, either you send your recordings from your Agents directly to Kerberos Hub, or you send your recordings to Kerberos Vault, and connect Kerberos Vault to Kerberos Hub. The latter is explained in the [Kerberos Hub integration](/docs/vault/integrations#kerberos-hub) of Kerberos Vault.
 
 Select the Kerberos Hub option, and copy-paste the credentials from your Kerberos Hub subscription.
 

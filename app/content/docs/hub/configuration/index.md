@@ -12,6 +12,11 @@ menu:
 weight: 303
 toc: true
 podcast: hub-configuration
+connects:
+  - page: /docs/agent/connect-to-hub
+    why: Enter the Hub API URL, keys and site on the Agent.
+  - page: /docs/factory/getting-started
+    why: Deploy many Agents on Kubernetes with the Hub settings applied.
 ---
 
 Once you have installed the Kerberos Hub Helm chart and confirmed that all microservices are running properly, you should be able to access the Kerberos Hub login screen and sign in through the default username and password [which was defined during the installation step](https://github.com/kerberos-io/hub#post-installation).
@@ -67,11 +72,11 @@ By clicking on the `(+ Add Camera)` button, you will see a modal explaining how 
 
 ### Assign an Agent
 
-As explained in the modal, there are different possibilities to set up and run an Agent. 
+As explained in the modal, there are [different possibilities to set up and run an Agent](/docs/agent/installation).
 
-Regardless of how you deployed an Agent, to connect the Agent to Kerberos Hub you will require the account credentials from your Kerberos Hub account to be shared with your Agents. By sharing those credentials you are linking your Agents to the relevant Kerberos Hub account.
+Regardless of how you deployed an Agent, to connect the Agent to Kerberos Hub you will require the account credentials from your Kerberos Hub account to be shared with your Agents. By sharing those credentials you are linking your Agents to the relevant Kerberos Hub account. [Connect to Hub](/docs/agent/connect-to-hub) shows where they go on the Agent; [Factory](/docs/factory/getting-started) sets them for every Agent it deploys.
 
-By navigating to the profile page and selecting your plan, you will find the required credentials for your Agents.
+By navigating to the profile page and selecting your plan, you will find the required credentials for your Agents. When [organisations and projects](/docs/hub/organisations#creating-and-managing-projects) are enabled, the credentials belong to the project instead: open **Project settings** and copy the **Agent public key** and **Agent private key**.
 
 Please note that when you are using the Kerberos Hub SaaS offering you will need both an access and secret key. If you are using Kerberos Hub self-hosted you will only need an access key.
 

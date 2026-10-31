@@ -199,6 +199,7 @@ Environment variables override values saved through the web interface. If a fiel
 
 ## Next steps
 
-- Tune motion and recording behaviour in the [Agent documentation](/docs/agent/).
+- Tune motion and recording behaviour in the [Agent settings](/docs/agent/getting-started/#settings).
 - Add a second camera by deploying a second Agent; one Agent process or container manages one camera.
-- Connect Agent to Hub when you want centralised live monitoring, search, alerts, and remote management.
+- [Connect the Agent to Hub](/docs/agent/connect-to-hub/) when you want centralised live monitoring, search, alerts, and remote management.
+- [Connect the Agent to Vault](/docs/agent/connect-to-vault/) to keep its recordings on storage you control.

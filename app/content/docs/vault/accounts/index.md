@@ -12,6 +12,11 @@ menu:
         parent: "vault"
 weight: 307
 toc: true
+connects:
+  - page: /docs/agent/connect-to-vault
+    why: Enter the account's access key, secret key and directory on the Agent.
+  - page: /docs/hub/pipeline
+    why: What Hub does with a recording when cloud analysis is enabled.
 ---
 
 Accounts can be managed in the Vault interface or supplied through
@@ -38,7 +43,7 @@ When selecting the `+ Add Account` button, a modal will open that allows you to 
 
 {{< figure src="add-account.gif" alt="Create a secure account." caption="Create a secure account" class="stretch">}}
 
-Once you've provided all the required fields and enabled the account, you should be able to use it and link your Agents to your Kerberos Vault.
+Once you've provided all the required fields and enabled the account, you should be able to use it and link your Agents to your Kerberos Vault. [Connect to Vault](/docs/agent/connect-to-vault#configure-the-agent) shows where the credentials go on the Agent.
 
 ### Account settings
 

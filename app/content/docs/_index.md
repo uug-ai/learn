@@ -34,7 +34,7 @@ Within the portfolio of [Kerberos.io](/docs/prologue/how) you leverage more or l
 
 {{< figure src="overview.svg" alt="The Kerberos.io solution stack" caption="The Kerberos.io solution stack" class="stretch">}}
 
-The backbone of the Kerberos.io ecosystem is the [Agent](/docs/agent/first-things-first). This [Agent](/docs/agent/first-things-first), installed [through various possibilities](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent), is deployed to a compute - VM, baremetal, Kubernetes cluster or other - of choice and connected to a camera stream you control.
+The backbone of the Kerberos.io ecosystem is the [Agent](/docs/agent/first-things-first). This [Agent](/docs/agent/first-things-first), installed [through various possibilities](/docs/agent/installation), is deployed to a compute - VM, baremetal, Kubernetes cluster or other - of choice and connected to a camera stream you control.
 
 {{< figure src="introduction-kerberos-io.svg" alt="An Agent is monitoring a single camera stream." caption="An Agent is monitoring a single camera stream." class="stretch">}}
 

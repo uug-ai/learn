@@ -12,12 +12,19 @@ menu:
 weight: 304
 toc: true
 podcast: hub-pipeline
+connects:
+  - page: /docs/vault/integrations#kerberos-hub
+    title: Kerberos Hub integration
+    why: Send an event to Hub for every recording Vault stores.
+  - page: /docs/vault/accounts#cloud-analysis
+    title: Cloud analysis
+    why: Turn cloud analysis on or off per Vault account.
 ---
 
 > [!WARNING] Workflows are the future direction
 > The pipeline described here is the **static default** every recording flows through today. [Workflows](/docs/hub/workflows/) build on it to let each user customise *which* processing runs — per camera, per time window and per model, with no code. Over time, workflows are expected to **supersede this static pipeline** as the primary way recordings are routed and enriched, so treat this page as the current baseline rather than a fixed design.
 
-Hub processes every recording through a pipeline of small, focused microservices. As soon as a camera triggers an Agent, the resulting recording is pushed to Vault, an event lands on the message broker and Hub picks it up — kicking off a chain of services that enrich, classify and alert on that single event.
+Hub processes every recording through a pipeline of small, focused microservices. As soon as a camera triggers an [Agent](/docs/agent), the resulting recording is pushed to [Vault](/docs/vault), an event lands on the message broker and Hub picks it up — kicking off a chain of services that enrich, classify and alert on that single event.
 
 {{< rete caption="Pipelines to scale the processing." alt="Pipelines to scale the processing." height="500" >}}
 {
@@ -91,7 +98,7 @@ Each microservice in the Hub pipeline owns a single responsibility. Together the
 
 # How it works
 
-When Vault stores a new recording, it publishes an event to the broker. Hub consumes that event and starts a pipeline run for it. From there messages flow through the services either sequentially (Monitor → Sequence → Analysis → Throttler → Notification) or in parallel (everything fanning out from Analysis), depending on the configuration. Once every service involved in the run has acknowledged its message, the pipeline goes idle until the next event arrives.
+When Vault stores a new recording, its [Hub integration](/docs/vault/integrations#kerberos-hub) publishes an event to the broker. Hub consumes that event and starts a pipeline run for it. From there messages flow through the services either sequentially (Monitor → Sequence → Analysis → Throttler → Notification) or in parallel (everything fanning out from Analysis), depending on the configuration. Once every service involved in the run has acknowledged its message, the pipeline goes idle until the next event arrives.
 
 Message distribution is handled by a message broker — Kafka, AMQP/RabbitMQ, or any other supported broker — using queues (or topics, depending on the broker). Each service consumes from its own queue, does its work, and hands off to the next stage. This loose coupling is what makes the pipeline easy to extend: adding a new capability is just a matter of adding a new consumer on a new queue.
 

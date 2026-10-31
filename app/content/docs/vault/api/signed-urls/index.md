@@ -38,7 +38,7 @@ The account also has a **default provider** assigned to it; you can override it 
 
 ## How asset filenames are derived
 
-When the Hub pipeline processes a recording, every generated asset is stored on the same provider, in the same `username/` directory, using a deterministic filename derived from the original recording. For a recording named:
+When the [Hub pipeline](/docs/hub/media-processing#2-registration-and-previews) processes a recording, every generated asset is stored on the same provider, in the same `username/` directory, using a deterministic filename derived from the original recording. For a recording named:
 
 ```
 account-a/1776427171_1-1_frontdoor_402-263-805-680_801_29960.mp4

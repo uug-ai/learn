@@ -13,11 +13,14 @@ menu:
 weight: 304
 toc: true
 podcast: hub-livestream
+connects:
+  - page: /docs/agent/connect-to-hub
+    why: The Hub, MQTT and STUN/TURN settings live view depends on.
 ---
 
 The **Live view** page in the Hub streams the cameras connected to
 your account directly in the browser. It is the page you land on most
-often during day-to-day monitoring: every connected Agent shows up as a
+often during day-to-day monitoring: every [connected Agent](/docs/agent/connect-to-hub) shows up as a
 tile, every tile streams its camera at the resolution your subscription
 allows, and a handful of controls let you talk back, switch quality,
 filter by site and pop a stream out to fullscreen.
@@ -139,6 +142,8 @@ media flows **peer-to-peer** between them. When a direct peer connection
 cannot be established (symmetric NAT, restrictive firewalls), the media
 is automatically relayed through the Kerberos-hosted TURN servers. WebRTC
 is also the only mode that carries a back-channel for two-way **talk**.
+To run your own TURN server instead, follow
+[Set up WebRTC live view with TURN](/tutorials/hub/setup-webrtc-turn/).
 
 {{< rete caption="Live over WebRTC: the Agent and browser exchange SDP/ICE through the MQTT broker, then stream media peer-to-peer. A Kerberos-hosted TURN server relays the media only when a direct connection cannot be established." alt="WebRTC live transport: SDP/ICE signalling over MQTT, peer-to-peer media, and a TURN relay used only as a fallback" height="600" >}}
 {
@@ -248,6 +253,10 @@ not available in HLS mode (it relies on the WebRTC back-channel), and the
 live statistics shown when you hover the blinking dot are reduced to
 resolution, bitrate and codec. Everything else — mute, fullscreen, PTZ
 and the status badges — works identically.
+[Set up HLS live view](/tutorials/hub/setup-hls-live-view/) walks through the
+Hub, Agent and network configuration, and
+[Choose a live-stream transport](/tutorials/hub/moq-vs-hls-vs-webrtc/)
+compares HLS with WebRTC and MoQ.
 
 ## Filtering and searching
 

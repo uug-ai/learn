@@ -12,11 +12,15 @@ menu:
     parent: "vault"
 weight: 309
 toc: true
+connects:
+  - page: /docs/hub/recordings#requesting-recordings-from-the-source
+    title: Request recordings in Hub
+    why: Request a recording from an edge Vault in Hub.
 ---
 
 Multiple Kerberos Vaults can be installed in your video landscape. You may have Kerberos Vaults at the edge and/or in a cloud environment, connected to edge and/or cloud storage providers.
 
-Kerberos Vaults can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by requesting a forward from Kerberos Hub or building your own forwarding application code.
+Kerberos Vaults can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by [requesting a forward from Kerberos Hub](/docs/hub/recordings#requesting-recordings-from-the-source) or building your own forwarding application code.
 
 {{< rete caption="Synchronise recordings between multiple Kerberos Vaults" alt="Synchronise recordings between multiple Kerberos Vaults" height="520" >}}
 {

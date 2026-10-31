@@ -14,7 +14,7 @@ weight: 300
 toc: true
 ---
 
-It all starts with your Agents. You might set up one or more Agents at several locations, sites, rooms, offices, etc. Each Agent will monitor a particular video stream and persist recordings on a local disk; taking into account the specific conditions such as region of interest, time window, etc.
+It all starts with your [Agents](/docs/agent). You might set up one or more Agents at several locations, sites, rooms, offices, etc. Each Agent will monitor a particular video stream and persist recordings on a local disk; taking into account the specific conditions such as region of interest, time window, etc.
 
 [![Bring Your Own Storage and extend/integrate your video landscape with Kerberos Vault](youtube-vault-kerberosio.png)](https://www.youtube.com/watch?v=QuRHTziIc30 "Bring Your Own Storage and extend/integrate your video landscape with Kerberos Vault")
 
@@ -79,7 +79,7 @@ By combining the intelligence of making recordings in small chunks, and distribu
 
 Multiple Kerberos Vaults can be installed in your video landscape. You may have Kerberos Vaults at the edge and/or in a cloud environment, connected to edge and/or cloud storage providers.
 
-Kerberos Vaults can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by requesting a forward from Kerberos Hub or building your own forwarding application code.
+Kerberos Vaults can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by [requesting a forward from Kerberos Hub](/docs/hub/recordings#requesting-recordings-from-the-source) or building your own forwarding application code.
 
 {{< figure src="vault-forwarding-chaining.svg" alt="Synchronise recordings between multiple Kerberos Vaults" caption="Synchronise recordings between multiple Kerberos Vaults" class="stretch">}}
 

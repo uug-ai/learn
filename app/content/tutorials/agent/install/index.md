@@ -20,6 +20,8 @@ By the end you will have:
 3. Optional: persisted configuration and recordings on disk.
 4. Optional: a camera (RTSP) configured through environment variables.
 
+For an overview of every deployment option, see the [Agent installation docs](/docs/agent/installation/).
+
 ## Prerequisites
 
 Before you start, make sure you have:
@@ -217,7 +219,7 @@ A few of the most common variables:
 | `AGENT_CAPTURE_IPCAMERA_RTSP` | Main RTSP stream of your camera. | *(empty)* |
 | `AGENT_CAPTURE_IPCAMERA_SUB_RTSP` | Sub-stream used for live view (WebRTC). | *(empty)* |
 | `AGENT_CAPTURE_CONTINUOUS` | `true` for continuous recording, `false` for motion-based. | `false` |
-| `AGENT_CLOUD` | Cloud target: `s3` (Hub), `kstorage` (Vault) or `dropbox`. | `s3` |
+| `AGENT_CLOUD` | Cloud target: `s3` ([Hub](/docs/agent/connect-to-hub/)), `kstorage` ([Vault](/docs/agent/connect-to-vault/)) or `dropbox`. | `s3` |
 
 The full list lives in the [Agent README](https://github.com/kerberos-io/agent#configure-with-environment-variables).
 
@@ -233,11 +235,12 @@ The full list lives in the [Agent README](https://github.com/kerberos-io/agent#c
 - **No live view / black screen:** verify the RTSP URL with `ffplay rtsp://...` from the same host. WebRTC requires H264 — H265 sub-streams will not preview.
 - **Permission errors on the volume:** make sure the host directory is owned by `100:101` and is mode `755` (see [Option 2](#option-2--docker-with-persistent-volumes)).
 - **Port `80` already in use:** map another host port, e.g. `-p 8080:80`.
-- **Behind a firewall / NAT for live streaming:** review the `AGENT_STUN_URI`, `AGENT_TURN_URI`, `AGENT_TURN_USERNAME` and `AGENT_TURN_PASSWORD` variables.
+- **Behind a firewall / NAT for live streaming:** review the `AGENT_STUN_URI`, `AGENT_TURN_URI`, `AGENT_TURN_USERNAME` and `AGENT_TURN_PASSWORD` variables. [Set up WebRTC live view with TURN](/tutorials/hub/setup-webrtc-turn/) walks through them.
 - **Logs:** `docker logs -f mycamera` (or `kubectl logs -f deploy/...`).
 
 ## Next steps
 
-- Connect this Agent to **Hub** for centralised monitoring — see the upcoming [Hub tutorial](/tutorials/hub/).
-- Forward recordings to **Vault** — see the upcoming [Vault tutorial](/tutorials/vault/).
+- Configure your camera's main and sub-stream — see [Connect any camera](/tutorials/agent/connect-any-camera/).
+- Connect this Agent to **Hub** for centralised monitoring — see [Connect to Hub](/docs/agent/connect-to-hub/).
+- Upload recordings to **Vault**, on storage you control — see [Connect to Vault](/docs/agent/connect-to-vault/).
 - Review the in-depth [Agent installation docs](/docs/agent/installation/) for advanced deployment patterns (Ansible, Terraform, Balena, ...).

@@ -72,7 +72,7 @@ No public inbound port is opened on an Agent. Agents, browsers and TURN all esta
 
 You need:
 
-- A self-hosted Hub and at least one connected Agent.
+- A self-hosted Hub and at least one Agent [connected to Hub](/docs/agent/connect-to-hub/).
 - A public VM or host for coturn. The Hub chart configures TURN but does not deploy it.
 - A DNS name such as `turn.example.com` pointing to the TURN host.
 - Firewall control for the TURN listener and relay port range.
@@ -290,6 +290,8 @@ Talk is a separate camera capability. A healthy WebRTC video path does not guara
 | Every viewer uses TURN | Direct UDP is blocked or candidate priority/network policy prefers relay |
 
 TURN bandwidth is approximately one inbound and one outbound media stream per relayed viewer. Monitor both directions and size the host, relay range and network egress for peak simultaneous live views.
+
+For how WebRTC fits next to the other Live transports, see [Live over WebRTC](/docs/hub/livestream/#live-over-webrtc) in the Live view docs.
 
 For an HTTPS-only alternative that needs no ICE or TURN, continue with [Set up HLS live view](/tutorials/hub/setup-hls-live-view/). For a protocol comparison, read [Choose a live-stream transport: MoQ vs HLS vs WebRTC](/tutorials/hub/moq-vs-hls-vs-webrtc/).
 

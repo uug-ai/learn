@@ -21,7 +21,7 @@ const products = [
     accent: '#933734',
     article: 'first-things-first',
     gettingStarted: 'Getting Started',
-    topics: ['License'],
+    topics: ['Connect to Hub', 'Connect to Vault', 'License'],
     topic: { slug: 'license', title: 'License' },
   },
   {
@@ -266,8 +266,9 @@ test('keeps footer navigation consistent with each product topic order', async (
     ['hub/authentication', 'Audit events', 'Cases'],
     ['hub/pipeline', 'Organisations and projects', 'Recordings'],
     ['hub/workflows', 'White-label', undefined],
-    ['agent/installation', 'Getting Started', 'License'],
-    ['agent/license', 'Installation', undefined],
+    ['agent/installation', 'Getting Started', 'Connect to Hub'],
+    ['agent/connect-to-vault', 'Connect to Hub', 'License'],
+    ['agent/license', 'Connect to Vault', undefined],
     ['factory/installation', 'Getting Started', 'Configuration & engines'],
     ['factory/configuration-and-engines', 'Installation', 'License'],
     ['factory/license', 'Configuration & engines', undefined],
@@ -280,6 +281,32 @@ test('keeps footer navigation consistent with each product topic order', async (
     const footerLinks = page.locator('#content > div > a[title]');
     await expect(footerLinks).toHaveText(next ? [previous, next] : [previous]);
   }
+});
+
+test('colours cross-product links by destination and lists counterparts under Works with', async ({ page }) => {
+  await page.goto('/docs/vault/getting-started/');
+  const vaultColor = await page.locator('#content .content p a[href]:not(.learn-xlink)').first()
+    .evaluate(element => getComputedStyle(element).color);
+
+  await page.goto('/docs/agent/connect-to-vault/');
+  const agentLink = page.locator('#content .content a[href^="/docs/agent/"]').first();
+  const crossLink = page.locator('#content .content a.learn-xlink[href="/docs/vault/accounts/"]').first();
+  await expect(crossLink).toHaveAttribute('data-product', 'vault');
+  await expect(crossLink).toHaveCSS('color', vaultColor);
+  await expect(agentLink).not.toHaveClass(/learn-xlink/);
+  await expect(agentLink).not.toHaveCSS('color', vaultColor);
+  await expect(crossLink.locator('.learn-sr-only')).toHaveText(' (Vault documentation)');
+  expect(await textContrast(crossLink), 'cross-product link').toBeGreaterThanOrEqual(4.5);
+
+  const panel = page.locator('#content aside.learn-works-with');
+  await expect(panel.getByRole('heading', { name: 'Works with' })).toBeVisible();
+  const cards = panel.locator('a.learn-works-with-card');
+  await expect(cards.first()).toHaveAttribute('href', '/docs/vault/accounts/');
+  await expect(cards.first()).toHaveAttribute('data-product', 'vault');
+  await expect(cards.first().locator('.learn-works-with-product')).toHaveText('Vault');
+
+  await page.goto('/docs/agent/license/');
+  await expect(page.locator('#content aside.learn-works-with')).toHaveCount(0);
 });
 
 test('leaves other documentation navigation unchanged', async ({ page }) => {

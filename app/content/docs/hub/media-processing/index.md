@@ -28,7 +28,7 @@ This page explains the user-visible lifecycle. See
 
 ### 1. Upload and intake
 
-An Agent uploads a recording to Vault and submits an event to Hub. Intake
+An Agent [uploads a recording to Vault](/docs/agent/connect-to-vault), and Vault's [Hub integration](/docs/vault/integrations#kerberos-hub) submits an event to Hub. Intake
 validates account limits, resolves the device and ownership context, and adds the
 metadata required by later stages.
 

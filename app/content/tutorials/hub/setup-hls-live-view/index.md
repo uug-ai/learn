@@ -73,7 +73,7 @@ The Agent stops live uploads about eight seconds after the last viewer keepalive
 You need:
 
 - A self-hosted Hub whose API and frontend are available through HTTPS.
-- A connected Agent with Hub URI, access key and private key configured.
+- An Agent connected to Hub, with its Hub API URL, public key and private key configured. See [Connect to Hub](/docs/agent/connect-to-hub/).
 - Live view enabled in the Agent camera configuration.
 - MQTT connectivity between Hub frontend and Agent.
 - Outbound HTTPS from the Agent to Hub API.
@@ -267,6 +267,8 @@ When sizing the deployment, account for:
 | H.265 stream is blank | Browser HEVC support; switch camera main/sub stream to H.264 |
 | Stream repeatedly restarts | Agent-to-Hub upload stability, object TTL, proxy buffering and camera timestamp continuity |
 | High works but Low fails | Sub-stream URL, codec, dimensions and keyframe production |
+
+For how HLS fits next to the other Live transports, see [Live over HLS](/docs/hub/livestream/#live-over-hls) in the Live view docs.
 
 If HLS works while WebRTC fails, the likely fault is ICE/TURN or direct UDP rather than camera capture. Continue with [Set up WebRTC live view with TURN](/tutorials/hub/setup-webrtc-turn/) to add the lower-latency interactive path, or read [Choose a live-stream transport: MoQ vs HLS vs WebRTC](/tutorials/hub/moq-vs-hls-vs-webrtc/) to compare the tradeoffs.
 

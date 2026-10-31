@@ -12,6 +12,9 @@ menu:
 weight: 308
 toc: true
 podcast: hub-mp4-verification
+connects:
+  - page: /docs/agent
+    why: Agents sign every recording they write.
 ---
 
 Video evidence is only useful if you can trust that it has not been altered between the moment it was recorded and the moment it is reviewed. Kerberos Hub addresses this with a built-in **fingerprint and signature** mechanism: every fragmented MP4 written by Agent is signed with a private key at the moment it is closed, and the resulting signature is embedded directly inside the file. Anyone with the matching public key can later verify — entirely offline — that the recording is authentic and bit-perfect.
@@ -113,7 +116,7 @@ As generative video tooling becomes more accessible, the ability to prove that a
 
 ## Operational notes
 
-- **Key management.** The Agent signs with a private key configured under `config.Signing.PrivateKey`. Hub serves the matching public key at `/public_key.pem`. Treat the private key as you would any other production secret: rotate it deliberately, and keep historical public keys available so that older recordings can still be verified.
-- **No private key, no signature.** If the Agent is started without a signing key configured, the MP4 will still be playable but it will not contain the `uuid` signature box. Verification of such a file will report `invalid`.
+- **Key management.** The Agent signs with the private key in `config.Signing.PrivateKey` (environment variable `AGENT_SIGNING_PRIVATE_KEY`), an RSA key in PKCS#8 PEM format. A key in another format is silently ignored and the MP4 gets no signature box, so verification reports `invalid`. Hub verifies against the public key bundled with the Hub frontend and served at `/public_key.pem`. Treat the private key as you would any other production secret, and keep earlier public keys so that recordings signed before a rotation can still be checked.
+- **The default key.** If no signing key is configured, the Agent signs with a built-in default key, and the public key bundled with Hub matches it, so verification reports `valid`. Because that default private key is published in the open-source [Agent](/docs/agent) repository, a valid result only shows that the file has not changed since it was signed, not which device signed it. For the authenticity guarantees above, sign with your own key and make sure Hub serves the matching public key.
 - **What is *not* covered.** The fingerprint protects the structural identity of the file. It does not encrypt the video content, and it does not protect against an attacker who has access to the Agent's private key. Combine MP4 verification with end-to-end encryption and proper key handling for the strongest guarantees.
 - **Performance.** Verification is fast — typically a few hundred milliseconds for a multi-minute fragmented MP4 — because only the box structure is parsed, not the video samples themselves.

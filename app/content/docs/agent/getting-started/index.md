@@ -1,8 +1,8 @@
 ---
 podcast: agent-getting-started
 title: "Getting Started"
-description: ""
-lead: ""
+description: "A tour of the Agent's web interface: dashboard, recordings and settings."
+lead: "A tour of the Agent's web interface: dashboard, recordings and settings."
 date: 2020-10-06T08:49:31+00:00
 lastmod: 2020-10-06T08:49:31+00:00
 draft: false
@@ -14,7 +14,7 @@ weight: 202
 toc: true
 ---
 
-Once you've installed one or more Agents, you should have access to the Agent user interface. The interface allows you to interact with the Agent, and more specifically configure the camera stream, set up a cloud connection, watch recordings and live views, etc.
+Once you've installed one or more Agents, you should have access to the Agent user interface. The interface allows you to interact with the Agent, and more specifically configure the camera stream, set up a cloud connection to [Vault](/docs/agent/connect-to-vault) or [Hub](/docs/agent/connect-to-hub), watch recordings and live views, etc.
 
 Having a UI in place, it is important to note that Agent also ships numerous APIs, that allow you to automate the configuration. The APIs are exposed as Swagger documentation, and can be used for configuration of Agent but also development of custom applications or business logic.
 
@@ -45,11 +45,13 @@ At the media page you'll find all your past and future recordings. It shows the 
 
 ## Settings
 
-The settings page allows you to modify the Agent configuration. While configuring you will find different settings such as:
+The settings page allows you to modify the Agent configuration. The settings are grouped in tabs:
 
-- general (name, timezone, etc)
-- camera (which main stream and/or sub stream)
-- streaming
-- persistence
+- **Overview**: the camera name, timezone, offline mode and encryption.
+- **Camera**: the main stream, the sub-stream and the ONVIF credentials. [Connect any IP camera to Agent](/tutorials/agent/connect-any-camera/) walks you through it.
+- **Recording**: continuous or motion-based recording, the pre- and post-recording time and the maximum length of a recording.
+- **Streaming**: the STUN/TURN servers and MQTT broker that [live view in Hub](/docs/hub/livestream) uses.
+- **Conditions**: when and where the Agent records, such as time and regions of interest.
+- **Persistence**: where recordings are uploaded, to [Kerberos Vault](/docs/agent/connect-to-vault), [Kerberos Hub](/docs/agent/connect-to-hub) or Dropbox, and the connection to Hub.
 
 {{< figure src="settings.gif" alt="Configure your Agent." caption="Configure your Agent." class="stretch">}}

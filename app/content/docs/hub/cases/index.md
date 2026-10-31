@@ -13,6 +13,11 @@ menu:
 weight: 305
 toc: true
 podcast: hub-cases
+connects:
+  - page: /docs/vault/providers
+    why: Create the archive provider cases copy recordings to.
+  - page: /docs/vault/accounts
+    why: Set the archive retention on a dedicated Vault account.
 ---
 
 By default, recordings are persisted for a limited amount of time. Within Hub you define a retention period per subscription and assign it to a user. The retention period can be set to 30, 60, 90 days or any custom value. It determines how many days of footage are visible to the end user after login, and controls when the associated recording metadata is removed from the database.
@@ -540,11 +545,11 @@ To start using cases, some configuration needs to be enabled in Vault and Hub.
 
 ### Create archive storage provider in Vault
 
-To use cases and the archiving process, an additional storage provider must be created in Vault.
+To use cases and the archiving process, an additional [storage provider](/docs/vault/providers) must be created in Vault.
 
 {{< figure src="add-storage-provider.png" alt="Create a new storage provider for archiving in Vault." caption="Create a new storage provider for archiving in Vault." class="stretch">}}
 
-To set the archiving retention period, a new Vault account must be created, since the retention period is defined at the account level. Recordings copied to the archive storage provider will inherit the retention period from this account.
+To set the archiving retention period, a new [Vault account](/docs/vault/accounts) must be created, since the retention period is defined at the account level. Recordings copied to the archive storage provider will inherit the retention period from this account.
 
 {{< figure src="add-account.png" alt="Define a retention period in a new Vault account." caption="Define a retention period in a new Vault account." class="stretch">}}
 

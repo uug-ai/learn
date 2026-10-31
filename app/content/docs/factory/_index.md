@@ -24,7 +24,7 @@ Factory is the web application for deploying and managing [Kerberos Agents](/doc
 ## How Factory manages your Agents
 
 1. **Connect your cluster.** Run Factory in the Kubernetes cluster where you want to manage Agents. Its interface gives you an overview of the Agents, nodes and pods in that cluster.
-2. **Add your cameras.** Enter a camera stream or discover cameras through ONVIF. Factory creates a Kubernetes deployment for each Agent and lets you tune its recording, streaming and storage settings.
+2. **Add your cameras.** Enter a camera stream or discover cameras through ONVIF. Factory creates a Kubernetes deployment for each Agent and lets you tune its recording, streaming and storage settings, such as uploads to [Kerberos Vault](/docs/vault) and the connection to [Kerberos Hub](/docs/hub).
 3. **Maintain the fleet.** Apply global settings, adjust individual Agents, upgrade or restart deployments, and follow their logs from the same interface.
 
 The [Configuration & engines](/docs/factory/configuration-and-engines) guide explains where Factory stores its settings and how it schedules Agents.

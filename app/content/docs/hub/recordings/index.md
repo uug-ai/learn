@@ -13,6 +13,12 @@ menu:
 weight: 310
 toc: true
 podcast: hub-recordings
+connects:
+  - page: /docs/vault/forwarding#on-demand-forwarding
+    title: On-demand forwarding
+    why: Keep video at an edge Vault and forward it when requested.
+  - page: /docs/agent
+    why: Where every recording starts.
 ---
 
 The **Recordings** page is the main starting point for reviewing footage in
@@ -35,7 +41,7 @@ or open its dedicated detail page at `/media/<id>`.
 
 ## How recordings become available
 
-An Agent sends recordings, or recording metadata, through the configured media
+An [Agent](/docs/agent) sends recordings, or recording metadata, through the configured media
 pipeline. Hub stores the information needed to find each recording and resolves
 the video from its storage provider when you play it.
 
@@ -45,7 +51,7 @@ its previews or analysis are ready. Not every deployment runs every analysis
 stage.
 
 Some deployments upload **metadata only** initially and keep the video at the
-source Vault. Those recordings can appear in searches without being immediately
+source Vault, using [on-demand forwarding](/docs/vault/forwarding#on-demand-forwarding). Those recordings can appear in searches without being immediately
 playable. See [Requesting recordings from the source](#requesting-recordings-from-the-source).
 
 ## Finding recordings

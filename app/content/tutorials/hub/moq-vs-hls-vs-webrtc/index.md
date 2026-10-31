@@ -306,6 +306,8 @@ Test for at least one camera keyframe interval after every reconnect. A transpor
 
 ## Apply the choice in Hub
 
+The [Live view](/docs/hub/livestream/) docs describe how each transport behaves on the page, and [Feature flags](/docs/hub/feature-flags/) lists every live-view setting.
+
 The Hub Helm chart exposes the transports under `kerberoshub.frontend.features.liveview`. This example offers all three choices and starts Live mode with MoQ:
 
 ```yaml

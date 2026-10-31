@@ -12,6 +12,12 @@ menu:
     parent: "vault"
 weight: 306
 toc: true
+connects:
+  - page: /docs/hub/pipeline
+    why: The services that process each recording Vault sends to Hub.
+  - page: /docs/agent/connect-to-vault#using-vault-together-with-hub
+    title: Using Vault with Hub
+    why: Set the Agent directory to the Hub username, so Hub can match recordings.
 ---
 
 One of the key differentiators is the ability to extend and integrate. Next to uploading and persisting recordings on your preferred storage providers, Kerberos Vault can trigger events and be configured through APIs.
@@ -117,7 +123,7 @@ The Kerberos Hub integration allows you to visualise your recordings, stored in 
 
 When creating a Kerberos Hub account and linking it to your own Kerberos Vault, you have to make sure the Kerberos Hub username is matching the Agent destination directory. If this does not match, your recordings will not be shown in the Kerberos Hub interface.
 
-Once you have logged in, or created an account, you will see your Kerberos Hub username at the left top of the navigation. You have to make sure this username equals the directory field of the Agent (or Factory settings).
+Once you have logged in, or created an account, you will see your Kerberos Hub username at the left top of the navigation. You have to make sure this username equals the [directory field of the Agent](/docs/agent/connect-to-vault#using-vault-together-with-hub) (or Factory settings).
 
 ![Kerberos Hub Account](./hub-integration-account-1.png)
 

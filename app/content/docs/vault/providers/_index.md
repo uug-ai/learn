@@ -12,9 +12,12 @@ menu:
     parent: "vault"
 weight: 305
 toc: true
+connects:
+  - page: /docs/agent/connect-to-vault
+    why: Point Agents at Vault, and optionally at a specific provider.
 ---
 
-When deploying Agents you have the possibility to Bring Your Own Storage; at the edge or in the cloud. By configuring Vault you persist your recordings in your preferred storage providers. The following providers are supported:
+When [connecting Agents to Vault](/docs/agent/connect-to-vault) you have the possibility to Bring Your Own Storage; at the edge or in the cloud. By configuring Vault you persist your recordings in your preferred storage providers. The following providers are supported:
 
 - [Google Cloud Platform Storage](/docs/vault/providers/google-cloud-storage/)
 - [Azure Blob Storage](/docs/vault/providers/azure-storage-account/)

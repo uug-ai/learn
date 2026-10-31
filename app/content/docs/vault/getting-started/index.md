@@ -70,7 +70,7 @@ Find more information about events and integrations on [the integrations page](/
 
 Having set up `Providers` and `Integrations`, you need a secure way to interact with them through the creation of an account. 
 
-By creating an account you will receive credentials that give access to the Kerberos Vault's providers, integrations and APIs. Account credentials are being used by an Agent to send recordings, and are used through API calls to download or forward recordings.
+By creating an account you will receive credentials that give access to the Kerberos Vault's providers, integrations and APIs. Account credentials are being used by an Agent to [send recordings](/docs/agent/connect-to-vault), and are used through API calls to download or forward recordings.
 
 Next to credentials, there are a couple of other fields which are specified on account level.
 

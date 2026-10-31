@@ -27,7 +27,7 @@ Kerberos Agent is the recording service that runs next to, or on, your camera. E
 2. **Record at the edge.** Choose motion-based or continuous recording, adjust regions of interest and time windows, and keep recordings on the Agent's local disk. Use its web interface to watch live video and browse past events.
 3. **Connect the wider platform.** Send recordings to [Kerberos Vault](/docs/vault) for storage on your own infrastructure, use [Kerberos Hub](/docs/hub) for a central view, or let [Factory](/docs/factory) deploy and configure many Agents on Kubernetes.
 
-An Agent can run on its own. Its web interface and APIs let you configure and integrate it without installing the rest of the platform.
+An Agent can run on its own. Its web interface and APIs let you configure and integrate it without installing the rest of the platform. When you're ready, [Connect to Vault](/docs/agent/connect-to-vault) and [Connect to Hub](/docs/agent/connect-to-hub) explain how to link it.
 
 ## Where to start
 
