@@ -25,6 +25,8 @@ aliases:
 
 Welcome to the documentation for [Agent](/docs/agent/), [Factory](/docs/factory/), [Vault](/docs/vault/) and [Hub](/docs/hub/). It covers everything you need to install the products, connect your cameras, configure them and run them at scale, whether you look after one camera or thousands across many sites.
 
+{{< iso-figure figure="ecosystem" alt="The platform's four products. Factory deploys an Agent for every camera; the Agents upload their recordings to Vault and send their events to Hub, and Hub plays recordings back from Vault. Each product links to its documentation." caption="Click a product to jump to its documentation." >}}
+
 ## What you'll find here
 
 The documentation has three goals:
@@ -49,47 +51,12 @@ New to the platform? The [Prologue](/docs/prologue/) explains where it comes fro
 
 ## The products
 
-{{< iso-figure figure="ecosystem" alt="The platform's four products. Factory deploys an Agent for every camera; the Agents upload their recordings to Vault and send their events to Hub, and Hub plays recordings back from Vault. Each product links to its documentation." caption="Click a product to jump to its documentation." >}}
+Each product has its own section. Start with its **First things first** page to learn what it does, then follow its installation and configuration pages.
 
-Each product has its own section. Start with **First things first** to learn what the product does, then follow its installation and configuration pages.
-
-### Agent
-
-The recording service that runs next to each camera: one Agent per camera stream, with motion or continuous recording and its own web interface. Open source, and the foundation of every deployment.
-
-- [First things first](/docs/agent/first-things-first/): what an Agent does and why it is built this way
-- [Installation](/docs/agent/installation/) and [Getting started](/docs/agent/getting-started/): deploy an Agent and find your way around its web interface and APIs
-- [Connect to Vault](/docs/agent/connect-to-vault/) and [Connect to Hub](/docs/agent/connect-to-hub/): store recordings centrally and see every Agent in one place
-- [License](/docs/agent/license/)
-
-### Factory
-
-The web application that deploys and manages an Agent for every camera on Kubernetes, with shared settings.
-
-- [First things first](/docs/factory/first-things-first/): when and why to use Factory
-- [Installation](/docs/factory/installation/), in the cloud or at the edge
-- [Getting started](/docs/factory/getting-started/) and [Configuration & engines](/docs/factory/configuration-and-engines/): add cameras and control how Agents are configured and scheduled
-- [License](/docs/factory/license/)
-
-### Vault
-
-The bring-your-own-storage layer: Agents upload recordings to Vault, which stores them on the storage you choose and makes them available to Hub and your own applications.
-
-- [First things first](/docs/vault/first-things-first/), [Installation](/docs/vault/installation/) and [Configuration](/docs/vault/configuration/)
-- [Providers](/docs/vault/providers/), [Accounts](/docs/vault/accounts/) and [Integrations](/docs/vault/integrations/): where recordings go, who may upload and who is told
-- [Forwarding](/docs/vault/forwarding/): move recordings between Vaults, from the edge to the cloud
-- [API](/docs/vault/api/), [Machine learning](/docs/vault/machine-learning/) and [License](/docs/vault/license/)
-
-### Hub
-
-The web application that brings all your Agents, sites and recordings together: one overview, live view, searchable recordings and alerts.
-
-- [First things first](/docs/hub/first-things-first/), [Installation](/docs/hub/installation/) and [Configuration](/docs/hub/configuration/)
-- Watching and reviewing: [Live view](/docs/hub/livestream/), [Recordings](/docs/hub/recordings/), [Cases](/docs/hub/cases/), [Analytics](/docs/hub/analytics/) and [Markers](/docs/hub/markers/)
-- Alerting and processing: [Notifications](/docs/hub/notifications/), [Workflows](/docs/hub/workflows/), [Pipeline](/docs/hub/pipeline/) and [Media processing](/docs/hub/media-processing/)
-- Sites and cameras: [Maps](/docs/hub/maps/), [Floor plans](/docs/hub/floor-plans/) and [ONVIF](/docs/hub/onvif/)
-- People and access: [Organisations and projects](/docs/hub/organisations/), [Roles](/docs/hub/roles/), [Authentication](/docs/hub/authentication/), [SSO](/docs/hub/sso/) and [Audit events](/docs/hub/audit-events/)
-- Running it: [Domains](/docs/hub/domains/), [Feature flags](/docs/hub/feature-flags/), [White-label](/docs/hub/whitelabel/), [Cleanup](/docs/hub/cleanup/), [MP4 verification](/docs/hub/mp4-verification/) and [License](/docs/hub/license/)
+- **[Agent](/docs/agent/)**: the recording service next to each camera, one Agent per camera stream. Open source, and the foundation of every deployment.
+- **[Factory](/docs/factory/)**: deploys and manages an Agent for every camera on Kubernetes, with shared settings.
+- **[Vault](/docs/vault/)**: stores recordings on the storage you choose and makes them available to Hub and your own applications.
+- **[Hub](/docs/hub/)**: brings all your Agents, sites and recordings together, with live view, searchable recordings and alerts.
 
 ## Going further
 
