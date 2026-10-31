@@ -1,4 +1,8 @@
 # Hugo configuration file
+# The production address; canonical URLs, social cards and the sitemap use it.
+# Without it, recent Hugo releases (the image installs hugo@latest) fall back
+# to https://example.org/.
+baseURL: https://learn.uug.ai/
 title: 
 
 services:

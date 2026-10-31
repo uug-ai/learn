@@ -1,0 +1,14 @@
+{{- /* Redirect page for a front-matter alias (an old address). Hugo's default
+     redirects to the absolute permalink, which follows baseURL; a relative URL
+     keeps the redirect on whichever domain the site is served from
+     (learn.uug.ai, learn.uug.lol, localhost). */ -}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ .Page.RelPermalink }}</title>
+    <link rel="canonical" href="{{ .Page.RelPermalink }}">
+    <meta name="robots" content="noindex">
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url={{ .Page.RelPermalink }}">
+  </head>
+</html>
