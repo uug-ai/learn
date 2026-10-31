@@ -1,25 +1,25 @@
 ---
 podcast: prologue-mission
 title: "Mission"
-description: "The Kerberos.io mission statement"
-lead: "The Kerberos.io mission statement"
+description: "The Augment Vision mission statement"
+lead: "The Augment Vision mission statement"
 date: 2020-10-06T08:48:57+00:00
-lastmod: 2020-10-06T08:48:57+00:00
+lastmod: 2026-10-31T00:00:00+00:00
 draft: false
 images: []
 menu:
   docs:
     parent: "prologue"
 weight: 104
-toc: true
+toc: false
 ---
 
-## Overview
+At Augment Vision, our mission is to make vision AI work at scale for everyone who depends on cameras: from a single home to organisations running thousands of cameras across many sites.
 
-We want to provide every human being on this planet with a free-of-charge solution, a video platform, to protect their families, friends, homes, or anything they care for, in the form of Open Source (MIT license).
+We hold ourselves to three principles:
 
-We develop our solutions in such a way that they use the latest technologies and best practices, to create a seamless, never-seen and delicious user experience in the space of video management, video analytics and video surveillance.
+- **Open at the core.** The [Kerberos Agent](/docs/agent/) has been open source (MIT license) from the start and stays free for anyone to run. What we build exposes open APIs, so it fits into the tools you already use instead of locking you in.
+- **Your data, your infrastructure.** You decide where the platform runs, on-premise, hybrid or in the cloud, and your recordings stay in storage you own.
+- **Scale without starting over.** Begin with one Agent on one camera, then add [Factory](/docs/factory/), [Vault](/docs/vault/) and [Hub](/docs/hub/) as you grow, keeping the cameras and Agents you already have under one control layer.
 
-Our mission is to reach far beyond the traditional video platforms we are experiencing nowadays. We have a strong focus on simplifying the process of scaling, going from a simple home deployment to a large-scale production deployment with thousands of cameras.
-
-While moving on, and leveraging our skills to scale, we are experimenting with and implementing video analyses that optimise specific use cases: people tracking, license plate recognition, people counting, etc. These concepts are, or will be, integrated in the various components of the Kerberos.io portfolio.
+Beyond recording and monitoring, we bring vision AI to concrete use cases, such as people tracking, license plate recognition and people counting, and build them into the platform so they run wherever your cameras are.
