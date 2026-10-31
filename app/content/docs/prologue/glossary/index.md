@@ -32,8 +32,6 @@ The words you'll meet across Agent, Factory, Vault and Hub, from A to Z. Each te
 <span id="alert"></span>Alert
 : A rule in [Hub](#hub) that decides which detection and device events matter. Matching events land in each recipient's [watchlist](#watchlist) and can be sent to external channels. [Read more](/docs/hub/notifications/).
 
-<span id="anpr"></span>ANPR
-: Automatic number-plate recognition. A [workflow stage](#stage) that reads the plate of every vehicle in a recording and returns the plates as [detections](#detection) and one [marker](#marker) per vehicle. [Read more](/docs/hub/workflows/anpr/).
 
 <span id="archive-provider"></span>Archive provider
 : A dedicated [storage provider](#provider) in Vault where [cases](#case) keep recordings beyond the [retention period](#retention-period). [Read more](/docs/hub/cases/).
@@ -80,7 +78,7 @@ The words you'll meet across Agent, Factory, Vault and Hub, from A to Z. Each te
 ## E
 
 <span id="edge"></span>Edge
-: On site, close to the cameras, as opposed to in the cloud. Agents record at the edge; Factory and Vault can be installed at the edge or in the cloud. [Read more](/docs/vault/installation-edge/).
+: On site, close to the cameras, as opposed to in the cloud. Agents record at the edge; Factory and Vault can be installed at the edge or in the cloud. [Read more](/docs/prologue/deployments/).
 
 <span id="external-stage"></span>External stage
 : A [workflow stage](#stage) that runs in your own environment instead of beside Hub. Hub reaches it through the workflow forwarder, over your RabbitMQ broker or an HTTPS endpoint. [Read more](/docs/hub/workflows/external-stages/).
@@ -139,7 +137,7 @@ The words you'll meet across Agent, Factory, Vault and Hub, from A to Z. Each te
 : A camera's full-quality stream, which the Agent records. See also [Sub-stream](#sub-stream). [Read more](/tutorials/agent/connect-any-camera/).
 
 <span id="marker"></span>Marker
-: A labelled point or span on a recording's timeline, such as a number-plate read or a period of activity, so operators can jump straight to the moment that matters. [Read more](/docs/hub/markers/).
+: A labelled point or span on a recording's timeline, such as a detected object or a period of activity, so operators can jump straight to the moment that matters. [Read more](/docs/hub/markers/).
 
 <span id="media-patch"></span>Media patch
 : A [block](#block) that updates fields of a recording that already exists, to add what a [stage](#stage) learned about it. [Read more](/docs/hub/workflows/ingest/blocks/media-patch/).
@@ -191,8 +189,6 @@ The words you'll meet across Agent, Factory, Vault and Hub, from A to Z. Each te
 <span id="recording"></span>Recording
 : A video file, a fragmented MP4, that an Agent writes for an event or a stretch of time. In Hub you find and review recordings on the Recordings page. [Read more](/docs/hub/recordings/).
 
-<span id="recycle"></span>Recycle
-: The Vault service that removes recordings by rules, so disks don't fill up and storage costs stay under control. [Read more](/docs/vault/recycle/).
 
 <span id="retention-period"></span>Retention period
 : How many days of recordings stay visible in Hub before they are cleaned up. It is set per subscription, for example 30, 60 or 90 days. Use a [case](#case) to keep recordings longer. [Read more](/docs/hub/cases/).

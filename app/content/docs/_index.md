@@ -1,10 +1,10 @@
 ---
 podcast: docs
 title: "Documentation"
-description: "And so it began. The ecosystem of Kerberos.io"
-lead: "And so it began. The ecosystem of Kerberos.io"
+description: "What the documentation covers, who it is for and where to find what you need."
+lead: "What the documentation covers, who it is for and where to find what you need."
 date: 2020-10-06T08:48:57+00:00
-lastmod: 2020-10-06T08:48:57+00:00
+lastmod: 2026-10-31T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -23,54 +23,94 @@ aliases:
   - /docs/open-source/first-things-first/
 ---
 
-The **Kerberos.io** project, pronounced as `/kuh buh ruhs dot ai o/`, is a video analytics and video management platform, which was initiated back in 2014. Over the years it has evolved into a stable and feature-rich video platform, which is used for video management and analytics such as machine learning.
+Welcome to the documentation for [Agent](/docs/agent/), [Factory](/docs/factory/), [Vault](/docs/vault/) and [Hub](/docs/hub/). It covers everything you need to install the products, connect your cameras, configure them and run them at scale, whether you look after one camera or thousands across many sites.
 
-[![An Introduction to Kerberos.io](youtube-introduction-kerberosio.png)](https://www.youtube.com/watch?v=HkMJHCsRd9M "An Introduction to Kerberos.io")
+## What you'll find here
 
-Next to being stable and feature-rich, Kerberos.io's main differentiator is scale. It helps you move from a small home deployment to a large-scale enterprise deployment. To illustrate the art of the possible, we recommend having a look [at the deployments page](/docs/prologue/deployments) to find out the most suitable architecture for your use case.
+The documentation has three goals:
 
-## The name: Kerberos.io
+- **Understand the platform.** What each product does, when you need it and how the products work together.
+- **Get it running.** Installation and first configuration, at the edge, in the cloud or across both.
+- **Operate and extend it.** Day-to-day features, security and access, APIs, integrations and automation.
 
-Many people are confused, and don't understand why this project is called Kerberos.io. If you've been in the IT world for a while you will notice that Kerberos is already used for the authentication protocol [Kerberos](<https://en.wikipedia.org/wiki/Kerberos_(protocol)>).
+It is written for the people who run the platform, the system administrators and DevOps engineers who install and maintain it, and the developers who integrate with it.
 
-After all those years, we still believe that the name Kerberos.io makes sense for this project, with a strong emphasis on the suffix **.IO**, which stands for any **(I) input** of camera, and any **(O) output** such as a webhook, bash script, MQTT, etc. Kerberos itself keeps an eye, using the configured input, and triggers the required outputs.
+## Start here
 
-## What is Kerberos.io
+New to the platform? The [Prologue](/docs/prologue/) explains where it comes from and gets you started.
 
-[Kerberos.io](/docs/prologue/how) is a video analytics and monitoring platform for everyone, from a traditional user to a multinational corporation. We have different solutions and components to help you grow.
+{{< cards cols="3" >}}
+  {{< card link="/docs/prologue/quick-start/" title="Quick Start" subtitle="Run your first Agent with Docker in a few minutes." icon="play" >}}
+  {{< card link="/docs/prologue/how/" title="How it works" subtitle="How Agent, Factory, Vault and Hub fit together." icon="puzzle" >}}
+  {{< card link="/docs/prologue/deployments/" title="Deployments" subtitle="Architectures from a single camera to many sites." icon="map" >}}
+  {{< card link="/docs/prologue/glossary/" title="Glossary" subtitle="The terms you'll meet, from A to Z." icon="book-open" >}}
+  {{< card link="/docs/prologue/mission/" title="Mission" subtitle="Why the platform exists and what we stand for." icon="flag" >}}
+{{< /cards >}}
 
-Within the portfolio of [Kerberos.io](/docs/prologue/how) you leverage more or fewer components depending on the stage you are in; there is no need to overcomplicate things.
+## The products
 
-{{< figure src="overview.svg" alt="The Kerberos.io solution stack" caption="The Kerberos.io solution stack" class="stretch">}}
+Each product has its own section. Start with **First things first** to learn what the product does, then follow its installation and configuration pages.
 
-The backbone of the Kerberos.io ecosystem is the [Agent](/docs/agent/first-things-first). This [Agent](/docs/agent/first-things-first), installed [through various possibilities](/docs/agent/installation), is deployed to a compute - VM, baremetal, Kubernetes cluster or other - of choice and connected to a camera stream you control.
+### Agent
 
-{{< figure src="introduction-kerberos-io.svg" alt="An Agent is monitoring a single camera stream." caption="An Agent is monitoring a single camera stream." class="stretch">}}
+The recording service that runs next to each camera: one Agent per camera stream, with motion or continuous recording and its own web interface. Open source, and the foundation of every deployment.
 
-With [Kerberos.io](/docs/prologue/how) you start small, with just one or more [Agents](/docs/agent/first-things-first), and grow over time while introducing more and more components like [Factory](/docs/factory/first-things-first), [Vault](/docs/vault/first-things-first) and [Hub](/docs/hub/first-things-first), which we refer to as the Kerberos Enterprise Suite. Each solution is shipped through the concept of containers and can be leveraged by using Docker, Docker Compose, Kubernetes, OpenShift, Terraform, Ansible, and many more.
+- [First things first](/docs/agent/first-things-first/): what an Agent does and why it is built this way
+- [Installation](/docs/agent/installation/) and [Getting started](/docs/agent/getting-started/): deploy an Agent and find your way around its web interface and APIs
+- [Connect to Vault](/docs/agent/connect-to-vault/) and [Connect to Hub](/docs/agent/connect-to-hub/): store recordings centrally and see every Agent in one place
+- [License](/docs/agent/license/)
 
-{{< figure src="./introduction-enterprise.svg" alt="A scalable video platform for an ever-growing video landscape." caption="A scalable video platform for an ever-growing video landscape." class="stretch">}}
+### Factory
 
-As previously mentioned, the Kerberos Enterprise Suite brings additional components into the picture which help you build a more scalable and resilient video landscape through concepts such as Kubernetes, bring your own storage, bring your own cloud, single pane of glass, live streaming, machine learning, etc.
+The web application that deploys and manages an Agent for every camera on Kubernetes, with shared settings.
 
-## Why Kerberos.io
+- [First things first](/docs/factory/first-things-first/): when and why to use Factory
+- [Installation](/docs/factory/installation/), in the cloud or at the edge
+- [Getting started](/docs/factory/getting-started/) and [Configuration & engines](/docs/factory/configuration-and-engines/): add cameras and control how Agents are configured and scheduled
+- [License](/docs/factory/license/)
 
-Kerberos.io was initiated as a side project, due to inspiration and motivation in the space of video analytics, computer vision and machine learning. Its first focus was video surveillance only, as nowadays burglary and attacks are very common in this world.
+### Vault
 
-Over time we have grown an amazing community, collaborated with lots of international companies and received a lot of kudos for the work we've done. To consolidate our efforts, [we have written down our mission statement](/docs/prologue/mission), which explains why this project exists.
+The bring-your-own-storage layer: Agents upload recordings to Vault, which stores them on the storage you choose and makes them available to Hub and your own applications.
 
-## Integration and extension
+- [First things first](/docs/vault/first-things-first/), [Installation](/docs/vault/installation/) and [Configuration](/docs/vault/configuration/)
+- [Providers](/docs/vault/providers/), [Accounts](/docs/vault/accounts/) and [Integrations](/docs/vault/integrations/): where recordings go, who may upload and who is told
+- [Forwarding](/docs/vault/forwarding/): move recordings between Vaults, from the edge to the cloud
+- [API](/docs/vault/api/), [Machine learning](/docs/vault/machine-learning/) and [License](/docs/vault/license/)
 
-The majority of video management platforms out there are owned by multinational manufacturers that are building closed systems which are inaccessible in any programmatic way, such as an API. This forces anyone to create unsupported workarounds, which become outdated very quickly.
+### Hub
 
-The whole idea behind Kerberos.io is to challenge the previous statement.
+The web application that brings all your Agents, sites and recordings together: one overview, live view, searchable recordings and alerts.
 
-> We want open and integratable systems for anyone and anywhere. You generate the data, you own the data.
+- [First things first](/docs/hub/first-things-first/), [Installation](/docs/hub/installation/) and [Configuration](/docs/hub/configuration/)
+- Watching and reviewing: [Live view](/docs/hub/livestream/), [Recordings](/docs/hub/recordings/), [Cases](/docs/hub/cases/), [Analytics](/docs/hub/analytics/) and [Markers](/docs/hub/markers/)
+- Alerting and processing: [Notifications](/docs/hub/notifications/), [Workflows](/docs/hub/workflows/), [Pipeline](/docs/hub/pipeline/) and [Media processing](/docs/hub/media-processing/)
+- Sites and cameras: [Maps](/docs/hub/maps/), [Floor plans](/docs/hub/floor-plans/) and [ONVIF](/docs/hub/onvif/)
+- People and access: [Organisations and projects](/docs/hub/organisations/), [Roles](/docs/hub/roles/), [Authentication](/docs/hub/authentication/), [SSO](/docs/hub/sso/) and [Audit events](/docs/hub/audit-events/)
+- Running it: [Domains](/docs/hub/domains/), [Feature flags](/docs/hub/feature-flags/), [White-label](/docs/hub/whitelabel/), [Cleanup](/docs/hub/cleanup/), [MP4 verification](/docs/hub/mp4-verification/) and [License](/docs/hub/license/)
 
-The response of Kerberos.io is that any solution you'll find in our portfolio allows you to integrate and extend by default: no workarounds, and the data belongs to you. We expose Swagger APIs by default, to extract all the data you desire.
+## Going further
 
-You decide where (cloud, self-hosted) and how (Docker, Kubernetes, OpenShift, Terraform, etc.) to deploy our solutions, what storage you prefer (local SSD, S3, etc.) and how to integrate it with other third-party solutions (Kafka, SQS, etc.).
+- [MLOps](/docs/machinelearning/): run machine learning models on your video at scale, decoupled from the cameras.
+- [CLI](/docs/cli/): command-line jobs for maintenance and migrations, run inside your cluster.
 
-## Machine learning
+## Finding your way
 
-Machine learning and artificial intelligence are a critical component of the Kerberos.io ecosystem. Within Vault you can integrate your own machine learning models, and run them at scale. [Learn more about how we support machine learning use cases](/docs/vault/machine-learning).
+- **Search** the whole site with the search box at the top, or press <kbd>Ctrl</kbd> <kbd>K</kbd>.
+- The **sidebar** lists every section; within a page, **On this page** lists its headings.
+- Unsure what a word means? The [Glossary](/docs/prologue/glossary/) explains it and links to the full page.
+
+## Beyond the documentation
+
+{{< cards cols="3" >}}
+  {{< card link="/tutorials/" title="Tutorials" subtitle="Step-by-step walkthroughs to get hands-on with the products." icon="academic-cap" >}}
+  {{< card link="/guides/" title="Guides" subtitle="In-depth how-tos for common tasks and workflows." icon="light-bulb" >}}
+  {{< card link="/release-notes/" title="Release notes" subtitle="What changed in each platform release." icon="tag" >}}
+  {{< card link="/blog/" title="Blog" subtitle="News, announcements and deep-dives from the team." icon="newspaper" >}}
+  {{< card link="/designer/" title="Designer" subtitle="Draw your architecture with drag and drop." icon="template" >}}
+  {{< card link="/support/" title="Support" subtitle="Get help from the team and the community." icon="support" >}}
+{{< /cards >}}
+
+## Help improve these pages
+
+Spotted a mistake or something missing? Every page has a link to edit it on [GitHub](https://github.com/uug-ai/documentation). Suggestions are welcome.
