@@ -14,11 +14,11 @@ weight: 101
 toc: true
 ---
 
-Machine learning or computer vision at scale is one of the key motivations of the entire Kerberos.io software stack. All services, from Agents and Kerberos Vault to Kerberos Hub, are designed in such a way that you can scale them independently of each other. 
+Machine learning or computer vision at scale is one of the key motivations of the entire Kerberos.io software stack. All services, from Agents and Vault to Hub, are designed in such a way that you can scale them independently of each other. 
 
 The design principle of Kerberos.io allows you to decouple video streams from any CPU or GPU workloads, through the creation of video chunks, queueing, event messaging and/or real-time processing. This is perfect for GPU workloads such as machine learning or other AI services.
 
-{{< figure src="vault-ml-cv.svg" alt="Machine learning and Computer Vision with Kerberos Vault." caption="Machine learning and Computer Vision with Kerberos Vault" class="stretch">}}
+{{< figure src="vault-ml-cv.svg" alt="Machine learning and Computer Vision with Vault." caption="Machine learning and Computer Vision with Vault" class="stretch">}}
 
 ## The problem we solve
 
@@ -32,7 +32,7 @@ Especially in the video analytics space, where we apply machine learning to vide
 4. What happens if you add more video streams? Do you need to add more GPUs?
 
 These challenges are where we at Kerberos.io bring value through 
-[the Kerberos Enterprise Suite](/docs/enterprise/first-things-first). We provide an elegant and scalable design for supporting your ever-growing machine learning use cases. Read more below.
+the Kerberos Enterprise Suite. We provide an elegant and scalable design for supporting your ever-growing machine learning use cases. Read more below.
 
 ## Video chunks
 
@@ -40,11 +40,11 @@ Agents are responsible for recording video streams into small chunks, mp4s, of w
 
 ## Queueing and events
 
-Video chunks prepared by one or more Agents are sent to Kerberos Vault where they are persisted in one or more storage providers. The key thing is that they are stored through a central application, Kerberos Vault, which has the ability to trigger [integrations such as a Kafka broker](/docs/vault/integrations#kafka).
+Video chunks prepared by one or more Agents are sent to Vault where they are persisted in one or more storage providers. The key thing is that they are stored through a central application, Vault, which has the ability to trigger [integrations such as a Kafka broker](/docs/vault/integrations#kafka).
 
 ## Consuming and inference
 
-Once events are being generated, they are ready to be consumed by one or more consumers. Having this publish and subscribe mechanism, for example Kafka, you have one or more producers (Kerberos Vault replicas) and one or more consumers (ML clients). This allows one to scale the number of consumers and workloads as the number of events, and thus recordings, increases.
+Once events are being generated, they are ready to be consumed by one or more consumers. Having this publish and subscribe mechanism, for example Kafka, you have one or more producers (Vault replicas) and one or more consumers (ML clients). This allows one to scale the number of consumers and workloads as the number of events, and thus recordings, increases.
 
 ## NVIDIA operator
 
@@ -60,13 +60,13 @@ The operator solves two main challenges:
 
 ### Installation
 
-The installation of the NVIDIA operator is described in the [nvidia-gpu-kubernetes repository](https://github.com/kerberos-io/nvidia-gpu-kubernetes), with a couple of examples of how to integrate a workload (a machine learning model) with Kerberos Vault.
+The installation of the NVIDIA operator is described in the [nvidia-gpu-kubernetes repository](https://github.com/kerberos-io/nvidia-gpu-kubernetes), with a couple of examples of how to integrate a workload (a machine learning model) with Vault.
 
 {{< figure src="yolov3-integration-kerberos-vault.png" alt="The NVIDIA operator brings scale to your GPUs." caption="The NVIDIA operator brings scale to your GPUs." class="stretch">}}
 
 ### An example
 
-The goal of the integration feature of Kerberos Vault is to allow an enterprise to bring its custom logic, while relying on a stable and scalable video management system. An enterprise can build its own notification service, trigger IoT or other kinds of sensors, or execute a custom machine learning model trying to detect specific objects, patterns or actions in a recording. The [vault-ml repository](https://github.com/kerberos-io/vault-ml) contains the complete example described below.
+The goal of the integration feature of Vault is to allow an enterprise to bring its custom logic, while relying on a stable and scalable video management system. An enterprise can build its own notification service, trigger IoT or other kinds of sensors, or execute a custom machine learning model trying to detect specific objects, patterns or actions in a recording. The [vault-ml repository](https://github.com/kerberos-io/vault-ml) contains the complete example described below.
 
 {{< figure src="yolov3-integration-kerberos-vault-example.png" alt="The NVIDIA operator brings scale to your GPUs." caption="The NVIDIA operator brings scale to your GPUs." class="stretch">}}
 
@@ -74,9 +74,9 @@ So having the above example, let us get a bit more concrete on how this is funct
 
 - **Step 0**: Small chunks of recordings are created, persisted in a storage provider, and a message is sent to a Kafka topic.
 
-- **Step 1**: An extension/workload which executes the YOLOv3 model is consuming Kafka messages from a topic, produced by Kerberos Vault.
+- **Step 1**: An extension/workload which executes the YOLOv3 model is consuming Kafka messages from a topic, produced by Vault.
 
-- **Step 2**: Before execution of the model, the extension consumes the relevant messages from a specific topic, and downloads the video chunk from Kerberos Vault in memory.
+- **Step 2**: Before execution of the model, the extension consumes the relevant messages from a specific topic, and downloads the video chunk from Vault in memory.
 
 - **Step 3**: The NVIDIA operator has assigned one of the GPUs from the GPU pool to the extension. The assigned GPU is used to execute the YOLOv3 model on the video chunk.
 

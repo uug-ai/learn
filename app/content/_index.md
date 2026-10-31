@@ -16,6 +16,7 @@ Welcome to our comprehensive learning hub. This is your go-to resource for tutor
 
 {{< cards cols="1" >}}
   {{< card link="/docs" title="Documentation" icon="book-open" >}}
+  {{< card link="/docs/prologue/quick-start/" title="Quick Start" icon="lightning-bolt" >}}
   {{< card link="/tutorials" title="Tutorials" icon="academic-cap" >}}
   {{< card link="/guides" title="Guides" icon="light-bulb" >}}
   {{< card link="/blog" title="Blog" icon="newspaper" >}}

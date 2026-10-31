@@ -1,7 +1,7 @@
 ---
 podcast: tutorials-hub-setup-webrtc-turn
 title: 'Set up WebRTC live view with TURN'
-description: 'Configure STUN and TURN for reliable Kerberos Hub WebRTC live video, then verify direct and relayed ICE paths.'
+description: 'Configure STUN and TURN for reliable Hub WebRTC live video, then verify direct and relayed ICE paths.'
 date: '2026-08-19'
 weight: 4
 toc: true
@@ -9,13 +9,14 @@ product: 'Hub'
 level: 'Intermediate'
 duration: '30 min'
 tags: ['WebRTC', 'TURN', 'Networking']
+illustration: 'tutorial-hub-webrtc-turn'
 ---
 
 {{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
 
-{{< tutorial-header alt="WebRTC architecture showing an IP camera, Kerberos Agent, Hub signalling, coturn relay fallback and Hub live viewer" >}}
+{{< tutorial-header alt="The Agent and the viewer each sit behind a firewall. Hub signals the session and the video is relayed through a coturn server." >}}
 
-WebRTC gives Kerberos Hub its most interactive live path: low-latency H.264 video, camera audio and the two-way talk backchannel. It prefers a direct Agent-to-browser connection, but NAT and enterprise firewalls often make a TURN relay the only reliable path.
+WebRTC gives Hub its most interactive live path: low-latency H.264 video, camera audio and the two-way talk backchannel. It prefers a direct Agent-to-browser connection, but NAT and enterprise firewalls often make a TURN relay the only reliable path.
 
 This tutorial provisions a coturn endpoint, configures the Hub Helm chart and Agent with the same credentials, then proves both normal ICE negotiation and TURN fallback.
 
@@ -120,7 +121,7 @@ no-cli
 
 Replace the hostname, public IP, username and password. Omit `external-ip` when coturn binds directly to its public address. Keep the password outside source control and use the same value later in Hub and Agent secrets.
 
-Static credentials are the configuration currently consumed by Kerberos Hub. For larger deployments, rotate them regularly and plan a time-limited TURN credential service.
+Static credentials are the configuration currently consumed by Hub. For larger deployments, rotate them regularly and plan a time-limited TURN credential service.
 
 ### Open the TURN firewall
 

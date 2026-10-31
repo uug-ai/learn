@@ -1,10 +1,10 @@
 ---
 podcast: docs
 title: "Documentation"
-description: "And so it began. The ecosystem of Kerberos.io"
-lead: "And so it began. The ecosystem of Kerberos.io"
+description: "What the documentation covers, who it is for and where to find what you need."
+lead: "What the documentation covers, who it is for and where to find what you need."
 date: 2020-10-06T08:48:57+00:00
-lastmod: 2020-10-06T08:48:57+00:00
+lastmod: 2026-10-31T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -12,56 +12,74 @@ menu:
     parent: "prologue"
 weight: 100
 toc: true
+# The Enterprise and Open source sections were removed; send their old addresses here.
+aliases:
+  - /docs/enterprise/
+  - /docs/enterprise/first-things-first/
+  - /docs/enterprise/welcome/
+  - /docs/enterprise/self-signed/
+  - /docs/enterprise/usecases/
+  - /docs/open-source/
+  - /docs/open-source/first-things-first/
 ---
 
-The **Kerberos.io** project, pronounced as `/kuh buh ruhs dot ai o/`, is a video analytics and video management platform, which was initiated back in 2014. Over the years it has evolved into a stable and feature-rich video platform, which is used for video management and analytics such as machine learning.
+Welcome to the documentation for [Agent](/docs/agent/), [Factory](/docs/factory/), [Vault](/docs/vault/) and [Hub](/docs/hub/). It covers everything you need to install the products, connect your cameras, configure them and run them at scale, whether you look after one camera or thousands across many sites.
 
-[![An Introduction to Kerberos.io](youtube-introduction-kerberosio.png)](https://www.youtube.com/watch?v=HkMJHCsRd9M "An Introduction to Kerberos.io")
+{{< iso-figure figure="ecosystem" alt="The platform's four products. Factory deploys an Agent for every camera; the Agents upload their recordings to Vault and send their events to Hub, and Hub plays recordings back from Vault. Each product links to its documentation." caption="Click a product to jump to its documentation." >}}
 
-Next to being stable and feature-rich, Kerberos.io's main differentiator is scale. It helps you move from a small home deployment to a large-scale enterprise deployment. To illustrate the art of the possible, we recommend having a look [at the deployments page](/docs/prologue/deployments) to find out the most suitable architecture for your use case.
+## What you'll find here
 
-## The name: Kerberos.io
+The documentation has three goals:
 
-Many people are confused, and don't understand why this project is called Kerberos.io. If you've been in the IT world for a while you will notice that Kerberos is already used for the authentication protocol [Kerberos](<https://en.wikipedia.org/wiki/Kerberos_(protocol)>).
+- **Understand the platform.** What each product does, when you need it and how the products work together.
+- **Get it running.** Installation and first configuration, at the edge, in the cloud or across both.
+- **Operate and extend it.** Day-to-day features, security and access, APIs, integrations and automation.
 
-After all those years, we still believe that the name Kerberos.io makes sense for this project, with a strong emphasis on the suffix **.IO**, which stands for any **(I) input** of camera, and any **(O) output** such as a webhook, bash script, MQTT, etc. Kerberos itself keeps an eye, using the configured input, and triggers the required outputs.
+It is written for the people who run the platform, the system administrators and DevOps engineers who install and maintain it, and the developers who integrate with it.
 
-## What is Kerberos.io
+## Start here
 
-[Kerberos.io](/docs/prologue/how) is a video analytics and monitoring platform for everyone, from a traditional user to a multinational corporation. We have different solutions and components to help you grow.
+New to the platform? The [Prologue](/docs/prologue/) explains where it comes from and gets you started.
 
-Within the portfolio of [Kerberos.io](/docs/prologue/how) you leverage more or fewer components depending on the stage you are in; there is no need to overcomplicate things.
+{{< cards cols="3" >}}
+  {{< card link="/docs/prologue/quick-start/" title="Quick Start" subtitle="Run your first Agent with Docker in a few minutes." icon="play" >}}
+  {{< card link="/docs/prologue/how/" title="How it works" subtitle="How Agent, Factory, Vault and Hub fit together." icon="puzzle" >}}
+  {{< card link="/docs/prologue/deployments/" title="Deployments" subtitle="Architectures from a single camera to many sites." icon="map" >}}
+  {{< card link="/docs/prologue/glossary/" title="Glossary" subtitle="The terms you'll meet, from A to Z." icon="book-open" >}}
+  {{< card link="/docs/prologue/mission/" title="Mission" subtitle="Why the platform exists and what we stand for." icon="flag" >}}
+{{< /cards >}}
 
-{{< figure src="overview.svg" alt="The Kerberos.io solution stack" caption="The Kerberos.io solution stack" class="stretch">}}
+## The products
 
-The backbone of the Kerberos.io ecosystem is the [Agent](/docs/agent/first-things-first). This [Agent](/docs/agent/first-things-first), installed [through various possibilities](/docs/agent/installation), is deployed to a compute - VM, baremetal, Kubernetes cluster or other - of choice and connected to a camera stream you control.
+Each product has its own section. Start with its **First things first** page to learn what it does, then follow its installation and configuration pages.
 
-{{< figure src="introduction-kerberos-io.svg" alt="An Agent is monitoring a single camera stream." caption="An Agent is monitoring a single camera stream." class="stretch">}}
+- **[Agent](/docs/agent/)**: the recording service next to each camera, one Agent per camera stream. Open source, and the foundation of every deployment.
+- **[Factory](/docs/factory/)**: deploys and manages an Agent for every camera on Kubernetes, with shared settings.
+- **[Vault](/docs/vault/)**: stores recordings on the storage you choose and makes them available to Hub and your own applications.
+- **[Hub](/docs/hub/)**: brings all your Agents, sites and recordings together, with live view, searchable recordings and alerts.
 
-With [Kerberos.io](/docs/prologue/how) you start small, with just one or more [Agents](/docs/agent/first-things-first), and grow over time while introducing more and more components like [Factory](/docs/factory/first-things-first), [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/hub/first-things-first), which we refer to as the [Kerberos Enterprise Suite](/docs/enterprise/first-things-first). Each solution is shipped through the concept of containers and can be leveraged by using Docker, Docker Compose, Kubernetes, OpenShift, Terraform, Ansible, and many more.
+## Going further
 
-{{< figure src="./introduction-enterprise.svg" alt="A scalable video platform for an ever-growing video landscape." caption="A scalable video platform for an ever-growing video landscape." class="stretch">}}
+- [MLOps](/docs/machinelearning/): run machine learning models on your video at scale, decoupled from the cameras.
+- [CLI](/docs/cli/): command-line jobs for maintenance and migrations, run inside your cluster.
 
-As previously mentioned, the [Kerberos Enterprise Suite](/docs/enterprise/first-things-first) brings additional components into the picture which help you build a more scalable and resilient video landscape through concepts such as Kubernetes, bring your own storage, bring your own cloud, single pane of glass, live streaming, machine learning, etc.
+## Finding your way
 
-## Why Kerberos.io
+- **Search** the whole site with the search box at the top, or press <kbd>Ctrl</kbd> <kbd>K</kbd>.
+- The **sidebar** lists every section; within a page, **On this page** lists its headings.
+- Unsure what a word means? The [Glossary](/docs/prologue/glossary/) explains it and links to the full page.
 
-Kerberos.io was initiated as a side project, due to inspiration and motivation in the space of video analytics, computer vision and machine learning. Its first focus was video surveillance only, as nowadays burglary and attacks are very common in this world.
+## Beyond the documentation
 
-Over time we have grown an amazing community, collaborated with lots of international companies and received a lot of kudos for the work we've done. To consolidate our efforts, [we have written down our mission statement](/docs/prologue/mission), which explains why this project exists.
+{{< cards cols="3" >}}
+  {{< card link="/tutorials/" title="Tutorials" subtitle="Step-by-step walkthroughs to get hands-on with the products." icon="academic-cap" >}}
+  {{< card link="/guides/" title="Guides" subtitle="In-depth how-tos for common tasks and workflows." icon="light-bulb" >}}
+  {{< card link="/release-notes/" title="Release notes" subtitle="What changed in each platform release." icon="tag" >}}
+  {{< card link="/blog/" title="Blog" subtitle="News, announcements and deep-dives from the team." icon="newspaper" >}}
+  {{< card link="/designer/" title="Designer" subtitle="Draw your architecture with drag and drop." icon="template" >}}
+  {{< card link="/support/" title="Support" subtitle="Get help from the team and the community." icon="support" >}}
+{{< /cards >}}
 
-## Integration and extension
+## Help improve these pages
 
-The majority of video management platforms out there are owned by multinational manufacturers that are building closed systems which are inaccessible in any programmatic way, such as an API. This forces anyone to create unsupported workarounds, which become outdated very quickly.
-
-The whole idea behind Kerberos.io is to challenge the previous statement.
-
-> We want open and integratable systems for anyone and anywhere. You generate the data, you own the data.
-
-The response of Kerberos.io is that any solution you'll find in our portfolio allows you to integrate and extend by default: no workarounds, and the data belongs to you. We expose Swagger APIs by default, to extract all the data you desire.
-
-You decide where (cloud, self-hosted) and how (Docker, Kubernetes, OpenShift, Terraform, etc.) to deploy our solutions, what storage you prefer (local SSD, S3, etc.) and how to integrate it with other third-party solutions (Kafka, SQS, etc.).
-
-## Machine learning
-
-Machine learning and artificial intelligence are a critical component of the Kerberos.io ecosystem. Within Kerberos Vault you can integrate your own machine learning models, and run them at scale. [Learn more about how we support machine learning use cases](/docs/vault/machine-learning).
+Spotted a mistake or something missing? Every page has a link to edit it on [GitHub](https://github.com/uug-ai/documentation). Suggestions are welcome.

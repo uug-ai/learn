@@ -14,7 +14,7 @@ toc: true
 podcast: hub-getting-started
 ---
 
-You might wonder what is inside the Kerberos Hub solution. We'll provide you with a concrete list of functionalities below; this should give you more insight into what Kerberos Hub looks like and what its capabilities are.
+You might wonder what is inside the Hub solution. We'll provide you with a concrete list of functionalities below; this should give you more insight into what Hub looks like and what its capabilities are.
 
 ## Sign in securely
 
@@ -22,17 +22,17 @@ Hub supports local passwords, authenticator-based two-factor authentication (2FA
 
 ## Bring your own storage
 
-Kerberos Hub integrates with [Kerberos Vault](/docs/vault/first-things-first), and makes your recordings available through a secure web interface. When using the Kerberos Hub SaaS offering, your Agents will connect to our Kerberos Vault SaaS environment. This means that your recordings will be stored on your storage providers, or on ours if you are using the SaaS version.
+Hub integrates with [Vault](/docs/vault/first-things-first), and makes your recordings available through a secure web interface. When using the Hub SaaS offering, your Agents will connect to our Vault SaaS environment. This means that your recordings will be stored on your storage providers, or on ours if you are using the SaaS version.
 
-{{< figure src="hub-with-vault.svg" alt="Kerberos Vault connected to Kerberos Hub." caption="Kerberos Vault connected to Kerberos Hub." class="stretch">}}
+{{< figure src="hub-with-vault.svg" alt="Vault connected to Hub." caption="Vault connected to Hub." class="stretch">}}
 
-Within Kerberos Hub specific metadata is stored regarding the different recordings such as the name, file size, classifications, etc. However, the actual recordings are in the storage provider you have selected (for example MinIO, S3, etc.) managed through Kerberos Vault. This means that Kerberos Vault itself is decoupled from Kerberos Hub.
+Within Hub specific metadata is stored regarding the different recordings such as the name, file size, classifications, etc. However, the actual recordings are in the storage provider you have selected (for example MinIO, S3, etc.) managed through Vault. This means that Vault itself is decoupled from Hub.
 
-Kerberos Hub uses APIs and authentication to request recordings from the Kerberos Vault instance. 
+Hub uses APIs and authentication to request recordings from the Vault instance. 
 
 ## Consolidated overview
 
-The [Kerberos Hub pipeline](/docs/hub/pipeline) groups recordings, coming from one or more Agents, into time sequences. The idea is to simplify the search for a specific event. Fewer recordings are shown at once, and when necessary you drill down to a level deeper to receive more details.
+The [Hub pipeline](/docs/hub/pipeline) groups recordings, coming from one or more Agents, into time sequences. The idea is to simplify the search for a specific event. Fewer recordings are shown at once, and when necessary you drill down to a level deeper to receive more details.
 
 {{< figure src="hub-media.gif" alt="The media page gives you an overview of all your recordings." caption="The media page gives you an overview of all your recordings." class="stretch">}}
 
@@ -40,9 +40,9 @@ In a few seconds you will see how many recordings were generated during a certai
 
 ### Signed URLs
 
-Once you're inside the Kerberos Hub application, you will see all available recordings of your Agents in a single interface. So how does this work? We already know that Kerberos Vault is involved, but there is something else happening as well.
+Once you're inside the Hub application, you will see all available recordings of your Agents in a single interface. So how does this work? We already know that Vault is involved, but there is something else happening as well.
 
-Kerberos Vault is linked to one or more storage providers (object storage), hosted in the cloud or at the edge. When you open a recording, Kerberos Hub asks Kerberos Vault for a signed URL: a link that gives access to that one recording for a limited time. Depending on the provider's [URL signing](/docs/vault/providers#url-signing) setting, the link points to the storage provider or to Vault itself. Hub hands the link to your browser, or hides it behind its own [media proxy](/docs/hub/configuration#media-proxy).
+Vault is linked to one or more storage providers (object storage), hosted in the cloud or at the edge. When you open a recording, Hub asks Vault for a signed URL: a link that gives access to that one recording for a limited time. Depending on the provider's [URL signing](/docs/vault/providers#url-signing) setting, the link points to the storage provider or to Vault itself. Hub hands the link to your browser, or hides it behind its own [media proxy](/docs/hub/configuration#media-proxy).
 
 ## Advanced searching
 
@@ -52,11 +52,11 @@ Next to showing your recordings in a single overview, we provide the capability 
 
 ## Machine learning
 
-Machine learning is a crucial part of the Kerberos Enterprise Suite. From Kerberos Hub and Kerberos Vault, you can trigger different machine learning models, and even bring your own.
+Machine learning is a crucial part of the Kerberos Enterprise Suite. From Hub and Vault, you can trigger different machine learning models, and even bring your own.
 
-An out-of-the-box machine learning model that we apply is the YOLOv3 classification, which is part of the Kerberos Hub pipeline; read more about it at the [GitHub repo](https://github.com/kerberos-io/hub-objecttracker). All recordings being uploaded to Kerberos Vault will be processed by the model, and have a prediction and metadata as a result. That information is stored in the Kerberos Hub application, and is used for features such as advanced search and notifications.
+An out-of-the-box machine learning model that we apply is the YOLOv3 classification, which is part of the Hub pipeline; read more about it at the [GitHub repo](https://github.com/kerberos-io/hub-objecttracker). All recordings being uploaded to Vault will be processed by the model, and have a prediction and metadata as a result. That information is stored in the Hub application, and is used for features such as advanced search and notifications.
 
-Next to classifying and predicting objects, the model is also tracking the classified objects. By doing this we can label the recording with the object of interest. More information about the analytical capabilities of Kerberos Hub can be [found on the analytics page](/docs/hub/analytics).
+Next to classifying and predicting objects, the model is also tracking the classified objects. By doing this we can label the recording with the object of interest. More information about the analytical capabilities of Hub can be [found on the analytics page](/docs/hub/analytics).
 
 {{< figure src="hub-ml.gif" alt="The media page gives you an overview of all your recordings." caption="The media page gives you an overview of all your recordings." class="stretch">}}
 
@@ -66,11 +66,11 @@ When a specific event occurs, a notification can be sent to one or more channels
 
 ### Alerts
 
-Kerberos Hub supports different types of alerts: generic alerts (1st generation) and custom alerts (2nd generation).
+Hub supports different types of alerts: generic alerts (1st generation) and custom alerts (2nd generation).
 
 #### Generic alerts
 
-Generic alerts are the first-generation alerts we have in Kerberos Hub; they are less flexible than custom alerts and can only be configured once for the entire account. If you need to configure multiple alerts, then custom alerts will be a better choice.
+Generic alerts are the first-generation alerts we have in Hub; they are less flexible than custom alerts and can only be configured once for the entire account. If you need to configure multiple alerts, then custom alerts will be a better choice.
 
 - **Detections**: send a notification if a recording was received from a specific Agent, within a time range, with a specific classification, etc.
 - **Devices**: when one of your Agents stops working, a notification will be sent.
@@ -88,7 +88,7 @@ As of this moment custom alerts are only available for detections, and not devic
 
 ### Channels
 
-Kerberos Hub supports different types of channels, to which notifications can be sent:
+Hub supports different types of channels, to which notifications can be sent:
 
 - **Browser**: notifications inside the browser (if the used browser supports this).
 - **E-mail**: a personal email can be sent.
@@ -105,13 +105,13 @@ Kerberos Hub supports different types of channels, to which notifications can be
 
 ## Livestreaming
 
-Kerberos Hub allows you to visualise live streams from your Agents. A low and a high resolution are made available.
+Hub allows you to visualise live streams from your Agents. A low and a high resolution are made available.
 
-{{< figure src="hub-livestream.gif" alt="Watch the live streams of your Agents in Kerberos Hub." caption="Watch the live streams of your Agents in Kerberos Hub." class="stretch">}}
+{{< figure src="hub-livestream.gif" alt="Watch the live streams of your Agents in Hub." caption="Watch the live streams of your Agents in Hub." class="stretch">}}
 
 ### Low resolution
 
-The low resolution livestream is a snapshot, JPEG, shared over MQTT (TCP) and visualised in Kerberos Hub using secure WebSockets (WSS). No port forwarding needs to be enabled.
+The low resolution livestream is a snapshot, JPEG, shared over MQTT (TCP) and visualised in Hub using secure WebSockets (WSS). No port forwarding needs to be enabled.
 
 ### High definition
 

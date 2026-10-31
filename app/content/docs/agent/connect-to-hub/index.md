@@ -1,7 +1,7 @@
 ---
 title: "Connect to Hub"
-description: "Link an Agent to Kerberos Hub for a central overview, live view and alerts."
-lead: "Link an Agent to Kerberos Hub for a central overview, live view and alerts."
+description: "Link an Agent to Hub for a central overview, live view and alerts."
+lead: "Link an Agent to Hub for a central overview, live view and alerts."
 date: 2026-10-31T00:00:00+00:00
 lastmod: 2026-10-31T00:00:00+00:00
 draft: false
@@ -18,7 +18,7 @@ connects:
     why: Get alerted when the Agent records something, or goes offline.
 ---
 
-An Agent works on its own, but you have to open each Agent's web interface separately, usually from inside the local network. Connect it to [Kerberos Hub](/docs/hub/first-things-first) to see all your Agents in one place: their status, live view, recordings and alerts, from anywhere.
+An Agent works on its own, but you have to open each Agent's web interface separately, usually from inside the local network. Connect it to [Hub](/docs/hub/first-things-first) to see all your Agents in one place: their status, live view, recordings and alerts, from anywhere.
 
 This page covers the Agent side of the connection. Where to find the keys, and how to organise Agents into sites and groups, is explained in the Hub docs.
 
@@ -59,8 +59,8 @@ Live view and camera control also use the **MQTT** broker and the **STUN/TURN** 
 
 Hub doesn't receive recordings over the Hub connection. Choose how they reach Hub in the **Persistence** block:
 
-- **Kerberos Hub**: the Agent uploads to the storage managed by Hub. Use this with the Hub SaaS offering.
-- **Kerberos Vault**: the Agent uploads to your own Vault, and Vault passes each recording on to Hub. Use this with self-hosted Hub, or whenever recordings must stay on your own storage. Follow [Connect to Vault](/docs/agent/connect-to-vault), and make sure the **Directory** equals your Hub username.
+- **Hub**: the Agent uploads to the storage managed by Hub. Use this with the Hub SaaS offering.
+- **Vault**: the Agent uploads to your own Vault, and Vault passes each recording on to Hub. Use this with self-hosted Hub, or whenever recordings must stay on your own storage. Follow [Connect to Vault](/docs/agent/connect-to-vault), and make sure the **Directory** equals your Hub username.
 
 ## Configure with environment variables
 
@@ -71,7 +71,7 @@ Hub doesn't receive recordings over the Hub connection. Choose how they reach Hu
 | `AGENT_HUB_PRIVATE_KEY` | Private key |
 | `AGENT_HUB_SITE` | Site |
 | `AGENT_HUB_ENCRYPTION` | Encryption (`true` by default) |
-| `AGENT_CLOUD` | Persistence: `s3` for Kerberos Hub, `kstorage` for Kerberos Vault |
+| `AGENT_CLOUD` | Persistence: `s3` for Hub, `kstorage` for Vault |
 | `AGENT_MQTT_URI`, `AGENT_MQTT_USERNAME`, `AGENT_MQTT_PASSWORD` | MQTT broker |
 | `AGENT_STUN_URI`, `AGENT_TURN_URI`, `AGENT_TURN_USERNAME`, `AGENT_TURN_PASSWORD` | WebRTC servers for live view |
 

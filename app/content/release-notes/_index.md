@@ -5,4 +5,4 @@ layout: list
 pagerSize: 10
 ---
 
-Follow the evolution of the UUG.AI platform across production releases.
+Every week, the platform takes another step forward. Here is what shipped in each release: new features, improvements and fixes.

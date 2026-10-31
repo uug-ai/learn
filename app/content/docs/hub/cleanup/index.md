@@ -1,6 +1,6 @@
 ---
 title: "Cleanup"
-description: "Automated subscription-based retention cleanup for Kerberos Hub data."
+description: "Automated subscription-based retention cleanup for Hub data."
 lead: "Use hub-cleanup to enforce retention by subscription plan and keep Hub storage predictable."
 date: 2026-04-07T00:00:00+00:00
 lastmod: 2026-04-07T00:00:00+00:00
@@ -17,7 +17,7 @@ podcast: hub-cleanup
 
 [![Go Version](https://img.shields.io/badge/Go-1.25.8%2B-blue.svg)](https://go.dev/)
 
-The `hub-cleanup` service is a background worker that enforces retention policies for Kerberos Hub data. It continuously scans MongoDB for data that exceeded retention and removes it safely.
+The `hub-cleanup` service is a background worker that enforces retention policies for Hub data. It continuously scans MongoDB for data that exceeded retention and removes it safely.
 
 ## What it does
 
@@ -156,7 +156,7 @@ These fields are useful for debugging scheduling via `mongosh`.
 |---|---|---|
 | `MONGODB_URI` | Full MongoDB URI, preferred when set. | `""` |
 | `MONGODB_HOST` | Host used when no full URI is provided. | `""` |
-| `MONGODB_DATABASE_CLOUD` | Kerberos Hub database name. | `"Kerberos"` |
+| `MONGODB_DATABASE_CLOUD` | Hub database name. | `"Kerberos"` |
 | `MONGODB_DATABASE_CREDENTIALS` | Auth source database. | `""` |
 | `MONGODB_AUTHENTICATION_MECHANISM` | Auth mechanism (`SCRAM-SHA-256`, `MONGODB-AWS`, etc.). | `""` |
 | `MONGODB_REPLICASET` | Replica set name (host-based config). | `""` |

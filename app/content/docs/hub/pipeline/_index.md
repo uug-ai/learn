@@ -14,7 +14,7 @@ toc: true
 podcast: hub-pipeline
 connects:
   - page: /docs/vault/integrations#kerberos-hub
-    title: Kerberos Hub integration
+    title: Hub integration
     why: Send an event to Hub for every recording Vault stores.
   - page: /docs/vault/accounts#hub-pipeline
     title: Hub pipeline toggle

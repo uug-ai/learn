@@ -9,11 +9,12 @@ product: 'Hub'
 level: 'Intermediate'
 duration: '25 min'
 tags: ['Workflows', 'Go', 'Kubernetes']
+illustration: 'tutorial-hub-workflow-stage'
 ---
 
 {{< tutorial-byline author="Kilian Boute" github="kilianboute" created="Jun 16, 2026" updated="Jun 16, 2026" >}}
 
-{{< tutorial-header alt="Abstract branching data paths representing a modular AI workflow" >}}
+{{< tutorial-header alt="An event runs through Hub's workflow stages: workflows, analyse, your own stage and notify, ending as an alert on a phone." >}}
 
 The Hub ships with a built-in pipeline, but every deployment eventually needs something the pipeline doesn't do out of the box. A custom **workflow stage** lets you run your own logic on every recording — its result feeds the rest of the workflow for later stages to build on, and the **blocks** it emits are persisted back into the Hub — in any language, deployed and scaled on its own.
 

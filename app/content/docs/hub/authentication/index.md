@@ -13,7 +13,7 @@ weight: 305
 toc: true
 ---
 
-Kerberos Hub supports local password sign-in, authenticator-based two-factor authentication (2FA), passkeys, and single sign-on (SSO) through OpenID Connect (OIDC). This page explains how they work together, what users can set up themselves, and what an administrator needs to configure.
+Hub supports local password sign-in, authenticator-based two-factor authentication (2FA), passkeys, and single sign-on (SSO) through OpenID Connect (OIDC). This page explains how they work together, what users can set up themselves, and what an administrator needs to configure.
 
 Authentication establishes **who you are**. It does not grant access to every camera or project: [organisation and project membership](/docs/hub/organisations) and [roles](/docs/hub/roles) determine what you can see and do after signing in.
 

@@ -1,7 +1,10 @@
 .release-notes {
-  width: min(100% - 2rem, 1100px);
+  /* The full page width, with the navbar's side padding, so the page lines
+     up with the menu (.learn-topbar-inner). */
+  box-sizing: border-box;
+  width: 100%;
   margin: 0 auto;
-  padding: 3rem 0 5rem;
+  padding: 3rem 20px 5rem;
   color: var(--text-primary);
 }
 
@@ -38,7 +41,7 @@
 
 .release-notes__eyebrow {
   margin: 0 0 0.65rem;
-  color: var(--secondary-color);
+  color: var(--primary-color);
   font: 700 0.75rem/1 var(--font-family-heading);
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -53,9 +56,12 @@
 }
 
 .release-notes h1 {
+  /* The same title style as the other pages (Hextra's content h1, as on Guides). */
   margin: 0;
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  line-height: 1;
+  font-size: var(--hx-text-4xl);
+  line-height: var(--hx-text-4xl--line-height);
+  font-weight: var(--hx-font-weight-bold);
+  letter-spacing: var(--hx-tracking-tight);
 }
 
 .release-notes__lead {
@@ -156,9 +162,12 @@
 }
 
 .release-note__header h2 {
+  /* The same section heading style as the docs (Hextra's content h2). */
   margin: 0;
-  font-size: 1.85rem;
-  line-height: 1.2;
+  font-size: var(--hx-text-3xl);
+  line-height: var(--hx-text-3xl--line-height);
+  font-weight: var(--hx-font-weight-semibold);
+  letter-spacing: var(--hx-tracking-tight);
 }
 
 .release-note__latest {

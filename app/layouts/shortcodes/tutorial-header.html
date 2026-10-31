@@ -1,5 +1,23 @@
-{{- $src := .Get "src" | default "header-art.jpg" -}}
+{{- /*
+  tutorial-header shortcode — the tutorial's header banner.
+
+  With `illustration: tutorial-…` in the front matter it draws that iso scene
+  (assets/iso/<name>.svg, exported from the design library) in the
+  tutorial's product colour; otherwise it shows header-art.jpg (or `src`).
+*/ -}}
 {{- $alt := .Get "alt" | default .Page.Title -}}
+{{- with .Page.Params.illustration -}}
+  {{- $svg := resources.Get (printf "iso/%s.svg" .) -}}
+  {{- if not $svg -}}
+    {{- errorf "tutorial-header: no assets/iso/%s.svg (illustration of %s)" . $.Page.RelPermalink -}}
+  {{- end -}}
+  <figure class="tutorial-header tutorial-header--iso not-prose" data-product="{{ $.Page.Params.product | lower }}">
+    <div class="iso-illustration iso-illustration--glow-auto" role="img" aria-label="{{ $alt }}">
+      {{- replace $svg.Content "ISO_ID" (printf "iso-%s-header" .) | safeHTML -}}
+    </div>
+  </figure>
+{{- else -}}
+{{- $src := .Get "src" | default "header-art.jpg" -}}
 {{- with .Page.Resources.GetMatch $src -}}
   {{- $small := .Resize "800x webp q82" -}}
   {{- $large := .Resize "1200x webp q84" -}}
@@ -23,4 +41,5 @@
   </figure>
 {{- else -}}
   {{- errorf "Tutorial header image %q not found for %s" $src .Page.RelPermalink -}}
+{{- end -}}
 {{- end -}}

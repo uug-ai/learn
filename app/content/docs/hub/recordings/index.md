@@ -1,6 +1,6 @@
 ---
 title: "Recordings"
-description: "Find, review, organise, and process recordings in Kerberos Hub."
+description: "Find, review, organise, and process recordings in Hub."
 lead: "Find the footage that matters and move from playback to investigation."
 date: 2026-09-09T00:00:00+00:00
 lastmod: 2026-10-17T00:00:00+00:00
@@ -23,7 +23,7 @@ connects:
 ---
 
 The **Recordings** page is the main starting point for reviewing footage in
-Kerberos Hub. Use it to find an incident by date, device, location, or analysis
+Hub. Use it to find an incident by date, device, location, or analysis
 result, play the relevant recordings, and preserve evidence in a case.
 
 ## Introduction
@@ -43,7 +43,7 @@ or open its dedicated detail page at `/media/<id>`.
 ## How recordings become available
 
 An [Agent](/docs/agent/connect-to-hub#choose-where-recordings-go) sends recordings, or recording metadata, to Hub:
-directly, or through your own Kerberos Vault and its [Hub integration](/docs/vault/integrations#kerberos-hub).
+directly, or through your own Vault and its [Hub integration](/docs/vault/integrations#kerberos-hub).
 Each recording then goes through the configured [media pipeline](/docs/hub/media-processing). Hub stores the information needed to find each recording and resolves
 the video from its storage provider when you play it.
 

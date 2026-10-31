@@ -1,7 +1,7 @@
 ---
 podcast: tutorials-hub-deploy-moq-relay-kubernetes
 title: 'Deploy a MoQ relay on Kubernetes'
-description: 'Run a TLS-enabled Media over QUIC relay behind a Kubernetes UDP LoadBalancer, then connect Kerberos Hub and Agent to it.'
+description: 'Run a TLS-enabled Media over QUIC relay behind a Kubernetes UDP LoadBalancer, then connect Hub and Agent to it.'
 date: '2026-08-19'
 weight: 3
 toc: true
@@ -9,11 +9,12 @@ product: 'Hub'
 level: 'Intermediate'
 duration: '30 min'
 tags: ['MoQ', 'Kubernetes', 'Networking']
+illustration: 'tutorial-hub-moq-relay'
 ---
 
 {{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
 
-{{< tutorial-header alt="Abstract media relay fanning one luminous stream across a cloud cluster" >}}
+{{< tutorial-header alt="One stream from an Agent enters MoQ relay pods on a three-node Kubernetes cluster, which fan it out to a monitor, a laptop and a phone." >}}
 
 A self-hosted Media over QUIC (MoQ) relay gives Kerberos Agents and Hub viewers one low-latency meeting point. The Agent publishes each live camera broadcast to the relay; browsers subscribe to the same broadcast without opening a peer-to-peer connection to the Agent.
 

@@ -9,11 +9,12 @@ product: 'Hub'
 level: 'Beginner'
 duration: '20 min'
 tags: ['HLS', 'Live video', 'Networking']
+illustration: 'tutorial-hub-hls'
 ---
 
 {{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
 
-{{< tutorial-header alt="Abstract HLS lettering on a dark background" >}}
+{{< tutorial-header alt="A segmenter cuts the Agent's stream into numbered segments listed in an M3U8 playlist, which a browser player fetches." >}}
 
 HLS live view carries video over ordinary authenticated HTTPS. It needs no browser-to-Agent media path, ICE negotiation or TURN relay, which makes it the most predictable Kerberos live transport across corporate firewalls, VPNs and mobile networks.
 
@@ -40,7 +41,7 @@ HLS separates control traffic from media traffic. The browser repeatedly request
 {
   "groups": [
     { "id": "edge", "label": "Camera site", "x": 0, "y": 20, "w": 410, "h": 520 },
-    { "id": "hub", "label": "Kerberos Hub", "x": 490, "y": 20, "w": 330, "h": 520 },
+    { "id": "hub", "label": "Hub", "x": 490, "y": 20, "w": 330, "h": 520 },
     { "id": "operator", "label": "Operator network", "x": 900, "y": 20, "w": 320, "h": 520 }
   ],
   "nodes": [

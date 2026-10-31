@@ -1,7 +1,7 @@
 ---
 title: "Configuration"
-description: "Configure Kerberos Hub to your own needs."
-lead: "Configure Kerberos Hub to your own needs."
+description: "Configure Hub to your own needs."
+lead: "Configure Hub to your own needs."
 date: 2020-10-06T08:49:31+00:00
 lastmod: 2020-10-06T08:49:31+00:00
 draft: false
@@ -18,13 +18,13 @@ connects:
   - page: /docs/factory/getting-started
     why: Deploy many Agents on Kubernetes with the Hub settings applied.
   - page: /docs/vault/integrations#kerberos-hub
-    title: Kerberos Hub integration
+    title: Hub integration
     why: Let Vault tell Hub about every new recording it stores.
 ---
 
-Once you have installed the Kerberos Hub Helm chart and confirmed that all microservices are running properly, you should be able to access the Kerberos Hub login screen and sign in through the default username and password [which was defined during the installation step](https://github.com/kerberos-io/hub#post-installation).
+Once you have installed the Hub Helm chart and confirmed that all microservices are running properly, you should be able to access the Hub login screen and sign in through the default username and password [which was defined during the installation step](https://github.com/kerberos-io/hub#post-installation).
 
-{{< figure src="hub-login.gif" alt="Kerberos Hub login screen after installation." caption="Kerberos Hub login screen after installation." class="stretch">}}
+{{< figure src="hub-login.gif" alt="Hub login screen after installation." caption="Hub login screen after installation." class="stretch">}}
 
 ## Accounts
 
@@ -40,7 +40,7 @@ On top of that a sub account can have a specific role such as **guest** or **edi
 
 You can create a new sub account by navigating to the accounts page and clicking on the `(+ Add Account)` button at the top left.
 
-{{< figure src="hub-add-account.gif" alt="Give another user limited access to Kerberos Hub by creating a sub account." caption="Give another user limited access to Kerberos Hub by creating a sub account." class="stretch">}}
+{{< figure src="hub-add-account.gif" alt="Give another user limited access to Hub by creating a sub account." caption="Give another user limited access to Hub by creating a sub account." class="stretch">}}
 
 ## Sites
 
@@ -76,27 +76,27 @@ The **Add Agent** button opens a dialog that writes the Agent's configuration fo
 
 As explained in the modal, there are [different possibilities to set up and run an Agent](/docs/agent/installation).
 
-Regardless of how you deployed an Agent, to connect the Agent to Kerberos Hub you will require the account credentials from your Kerberos Hub account to be shared with your Agents. By sharing those credentials you are linking your Agents to the relevant Kerberos Hub account. [Connect to Hub](/docs/agent/connect-to-hub) shows where they go on the Agent; [Factory](/docs/factory/getting-started) sets them for every Agent it deploys.
+Regardless of how you deployed an Agent, to connect the Agent to Hub you will require the account credentials from your Hub account to be shared with your Agents. By sharing those credentials you are linking your Agents to the relevant Hub account. [Connect to Hub](/docs/agent/connect-to-hub) shows where they go on the Agent; [Factory](/docs/factory/getting-started) sets them for every Agent it deploys.
 
 Open **Plans & integrations** to find the **Public key** and **Private key** for your Agents. When [organisations and projects](/docs/hub/organisations#creating-and-managing-projects) are enabled, the credentials belong to the project instead: open **Project settings** and copy the **Agent public key** and **Agent private key**.
 
-The Agent needs both keys, whether you use Kerberos Hub SaaS or a self-hosted installation.
+The Agent needs both keys, whether you use Hub SaaS or a self-hosted installation.
 
 {{< figure src="hub-link-agent.gif" alt="Get your credentials to link your Agents." caption="Get your credentials to link your Agents." class="stretch">}}
 
-## Connect Kerberos Vault
+## Connect Vault
 
-When your Agents store recordings in your own [Kerberos Vault](/docs/vault), Hub needs to reach that Vault: each time someone opens a recording, Hub asks Vault for a signed URL. Give Hub the Vault API URL and the access key and secret key of a [Vault account](/docs/vault/accounts):
+When your Agents store recordings in your own [Vault](/docs/vault), Hub needs to reach that Vault: each time someone opens a recording, Hub asks Vault for a signed URL. Give Hub the Vault API URL and the access key and secret key of a [Vault account](/docs/vault/accounts):
 
-- **For your whole account**: open **Plans & integrations** and fill in **Kerberos Vault settings**. The block is shown on Enterprise plans.
+- **For your whole account**: open **Plans & integrations** and fill in **Vault settings**. The block is shown on Enterprise plans.
 - **For one site**: open the site and fill in **Connect to dedicated Vault**, for example to use a Vault in the same region as that site's cameras. **Test connection** checks the URL and keys.
 - **On a self-hosted installation**: set the `kerberosvault` values of the Helm chart (`uri`, `provider`, `accesskey` and `secretkey`).
 
-These settings only let Hub read recordings. For new recordings to show up in Hub, Vault also needs its [Kerberos Hub integration](/docs/vault/integrations#kerberos-hub).
+These settings only let Hub read recordings. For new recordings to show up in Hub, Vault also needs its [Hub integration](/docs/vault/integrations#kerberos-hub).
 
 ## Integrations
 
-You have your accounts set up, sites and groups created and, last but not least, one or more Agents connected to your Kerberos Hub.
+You have your accounts set up, sites and groups created and, last but not least, one or more Agents connected to your Hub.
 
 Now it is time to configure some integrations using alerts and channels. The idea of integrations is that you can send messages to other 3rd-party services, or your own APIs, when an interesting event/alert occurs.
 
@@ -110,7 +110,7 @@ Alerts can be configured to trigger one or more channels on specific events. Gen
 
 #### Generic Alerts
 
-Generic alerts (legacy) are the first alerts created in Kerberos Hub. Three different alerts can be configured:
+Generic alerts (legacy) are the first alerts created in Hub. Three different alerts can be configured:
 
 ![Configuring alerts](hub-alerts.gif)
 
@@ -155,7 +155,7 @@ To easily verify whether the POST request is happening, you can use a public web
 
 ## Media proxy
 
-By default Kerberos Hub hands the URLs it receives from Kerberos Vault straight to the browser. Depending on the Vault configuration these point to Vault ([vault-signed URLs](/docs/vault/providers#url-signing)) or directly to the storage provider (S3, MinIO, GCS, Azure presigned URLs).
+By default Hub hands the URLs it receives from Vault straight to the browser. Depending on the Vault configuration these point to Vault ([vault-signed URLs](/docs/vault/providers#url-signing)) or directly to the storage provider (S3, MinIO, GCS, Azure presigned URLs).
 
 Enable the media proxy to hide both. The Hub API then asks Vault for the signed URL as usual, seals it into an opaque, encrypted token and returns a Hub API URL instead:
 
@@ -178,4 +178,4 @@ All media bytes now flow through the Hub API, so size its replicas, ingress time
 
 ## What's next
 
-Want to learn more about how Kerberos Hub works under the hood? Then [have a look at the Kerberos Hub pipeline page](/docs/hub/pipeline) where we introduce the microservice architecture.
+Want to learn more about how Hub works under the hood? Then [have a look at the Hub pipeline page](/docs/hub/pipeline) where we introduce the microservice architecture.

@@ -112,12 +112,6 @@
   outline-offset: 3px;
 }
 
-/* Links into another product's docs (set by the render-link hook) carry that
-   product's colour, so crossing a product boundary is visible. */
-.content a.learn-xlink {
-  color: var(--learn-product-text);
-}
-
 .learn-sr-only {
   position: absolute;
   width: 1px;
@@ -1663,4 +1657,99 @@ html.dark .learn-hero-split > h1 {
   .learn-hero-aside > h2:first-child {
     margin-top: 0;
   }
+}
+
+/* Glossary (docs/prologue/glossary): an A-Z bar to jump to a letter, then
+   each letter's terms as a definition list. Letters without terms are greyed
+   out; jumps land below the sticky navbar. */
+/* The search box above the A-Z bar (assets/js/glossary.js filters the terms). */
+.learn-glossary-search {
+  margin-top: 1.5rem;
+}
+
+.learn-glossary-search input {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.learn-glossary-search input:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 1px;
+}
+
+.learn-glossary-search p {
+  min-height: 1.4em;
+  margin: 0.4rem 0 0;
+  font-size: 0.875rem;
+  opacity: 0.7;
+}
+
+.learn-glossary-index a.is-empty {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.learn-glossary-index {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.learn-glossary-index > * {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.content .learn-glossary-index a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.content .learn-glossary-index a:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.learn-glossary-index span {
+  opacity: 0.3;
+}
+
+.content dl {
+  margin: 0.5rem 0 0;
+}
+
+.content dt {
+  margin-top: 1.4rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.content dd {
+  margin: 0.35rem 0 0;
+  padding-left: 1rem;
+  border-left: 2px solid var(--border);
+}
+
+.content :is(dt > span[id], h2) {
+  scroll-margin-top: calc(var(--navbar-height, 4rem) + 1.5rem);
+}
+
+/* Hextra's cards push their text to the bottom (mt-auto), which suits cards
+   with an image on top. In a row of image-less cards, a card stretched to a
+   taller neighbour's height would show its text at the bottom; keep the text
+   at the top instead. */
+.hextra-card > div:first-child {
+  margin-top: 0;
 }

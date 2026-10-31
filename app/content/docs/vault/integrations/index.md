@@ -19,19 +19,19 @@ connects:
     title: Using Vault with Hub
     why: Set the Agent directory to the Hub username, so Hub can match recordings.
   - page: /docs/hub/configuration#connect-kerberos-vault
-    title: Connect Kerberos Vault
+    title: Connect Vault
     why: Enter this Vault's URL and account keys in Hub, so Hub can play the recordings.
 ---
 
-One of the key differentiators is the ability to extend and integrate. Next to uploading and persisting recordings on your preferred storage providers, Kerberos Vault can trigger events and be configured through APIs.
+One of the key differentiators is the ability to extend and integrate. Next to uploading and persisting recordings on your preferred storage providers, Vault can trigger events and be configured through APIs.
 
-Each time an Agent sends a recording to Kerberos Vault, it is persisted on a storage provider, and an event is triggered through one of the following integrations.
+Each time an Agent sends a recording to Vault, it is persisted on a storage provider, and an event is triggered through one of the following integrations.
 
 - [Apache Kafka](https://kafka.apache.org/)
 - [Amazon Web Services SQS](https://aws.amazon.com/sqs/)
 - [RabbitMQ](https://www.rabbitmq.com/)
-- [Kerberos Hub](/docs/hub/first-things-first/)
-- Kerberos Vault (remote forwarding)
+- [Hub](/docs/hub/first-things-first/)
+- Vault (remote forwarding)
 
 Every time an event is delivered, it will be consumed by the configured integrations. For example in case of a Kafka
 integration, one can build a Kafka consumer with custom application logic: a notification manager, a machine learning
@@ -39,13 +39,13 @@ service, etc.
 
 ## Prerequisites
 
-Before you can configure an integration, make sure [you have installed a Kerberos Vault](/docs/vault/installation) inside a Kubernetes cluster.
+Before you can configure an integration, make sure [you have installed a Vault](/docs/vault/installation) inside a Kubernetes cluster.
 
 ## Configuration of an integration
 
-Once you have set up your Kerberos Vault instance, and have successfully logged in to the application, you should see the integration navigation item on the left.
+Once you have set up your Vault instance, and have successfully logged in to the application, you should see the integration navigation item on the left.
 
-{{< figure src="integrations.gif" alt="Kerberos Vault can be configured to send events to message brokers to create real-time apps or ML models." caption="Kerberos Vault can be configured to send events to message brokers to create real-time apps or ML models." class="stretch">}}
+{{< figure src="integrations.gif" alt="Vault can be configured to send events to message brokers to create real-time apps or ML models." caption="Vault can be configured to send events to message brokers to create real-time apps or ML models." class="stretch">}}
 
 When selecting the `+ Add Integration` button, a modal will open that allows you to configure a specific integration. Go ahead and select one from the list.
 
@@ -61,7 +61,7 @@ for JSON examples, required fields, precedence, and secret-handling guidance.
 
 ## Queue integrations
 
-Kerberos Vault integrates with queues and message brokers in the cloud such as AWS SQS. The advantage is that it takes complete control of your ever-growing messaging/event requirements.
+Vault integrates with queues and message brokers in the cloud such as AWS SQS. The advantage is that it takes complete control of your ever-growing messaging/event requirements.
 
 ### AWS SQS
 
@@ -75,7 +75,7 @@ Alternatives to cloud event integrations are self-hosted variants such as a Kafk
 
 Apache Kafka is an open-source distributed event streaming platform used by thousands of companies for high-performance data pipelines, streaming analytics, data integration, and mission-critical applications.
 
-To integrate a Kafka broker with Kerberos Vault you could use your existing Kafka installation, or onboard a new Kafka broker inside your Kubernetes cluster. Before installing the Kafka broker, we will need to set up a storage class. As previously mentioned we will use OpenEBS for that, but you could use the storage class you prefer.
+To integrate a Kafka broker with Vault you could use your existing Kafka installation, or onboard a new Kafka broker inside your Kubernetes cluster. Before installing the Kafka broker, we will need to set up a storage class. As previously mentioned we will use OpenEBS for that, but you could use the storage class you prefer.
 
     kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
 
@@ -88,7 +88,7 @@ Once done, you should see the relevant Kafka pods and ZooKeeper being deployed.
 
     kubectl get po -n kafka
 
-Now you are ready to configure the Kerberos Vault integration, by selecting the Kafka option. You should add the Kafka credentials and authentication mechanism.
+Now you are ready to configure the Vault integration, by selecting the Kafka option. You should add the Kafka credentials and authentication mechanism.
 
 {{< figure src="kafka.gif" alt="Configure, add and validate the Kafka integration." caption="Configure, add and validate the Kafka integration." class="stretch">}}
 
@@ -103,46 +103,46 @@ Now you are ready to configure the Kerberos Vault integration, by selecting the 
 
 ## Kerberos integrations
 
-Next to third party integrations such as Kafka or AWS SQS, it is possible to integrate with a remote Kerberos Vault (also called chaining or forwarding) or with Kerberos Hub.
+Next to third party integrations such as Kafka or AWS SQS, it is possible to integrate with a remote Vault (also called chaining or forwarding) or with Hub.
 
-### Kerberos Vault
+### Vault
 
-Kerberos Vaults can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by requesting a forward from Kerberos Hub or building your own forwarding application code.
+Vaults can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by requesting a forward from Hub or building your own forwarding application code.
 
 {{< figure src="vault-forwarding.gif" alt="Two forwarding modes: continuous and on demand." caption="Two forwarding modes: continuous and on demand." class="stretch">}}
 
-To learn more about how to enable the Kerberos Vault integration, have [a look at the forwarding page](/docs/vault/forwarding).
+To learn more about how to enable the Vault integration, have [a look at the forwarding page](/docs/vault/forwarding).
 
-### Kerberos Hub
+### Hub
 
-The Kerberos Hub integration allows you to visualise your recordings, stored in your Kerberos Vault, in your Kerberos Hub account. By using the integration, events are sent to [the Kerberos Hub pipeline](/docs/hub/pipeline) and visualised in the Kerberos Hub interface. Each time a recording is uploaded to Kerberos Vault, an event is sent to the REST API of Kerberos Hub, and injected into the Kerberos Hub pipeline. The Kerberos Hub pipeline will start evaluating the recording and generate various metadata.
+The Hub integration allows you to visualise your recordings, stored in your Vault, in your Hub account. By using the integration, events are sent to [the Hub pipeline](/docs/hub/pipeline) and visualised in the Hub interface. Each time a recording is uploaded to Vault, an event is sent to the REST API of Hub, and injected into the Hub pipeline. The Hub pipeline will start evaluating the recording and generate various metadata.
 
-{{< figure src="vault-integration-hub.gif" alt="Kerberos Hub integrates with Kerberos Vault to visualise recordings and metadata." caption="Kerberos Hub integrates with Kerberos Vault to visualise recordings and metadata." class="stretch">}}
+{{< figure src="vault-integration-hub.gif" alt="Hub integrates with Vault to visualise recordings and metadata." caption="Hub integrates with Vault to visualise recordings and metadata." class="stretch">}}
 
 - Integration name: this is a preferred name for the integration.
-- Kerberos Hub Url: the URL to the API of Kerberos Hub, `https://api.your.hub.com`
+- Hub Url: the URL to the API of Hub, `https://api.your.hub.com`
 - Hub Key: the **Public key** of your Hub account, for example `AKIAxxxxxxG5Q`. Hub shows it under **Plans & integrations** (see [Assign an Agent](/docs/hub/configuration#assign-an-agent)).
 
 Then open the [account](/docs/vault/accounts) your Agents upload with and select the integration on its **Integrations** tab. Vault only sends the recordings of accounts that use the integration.
 
-#### Kerberos Hub username
+#### Hub username
 
-When creating a Kerberos Hub account and linking it to your own Kerberos Vault, you have to make sure the Kerberos Hub username matches the Agent destination directory. If this does not match, your recordings will not be shown in the Kerberos Hub interface.
+When creating a Hub account and linking it to your own Vault, you have to make sure the Hub username matches the Agent destination directory. If this does not match, your recordings will not be shown in the Hub interface.
 
-Once you have logged in, or created an account, you will see your Kerberos Hub username at the top left of the navigation. You have to make sure this username equals the [directory field of the Agent](/docs/agent/connect-to-vault#using-vault-together-with-hub) (or Factory settings). Vault only uses the Agent's directory when the account's directory is `*`; otherwise the recordings are stored in the [account's directory](/docs/vault/accounts#directory), and that is the one that must equal the Hub username.
+Once you have logged in, or created an account, you will see your Hub username at the top left of the navigation. You have to make sure this username equals the [directory field of the Agent](/docs/agent/connect-to-vault#using-vault-together-with-hub) (or Factory settings). Vault only uses the Agent's directory when the account's directory is `*`; otherwise the recordings are stored in the [account's directory](/docs/vault/accounts#directory), and that is the one that must equal the Hub username.
 
-![Kerberos Hub Account](./hub-integration-account-1.png)
+![Hub Account](./hub-integration-account-1.png)
 
-Make sure the `directory` field of your Agents or Factory is configured with the Kerberos Hub username.
+Make sure the `directory` field of your Agents or Factory is configured with the Hub username.
 
 ![Agent directory](./hub-integration-account-2.png)
 
-#### Kerberos Vault credentials
+#### Vault credentials
 
-Once you have added the integration to Kerberos Vault, and made sure the Kerberos Hub account name matches the Agent directory field, you should see some recordings landing in your Kerberos Hub account. However, to view your recordings in Kerberos Hub, you'll need to add your Kerberos Vault credentials to your Kerberos Hub account (or installation). [Connect Kerberos Vault](/docs/hub/configuration#connect-kerberos-vault) shows where.
+Once you have added the integration to Vault, and made sure the Hub account name matches the Agent directory field, you should see some recordings landing in your Hub account. However, to view your recordings in Hub, you'll need to add your Vault credentials to your Hub account (or installation). [Connect Vault](/docs/hub/configuration#connect-kerberos-vault) shows where.
 
-As you are the owner of the Kerberos Vault, you'll need to make Kerberos Hub (SaaS or self-hosted) aware of where your Kerberos Vault is located (DNS name) and the Kerberos Vault account you have used.
+As you are the owner of the Vault, you'll need to make Hub (SaaS or self-hosted) aware of where your Vault is located (DNS name) and the Vault account you have used.
 
-![Kerberos Hub configure Kerberos Vault](./hub-integration-vault.png)
+![Hub configure Vault](./hub-integration-vault.png)
 
-As soon as you have configured the Kerberos Vault settings in your Kerberos Hub account, you should be able to open the recordings and view them in the application. Note that you are in full control (and the owner) of your recordings, so once you change the Kerberos Vault credentials or you disconnect the Kerberos Vault, you won't be able to view the recordings in Kerberos Hub anymore.
+As soon as you have configured the Vault settings in your Hub account, you should be able to open the recordings and view them in the application. Note that you are in full control (and the owner) of your recordings, so once you change the Vault credentials or you disconnect the Vault, you won't be able to view the recordings in Hub anymore.

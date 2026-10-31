@@ -21,7 +21,7 @@ toc: true
 
 Factory brings the Agent to another level. The Agent can be deployed anywhere you want: it can run as a binary, as a Docker container or inside a Kubernetes cluster. The latter is where Factory shines: it is a UI that allows you to deploy and configure your Agents into your Kubernetes cluster more easily.
 
-{{< figure src="introduction-enterprise.svg" alt="Kerberos Enterprise Suite contains Agent, Factory, Kerberos Vault and Kerberos Hub." caption="Kerberos Enterprise Suite contains Agent, Factory, Kerberos Vault and Kerberos Hub." class="stretch">}}
+{{< figure src="introduction-enterprise.svg" alt="Kerberos Enterprise Suite contains Agent, Factory, Vault and Hub." caption="Kerberos Enterprise Suite contains Agent, Factory, Vault and Hub." class="stretch">}}
 
 ## Factory in a nutshell
 
