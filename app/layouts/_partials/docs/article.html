@@ -1,10 +1,5 @@
   {{- $podcast := partial "podcast/data.html" . -}}
-  {{- $product := .Params.sidebar.product | default "" -}}
-  {{- range .Ancestors -}}
-    {{- if not $product -}}
-      {{- $product = .Params.sidebar.product | default "" -}}
-    {{- end -}}
-  {{- end -}}
+  {{- $product := partial "docs/product.html" . -}}
   <div class="hx:mx-auto hx:flex hextra-max-page-width{{ if $product }} learn-product-page{{ end }}"{{ with $product }} data-product="{{ . }}"{{ end }}>
     {{ partial "sidebar.html" (dict "context" .) }}
     {{ partial "toc.html" . }}
@@ -16,6 +11,7 @@
           {{ with $podcast }}{{ partial "podcast/player.html" . }}{{ end }}
           {{ .Content }}
         </div>
+        {{ partial "docs/works-with.html" . }}
         {{ partial "components/last-updated.html" . }}
         {{- if (site.Params.page.displayPagination | default true) -}}
           {{- partial "components/pager.html" . -}}

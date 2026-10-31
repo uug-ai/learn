@@ -6,13 +6,13 @@ weight: 3
 ---
 
 - My media is not loading in the day overview page on Hub
-- How to do this.
+- How do I enable CORS?
 
 ### Answer
 
-Enabling CORS on Vault depends on the storage provider you are using. Each cloud provider has its own method for configuring CORS:
+Enabling CORS for Vault depends on the storage provider you are using. Each storage provider has its own method for configuring CORS:
 
-- **GCP (Google Cloud Storage)**: Use `gsutil cors set` command or configure through Cloud Console
+- **GCP (Google Cloud Storage)**: Use the `gsutil cors set` command or configure through Cloud Console
 - **AWS (S3)**: Configure CORS rules in the bucket permissions settings
 - **Azure (Blob Storage)**: Set CORS rules via Azure Portal or Azure CLI
 - **MinIO**: Configure CORS using the MinIO client or API
@@ -21,5 +21,7 @@ Refer to your specific storage provider's documentation for detailed CORS config
 
 ### Related articles
 
+- [URL signing](/docs/vault/providers#url-signing)
+- [Google Cloud Storage](/docs/vault/providers/google-cloud-storage/)
 - [Amazon S3](/docs/vault/providers/amazon-s3/)
 - [Azure Storage Account](/docs/vault/providers/azure-storage-account/)

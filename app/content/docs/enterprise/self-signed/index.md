@@ -1,8 +1,8 @@
 ---
 podcast: enterprise-self-signed
 title: "Self-signed certificates"
-description: "Using your own self-signed certifates."
-lead: "Using your own self-signed certifates."
+description: "Using your own self-signed certificates."
+lead: "Using your own self-signed certificates."
 date: 2020-10-06T08:49:31+00:00
 lastmod: 2020-10-06T08:49:31+00:00
 draft: false
@@ -14,9 +14,9 @@ weight: 302
 toc: true
 ---
 
-When running an edge deployment for Factory, Kerberos Vault, Kerberos Hub and/or your storage providers, you can enhance security by bringing your own self-signed certificates. Those certificates will be consumed to create a secure connection between the different applications, and for example encrypt your data while it's being send or retrieved from your storage provider (Minio, Ceph).
+When running an edge deployment for Factory, Kerberos Vault, Kerberos Hub and/or your storage providers, you can enhance security by bringing your own self-signed certificates. Those certificates will be consumed to create a secure connection between the different applications, and for example encrypt your data while it's being sent or retrieved from your storage provider (MinIO, Ceph).
 
-When using self-signed certificates, the different deployments needs to be aware of those certificates and more importantly trust them. To achieve this trust, traditionally you would benefit from services like Certmanager.io and LetsEncrypt which act as a trusted CA (Certification Authority). However when self-signing you will need to make your deployments aware as there is probably no public CA available.
+When using self-signed certificates, the different deployments need to be aware of those certificates and more importantly trust them. To achieve this trust, traditionally you would benefit from services like cert-manager and Let's Encrypt which act as a trusted CA (Certificate Authority). However, when self-signing you will need to make your deployments aware as there is probably no public CA available.
 
 ## The issue
 
@@ -38,7 +38,7 @@ By creating the configmap, the file contents of your `ca-certificates.crt` will 
 
 ## Agent
 
-To inject your certificates file into your Agents, you'll need to make Factory aware of the configmap `rootcerts` that holds the certificate file. Go to your relevant `deployment.yaml` file and specify the name of your configmap in `CERTIFICATES_CONFIGMAP` variable. 
+To inject your certificates file into your Agents, you'll need to make Factory aware of the configmap `rootcerts` that holds the certificate file. Go to your relevant `deployment.yaml` file and specify the name of your configmap in the `CERTIFICATES_CONFIGMAP` variable. 
 
     - name: CERTIFICATES_CONFIGMAP
       value: "rootcerts" 

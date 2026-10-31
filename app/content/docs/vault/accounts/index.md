@@ -12,33 +12,38 @@ menu:
         parent: "vault"
 weight: 307
 toc: true
+connects:
+  - page: /docs/agent/connect-to-vault
+    why: Enter the account's access key, secret key and directory on the Agent.
+  - page: /docs/hub/pipeline
+    why: What Hub does with a recording when cloud analysis is enabled.
 ---
 
 Accounts can be managed in the Vault interface or supplied through
 `VAULT_ACCOUNTS` for immutable deployments. Environment-managed accounts are
-shown grayed out and cannot be edited or deleted in the interface. See
+shown greyed out and cannot be edited or deleted in the interface. See
 [Database and environment configuration](/docs/vault/configuration/#database-and-environment-configuration)
 for the JSON contract, precedence, and secret-handling guidance.
 
-Having setup `Providers` and `Integrations`, you need a secure way to interact with them through the creation of an account.
+Having set up `Providers` and `Integrations`, you need a secure way to interact with them through the creation of an account.
 
-By creating an account you will receive credentials that give access to the Kerberos Vault's providers, integrations and APIs. Account credentials are being used by an Agent to send recordings, and/or through custom code by API calls to download and/or forward recordings.
+By creating an account you will receive credentials that give access to the Kerberos Vault's providers, integrations and APIs. Account credentials are used by an Agent to send recordings, and/or through custom code by API calls to download and/or forward recordings.
 
 ## Prerequisites
 
-Before you can configure a provider, make sure [you have installed a Kerberos Vault](/docs/vault/installation) inside a Kubernetes cluster.
+Before you can configure an account, make sure [you have installed a Kerberos Vault](/docs/vault/installation) inside a Kubernetes cluster.
 
 ## Configuration of an account
 
-Once you have set up your Kerberos Vault instance, and have successfully login to the application, you should see the account navigation item on the left.
+Once you have set up your Kerberos Vault instance, and have successfully logged in to the application, you should see the account navigation item on the left.
 
 {{< figure src="account.gif" alt="One or more accounts can be created to secure your storage access." caption="One or more accounts can be created to secure your storage access." class="stretch">}}
 
-When selecting the `+ Add Account` button, a modal will open that allows you to configure a specific account. Go a head and select one from the list.
+When selecting the `+ Add Account` button, a modal will open that allows you to configure a specific account. Go ahead and fill in the fields.
 
 {{< figure src="add-account.gif" alt="Create a secure account." caption="Create a secure account" class="stretch">}}
 
-Once you've provided all the required fields and enabled the account, you should be able to use it and link your Agents to your Kerberos Vault.
+Once you've provided all the required fields and enabled the account, you should be able to use it and link your Agents to your Kerberos Vault. [Connect to Vault](/docs/agent/connect-to-vault#configure-the-agent) shows where the credentials go on the Agent.
 
 ### Account settings
 
@@ -46,29 +51,31 @@ There are a couple of interesting configurations you can enable on account level
 
 #### Details
 
- - Account name: a random name identifying the account.
- - Main provider: the default provider the account is linked too.
- - Day limit: the expiry date of all recordings stored through this account.
- - Integrations: all the integrations which will be executed each time a recording was stored in a storage provider.
+ - Account name (**General** tab): a name identifying the account. The same tab holds the access key and secret key.
+ - Providers (**Storage** tab): the storage providers of the account. The first one you select is the default provider.
+ - Day limit (**Storage** tab): the number of days recordings stored through this account are kept before they expire.
+ - Integrations (**Integrations** tab): all the integrations which will be executed each time a recording is stored in a storage provider.
 
 #### Directory
 
 By defining a `directory` you force an account, and all its producing Agents, to store all recordings in a specific subdirectory on the selected storage provider. 
 
-By defining the `asteriks` (*) value, you will provide more flexibility and deligate the subdirectory to the connected Agents. This means that different Agents can store in different subdirectories, although they are connected to the same `account`.
+By defining the `asterisk` (*) value, you will provide more flexibility and delegate the subdirectory to the connected Agents. This means that different Agents can store in different subdirectories, although they are connected to the same `account`.
+
+If you use Kerberos Hub, the directory the recordings end up in (the account's, or the Agent's when the account uses `*`) must equal the Hub username. See [Kerberos Hub username](/docs/vault/integrations#kerberos-hub-username).
 
 #### Credentials
 
 These credentials are shared with Agents, Kerberos Vaults (chained/forwarding) and/or Kerberos Hub. It's the authentication information needed to push recordings or retrieve recordings from Kerberos Vault.
 
-#### Cloud analysis
+#### Hub pipeline
 
-When connecting Kerberos Vault to Kerberos Hub through the integration, an event is forwarded [to the Kerberos Hub pipeline](/docs/hub/pipeline). By enabling or disabling the cloud analysis you will enable or disable any cloud computing done on the Kerberos Hub.
+When connecting Kerberos Vault to Kerberos Hub through the integration, an event is forwarded [to the Kerberos Hub pipeline](/docs/hub/pipeline). On the **Integrations** tab, with **Default routing** selected, the **Hub pipeline** toggle enables or disables the cloud analysis Hub runs for this account, such as thumbnails, machine learning and dominant colours.
 
-This is required if you only want to store recordings and avoid any analysis in the cloud, and thus reduce bandwidth from Kerberos Vault to the Kerberos Hub microservices.
+Disable it if you only want to store recordings and avoid any analysis in the cloud, and thus reduce bandwidth from Kerberos Vault to the Kerberos Hub microservices.
 
 #### Edge analysis
 
 When connecting Kerberos Vault to Kerberos Hub through the integration, an event is forwarded [to the Kerberos Hub pipeline](/docs/hub/pipeline). By enabling or disabling the edge analysis you will enable or disable edge computing in Kerberos Vault.
 
-This is useful when you want to compute specific analysis at the edge and forward the relevant results [to the Kerberos Hub pipeline](/docs/hub/pipeline). This avoids bandwidth consumption but increases computing power at the edge.
+This is useful when you want to compute specific analysis at the edge and forward the relevant results [to the Kerberos Hub pipeline](/docs/hub/pipeline). This reduces bandwidth consumption but requires more computing power at the edge.

@@ -17,7 +17,7 @@ podcast: hub-audit-events
 
 The **Audit events** page provides a read-only history of security,
 configuration, and data operations in the current organisation. Use it to
-answer questions such as who changed a device, whether an authorization check
+answer questions such as who changed a device, whether an authorisation check
 succeeded, or which resource an action affected.
 
 Open **Management > Audit events** in the Hub sidebar. The page is available at
@@ -36,7 +36,7 @@ feed:
 - **Operation** separates reads, writes, creates, deletes, and authentication.
 - **Category** groups identity, data, and configuration activity.
 - **Outcome** separates successful and failed operations.
-- **Permission** finds authorization checks for a specific permission.
+- **Permission** finds authorisation checks for a specific permission.
 
 Changing a filter returns to the first page. Use **Clear** to remove every
 filter or **Refresh** to request the latest events without changing the current
@@ -55,7 +55,7 @@ the complete value.
 Select the details control at the end of a row to inspect the evidence captured
 with the event. Depending on the action, this can include:
 
-- the authorization decision and evaluated permission;
+- the authorisation decision and evaluated permission;
 - request information such as the source IP address and user agent;
 - identifiers for the affected device, recording, alert, or user;
 - structured metadata supplied by the action; and
@@ -68,7 +68,7 @@ browser or IP evidence. Events without a resource display no target.
 
 The footer shows the visible result range and the total number of matching
 events. Choose 25, 50, or 100 rows per page, or use the numbered, previous,
-next, first, and last controls to move through the result.
+next, first, and last controls to move through the results.
 
 Filtering and pagination happen on the server. The browser does not download
 the complete audit history before displaying the table.
@@ -101,11 +101,11 @@ from Hub's own database.
 | Feature | Helm chart | `hub-audit` image |
 | --- | --- | --- |
 | Webhook destinations | 0.137.0 or later | Any release |
-| S3 Object Lock destinations | 0.168.0 or later | v1.0.9 or later |
+| S3 Object Lock destinations | 0.168.1 or later | v1.0.9 or later |
 | `s3.allowUnlockedBucket` | 0.168.2 or later | v1.0.10 or later |
 
-The chart's default `kerberoshub.audit.tag` is older than v1.0.9, so set it
-explicitly when you use S3 destinations.
+Before chart 0.168.4, the default `kerberoshub.audit.tag` was older than v1.0.9, so
+set it explicitly when you use S3 destinations with an older chart.
 
 Auditing is off by default. `audit.enabled: true` deploys `hub-audit` and turns
 on audit publishing in every Hub service that supports it. Each service can opt

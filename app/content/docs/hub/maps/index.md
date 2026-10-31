@@ -36,7 +36,7 @@ origin for geolocation to work outside local development.
 > [!NOTE]
 > The address field depends on the Google Maps JavaScript and Places APIs. A
 > deployer must configure a browser API key before address suggestions and
-> reverse geocoding are available. See [Installation]({{< ref "/docs/hub/installation" >}}#google-maps-and-address-search).
+> reverse geocoding are available. See [Installation](/docs/hub/installation#google-places-address-autocomplete).
 
 ## Use the sites map
 
@@ -53,15 +53,15 @@ dragging or clicking it does not change a site's location.
 Use the location editor when the selected address points to the wrong entrance,
 building, or part of a larger property:
 
-1. Open the site and select **Edit site**.
+1. Open the site and select **Edit Site**.
 2. Choose a valid address if the site does not have coordinates yet.
-3. Expand the location control below the address field.
+3. Expand **Fine-tune map position** below the address field.
 4. Pan and zoom until the fixed centre pin marks the correct position, or enter
    valid latitude and longitude values.
 5. Save the site.
 
 Changing the pin updates only the coordinates. Hub preserves the formatted
-address and its other address metadata. Use **Reset** before saving to restore
+address and its other address metadata. Use **Reset position** before saving to restore
 the coordinates from the most recently selected address.
 
 ## Map layers

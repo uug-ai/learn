@@ -20,12 +20,14 @@ By the end you will have:
 3. Optional: persisted configuration and recordings on disk.
 4. Optional: a camera (RTSP) configured through environment variables.
 
+For an overview of every deployment option, see the [Agent installation docs](/docs/agent/installation/).
+
 ## Prerequisites
 
 Before you start, make sure you have:
 
 - An **IP camera** that supports an RTSP H264 or H265 stream. USB / Raspberry Pi cameras can be used through the [`camera-to-rtsp`](https://github.com/kerberos-io/camera-to-rtsp) sidecar.
-- A machine with one of the supported architectures: ARMv6, ARMv7, ARM64 or AMD64. Examples: Raspberry Pi, NVIDIA Jetson, Intel NUC, a VM, bare metal or a Kubernetes cluster.
+- A machine with one of the supported architectures: ARM64 or AMD64. Releases ship images and binaries for these two only. Examples: Raspberry Pi, NVIDIA Jetson, Intel NUC, a VM, bare metal or a Kubernetes cluster.
 - One of the following runtimes installed (depending on the option you pick below):
   - [Docker](https://docs.docker.com/get-docker/) (≥ 20.10)
   - [Docker Compose](https://docs.docker.com/compose/install/) (v2)
@@ -48,9 +50,9 @@ Open [http://localhost](http://localhost) and log in with the default credential
 - **Username:** `root`
 - **Password:** `root`
 
-> Change these credentials before exposing the agent to anything that isn't `localhost` (see [Configure with environment variables](#configure-with-environment-variables)).
+> Change these credentials before exposing the Agent to anything that isn't `localhost` (see [Configure with environment variables](#configure-with-environment-variables)).
 
-If you intend to connect to a USB / Raspberry Pi camera through the [`camera-to-rtsp`](https://github.com/kerberos-io/camera-to-rtsp) sidecar, run the agent in the host network so it can reach the local RTSP stream:
+If you intend to connect to a USB / Raspberry Pi camera through the [`camera-to-rtsp`](https://github.com/kerberos-io/camera-to-rtsp) sidecar, run the Agent in the host network so it can reach the local RTSP stream:
 
 ```bash
 docker run --network=host --name mycamera -d --restart=always kerberos/agent:latest
@@ -63,7 +65,7 @@ By default, configuration and recordings live inside the container. To persist t
 ```bash
 mkdir -p agent/config agent/recordings
 chmod -R 755 agent/
-chown 100:101 agent/ -R   # required by the non-root user inside the container
+chown 999:999 agent/ -R   # the non-root agent user inside current images
 
 docker run -p 80:80 --name mycamera \
   -v $(pwd)/agent/config:/home/agent/data/config \
@@ -107,9 +109,11 @@ services:
       - ./garage/recordings:/home/agent/data/recordings
 ```
 
-Start the stack:
+Create the host directories and give them to the container's non-root user, as in Option 2, then start the stack:
 
 ```bash
+mkdir -p frontdoor/config frontdoor/recordings garage/config garage/recordings
+chown -R 999:999 frontdoor garage
 docker compose up -d
 ```
 
@@ -117,7 +121,7 @@ Each camera is reachable on its own host port (`8080`, `8081`, ...).
 
 ## Option 4 — Kubernetes
 
-For production or multi-node deployments, use the Kubernetes manifests provided in the [`deployments/kubernetes`](https://github.com/kerberos-io/agent/tree/master/deployments/kubernetes) folder of the agent repo.
+For production or multi-node deployments, use the Kubernetes manifests provided in the [`deployments/kubernetes`](https://github.com/kerberos-io/agent/tree/master/deployments/kubernetes) folder of the Agent repo.
 
 A minimal `Deployment` + `Service` looks like:
 
@@ -160,7 +164,7 @@ spec:
       targetPort: 80
 ```
 
-Apply it:
+Save it as `kerberos-agent.yaml` and apply it:
 
 ```bash
 kubectl apply -f kerberos-agent.yaml
@@ -184,11 +188,12 @@ Configuration lives at `/var/snap/kerberosio/common`.
 
 ## Option 6 — Static binary
 
-Each release publishes pre-built binaries on the [releases page](https://github.com/kerberos-io/agent/releases). Download the archive matching your OS / architecture, extract it, and run:
+Each release publishes pre-built Linux binaries for AMD64 and ARM64 on the [releases page](https://github.com/kerberos-io/agent/releases), as `agent-amd64.tar` and `agent-arm64.tar`. The files sit at the root of the archive, so extract it into an empty directory and run:
 
 ```bash
-tar -xzf kerberos-agent-*.tar.gz
-cd kerberos-agent
+mkdir kerberos-agent && cd kerberos-agent
+curl -LO https://github.com/kerberos-io/agent/releases/latest/download/agent-amd64.tar   # or agent-arm64.tar
+tar -xf agent-amd64.tar
 ./main -action run -port 80
 ```
 
@@ -211,13 +216,13 @@ A few of the most common variables:
 
 | Variable | Description | Default |
 | --- | --- | --- |
-| `AGENT_NAME` | Friendly name of the agent. | `agent` |
+| `AGENT_NAME` | Friendly name of the Agent. | `agent` |
 | `AGENT_USERNAME` / `AGENT_PASSWORD` | Web UI credentials. | `root` / `root` |
 | `AGENT_TIMEZONE` | Timezone used for timestamps. | `Africa/Ceuta` |
 | `AGENT_CAPTURE_IPCAMERA_RTSP` | Main RTSP stream of your camera. | *(empty)* |
 | `AGENT_CAPTURE_IPCAMERA_SUB_RTSP` | Sub-stream used for live view (WebRTC). | *(empty)* |
 | `AGENT_CAPTURE_CONTINUOUS` | `true` for continuous recording, `false` for motion-based. | `false` |
-| `AGENT_CLOUD` | Cloud target: `s3` (Hub), `kstorage` (Vault) or `dropbox`. | `s3` |
+| `AGENT_CLOUD` | Cloud target: `s3` ([Hub](/docs/agent/connect-to-hub/)), `kstorage` ([Vault](/docs/agent/connect-to-vault/)) or `dropbox`. | `s3` |
 
 The full list lives in the [Agent README](https://github.com/kerberos-io/agent#configure-with-environment-variables).
 
@@ -225,19 +230,20 @@ The full list lives in the [Agent README](https://github.com/kerberos-io/agent#c
 
 1. Open `http://<host>:80` in your browser.
 2. Log in with the credentials above.
-3. Open **Settings → Camera** and confirm your RTSP URL — the live preview should appear.
+3. Open **Settings → Camera** and confirm your RTSP URL, then return to the **Dashboard** — the live view should appear.
 4. Trigger motion in front of the camera (or enable `AGENT_CAPTURE_CONTINUOUS=true`) and check **Recordings**.
 
 ## Troubleshooting
 
 - **No live view / black screen:** verify the RTSP URL with `ffplay rtsp://...` from the same host. WebRTC requires H264 — H265 sub-streams will not preview.
-- **Permission errors on the volume:** make sure the host directory is owned by `100:101` and is mode `755` (see [Option 2](#option-2--docker-with-persistent-volumes)).
+- **Permission errors on the volume:** make sure the host directory is owned by `999:999` and is mode `755` (see [Option 2](#option-2--docker-with-persistent-volumes)).
 - **Port `80` already in use:** map another host port, e.g. `-p 8080:80`.
-- **Behind a firewall / NAT for live streaming:** review the `AGENT_STUN_URI`, `AGENT_TURN_URI`, `AGENT_TURN_USERNAME` and `AGENT_TURN_PASSWORD` variables.
+- **Behind a firewall / NAT for live streaming:** review the `AGENT_STUN_URI`, `AGENT_TURN_URI`, `AGENT_TURN_USERNAME` and `AGENT_TURN_PASSWORD` variables. [Set up WebRTC live view with TURN](/tutorials/hub/setup-webrtc-turn/) walks through them.
 - **Logs:** `docker logs -f mycamera` (or `kubectl logs -f deploy/...`).
 
 ## Next steps
 
-- Connect this agent to **Hub** for centralized monitoring — see the upcoming [Hub tutorial](../../hub/).
-- Forward recordings to **Vault** — see the upcoming [Vault tutorial](../../vault/).
-- Review the in-depth [agent installation docs](/docs/agent/installation/) for advanced deployment patterns (Ansible, Terraform, Balena, ...).
+- Configure your camera's main and sub-stream — see [Connect any camera](/tutorials/agent/connect-any-camera/).
+- Connect this Agent to **Hub** for centralised monitoring — see [Connect to Hub](/docs/agent/connect-to-hub/).
+- Upload recordings to **Vault**, on storage you control — see [Connect to Vault](/docs/agent/connect-to-vault/).
+- Review the in-depth [Agent installation docs](/docs/agent/installation/) for advanced deployment patterns (Ansible, Terraform, Balena, ...).

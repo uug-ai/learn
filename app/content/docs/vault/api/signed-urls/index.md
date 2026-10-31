@@ -29,7 +29,7 @@ Two HTTP headers are always required:
 | `X-Kerberos-Storage-AccessKey` | The access key of the Vault account. |
 | `X-Kerberos-Storage-SecretAccessKey` | The matching secret. |
 
-The account also has a **default provider** assigned to it; you can override it per request via `X-Kerberos-Storage-Provider` (single-file endpoints) or via the JSON body (bulk endpoint).
+The account also has a **default provider** assigned to it. The single-file endpoint always takes the provider from `X-Kerberos-Storage-Provider`; the bulk endpoint uses the default provider unless the JSON body names another one.
 
 > **Warning:** Treat the access key + secret pair as a long-lived credential.
 > Do not embed them in frontend code or share them with end-users. The
@@ -38,7 +38,7 @@ The account also has a **default provider** assigned to it; you can override it 
 
 ## How asset filenames are derived
 
-When the Hub pipeline processes a recording, every generated asset is stored on the same provider, in the same `username/` directory, using a deterministic filename derived from the original recording. For a recording named:
+When the [Hub pipeline](/docs/hub/media-processing#2-registration-and-previews) processes a recording, every generated asset is stored on the same provider, in the same `username/` directory, using a deterministic filename derived from the original recording. For a recording named:
 
 ```
 account-a/1776427171_1-1_frontdoor_402-263-805-680_801_29960.mp4
@@ -64,7 +64,7 @@ Returns a signed URL for one file.
 | Header | Required | Description |
 |---|---|---|
 | `X-Kerberos-Storage-FileName` | yes | Object key, e.g. `account-a/1776427171_..._29960.mp4` |
-| `X-Kerberos-Storage-Provider` | yes | Provider name the file lives on (must match the account's provider) |
+| `X-Kerberos-Storage-Provider` | yes | Provider name the file lives on (must be one of the account's providers) |
 | `X-Kerberos-Storage-AccessKey` | yes | Account access key |
 | `X-Kerberos-Storage-SecretAccessKey` | yes | Account secret |
 
@@ -164,7 +164,7 @@ curl -s -X POST "http://localhost:8085/api/storage/bulk" \
   ]' | jq -r '.data | fromjson'
 ```
 
-A complete `.http` reference is shipped with the repository at [`vault/examples/get_signed_urls.http`](https://github.com/uug-ai/vault/blob/main/examples/get_signed_urls.http).
+A complete `.http` reference ships with the Vault source code as `examples/get_signed_urls.http`.
 
 ## 3. Two signing modes
 
@@ -219,7 +219,7 @@ GET http://localhost:8085/api/storage/signed
 
 The recommended pattern when you need *all* assets for a recording (player + scrubber thumbnails + share link to the redacted version, etc.):
 
-1. Start from the recording filename you already have, e.g. from a Hub pipeline event payload (`payload.key`).
+1. Start from the recording filename you already have, e.g. from a [Hub pipeline](/docs/hub/pipeline) event payload (`payload.key`).
 2. Derive the asset filenames using the suffix convention (`_thumbnail.jpg`, `_sprite.jpg`, `_redacted.mp4`, …).
 3. Call `POST /api/storage/bulk` once with the full list.
 4. Use the URLs from the response directly — no further auth needed for the lifetime of `uriExpiryTime`.

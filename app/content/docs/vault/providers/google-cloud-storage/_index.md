@@ -24,7 +24,7 @@ draft: false
 ### Use Cases for Kerberos Vault
 
 Google Cloud Storage is ideal for:
-- **Cloud-based deployments**: Centralized storage for recordings from distributed agents
+- **Cloud-based deployments**: Centralised storage for recordings from distributed Agents
 - **Long-term archival**: Cost-effective storage with lifecycle management
 - **Hybrid deployments**: Combining edge and cloud storage strategies
 - **Global operations**: Multi-region availability for worldwide deployments
@@ -119,25 +119,22 @@ Ensure the service account has the necessary permissions on the bucket:
 Now you're ready to configure Google Cloud Storage as a provider in Kerberos Vault:
 
 1. Open the Kerberos Vault web interface
-2. Navigate to **Providers** in the left menu
+2. Navigate to **Storage Providers** in the left menu
 3. Click **+ Add Storage Provider**
-4. Select **Google Cloud Storage** from the list
+4. Select **Google Cloud Platform: storage** from the list
 5. Fill in the configuration:
    - **Provider name**: A descriptive name (e.g., "GCS Production")
    - **Bucket name**: The name of your GCS bucket (e.g., `kerberos-vault-recordings`)
-   - **Region**: Leave blank or specify the region (e.g., `us-central1`)
-   - **Hostname**: Use `storage.googleapis.com` for global endpoint
-   - **Access Key**: The HMAC Access Key from Step 4
-   - **Secret Access Key**: The HMAC Secret from Step 4
+   - **Service key**: The contents of the service account JSON key file from Step 3
 6. Click **Validate** to test the connection
 7. If successful, you'll see a green confirmation message
-8. Click **Save** to add the provider
+8. Click **Add provider** to save the provider
 
 ## Configuration Options
 
 ### Storage Classes and Lifecycle Management
 
-To optimize costs, configure lifecycle rules in your GCS bucket:
+To optimise costs, configure lifecycle rules in your GCS bucket:
 
 1. Go to your bucket in the Cloud Console
 2. Click on the **Lifecycle** tab
@@ -179,11 +176,11 @@ Example lifecycle configuration:
 5. **Enable audit logging**: Track all access to your recordings
 6. **Encrypt with customer-managed keys**: Use Cloud KMS for additional encryption control
 
-### Performance Optimization
+### Performance Optimisation
 
 - **Use regional buckets**: For lowest latency, store data in the same region as your compute
 - **Multi-region buckets**: For global access and high availability
-- **Enable request logging**: Monitor access patterns and optimize accordingly
+- **Enable request logging**: Monitor access patterns and optimise accordingly
 - **Use signed URLs**: For secure, temporary access to recordings
 
 ## Monitoring and Management
@@ -220,12 +217,12 @@ Google Cloud Storage pricing is based on:
 
 For detailed pricing, visit the [Google Cloud Storage Pricing page](https://cloud.google.com/storage/pricing).
 
-### Cost Optimization Tips
+### Cost Optimisation Tips
 
 1. Use lifecycle management to transition to cheaper storage classes
 2. Choose the right storage class for your access patterns
 3. Enable object versioning only if needed
-4. Monitor and optimize egress costs
+4. Monitor and optimise egress costs
 5. Use Cloud CDN for frequently accessed content
 
 ## Troubleshooting
@@ -252,7 +249,7 @@ For detailed pricing, visit the [Google Cloud Storage Pricing page](https://clou
 - Review storage class usage
 - Implement lifecycle policies
 - Monitor and reduce unnecessary egress
-- Use Cloud Storage Insights to analyze usage patterns
+- Use Cloud Storage Insights to analyse usage patterns
 
 ## Additional Resources
 

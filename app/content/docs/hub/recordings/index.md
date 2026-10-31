@@ -1,6 +1,6 @@
 ---
 title: "Recordings"
-description: "Find, review, organize, and process recordings in Kerberos Hub."
+description: "Find, review, organise, and process recordings in Kerberos Hub."
 lead: "Find the footage that matters and move from playback to investigation."
 date: 2026-09-09T00:00:00+00:00
 lastmod: 2026-10-17T00:00:00+00:00
@@ -13,6 +13,13 @@ menu:
 weight: 310
 toc: true
 podcast: hub-recordings
+connects:
+  - page: /docs/vault/forwarding#on-demand-forwarding
+    title: On-demand forwarding
+    why: Keep video at an edge Vault and forward it when requested.
+  - page: /docs/agent/connect-to-hub#choose-where-recordings-go
+    title: Choose where recordings go
+    why: Send an Agent's recordings to Hub directly or through your Vault.
 ---
 
 The **Recordings** page is the main starting point for reviewing footage in
@@ -35,8 +42,9 @@ or open its dedicated detail page at `/media/<id>`.
 
 ## How recordings become available
 
-An Agent sends recordings, or recording metadata, through the configured media
-pipeline. Hub stores the information needed to find each recording and resolves
+An [Agent](/docs/agent/connect-to-hub#choose-where-recordings-go) sends recordings, or recording metadata, to Hub:
+directly, or through your own Kerberos Vault and its [Hub integration](/docs/vault/integrations#kerberos-hub).
+Each recording then goes through the configured [media pipeline](/docs/hub/media-processing). Hub stores the information needed to find each recording and resolves
 the video from its storage provider when you play it.
 
 Thumbnails, sprite previews, detections, counting results, and other analysis
@@ -45,7 +53,7 @@ its previews or analysis are ready. Not every deployment runs every analysis
 stage.
 
 Some deployments upload **metadata only** initially and keep the video at the
-source Vault. Those recordings can appear in searches without being immediately
+source Vault, using [on-demand forwarding](/docs/vault/forwarding#on-demand-forwarding). Those recordings can appear in searches without being immediately
 playable. See [Requesting recordings from the source](#requesting-recordings-from-the-source).
 
 ## Finding recordings
@@ -90,7 +98,7 @@ Combining several filters can produce an empty result even when footage exists
 for the day. Clear the analysis filters first when checking whether a camera
 recorded anything.
 
-See [Markers]({{< ref "/docs/hub/markers" >}}) for marker categories, events,
+See [Markers](/docs/hub/markers) for marker categories, events,
 tags, and occurrence details.
 
 ### Timeline and chart
@@ -236,7 +244,7 @@ The side panel and dedicated detail page expose an **Actions** menu:
 | **View Context** | Opens surrounding footage in the shared player. |
 | **Copy Video URL** | Copies the resolved video URL when one is available. Treat this as a storage access link, not a permanent archive link. |
 | **Request recording** | Requests footage from the source for an eligible metadata-only recording. |
-| **Verify video** | Opens the verification page in a new tab with the video URL prefilled and verification requested. |
+| **Verify video** | Opens the [verification page](/docs/hub/mp4-verification) in a new tab with the video URL prefilled and verification requested. |
 | **Share Recording** | Opens the sharing form for a title, notes, and recipient email addresses. |
 | **New case** | Starts a new case containing this recording. |
 | **Add to case** | Lets you find and select an existing case to attach the recording to. |
@@ -287,11 +295,11 @@ deployment-configured; if the selection exceeds it, narrow the time window or
 device filters before trying again.
 
 Creating a case queues the recordings for archiving to the configured Vault
-archive provider. Follow the export progress on the **Cases** page before
+[archive provider](/docs/vault/providers). Follow the export progress on the **Cases** page before
 assuming the evidence has been preserved. Case lifetime and archived-video
 retention are separate settings.
 
-See [Cases]({{< ref "/docs/hub/cases" >}}) for the full creation form, assignment,
+See [Cases](/docs/hub/cases) for the full creation form, assignment,
 privacy, archive configuration, and export behaviour.
 
 ## Permissions and retention
@@ -305,7 +313,7 @@ Ordinary recordings remain subject to the deployment's retention policy.
 Neither a star nor an edited description protects a recording from cleanup.
 Use cases for important evidence and confirm that archiving succeeds.
 
-See [Cleanup]({{< ref "/docs/hub/cleanup" >}}) for the retention service.
+See [Cleanup](/docs/hub/cleanup) for the retention service.
 
 ## Configuration
 
@@ -314,7 +322,7 @@ groups, devices, regions, marker fields, starred recordings, descriptions, the
 **With analysis** filter, and case creation. The default overview and fallback
 frame rate are also configurable.
 
-See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#media-filters) for the
+See [Feature flags](/docs/hub/feature-flags#media-filters) for the
 current recording settings. Feature flags control the UI; they do not replace
 backend authorisation or configure analysis processing by themselves.
 

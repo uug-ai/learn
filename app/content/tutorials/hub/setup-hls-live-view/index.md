@@ -28,7 +28,7 @@ By the end, you will have:
 - Agent-to-Hub live CMAF uploads over HTTPS
 - Authenticated browser playback over the same HTTPS endpoint
 - LL-HLS parts and idle prewarming enabled for faster startup
-- Quality selection between camera main and sub streams
+- Quality selection between camera main and sub-streams
 - Hub diagnostics for request, playlist and buffering phases
 {{< /tutorial-panel >}}
 
@@ -73,7 +73,7 @@ The Agent stops live uploads about eight seconds after the last viewer keepalive
 You need:
 
 - A self-hosted Hub whose API and frontend are available through HTTPS.
-- A connected Agent with Hub URI, access key and private key configured.
+- An Agent connected to Hub, with its Hub API URL, public key and private key configured. See [Connect to Hub](/docs/agent/connect-to-hub/).
 - Live view enabled in the Agent camera configuration.
 - MQTT connectivity between Hub frontend and Agent.
 - Outbound HTTPS from the Agent to Hub API.
@@ -99,7 +99,7 @@ kerberoshub:
         moqEnabled: "false"
 ```
 
-`liveStreamMode` controls what the **Live** button opens. `hlsEnabled` keeps HLS selectable if another transport is the default. You can leave WebRTC or MoQ enabled alongside it and let operators switch per stream.
+`liveStreamMode` controls what the **Live** button opens. `hlsEnabled` keeps HLS selectable if another transport is the default. WebRTC stays available, and you can leave MoQ enabled alongside it, so operators can switch per stream.
 
 ### Apply the Hub release
 
@@ -123,7 +123,7 @@ After the rollout, log out and back in or hard-refresh Hub. Open a camera and co
 
 ## Configure the Agent
 
-HLS uses the existing Hub identity rather than HLS-specific credentials. A containerized Agent needs the equivalent of:
+HLS uses the existing Hub identity rather than HLS-specific credentials. A containerised Agent needs the equivalent of the following ([Connect to Hub](/docs/agent/connect-to-hub#configure-with-environment-variables) lists every Hub variable):
 
 ```yaml
 env:
@@ -145,7 +145,7 @@ Factory-managed Agents already receive these values from their assigned Hub acco
 
 ### Keep the low-latency defaults
 
-The current Agent enables both optimizations unless they are set to the exact string `false`:
+The current Agent enables both optimisations unless they are set to the exact string `false`:
 
 | Agent variable | Default | Effect |
 |---|---|---|
@@ -162,7 +162,7 @@ env:
     value: "true"
 ```
 
-Disable low latency only to diagnose a client or proxy that mishandles LL-HLS parts. Disable prewarming only when minimizing idle CPU is more important than startup speed.
+Disable low latency only to diagnose a client or proxy that mishandles LL-HLS parts. Disable prewarming only when minimising idle CPU is more important than startup speed.
 
 {{< tutorial-panel tone="neutral" icon="clipboard-check" title="Live HLS uses its own segmenter" >}}
 Current Agents always write recordings as fragmented MP4. Live HLS independently packages camera frames into short-lived CMAF parts and segments for Hub, so no recording-format setting is needed for this tutorial.
@@ -234,13 +234,13 @@ The Agent should log a prewarmed session, activate uploads for the viewer, and a
 
 ## Verify quality selection
 
-If the camera has both main and sub streams configured, change the HLS quality control between **High** and **Low**. Each change requests a fresh session because resolution and codec initialization belong to that session.
+If the camera has both main and sub-streams configured, change the HLS quality control between **High** and **Low**. Each change requests a fresh session because resolution and codec initialisation belong to that session.
 
 - **High** selects the camera main stream.
-- **Low** selects the camera sub stream.
+- **Low** selects the camera sub-stream.
 - **Auto** lets the Agent apply its configured stream-selection policy.
 
-Use H.264 for both streams. A lower-resolution sub stream is useful on constrained uplinks because each active viewer causes the Agent to upload one selected live rendition to Hub.
+Use H.264 for both streams. A lower-resolution sub-stream is useful on constrained uplinks because each active viewer causes the Agent to upload one selected live rendition to Hub.
 
 ## Measure latency and load
 
@@ -267,6 +267,8 @@ When sizing the deployment, account for:
 | H.265 stream is blank | Browser HEVC support; switch camera main/sub stream to H.264 |
 | Stream repeatedly restarts | Agent-to-Hub upload stability, object TTL, proxy buffering and camera timestamp continuity |
 | High works but Low fails | Sub-stream URL, codec, dimensions and keyframe production |
+
+For how HLS fits next to the other Live transports, see [Live over HLS](/docs/hub/livestream/#live-over-hls) in the Live view docs.
 
 If HLS works while WebRTC fails, the likely fault is ICE/TURN or direct UDP rather than camera capture. Continue with [Set up WebRTC live view with TURN](/tutorials/hub/setup-webrtc-turn/) to add the lower-latency interactive path, or read [Choose a live-stream transport: MoQ vs HLS vs WebRTC](/tutorials/hub/moq-vs-hls-vs-webrtc/) to compare the tradeoffs.
 

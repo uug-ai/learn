@@ -14,7 +14,7 @@ toc: true
 podcast: hub-workflows-ingest-blocks-media-patch
 ---
 
-A **media-patch** is a partial update to a single recording. Where a [detection](../detection/) creates a run of tracks and a [marker](../marker/) creates a timeline annotation, a media-patch **changes fields on a media document that already exists** — it enriches the recording itself:
+A **media-patch** is a partial update to a single recording. Where a [detection](/docs/hub/workflows/ingest/blocks/detection/) creates a run of tracks and a [marker](/docs/hub/workflows/ingest/blocks/marker/) creates a timeline annotation, a media-patch **changes fields on a media document that already exists** — it enriches the recording itself:
 
 - a **description** an analysis stage produced for the clip,
 - a **star** flag an alerting stage set on a recording worth keeping,
@@ -24,7 +24,7 @@ It is the block a stage emits when its job is *"take this recording and add what
 
 ## How a media-patch is delivered
 
-A media-patch is the `data` body of a **`media-patch` block**. A workflow stage returns it inside its [block envelope](../../#the-block-envelope); the shared [ingest core](../../) validates it and applies the change to the `media` collection.
+A media-patch is the `data` body of a **`media-patch` block**. A workflow stage returns it inside its [block envelope](/docs/hub/workflows/ingest/#the-block-envelope); the shared [ingest core](/docs/hub/workflows/ingest/) validates it and applies the change to the `media` collection.
 
 The `data` body is **flat**: a reserved `mediaId` names the recording to update, and every other key is a field to set.
 
@@ -72,7 +72,7 @@ Delivery is **at-least-once**, so the write is an idempotent `$set`: it sets the
 
 ## Writable from
 
-A media-patch is **pipeline only** — it is emitted by a [workflow stage](../../../stages/) that has already resolved which recording to enrich. It is not accepted over the [ingest API](../../#over-the-api-post-ingest): patching an arbitrary recording by id is a trusted, in-cluster operation.
+A media-patch is **pipeline only** — it is emitted by a [workflow stage](/docs/hub/workflows/stages/) that has already resolved which recording to enrich. It is not accepted over the [ingest API](/docs/hub/workflows/ingest/#over-the-api-post-ingest): patching an arbitrary recording by id is a trusted, in-cluster operation.
 
 ## Out of scope
 
@@ -82,8 +82,8 @@ A media-patch is **pipeline only** — it is emitted by a [workflow stage](../..
 
 ## See also
 
-- [Blocks](../) — the full catalogue of block types and how a block envelope is shaped.
-- [Detection](../detection/) — a run of geometric tracks rather than a field update.
-- [Marker](../marker/) — a timeline annotation rather than a field update.
-- [Ingest](../../) — how the core routes a block envelope.
-- [Stages](../../../stages/) — how a microservice connects and hands a result back.
+- [Blocks](/docs/hub/workflows/ingest/blocks/) — the full catalogue of block types and how a block envelope is shaped.
+- [Detection](/docs/hub/workflows/ingest/blocks/detection/) — a run of geometric tracks rather than a field update.
+- [Marker](/docs/hub/workflows/ingest/blocks/marker/) — a timeline annotation rather than a field update.
+- [Ingest](/docs/hub/workflows/ingest/) — how the core routes a block envelope.
+- [Stages](/docs/hub/workflows/stages/) — how a microservice connects and hands a result back.

@@ -15,7 +15,7 @@ toc: true
 podcast: hub-workflows
 ---
 
-The [Pipeline]({{< relref "/docs/hub/pipeline" >}}) section describes the fixed chain of microservices that every recording flows through by default. **Workflows** build on top of that pipeline and let an organisation *customise* how its events are routed, filtered and processed — without changing a single line of code or touching the platform configuration.
+The [Pipeline](/docs/hub/pipeline) section describes the fixed chain of microservices that every recording flows through by default. **Workflows** build on top of that pipeline and let an organisation *customise* how its events are routed, filtered and processed — without changing a single line of code or touching the platform configuration.
 
 {{< callout type="info" >}}
 **Current deployment path.** Production deployments currently define workflows through Helm and `WORKFLOW_DEFINITIONS`. Database-backed `source: user` workflows and their API/editor path are implemented, but are not yet the established deployment path.
@@ -25,7 +25,7 @@ Where the pipeline is the same for everyone, a workflow is yours: pick the camer
 
 ## Why workflows?
 
-The default Hub pipeline is intentionally opinionated: a recording arrives from an Agent, is classified, throttled and turned into a notification. That's a great starting point, but real deployments have very different needs:
+The default Hub pipeline is intentionally opinionated: a recording arrives from an [Agent](/docs/agent/connect-to-hub), is classified, throttled and turned into a notification. That's a great starting point, but real deployments have very different needs:
 
 - A retail store only needs people detection during opening hours.
 - A logistics site wants vehicle detection on the parking camera, but a no-helmet model on the warehouse camera.
@@ -66,7 +66,7 @@ The **Workflows** page in Hub (`/workflows`) gives users an organisation-scoped 
 
 The page shows a searchable list of *My Workflows* with — for each entry — its enabled state, name, description and a summary of how many nodes and connections it contains. From there you can:
 
-- **Add Workflow** — opens the workflow editor in a modal to design a brand-new flow from an empty canvas.
+- **Add Workflow** — opens the workflow editor to design a brand-new flow from an empty canvas.
 - **Edit** (pen icon) — re-opens an existing workflow in the editor.
 - **Enable / disable** (slider) — toggles the workflow on or off without opening the editor.
 - **Delete** (trash icon) — permanently removes the workflow after a confirmation prompt.
@@ -85,7 +85,7 @@ Creating a workflow is a three-step process:
    Device  ──►  Active window  ──►  Throttle  ──►  ML Model
    ```
 
-When you're happy, hit *Save changes* (or *Add Workflow* for a new one) and flip the slider on. The workflow is now live and starts shaping how events from that device reach the rest of the Hub pipeline.
+When you're happy, hit *Save changes* (or *Create workflow* for a new one) and flip the slider on. The workflow is now live and starts shaping how events from that device reach the rest of the Hub pipeline.
 
 ## Examples
 
@@ -97,30 +97,30 @@ A few starting points to give an idea of what's possible:
 
 ## Relationship with the fixed pipeline
 
-Workflows do not replace the Hub [Pipeline]({{< relref "/docs/hub/pipeline" >}}); they steer it. The pipeline microservices (sequence, analysis, throttler, notification, classifier, …) keep doing their job for every recording. What a workflow does is to declare, per organisation and per device, *which* of those services should run, *when* they should run and *with which* configuration — turning a one-size-fits-all pipeline into something each organisation can tailor to its own use-case.
+Workflows do not replace the Hub [Pipeline](/docs/hub/pipeline); they steer it. The pipeline microservices (sequence, analysis, throttler, notification, classifier, …) keep doing their job for every recording. What a workflow does is to declare, per organisation and per device, *which* of those services should run, *when* they should run and *with which* configuration — turning a one-size-fits-all pipeline into something each organisation can tailor to its own use-case.
 
 ## Bring your own processing
 
 The nodes above are the **no-code** side of workflows. If you want a workflow to run *your own* service — a custom model, a speed estimator, any processing step, in any language — that is the **developer** side of the same system. A **stage** is a step in a workflow; you implement it as a **microservice**.
 
-Use **[Stages](stages/)** when your microservice runs inside the Hub deployment
-and can consume its stage queue directly. Use **[External stages](external-stages/)**
+Use **[Stages](/docs/hub/workflows/stages/)** when your microservice runs inside the Hub deployment
+and can consume its stage queue directly. Use **[External stages](/docs/hub/workflows/external-stages/)**
 when the service runs in a customer environment: the workflow forwarder sends a
-sanitized invocation to the customer's queue or API, and the service returns
+sanitised invocation to the customer's queue or API, and the service returns
 its result through an authenticated Hub callback.
 
-Your microservice hands its result back as a **block envelope** — a small JSON list of typed *blocks* (a detection, a marker, …), set on the run's `payload`. The **[Ingest](ingest/)** core is the shared layer on the platform side that receives it — from either the queue or the API — and runs the right actions for each block's type: validate it, store it, and trigger any follow-up side-effects.
+Your microservice hands its result back as a **block envelope** — a small JSON list of typed *blocks* (a detection, a marker, …), set on the run's `payload`. The **[Ingest](/docs/hub/workflows/ingest/)** core is the shared layer on the platform side that receives it — from either the queue or the API — and runs the right actions for each block's type: validate it, store it, and trigger any follow-up side-effects.
 
-A workflow does not have to wait for a recording to flow through the pipeline: **[Triggers](triggers/)** specs how a workflow is *activated* — automatically by analysis on every matching recording, or **manually** on demand from a surface such as a [case](../cases/), where a user runs a chosen workflow over the media they selected.
+A workflow does not have to wait for a recording to flow through the pipeline: **[Triggers](/docs/hub/workflows/triggers/)** specifies how a workflow is *activated* — automatically by analysis on every matching recording, or **manually** on demand from a surface such as a [case](/docs/hub/cases/), where a user runs a chosen workflow over the media they selected.
 
-When something doesn't behave, **[Observability](observability/)** documents the structured log lines and distributed trace the workflows engine emits for every run — so a deployer can see why a recording did or did not reach a stage, and send us logs precise enough to act on.
+When something doesn't behave, **[Observability](/docs/hub/workflows/observability/)** documents the structured log lines and distributed trace the workflows engine emits for every run — so a deployer can see why a recording did or did not reach a stage, and send us logs precise enough to act on.
 
 ## What you can gate on
 
 A workflow definition decides *what runs* at two points, and — since both now share **one** matching engine — they use the exact same condition vocabulary:
 
-- **The trigger gate** decides whether a recording **opens a run** at all. See **[Triggers](triggers/)**.
-- **The stage gate** decides whether an individual **stage fires** within a run. See **[Stages → Conditional routing](stages/#conditional-routing)**.
+- **The trigger gate** decides whether a recording **opens a run** at all. See **[Triggers](/docs/hub/workflows/triggers/)**.
+- **The stage gate** decides whether an individual **stage fires** within a run. See **[Stages → Conditional routing](/docs/hub/workflows/stages/#conditional-routing)**.
 
 A condition is always the same triple — a **`path`** (a dot-separated lookup, with `*` to fan out across array elements), an **`op`**, and a **`value`**:
 
@@ -141,7 +141,7 @@ The two gates differ only in **what fields are in scope**, because the trigger r
 | `device.siteIds` — the sites the recording's device is linked to (an **array**; match with `contains` / `in` / `exists` / `matches`) | ✅ | ✅ |
 | `user.organisationId` | ✅ | ✅ |
 | Weekly schedule (day + time, in the author's timezone) | ✅ (a dedicated field, not a `path`) | — |
-| `inputs.<operation>.…` — outputs of upstream/seed operations (e.g. `inputs.classify.details.*.classified`) | — | ✅ |
+| `inputs.<operation>.…` — outputs of upstream/seed operations (e.g. `inputs.classify.details.*.classified`) | ✅ (only the classification hand-off, `inputs.classify`) | ✅ |
 | `results.<operation>.…` — results accrued so far in the run | — | ✅ |
 | A **gate operation** — the stage waits until that operation's result is present | — | ✅ |
 
@@ -159,20 +159,20 @@ A few examples:
 
 Everything above can be authored **in the editor** as an organisation-scoped workflow (`source: user`). A deployment can also ship workflows as **configuration**: `source: config` workflows defined in the Helm chart under `kerberoshub.workflows.definitions`. These are deployment-global, ops-managed and read-only in the API — the *same workflow object* (a name, an enabled toggle, triggers and a set of stages), expressed as chart values instead of canvas nodes.
 
-`definitions` is the engine's **configuration routing source** (rendered to the `WORKFLOW_DEFINITIONS` env), a **map keyed by workflow name**. Each workflow is one key: an `enabled` toggle, its `triggers` and its `stages`. Every stage pairs with a **worker deployment** under `kerberoshub.services.<operation>` — the microservice that consumes the stage's queue (taken from `services.<operation>.queue`, never set on the stage). Those per-stage fields and the worker itself are the subject of [Stages](stages/#registering-a-stage). Because it's a map, one deployment can also define **several** workflows at once — each opens its own run over a recording and dispatches only its own stages — but a single workflow is the common case.
+`definitions` is the engine's **configuration routing source** (rendered to the `WORKFLOW_DEFINITIONS` env), a **map keyed by workflow name**. Each workflow is one key: an `enabled` toggle, its `triggers` and its `stages`. Every stage pairs with a **worker deployment** under `kerberoshub.services.<operation>` — the microservice that consumes the stage's queue (taken from `services.<operation>.queue`, never set on the stage). Those per-stage fields and the worker itself are the subject of [Stages](/docs/hub/workflows/stages/#registering-a-stage). Because it's a map, one deployment can also define **several** workflows at once — each opens its own run over a recording and dispatches only its own stages — but a single workflow is the common case.
 
 > **It's the engine switch, not the front-end one.** The workflows engine is off by default; set `kerberoshub.workflows.enabled: true` to run it. Don't confuse it with the unrelated `kerberoshub.…features.workflows.enabled` front-end feature flag.
 
 > [!NOTE] Feature flags
-> Set `kerberoshub.frontend.features.workflows.enabled: "true"` to expose the workflow UI and `kerberoshub.workflows.enabled: true` to run the engine. Neither switch replaces the other. See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#backend-and-deployment-switches).
+> Set `kerberoshub.frontend.features.workflows.enabled: "true"` to expose the workflow UI and `kerberoshub.workflows.enabled: true` to run the engine. Neither switch replaces the other. See [Feature flags](/docs/hub/feature-flags#backend-and-deployment-switches).
 
 **Workflow definition — `kerberoshub.workflows.definitions.<workflow>`**
 
 | Field | Required | Value | What it does |
 |---|---|---|---|
 | `enabled` | yes | bool | Include this workflow. Off = the engine doesn't run it. |
-| `triggers` | no | list | How a run **opens** — omit for one bare automatic trigger (every recording), or narrow by device/schedule. See [Triggers](triggers/). |
-| `stages` | yes | list | The workflow's stage entries — each an `operation` plus its dispatch rule. The per-stage fields and the worker that runs them live in [Stages](stages/#registering-a-stage). |
+| `triggers` | no | list | How a run **opens** — omit for one bare automatic trigger (every recording), or narrow by device/schedule. See [Triggers](/docs/hub/workflows/triggers/). |
+| `stages` | yes | list | The workflow's stage entries — each an `operation` plus its dispatch rule. The per-stage fields and the worker that runs them live in [Stages](/docs/hub/workflows/stages/#registering-a-stage). |
 
 (The chart renders each definition's `source` as `config` — a Helm-defined, deployment-global, ops-managed workflow that is read-only in the API; you don't set it.)
 
@@ -248,7 +248,7 @@ kerberoshub:
       volumeMounts: []
 ```
 
-The stage's own fields (`operation`, `dispatch`, `needs`, `needsMode`) and the worker's deployment fields are documented in **[Stages](stages/#registering-a-stage)**; how a run *opens* from `triggers` is **[Triggers](triggers/)**.
+The stage's own fields (`operation`, `dispatch`, `needs`, `needsMode`) and the worker's deployment fields are documented in **[Stages](/docs/hub/workflows/stages/#registering-a-stage)**; how a run *opens* from `triggers` is **[Triggers](/docs/hub/workflows/triggers/)**.
 
 ## Deploying and operating
 
@@ -270,16 +270,16 @@ For API clients and stored definitions, workflow ownership and timestamps use th
 
 Both automatic and manual activation resolve config **and** user workflows:
 
-- **Automatic** — for each finished recording the engine matches the boot-loaded config workflows *and* reads that organisation's `enabled` workflows from the database, opening a run for every one whose [automatic trigger](triggers/) matches. Config wins if a config and a user workflow ever resolve to the same id; if the database read fails the hand-off still fans out to the config workflows rather than being dropped.
-- **Manual** — a [Run action](triggers/#manual-trigger-on-a-case) names one `workflowId`; `hub-api` resolves it (a config workflow, else the caller's own org-scoped one), compiles its stages and seeds the run. An unknown or unowned id is a `404`.
+- **Automatic** — for each finished recording the engine matches the boot-loaded config workflows *and* reads that organisation's `enabled` workflows from the database, opening a run for every one whose [automatic trigger](/docs/hub/workflows/triggers/) matches. Config wins if a config and a user workflow ever resolve to the same id; if the database read fails the hand-off still fans out to the config workflows rather than being dropped.
+- **Manual** — a [Run action](/docs/hub/workflows/triggers/#manual-trigger-on-a-case) names one `workflowId`; `hub-api` resolves it (a config workflow, else the caller's own org-scoped one), compiles its stages and seeds the run. An unknown or unowned id is a `404`.
 
 A user workflow carries its compiled stages **on the run**, so any engine replica can route its stage results back without re-reading the definition. Each run is scoped to the active organisation id, so one tenant's workflows never fire on another's recordings — a read backed by an automatically-created index on `{ organisationId, enabled }`.
 
 ### What a deployment must provide
 
 1. **Turn the engine on.** It is off by default: set `kerberoshub.workflows.enabled: true` (the engine switch, *not* the unrelated `kerberoshub.…features.workflows.enabled` front-end flag).
-2. **Deploy a worker for every stage operation.** A workflow references a stage by its `operation`; the service is a separate `kerberoshub.services.<operation>` deployment. Crucially, **a user can only wire operations whose workers you have already deployed** — the catalog of stage operations is deployment-defined.
-3. **Line up the queue name.** The engine dispatches a stage to the queue set on it, defaulting to `kcloud-<operation>-queue.fifo` when none is set. A **user** workflow compiled from the graph has no explicit queue, so its stages use that default — make sure the worker for any operation a user workflow can reach consumes `kcloud-<operation>-queue.fifo`.
+2. **Deploy a worker for every stage operation.** A workflow references a stage by its `operation`; the service is a separate `kerberoshub.services.<operation>` deployment. Crucially, **a user can only wire operations whose workers you have already deployed** — the catalogue of stage operations is deployment-defined.
+3. **Line up the queue name.** The engine dispatches a stage to the queue set on it. A **user** workflow compiled from the graph has no explicit queue, so the engine resolves the operation's deployment queue — the `services.<operation>.queue` value, which the chart also renders into `WORKFLOW_STAGE_QUEUES` — and falls back to `kcloud-<operation>-queue.fifo` only when the deployment defines no queue for that operation. Give every worker a user workflow can reach a `queue` value so dispatch and consumption agree.
 
 ### Good to know
 
@@ -304,13 +304,13 @@ A quick reference to the vocabulary used across Workflows. The terms split into 
 
 | Term | Meaning |
 |------|---------|
-| **Stage** | A step in a workflow — built-in or your own. The *concept*. See [Stages](stages/). |
-| **Operation** | A stage's unique *id*: the value the engine routes on, files its result under (`results.<operation>`) and that other stages gate on. Defaults to the stage name. See [Stages](stages/#registering-a-stage). |
+| **Stage** | A step in a workflow — built-in or your own. The *concept*. See [Stages](/docs/hub/workflows/stages/). |
+| **Operation** | A stage's unique *id*: the value the engine routes on, files its result under (`results.<operation>`) and that other stages gate on. Required on every stage. See [Stages](/docs/hub/workflows/stages/#registering-a-stage). |
 | **Microservice** | The *implementation* of a stage: a service that consumes a message, does one job and returns a result, in any language. |
 | **WorkflowRun** | The event a stage receives off the queue — the run it processes and hands a result back for. |
-| **Block** | One typed unit of a result: a `type` (`detection`, `marker`, …) plus a `data` body in that type's shape. See [Blocks](ingest/blocks/). |
-| **Block envelope** | The ordered list of blocks a microservice hands back, set on the run's `payload`. See [Ingest](ingest/). |
+| **Block** | One typed unit of a result: a `type` (`detection`, `marker`, …) plus a `data` body in that type's shape. See [Blocks](/docs/hub/workflows/ingest/blocks/). |
+| **Block envelope** | The ordered list of blocks a microservice hands back, set on the run's `payload`. See [Ingest](/docs/hub/workflows/ingest/). |
 | **Ingest core** | The shared platform layer that receives the envelope and runs each block type's ordered, idempotent actions — validate, store, side-effects. |
-| **Conditional routing** | Branching a workflow on an earlier stage's result, so a stage runs only when an upstream result matches. See [Conditional routing](stages/#conditional-routing). |
+| **Conditional routing** | Branching a workflow on an earlier stage's result, so a stage runs only when an upstream result matches. See [Conditional routing](/docs/hub/workflows/stages/#conditional-routing). |
 
 Two layers, two words: on the **canvas** you wire **nodes**; behind a **stage** a microservice returns **blocks**. They live in different parts of the system — *node* for the thing you drag, *block* for a stage's typed output — so there's no overlap to trip over.

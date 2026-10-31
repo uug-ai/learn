@@ -14,7 +14,7 @@ toc: true
 podcast: hub-feature-flags
 ---
 
-Hub frontend feature flags control which pages, controls, and optional data sources are available to users. They do not grant permissions and they do not start backend services. Roles and resource authorization still apply after a feature is visible.
+Hub frontend feature flags control which pages, controls, and optional data sources are available to users. They do not grant permissions and they do not start backend services. Roles and resource authorisation still apply after a feature is visible.
 
 This page covers every product-facing boolean flag understood by the current Hub frontend and the related backend switches operators commonly need with them. Infrastructure toggles such as TLS, telemetry, ingress, persistence, and storage-provider settings remain in the Helm chart reference because they configure the deployment rather than a Hub product feature.
 
@@ -44,12 +44,14 @@ Use quoted `"true"` and `"false"` values for frontend flags unless the chart fie
 | `kerberoshub.frontend.features.case.enabled` | `FEATURE_CASE_ENABLED` | `"true"` | Enables case-management navigation, routes, and case actions. |
 | `kerberoshub.frontend.caseFilterAssigneesDefault` | `CASE_FILTER_ASSIGNEES_DEFAULT` | `"false"` | Applies the current user as the initial assignee filter on case lists. This changes the initial filter state; it does not restrict which cases the user may access. |
 | `kerberoshub.frontend.features.workflows.enabled` | `FEATURE_WORKFLOWS_ENABLED` | `"false"` | Enables workflow pages and navigation. This does not start the workflow engine. |
-| `kerberoshub.frontend.features.audit.enabled` | `FEATURE_AUDIT_ENABLED` | `"true"` | Shows the owner/admin Audit events page and navigation link. This does not deploy the audit dispatcher or change audit-event authorization. |
+| `kerberoshub.frontend.features.audit.enabled` | `FEATURE_AUDIT_ENABLED` | `"true"` | Shows the owner/admin Audit events page and navigation link. This does not deploy the audit dispatcher or change audit-event authorisation. |
+| `kerberoshub.frontend.features.dayOverview.enabled` | `FEATURE_DAY_OVERVIEW_ENABLED` | `"true"` | Shows the Day overview page and its navigation menu. Role page permissions still apply. |
+| `kerberoshub.api.passkeys.enabled` | `FEATURE_PASSKEYS_ENABLED` | `false` | Shows passkey sign-in and passkey management. The chart sets the same variable on Hub API together with the passkey configuration; see [Authentication](/docs/hub/authentication#configure-passkeys-in-a-self-hosted-deployment). |
 | `kerberoshub.frontend.features.floorplan.enabled` | `FEATURE_FLOORPLAN_ENABLED` | `"true"` | Enables floor-plan functionality in the frontend. |
 | `kerberoshub.frontend.features.i18n.enabled` | `FEATURE_I18N_ENABLED` | `"true"` | Shows the language switcher. When disabled, Hub always uses `i18n.defaultLanguage`. |
 | `kerberoshub.frontend.features.devices.hideAgent` | `FEATURE_DEVICES_HIDE_AGENT` | `"false"` | Hides the Add Agent control on the Devices page when set to `"true"`. |
 | `kerberoshub.frontend.features.devices.analyticsEnabled` | `FEATURE_DEVICE_ANALYTICS_ENABLED` | `"true"` | Shows the Analytics tab on device detail pages. When disabled, analytics fragments fall back to Overview. |
-| `kerberoshub.frontend.features.devices.developerToolsEnabled` | `FEATURE_DEVICE_DEVELOPER_TOOLS_ENABLED` | `"true"` | Shows owner-only live Agent logs and terminal access on device detail pages. When disabled, the Logs tab and terminal console are unavailable. This does not change the Agent's independent remote-access authorization. |
+| `kerberoshub.frontend.features.devices.developerToolsEnabled` | `FEATURE_DEVICE_DEVELOPER_TOOLS_ENABLED` | `"true"` | Shows owner-only live Agent logs and terminal access on device detail pages. When disabled, the Logs tab and terminal console are unavailable. This does not change the Agent's independent remote-access authorisation. |
 | `kerberoshub.frontend.features.dashboard.sitesFullscreenEnabled` | `FEATURE_DASHBOARD_SITES_FULLSCREEN_ENABLED` | `"true"` | Shows the fullscreen Sites map action on the Dashboard. |
 
 ## Organisations and projects
@@ -76,25 +78,25 @@ The organisation and project flags form a hierarchy:
 | Helm value | Container environment variable | Default | Effect |
 | --- | --- | --- | --- |
 | `kerberoshub.frontend.features.liveview.hlsEnabled` | `FEATURE_HLS_ENABLED` | `"true"` | Offers HLS as a LIVE transport. Disabling it removes HLS from transport selection. |
-| `kerberoshub.frontend.features.liveview.moqEnabled` | `FEATURE_MOQ_ENABLED` | `"false"` | Offers Media over QUIC (MoQ) as a LIVE transport. A relay URL and compatible Agent are also required. |
+| `kerberoshub.frontend.features.liveview.moqEnabled` | `FEATURE_MOQ_ENABLED` | `"false"` | Offers Media over QUIC (MoQ) as a LIVE transport. A relay URL and compatible Agent are also required; see [Deploy a MoQ relay on Kubernetes](/tutorials/hub/deploy-moq-relay-kubernetes/). |
 | `kerberoshub.frontend.features.liveview.remoteRecordingEnabled` | `FEATURE_REMOTE_RECORDING_ENABLED` | `"true"` | Shows the manual REC control and top-left REC recording-state overlay in live views. The Agent and the user's permissions must still allow remote recording. |
 | `kerberoshub.frontend.features.liveview.deviceStatusEnabled` | `FEATURE_LIVE_VIEW_DEVICE_STATUS_ENABLED` | `"true"` | Shows device status in live view tile headers. An online badge changes to a red `event detected` badge for 30 seconds after motion. Disabling it hides this badge without changing stream availability, device filtering, LIVE health, or REC indicators. |
 
-`liveStreamMode`, `defaultStreamMode`, `paginationMode`, `pageSize`, and `maxStreams` configure behavior but are not on/off feature flags. See the chart values for those settings.
+`liveStreamMode`, `defaultStreamMode`, `paginationMode`, `pageSize`, and `maxStreams` configure behaviour but are not on/off feature flags. See the chart values for those settings.
 
 ## Video editing and face redaction
 
 | Helm value | Container environment variable | Default | Effect |
 | --- | --- | --- | --- |
 | `kerberoshub.frontend.features.videoEdits.enabled` | `FEATURE_VIDEO_EDITS_ENABLED` | `"false"` | Umbrella for in-app video editing tools, including face redaction. |
-| `kerberoshub.frontend.features.faceRedaction.enabled` | `FEATURE_FACE_REDACTION_ENABLED` | `"false"` | Enables the face-redaction tool. `videoEdits.enabled` must also expose the edit surface. |
+| `kerberoshub.frontend.features.faceRedaction.enabled` | `FEATURE_FACE_REDACTION_ENABLED` | `"false"` | Enables the face-redaction tool. `videoEdits.enabled` must also be enabled to expose the edit surface. |
 | `kerberoshub.frontend.features.faceRedaction.classifierTracksEnabled` | `FEATURE_FACE_REDACTION_CLASSIFIER_TRACKS_ENABLED` | `"true"` | Makes legacy classifier/analysis tracks available as a redaction starting point. When disabled, saved edits, detection runs, manual box drawing, and submission remain available. |
 
 These flags expose frontend controls only. Rendering redacted recordings still requires the redaction workflow and worker to be configured.
 
 ## Media filters
 
-Visible media-filter controls default to `"true"`. Disabling one removes that filter control; it does not delete or change existing data. `markerOptionsByDate.enabled` is a behavior flag and defaults to `"false"`.
+Visible media-filter controls default to `"true"`. Disabling one removes that filter control; it does not delete or change existing data. `markerOptionsByDate.enabled` is a behaviour flag and defaults to `"false"`.
 
 | Helm value | Container environment variable | Default | Effect |
 | --- | --- | --- | --- |
@@ -146,7 +148,7 @@ Some components use replica counts rather than an `enabled` flag; setting replic
 
 - The frontend consumes `FEATURE_DARK_MODE_ENABLED`, while the current chart template emits `FEATURE_DARK_MODE`. Until those names are aligned, `kerberoshub.frontend.features.darkModeEnabled` does not reliably control the frontend through the standard chart.
 - Runtime-only flags listed above are valid frontend inputs but are not currently mapped by the Hub chart.
-- A visible control never replaces backend authorization. Users still need the required role, permissions, organisation membership, and project scope.
+- A visible control never replaces backend authorisation. Users still need the required role, permissions, organisation membership, and project scope.
 
 ## Applying changes
 

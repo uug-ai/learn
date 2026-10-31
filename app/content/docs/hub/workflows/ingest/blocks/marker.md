@@ -14,7 +14,7 @@ toc: true
 podcast: hub-workflows-ingest-blocks-marker
 ---
 
-A **marker** is a single annotation on a recording's timeline — a labelled point or span that says *something happened here, and here is what it was*. Where a [detection](../detection/) is a run of geometric tracks (a box per frame), a marker is a higher-level, human-meaningful label on a stretch of time:
+A **marker** is a single annotation on a recording's timeline — a labelled point or span that says *something happened here, and here is what it was*. Where a [detection](/docs/hub/workflows/ingest/blocks/detection/) is a run of geometric tracks (a box per frame), a marker is a higher-level, human-meaningful label on a stretch of time:
 
 - a licence-plate read (`2-HCP-007`) from an ANPR stage,
 - a point-of-sale transaction (`transaction_id`) lined up against the camera over the till,
@@ -24,9 +24,9 @@ Markers are what the timeline and search surfaces read to let an operator jump s
 
 ## How a marker is delivered
 
-A marker is the `data` body of a **`marker` block**. A workflow stage returns it inside its [block envelope](../../#the-block-envelope); the shared [ingest core](../../) validates it and writes it to the `markers` collection.
+A marker is the `data` body of a **`marker` block**. A workflow stage returns it inside its [block envelope](/docs/hub/workflows/ingest/#the-block-envelope); the shared [ingest core](/docs/hub/workflows/ingest/) validates it and writes it to the `markers` collection.
 
-Like [`detection`](../detection/), a `marker` block is delivered through the shared [ingest core](../../) — a [workflow stage](../../../stages/) emits it inside a block envelope and the core routes it the same way as any other block type. The **organisation and device are taken from the run**, not from the body; your `data` supplies the annotation itself — its `name`, its timing, and its descriptive fields.
+Like [`detection`](/docs/hub/workflows/ingest/blocks/detection/), a `marker` block is delivered through the shared [ingest core](/docs/hub/workflows/ingest/) — a [workflow stage](/docs/hub/workflows/stages/) emits it inside a block envelope and the core routes it the same way as any other block type. The **organisation and device are taken from the run**, not from the body; your `data` supplies the annotation itself — its `name`, its timing, and its descriptive fields.
 
 ```json
 {
@@ -64,7 +64,10 @@ All timestamps are **seconds since the Unix epoch** (not frames, not millisecond
 
 ### Identity & timing
 
-These fields are required, and together they form the marker's identity.
+`name` and `startTimestamp` are required and form the marker's identity. A
+missing (or earlier) `endTimestamp` is set to `startTimestamp`, and `duration`
+is always recomputed from the two, so a point-in-time marker needs only a name
+and a start.
 
 | Field | Type | Notes |
 |-------|------|-------|
@@ -109,7 +112,7 @@ overlap); set it only to override which recordings the marker attaches to.
 
 ### Detection-track link (`detections`)
 
-When a stage emits both a [`detection`](../detection/) block and a marker derived
+When a stage emits both a [`detection`](/docs/hub/workflows/ingest/blocks/detection/) block and a marker derived
 from one or more of its tracks, link them through the marker's optional
 `detections` array. Each reference identifies one track in one stored detection
 run:
@@ -227,12 +230,12 @@ Delivery is **at-least-once**, so the write is an **idempotent upsert** keyed by
 - **Runtime-derived metadata** (`atRuntimeMetadata`, the marker/tag/event time ranges) is computed by the platform for the timeline UI — a producer does not set it.
 - **System fields** — `id`, `synchronize` and `audit` are managed by the platform.
 - **Geometry.** A marker labels *time*, not *space*. If you need a box per frame,
-  emit a [`detection`](../detection/) block and reference its track through
+  emit a [`detection`](/docs/hub/workflows/ingest/blocks/detection/) block and reference its track through
   `detections`; the two blocks can travel in the same envelope.
 
 ## See also
 
-- [Blocks](../) — the full catalogue of block types and how a block envelope is shaped.
-- [Detection](../detection/) — the other built-in block type: geometric tracks rather than timeline labels.
-- [Ingest](../../) — how the core routes a block envelope.
-- [Stages](../../../stages/) — how a microservice connects and hands a result back.
+- [Blocks](/docs/hub/workflows/ingest/blocks/) — the full catalogue of block types and how a block envelope is shaped.
+- [Detection](/docs/hub/workflows/ingest/blocks/detection/) — another built-in block type: geometric tracks rather than timeline labels.
+- [Ingest](/docs/hub/workflows/ingest/) — how the core routes a block envelope.
+- [Stages](/docs/hub/workflows/stages/) — how a microservice connects and hands a result back.

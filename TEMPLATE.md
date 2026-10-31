@@ -137,7 +137,7 @@ a checklist and drop the ones that do not apply.
    self-contained (they should make sense in a search result excerpt).
 4. **Permissions & roles** — when the feature has per-role behaviour,
    call it out explicitly: who can read, who can write, who can delete.
-   Link to the central [roles documentation]({{< ref "/docs/hub/roles" >}})
+   Link to the central [roles documentation](/docs/hub/roles)
    for the gory details.
 5. **Configuration** — every Helm value, env var or feature flag the
    admin needs to know about, with a `values.yaml` snippet and the
@@ -145,6 +145,11 @@ a checklist and drop the ones that do not apply.
 6. **Troubleshooting** — a small FAQ-style block listing the failures
    users have actually hit in support tickets, with a copy/pasteable
    diagnosis.
+7. **Works with** — when the feature depends on another product (an Agent
+   setting, a Vault provider or account), link to that product's page at the
+   step where the reader needs it, and list it under `connects:` in the
+   front matter. Explain only the Hub side; see
+   [Linking between products](README.md#linking-between-products).
 
 ### Embedding screenshots
 

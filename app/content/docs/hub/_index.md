@@ -23,14 +23,16 @@ Kerberos Hub is the web application that brings all your Agents, sites and recor
 
 ## How an event moves through Hub
 
-1. **On site.** Every camera has its own Agent; on a site with several cameras the Agents often run side by side on one gateway machine. A camera triggers its Agent, which records the event and uploads the recording to [Kerberos Vault]({{< relref "/docs/vault/first-things-first" >}}), so your footage stays on the storage you choose.
-2. **In Hub.** Hub picks up the event and runs it through its [pipeline]({{< relref "/docs/hub/pipeline" >}}): it groups recordings into sequences, analyses them with machine learning (for example to detect a person or a vehicle) and decides whether anyone should be told. With [workflows]({{< relref "/docs/hub/workflows" >}}) you choose which cameras, models and time windows apply.
-3. **For operators.** The result shows up where people work: on livestreams and videowalls, in the recordings overview, and as [notifications]({{< relref "/docs/hub/notifications" >}}) in the Watchlist or through channels such as email, Slack or webhooks.
+1. **On site.** Every camera has its own Agent; on a site with several cameras the Agents often run side by side on one gateway machine. A camera triggers its [Agent](/docs/agent), which records the event and uploads the recording to [Kerberos Vault](/docs/vault/first-things-first), so your footage stays on the storage you choose.
+2. **In Hub.** Hub picks up the event and runs it through its [pipeline](/docs/hub/pipeline): it groups recordings into sequences, analyses them with machine learning (for example to detect a person or a vehicle) and decides whether anyone should be told. With [workflows](/docs/hub/workflows) you choose which cameras, models and time windows apply.
+3. **For operators.** The result shows up where people work: on livestreams and videowalls, in the recordings overview, and as [notifications](/docs/hub/notifications) in the Watchlist or through channels such as email, Slack or webhooks.
 
-Sign in using a password, 2FA, a passkey, or OIDC single sign-on; the [Authentication guide]({{< relref "/docs/hub/authentication" >}}) explains the options. Who sees what is managed per [organisation and project]({{< relref "/docs/hub/organisations" >}}), with roles for each member.
+Agents connect to Hub with [your account's keys](/docs/hub/configuration#assign-an-agent); [Connect to Hub](/docs/agent/connect-to-hub) in the Agent docs shows how.
+
+Sign in using a password, 2FA, a passkey, or OIDC single sign-on; the [Authentication guide](/docs/hub/authentication) explains the options. Who sees what is managed per [organisation and project](/docs/hub/organisations), with roles for each member.
 
 ## Where to start
 
-- [First things first]({{< relref "/docs/hub/first-things-first" >}}): why Hub exists and what it does.
-- [Getting started]({{< relref "/docs/hub/getting-started" >}}): a tour of the main features.
-- [Pipeline]({{< relref "/docs/hub/pipeline" >}}): the services every recording flows through.
+- [First things first](/docs/hub/first-things-first): why Hub exists and what it does.
+- [Getting started](/docs/hub/getting-started): a tour of the main features.
+- [Pipeline](/docs/hub/pipeline): the services every recording flows through.

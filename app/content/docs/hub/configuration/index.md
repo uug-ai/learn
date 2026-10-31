@@ -12,83 +12,99 @@ menu:
 weight: 303
 toc: true
 podcast: hub-configuration
+connects:
+  - page: /docs/agent/connect-to-hub
+    why: Enter the Hub API URL, keys and site on the Agent.
+  - page: /docs/factory/getting-started
+    why: Deploy many Agents on Kubernetes with the Hub settings applied.
+  - page: /docs/vault/integrations#kerberos-hub
+    title: Kerberos Hub integration
+    why: Let Vault tell Hub about every new recording it stores.
 ---
 
-Once you have installed the Kerberos Hub Helm chart, and you confirm to have all microservices properly running you should be able to access the Kerberos Hub login screen and sign in through the default username and password [which was defined during the installation step](https://github.com/kerberos-io/hub#post-installation).
+Once you have installed the Kerberos Hub Helm chart and confirmed that all microservices are running properly, you should be able to access the Kerberos Hub login screen and sign in through the default username and password [which was defined during the installation step](https://github.com/kerberos-io/hub#post-installation).
 
 {{< figure src="hub-login.gif" alt="Kerberos Hub login screen after installation." caption="Kerberos Hub login screen after installation." class="stretch">}}
 
-# Accounts
+## Accounts
 
-Once you have executed the post installation you should now have a user with the role **owner**. The owner role is the highest privileged role and gives access to all features, functions, Agents and related recordings of the specific user. An owner has an overview of all connected Agents, and can create sites, groups, alerts, channels, etc. The owner can also delegate specific Agents, sites or groups to sub accounts.
+Once you have executed the post-installation steps, you should now have a user with the role **owner**. The owner role is the highest privileged role and gives access to all features, functions, Agents and related recordings of the specific user. An owner has an overview of all connected Agents, and can create sites, groups, alerts, channels, etc. The owner can also delegate specific Agents, sites or groups to sub accounts.
 
-## Sub accounts
+### Sub accounts
 
-Sub accounts are created to delegate access to other users, and have a limited scope or access to the different Agents and there related recordings and livestreams.
+Sub accounts are created to delegate access to other users, and have a limited scope or access to the different Agents and their related recordings and livestreams.
 
-An example of sub account would be a site owner, a store owner, etc. Who only needs access to the livestreams or cameras from the specific site or store.
+An example of a sub account would be a site owner, a store owner, etc., who only needs access to the livestreams or cameras from the specific site or store.
 
-On top of that a sub account can have a specific role such as **guest** or **editor**. This role will limit the access to specific function and features.
-On top of that a sub account can have a specific role such as **guest** or **editor**. This role will limit the access to specific function and features.
+On top of that a sub account can have a specific role such as **guest** or **editor**. This role will limit the access to specific functions and features.
 
-You can create a new sub account by navigation to the accounts page and clicking on the `(+ Add Account)` button at the left top.
+You can create a new sub account by navigating to the accounts page and clicking on the `(+ Add Account)` button at the top left.
 
 {{< figure src="hub-add-account.gif" alt="Give another user limited access to Kerberos Hub by creating a sub account." caption="Give another user limited access to Kerberos Hub by creating a sub account." class="stretch">}}
 
 ## Sites
 
-While scaling and installing more and more Agents, it might become tedious to manage and structure them properly. Due to this reason the concept of sites was created. A site is a logical grouping of a number of Agents that are physically installed at the same location.
+While scaling and installing more and more Agents, it might become tedious to manage and structure them properly. For this reason, the concept of sites was created. A site is a logical grouping of a number of Agents that are physically installed at the same location.
 
-By creating sites and assigning Agents to a specific site, it is easier to monitor specific video streams and there related recordings/events.
+By creating sites and assigning Agents to a specific site, it is easier to monitor specific video streams and their related recordings/events.
 
-Next to that sites also gives an additional advantage in terms of authorization and access control. As described in the accounts paragraph, a sub account can be granted access to only a limited number of sites, and therefore will only be able to view the Agents at a specific location.
+Next to that, sites also give an additional advantage in terms of authorisation and access control. As described in the accounts paragraph, a sub account can be granted access to only a limited number of sites, and therefore will only be able to view the Agents at a specific location.
 
-You can create a new site, by navigating to the sites page and clicking the `(+ Add Site)` button at the left top.
+You can create a new site by navigating to the sites page and clicking the `(+ Add Site)` button at the top left.
 
 {{< figure src="hub-add-site.gif" alt="Structure your Agents by using sites, and introduce Access Control for sub accounts." caption="Structure your Agents by using sites, and introduce Access Control for sub accounts." class="stretch">}}
 
 ## Groups
 
-Groups are similar to sites, the only difference is that it is more abstract than a site. A group can be for example "Cash desks", "Entrance gates", "All stores of Belgium", "EMEA sites", etc. A group can be either a collection of sites, what we call then a **site group**, or it can contain a number of cameras from one or more sites, what we call a **group**.
+Groups are similar to sites; the only difference is that a group is more abstract than a site. A group can be for example "Cash desks", "Entrance gates", "All stores of Belgium", "EMEA sites", etc. A group can be either a collection of sites, what we call then a **site group**, or it can contain a number of cameras from one or more sites, what we call a **group**.
 
-Similar to sites, groups can also be used to give access to specific Agents, and introduces a next level of flexibility and access controls. As illustrated before you could have some responsible for all "entrance gates" of all buildings within a specific country. By giving a sub account access to this group, he or she will only see the entrance gates of the different sites and not the other Agents belonging to the related sites.
+Similar to sites, groups can also be used to give access to specific Agents, and introduce an extra level of flexibility and access control. As illustrated before you could have someone responsible for all "entrance gates" of all buildings within a specific country. By giving a sub account access to this group, he or she will only see the entrance gates of the different sites and not the other Agents belonging to the related sites.
 
-You can create a new group, by navigating to the groups page and clicking the `(+ Add Group)` button at the left top.
+You can create a new group by navigating to the groups page and clicking the `(+ Add Group)` button at the top left.
 
 {{< figure src="hub-add-group.gif" alt="Structure your Agents by using groups, another level of flexibility." caption="Structure your Agents by using groups, another level of flexibility." class="stretch">}}
 
 ## Cameras
 
-On the cameras page you will have an overview of all the 
- cameras, Agents, your (sub) account has access too. This means that if your account only has access to a couple of sites or groups, the cameras page will only show the Agents that belong to the relating groups and sites.
+On the **Devices** page you will have an overview of all the cameras (Agents) your (sub) account has access to. This means that if your account only has access to a couple of sites or groups, the page will only show the Agents that belong to the related groups and sites.
 
-{{< figure src="hub-cameras.gif" alt="Structure your Agents by using groups, another level of flexibility." caption="Structure your Agents by using groups, another level of flexibility." class="stretch">}}
+{{< figure src="hub-cameras.gif" alt="The cameras page lists every Agent your account has access to." caption="The cameras page lists every Agent your account has access to." class="stretch">}}
 
-By clicking on the `(+ Add Camera)` button, you will see a modal explaining you how to connect an Agent to Kerberos Hub, and the different deployments which are available.
+The **Add Agent** button opens a dialog that writes the Agent's configuration for you. Enter an Agent name, select a site, paste the **Hub key** and **Hub private key**, then choose **Docker command** or **Kubernetes manifest** and select **Copy configuration**. The copied command has the Agent's Hub settings filled in.
 
 ### Assign an Agent
 
-As explained in the modal, there are different possibilities to set up and run an Agent. 
+As explained in the modal, there are [different possibilities to set up and run an Agent](/docs/agent/installation).
 
-Nevertheless, how you deployed an Agent, to connect the Agent to Kerberos Hub, you will require the account credentials from your Kerberos Hub account to be shared with your Agents. By sharing those credentials you are linking your Agents to the relevant Kerberos Hub account.
+Regardless of how you deployed an Agent, to connect the Agent to Kerberos Hub you will require the account credentials from your Kerberos Hub account to be shared with your Agents. By sharing those credentials you are linking your Agents to the relevant Kerberos Hub account. [Connect to Hub](/docs/agent/connect-to-hub) shows where they go on the Agent; [Factory](/docs/factory/getting-started) sets them for every Agent it deploys.
 
-By navigating to the profile page, and selecting your plan you will find the required credentials for your Agents.
+Open **Plans & integrations** to find the **Public key** and **Private key** for your Agents. When [organisations and projects](/docs/hub/organisations#creating-and-managing-projects) are enabled, the credentials belong to the project instead: open **Project settings** and copy the **Agent public key** and **Agent private key**.
 
-Please note that when you are using the Kerberos Hub Saas offering you will need both an access and secret key. If you are using Kerberos Hub self-hosted you will only need an access key.
+The Agent needs both keys, whether you use Kerberos Hub SaaS or a self-hosted installation.
 
 {{< figure src="hub-link-agent.gif" alt="Get your credentials to link your Agents." caption="Get your credentials to link your Agents." class="stretch">}}
 
+## Connect Kerberos Vault
+
+When your Agents store recordings in your own [Kerberos Vault](/docs/vault), Hub needs to reach that Vault: each time someone opens a recording, Hub asks Vault for a signed URL. Give Hub the Vault API URL and the access key and secret key of a [Vault account](/docs/vault/accounts):
+
+- **For your whole account**: open **Plans & integrations** and fill in **Kerberos Vault settings**. The block is shown on Enterprise plans.
+- **For one site**: open the site and fill in **Connect to dedicated Vault**, for example to use a Vault in the same region as that site's cameras. **Test connection** checks the URL and keys.
+- **On a self-hosted installation**: set the `kerberosvault` values of the Helm chart (`uri`, `provider`, `accesskey` and `secretkey`).
+
+These settings only let Hub read recordings. For new recordings to show up in Hub, Vault also needs its [Kerberos Hub integration](/docs/vault/integrations#kerberos-hub).
+
 ## Integrations
 
-You got your accounts setup, sites and groups created and last but not least, one or more Agents connected to your Kerberos Hub.
+You have your accounts set up, sites and groups created and, last but not least, one or more Agents connected to your Kerberos Hub.
 
-Now it is time to configure some integrations using alerts and channels. The idea of integrations is that you can send messages to other 3rd-party services, or your own APIs, when an interesting event/alert occurred.
+Now it is time to configure some integrations using alerts and channels. The idea of integrations is that you can send messages to other 3rd-party services, or your own APIs, when an interesting event/alert occurs.
 
-{{< figure src="hub-alerts.gif" alt="Get your credentials to link your Agents." caption="Get your credentials to link your Agents." class="stretch">}}
+{{< figure src="hub-alerts.gif" alt="Configure alerts and channels to send events to other services." caption="Configure alerts and channels to send events to other services." class="stretch">}}
 
 ### Alerts
 
-Alerts can be configured to trigger one or more channels on a specific events. Generic or customer alerts can be configured to meet specific requirements and behaviours. A more indepth configuration of both generic and customer alerts are explained below.
+Alerts can be configured to trigger one or more channels on specific events. Generic or custom alerts can be configured to meet specific requirements and behaviours. A more in-depth configuration of both generic and custom alerts is explained below.
 
 ![Configuring alerts](hub-customalerts.png)
 
@@ -100,7 +116,7 @@ Generic alerts (legacy) are the first alerts created in Kerberos Hub. Three diff
 
 - **Detections**: send a notification if a recording was received from a specific Agent, within a time range, with a specific classification, etc.
 - **Devices**: when one of your Agents stops working, a notification will be sent.
-- **High upload**: when a lot of recordings are generated within a specific period of time, a notification can be send.
+- **High upload**: when a lot of recordings are generated within a specific period of time, a notification can be sent.
 
 #### Custom Alerts
 
@@ -108,7 +124,7 @@ To be written
 
 ### Channels
 
-Multiple channels can be configured and used as an event endpoint. Each channel has its own API and visualisation to the end user, therefore we will discuss them below.
+Multiple channels can be configured and used as an event endpoint. Each channel has its own API and visualisation to the end user, so we will discuss them below.
 
 #### Webhook
 
@@ -133,13 +149,13 @@ By configuring a webhook, you will be able to receive the event/notification thr
         ]
     }
 
-An easy way to verify if the POST request is happening, you can use a public webhook service like `https://pipedream.com/`. By creating an account, you will receive your own HTTP endpoint and all the required inspection tools.
+To easily verify whether the POST request is happening, you can use a public webhook service like `https://pipedream.com/`. By creating an account, you will receive your own HTTP endpoint and all the required inspection tools.
 
 {{< figure src="configure-webhook.gif" alt="Configure the webhook channel." caption="Configure the webhook channel." class="stretch">}}
 
 ## Media proxy
 
-By default Kerberos Hub hands the URLs it receives from Kerberos Vault straight to the browser. Depending on the Vault configuration these point to Vault (vault-signed URLs) or directly to the storage provider (S3, MinIO, GCS, Azure presigned URLs).
+By default Kerberos Hub hands the URLs it receives from Kerberos Vault straight to the browser. Depending on the Vault configuration these point to Vault ([vault-signed URLs](/docs/vault/providers#url-signing)) or directly to the storage provider (S3, MinIO, GCS, Azure presigned URLs).
 
 Enable the media proxy to hide both. The Hub API then asks Vault for the signed URL as usual, seals it into an opaque, encrypted token and returns a Hub API URL instead:
 
@@ -162,4 +178,4 @@ All media bytes now flow through the Hub API, so size its replicas, ingress time
 
 ## What's next
 
-Want to learn more how Kerberos Hub is working under the hood? Then [have a look at the Kerberos Hub pipeline page](/docs/hub/pipeline) where we introduce the microservice architecture.
+Want to learn more about how Kerberos Hub works under the hood? Then [have a look at the Kerberos Hub pipeline page](/docs/hub/pipeline) where we introduce the microservice architecture.

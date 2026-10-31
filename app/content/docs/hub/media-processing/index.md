@@ -21,21 +21,21 @@ contribute metadata and derived assets, so a recording can become playable
 before every preview or analysis result is ready.
 
 This page explains the user-visible lifecycle. See
-[Pipeline]({{< ref "/docs/hub/pipeline" >}}) for the legacy service topology and
-[Workflows]({{< ref "/docs/hub/workflows" >}}) for configurable processing stages.
+[Pipeline](/docs/hub/pipeline) for the legacy service topology and
+[Workflows](/docs/hub/workflows) for configurable processing stages.
 
 ## Processing lifecycle
 
 ### 1. Upload and intake
 
-An Agent uploads a recording to Vault and submits an event to Hub. Intake
+An Agent [uploads a recording to Vault](/docs/agent/connect-to-vault), and Vault's [Hub integration](/docs/vault/integrations#kerberos-hub) submits an event to Hub. Intake
 validates account limits, resolves the device and ownership context, and adds the
 metadata required by later stages.
 
 ### 2. Registration and previews
 
 The sequence stage registers the recording and its available date so it can
-appear in [Recordings]({{< ref "/docs/hub/recordings" >}}). Other workers can
+appear in [Recordings](/docs/hub/recordings). Other workers can
 then generate:
 
 - a thumbnail for cards and notification previews;
@@ -90,7 +90,7 @@ workflow actions can require additional permissions.
 
 Derived data remains tied to the source recording's lifecycle unless a feature,
 such as a case archive, creates a separately managed copy. See
-[Cleanup]({{< ref "/docs/hub/cleanup" >}}) for retention enforcement.
+[Cleanup](/docs/hub/cleanup) for retention enforcement.
 
 ## Troubleshooting
 

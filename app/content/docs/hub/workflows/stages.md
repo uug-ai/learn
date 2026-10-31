@@ -28,8 +28,8 @@ This page is the **contract your microservice codes against** — the queue it l
 
 {{< callout type="info" >}}
 Does the worker run outside the Hub deployment? Use the
-[workflow forwarder for external stages](../external-stages/) instead. It sends
-a sanitized invocation to a customer RabbitMQ broker or HTTPS endpoint and
+[workflow forwarder for external stages](/docs/hub/workflows/external-stages/) instead. It sends
+a sanitised invocation to a customer RabbitMQ broker or HTTPS endpoint and
 accepts the result through a project-scoped API callback.
 {{< /callout >}}
 
@@ -190,7 +190,7 @@ A condition is `{ path, op, value }`.
 | `inputs.<op>.<field>` | `inputs.classify.details.*.classified` | An upstream result. `classify` is always present (the trigger); its fields are `properties` (array), `objectCount` (int), and `details` (array — fan out with `*`, e.g. `inputs.classify.details.*.classified`). |
 | `results.<op>.<field>` | `results.speed.kmh` | A finished stage's output. Fields of your own custom operations are accepted as-is; array fields can be matched element-wise with `*` (see [Matching inside arrays](#matching-inside-arrays)). |
 | `device.<field>` | `device.deviceKey` | One of `deviceKey`, `deviceName`, `provider`, `storageSolution` (scalars), or `siteIds` — an **array** of the device's linked site ids, matched with `contains` / `in` / `exists` / `matches` (not traversed with `*`). |
-| `user.<field>` | `user.organisationId` | One of `id`, `organisationId`. |
+| `user.<field>` | `user.organisationId` | Only `organisationId`. |
 | scalar | `key`, `operation`, `runId`, `traceId` | Top-level identity values (not traversable). |
 
 Credentials (`storage`, `user.storage`) are deliberately **not** matchable.
@@ -386,7 +386,7 @@ Your microservice does **not** receive the pipeline's internal `PipelineEvent`. 
 
 **`storage` — media-fetch credentials**
 
-The credentials your microservice uses to fetch the recording. The base trio is always set; the `vaultOverride*` quartet appears when the recording lives on its own (per-tenant) backend — **prefer the override when present**, otherwise use the base.
+The credentials your microservice uses to fetch the recording: the keys of a [Vault account](/docs/vault/accounts). The base trio is always set; the `vaultOverride*` quartet appears when the recording lives on its own (per-tenant) backend — **prefer the override when present**, otherwise use the base.
 
 | Field | Type | What it is |
 |---|---|---|
@@ -405,7 +405,7 @@ A dispatch gives you **two ways** to reach the recording, in order of preference
 1. **`signedUrl`** — when present, `GET` it directly; it needs no credentials. It is short-lived, so on a replayed or backlogged run it may have **expired** (the storage backend answers `403`).
 2. **`storage` + `key`** — the **authoritative** path. Re-sign a fresh URL for the recording from the storage credentials and download that. It always works, and is the fallback whenever `signedUrl` is absent or rejected.
 
-To re-sign, `POST {storage.uri}/storage/bulk` with the `X-Kerberos-Storage-AccessKey` and `X-Kerberos-Storage-SecretAccessKey` headers and a `[{ "filename": "<key>", "provider": "<provider>" }]` body; the response is `{ "data": "<json map of filename → url>" }` — read your `key`'s entry and `GET` it. Prefer the `vaultOverride*` credentials and `vaultOverrideProvider` when set, otherwise the base trio and `device.provider`. The first-party stages (object tracking, export, redaction) all fetch exactly this way: prefer the signed URL, re-sign from `storage` on absence or expiry.
+To re-sign, call Vault's [bulk signing endpoint](/docs/vault/api/signed-urls#2-bulk--post-apistoragebulk): `POST {storage.uri}/storage/bulk` with the `X-Kerberos-Storage-AccessKey` and `X-Kerberos-Storage-SecretAccessKey` headers and a `[{ "filename": "<key>", "provider": "<provider>" }]` body; the response is `{ "data": "<json map of filename → url>" }` — read your `key`'s entry and `GET` it. Prefer the `vaultOverride*` credentials and `vaultOverrideProvider` when set, otherwise the base trio and `device.provider`. The first-party stages (object tracking, export, redaction) all fetch exactly this way: prefer the signed URL, re-sign from `storage` on absence or expiry.
 
 `inputs` and `results` are your **read-only upstream context** — the same bags the condition matcher evaluates `needs` against. The engine routes purely by `operation` and the workflow definition; it never inspects your output to decide where the run goes.
 
@@ -439,7 +439,7 @@ Every custom stage is **asynchronous**: nothing blocks on it. The analysis servi
 
 Whichever [sink](#sending-a-result-back) you use, your microservice routes the run back to the workflows engine — its `WORKFLOWS_QUEUE` — once the work is durably done. The engine records the **stage** as resolved on the run (`$addToSet resolvedoperations`), which keeps the run's provenance complete and stops a re-run from redoing the work. An own-collection stage's returned run carries just its routing values under `results.<operation>`; a delegated stage carries the typed `payload`. A run that never hears back from a stage still completes on the engine's own rules (with a safety timeout as a backstop), so a crashed microservice can't wedge the pipeline.
 
-> **Following a run.** The engine logs and traces every run from open to finalize — including the timeout backstop above — under the recording's `mediaKey` and `traceId`. See [Observability](/docs/hub/workflows/observability/) for the log lines it emits and how to follow one recording end-to-end.
+> **Following a run.** The engine logs and traces every run from open to finalise — including the timeout backstop above — under the recording's `mediaKey` and `traceId`. See [Observability](/docs/hub/workflows/observability/) for the log lines it emits and how to follow one recording end-to-end.
 
 ## Failure modes & gotchas
 

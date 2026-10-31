@@ -112,8 +112,41 @@ the same product color, without repeating front matter. The color rules live
 in `app/assets/css/custom.css`. Link text and highlights adapt to light/dark
 mode for at least 4.5:1 text contrast, which
 the navigation tests measure. The global navbar and non-product sections retain
-the UUG palette. Cross-product links within an article use the current article's
-color; sidebar branches always retain their own product colors.
+the UUG palette. A link into another product's docs takes the *destination*
+product's color (see [Linking between products](#linking-between-products));
+sidebar branches always retain their own product colors.
+
+### Linking between products
+
+Each product section stands on its own, but readers move between products at
+a few seams: an Agent uploads to Vault (Agent *Connect to Vault* ↔ Vault
+*Accounts*), Vault passes recordings to Hub (Vault *Integrations* ↔ Hub
+*Pipeline*), and an Agent connects to Hub (Agent *Connect to Hub* ↔ Hub
+*Configuration → Assign an Agent*). Explain only your own product's side of a
+seam and link to the other side at the step where the reader needs it.
+
+- **Write internal links as absolute paths**, `[Accounts](/docs/vault/accounts)`,
+  not `{{< relref >}}` and not relative paths. The link render hook
+  (`app/layouts/_markup/render-link.html`) resolves them to the page, and
+  warns during the build when a path does not resolve to a page (an alias
+  doesn't count).
+- **Cross-product links are marked automatically.** When the destination is in
+  another product (Agent, Vault, Hub, Factory), the hook adds
+  `class="learn-xlink"` and `data-product`, so the link takes that product's
+  color and screen readers hear "(Vault documentation)". Product names come
+  from `app/data/products.yaml`; product detection is shared with the article
+  layout in `app/layouts/_partials/docs/product.html`.
+- **Pages at a seam end with a "Works with" panel.** List the counterpart pages
+  in front matter; the build fails if a page doesn't exist:
+
+  ```yaml
+  connects:
+    - page: /docs/vault/accounts
+      why: Create the account whose access and secret key the Agent uploads with.
+    - page: /docs/hub/configuration#assign-an-agent
+      title: Assign an Agent   # optional, defaults to the page's link title
+      why: Find the keys in Hub and assign the Agent to a site.
+  ```
 
 ### Product overviews
 
@@ -122,10 +155,10 @@ the product, show an animated illustration, explain its workflow in three steps,
 and link to the next guides. Content lives in each product's
 `app/content/docs/<product>/_index.md`.
 
-Agent and Factory temporarily reuse Hub's `iso-figure figure="hub"`
-illustration; Vault has its own artwork. When product-specific artwork is ready, add the SVG under
-`app/assets/iso/` and change the shortcode's `figure`, `alt`, and `caption` in
-the corresponding overview. The shared shortcode handles the animation styles
+Each product has its own artwork, rendered with the `iso-figure` shortcode
+(`figure="agent-link"`, `"factory"`, `"vault"` and `"hub"`). To replace one, add
+the SVG under `app/assets/iso/` and change the shortcode's `figure`, `alt`, and
+`caption` in the corresponding overview. The shared shortcode handles the animation styles
 and accessible description; no template changes are needed.
 
 The navigation tests also check these overviews, their illustrations, and

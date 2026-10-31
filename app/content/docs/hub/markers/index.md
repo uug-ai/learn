@@ -22,13 +22,13 @@ and links to detection tracks.
 
 When marker analysis is enabled, open **Analysis > Markers** or visit
 `/analytics/markers`. Markers also appear on the
-[Recordings]({{< ref "/docs/hub/recordings" >}}) overview and detail pages.
+[Recordings](/docs/hub/recordings) overview and detail pages.
 
 > [!NOTE] Feature flag
 > The dedicated marker analysis page requires `FEATURE_MARKERS_ENABLED=true`.
 > Recording filters for marker names, categories, events, and tags have their
 > own feature settings. See
-> [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#media-filters).
+> [Feature flags](/docs/hub/feature-flags#media-filters).
 
 ## Find a marker
 
@@ -53,7 +53,7 @@ action to open the complete recording detail page.
 
 ## Use markers on recordings
 
-Recording cards show up to five marker icons and summarize additional markers
+Recording cards show up to five marker icons and summarise additional markers
 with an overflow count. Select an icon to start playback at that marker. Hover
 states can highlight the marker's time range on the recording timeline.
 
@@ -71,7 +71,7 @@ detection references; Hub stores the result and updates the recording's bounded
 summary for fast display and filtering.
 
 For the technical result format, see the
-[marker block contract]({{< ref "/docs/hub/workflows/ingest/blocks/marker" >}}).
+[marker block contract](/docs/hub/workflows/ingest/blocks/marker).
 
 ## Access and limits
 

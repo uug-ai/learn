@@ -1,0 +1,27 @@
+{{- /* "Works with" panel: links a page to its counterparts in other products,
+     listed in front matter as
+       connects:
+         - page: /docs/vault/accounts#credentials
+           why: Create the account whose keys the Agent uploads with.
+     A missing page fails the build so the panel can't rot silently. */ -}}
+{{- with .Params.connects -}}
+<aside class="learn-works-with" aria-labelledby="learn-works-with-title">
+  <h2 id="learn-works-with-title" class="learn-works-with-title">Works with</h2>
+  <div class="learn-works-with-grid">
+    {{- range . -}}
+      {{- $path := index (split .page "#") 0 -}}
+      {{- $anchor := index (split (printf "%s#" .page) "#") 1 -}}
+      {{- $target := site.GetPage $path -}}
+      {{- if not $target -}}
+        {{- errorf "%s: connects page %q not found" $.File.Path .page -}}
+      {{- end -}}
+      {{- $product := partial "docs/product.html" $target -}}
+      <a class="learn-works-with-card" href="{{ $target.RelPermalink }}{{ with $anchor }}#{{ . }}{{ end }}"{{ with $product }} data-product="{{ . }}"{{ end }}>
+        {{- with index hugo.Data.products $product }}<span class="learn-works-with-product">{{ . }}</span>{{ end -}}
+        <span class="learn-works-with-page">{{ .title | default $target.LinkTitle }}</span>
+        {{- with .why }}<span class="learn-works-with-why">{{ . }}</span>{{ end -}}
+      </a>
+    {{- end -}}
+  </div>
+</aside>
+{{- end -}}

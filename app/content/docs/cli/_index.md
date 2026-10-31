@@ -11,15 +11,16 @@ weight: 8
 
 ---
 
-This repository contains CLI tools for performing specific automations.
-- [`vault-to-hub-migration`](vault-to-hub-migration): Migrating data from a Vault database to a Hub database.
-- [`generate-default-labels`](generate-default-labels): Adding labels to existing users.
-- [`check-indexes`](check-indexes): Check for and add missing indexes compared to recommended versions.
+The [CLI repository](https://github.com/uug-ai/cli) contains tools for performing specific automations.
+
+- [`vault-to-hub-migration`](/docs/cli/vault-to-hub-migration/): Migrating data from a Vault database to a Hub database.
+- [`generate-default-labels`](/docs/cli/generate-default-labels/): Adding labels to existing users.
+- [`check-indexes`](/docs/cli/check-indexes/): Check for and add missing indexes compared to recommended versions.
 
 
 ## Run
 
-You can run these jobs in your cluster. The benefit is that you do not need to expose anything, and use the internal Kubernetes dns.
+You can run these jobs in your cluster. The benefit is that you do not need to expose anything, and use the internal Kubernetes DNS.
 
 For example: 
 ```sh

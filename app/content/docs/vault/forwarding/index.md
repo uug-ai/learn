@@ -12,13 +12,17 @@ menu:
     parent: "vault"
 weight: 309
 toc: true
+connects:
+  - page: /docs/hub/recordings#requesting-recordings-from-the-source
+    title: Request recordings in Hub
+    why: Request a recording from an edge Vault in Hub.
 ---
 
 Multiple Kerberos Vaults can be installed in your video landscape. You may have Kerberos Vaults at the edge and/or in a cloud environment, connected to edge and/or cloud storage providers.
 
-Kerberos Vaults can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by requesting a forward from Kerberos Hub or building your own forwarding application code.
+Kerberos Vaults can be chained and configured in forwarding mode. This configuration makes it possible to enable offline capabilities and keep the majority of your recordings at the edge. Only a subset of your recordings will be transferred from the edge to the cloud by [requesting a forward from Kerberos Hub](/docs/hub/recordings#requesting-recordings-from-the-source) or building your own forwarding application code.
 
-{{< rete caption="Synchronise recordings between multiple Kerberos Vault" alt="Synchronise recordings between multiple Kerberos Vault" height="520" >}}
+{{< rete caption="Synchronise recordings between multiple Kerberos Vaults" alt="Synchronise recordings between multiple Kerberos Vaults" height="520" >}}
 {
   "groups": [
     { "id": "cloud", "label": "Cloud", "x":   0, "y": 20, "w": 320, "h": 540 },
@@ -48,15 +52,15 @@ Kerberos Vaults can be chained and configured in forwarding mode. This configura
     { "from": "agent-3", "to": "edge-vault", "fromSide": "left", "toSide": "right" }
   ]
 }
-{{< /rete >}}f
+{{< /rete >}}
 
-Forwarding can be configured in two modes: continuous forwarding and on-demand recording.
+Forwarding can be configured in two modes: continuous forwarding and on-demand forwarding.
 
 ## Continuous forwarding
 
-All recordings from your edge Kerberos Vault will be replicated to a Kerberos Vault in the cloud. While forwarding, edge computing such as machine learning, can be executed in parallel.
+All recordings from your edge Kerberos Vault will be replicated to a Kerberos Vault in the cloud. While forwarding, edge computing, such as machine learning, can be executed in parallel.
 
-## On demand forwarding
+## On-demand forwarding
 
 Recordings are stored at the edge, and only a subset is forwarded to a Kerberos Vault in the cloud. You can specify the forwarding rules using custom code.
 
@@ -64,11 +68,11 @@ Recordings are stored at the edge, and only a subset is forwarded to a Kerberos 
 
 Go to the integrations page, and click (+ Add Integration). Select the Kerberos Vault option, and choose on-demand or continuous forwarding.
 
-Define the account credentials of the remote Kerberos Vault, to which you are forwarding recordings. If not yet created make sure an account is set up with a valid storage provider.
+Define the account credentials of the remote Kerberos Vault, to which you are forwarding recordings. If not yet created, make sure an account is set up with a valid storage provider.
 
-{{< figure src="vault-forwarding.gif" alt="Two forwarding modes continuous and on demand." caption="Two forwarding modes continuous and on demand." class="stretch">}}
+{{< figure src="vault-forwarding.gif" alt="Two forwarding modes: continuous and on demand." caption="Two forwarding modes: continuous and on demand." class="stretch">}}
 
-Once the integration is created, you still need to activate the integration for a specific account on the account page. Every recording that's now being uploaded through your account will be stored in the local storage provider, and depending on the use case will be forwarded to the remote storage provider.
+Once the integration is created, you still need to activate the integration for a specific account on the account page. Every recording that's now being uploaded through your account will be stored in the local storage provider, and, depending on the use case, will be forwarded to the remote storage provider.
 
 {{< figure src="vault-activate-forward.gif" alt="Enable the integration for your account." caption="Enable the integration for your account." class="stretch">}}
 
@@ -83,4 +87,4 @@ Two examples of on demand forwarding:
 
 1. A machine learning filter: recordings are stored in a Kerberos Vault at the edge, and are processed by a machine learning model. Every time the machine learning model finds a match, e.g. a pedestrian detected, it will forward the recording to Kerberos Vault in a cloud environment. By doing this you will send limited recordings (storage) into the cloud.
 
-2. An on demand request through Kerberos Hub: From Kerberos Hub a user can initiate a request for forwarding. By default, no recordings are forwarded from your Kerberos Vault at the edge to your Kerberos Vault in the cloud. However, you can enable the thumbnail option to send thumbnails to Kerberos Hub. Only when an end user requests one or more recordings, the forwarding will start for the requested recordings.
+2. An on demand request through Kerberos Hub: From Kerberos Hub a user can initiate a request for forwarding. By default, no recordings are forwarded from your Kerberos Vault at the edge to your Kerberos Vault in the cloud. However, you can enable the thumbnail option to send thumbnails to Kerberos Hub. Only when an end user requests one or more recordings will the forwarding start for the requested recordings.

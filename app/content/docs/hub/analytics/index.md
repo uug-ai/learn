@@ -32,11 +32,11 @@ serves the route `/analytics`.
 Analytics is not a separate ingestion path: it is a read-only view on
 top of the data the [Hub pipeline](/docs/hub/pipeline/) already produces.
 
-- **Recordings** are uploaded to the [Vault](/docs/vault/) by the agent and
+- **Recordings** are uploaded to [Vault](/docs/vault/) by the [Agent](/docs/agent/connect-to-vault) and
   registered in the Hub database by `hub-api`.
 - **Counts and region detections** are produced by the
-  [`hub-pipeline-analysis`](https://github.com/uug-ai/hub-pipeline-analysis)
-  service when an [alert]({{< ref "/docs/hub/configuration" >}}#alerts) of type `counting_line`,
+  `hub-pipeline-analysis`
+  service when an [alert](/docs/hub/configuration#alerts) of type `counting_line`,
   `counting_region` or `multi` matches an object track on a recording.
 - The Analytics page aggregates those rows for the selected day, sites
   and devices, and asks `hub-api` for hourly buckets to feed the
@@ -44,7 +44,7 @@ top of the data the [Hub pipeline](/docs/hub/pipeline/) already produces.
   filters only re-queries the existing data.
 
 The set of KPIs and the hourly buckets you see on this page therefore
-exactly mirror what your [alerts]({{< ref "/docs/hub/configuration" >}}#alerts) have produced and what
+exactly mirror what your [alerts](/docs/hub/configuration#alerts) have produced and what
 your devices have uploaded. If a KPI stays at zero, the most common
 cause is either *"no alert is configured for this device"* or *"no
 recording was uploaded for the selected day"*.
@@ -70,7 +70,7 @@ triggered.
 
 A 5-card strip summarises the selected day:
 
-- **Devices online** — the number of agents that were connected during
+- **Devices online** — the number of Agents that were connected during
   the day.
 - **Total recordings** — the number of recordings uploaded for the
   selected scope.
@@ -94,7 +94,7 @@ the alert type:
   in the region.
 
 When no alert is configured (or none fired), the track is replaced by
-a placeholder that links straight to the [Alerts]({{< ref "/docs/hub/configuration" >}}#alerts) section
+a placeholder that links straight to the [Alerts](/docs/hub/configuration#alerts) section
 so you can configure one.
 
 ### Hourly charts
@@ -123,9 +123,9 @@ triggered the count.
 
 The final block plots the number of recordings uploaded per hour for
 the selected scope. Use it to correlate spikes in analytics with the
-volume of footage your agents actually pushed up.
+volume of footage your Agents actually pushed up.
 
-{{< figure src="hub-analytics-recordings-chart.png" alt="The Recordings per hour chart at the bottom of the Analytics page." caption="Recordings per hour reflects what the agents uploaded, regardless of whether an alert matched. A flat line here usually means the cameras were offline, not that the analytics are broken." class="stretch">}}
+{{< figure src="hub-analytics-recordings-chart.png" alt="The Recordings per hour chart at the bottom of the Analytics page." caption="Recordings per hour reflects what the Agents uploaded, regardless of whether an alert matched. A flat line here usually means the cameras were offline, not that the analytics are broken." class="stretch">}}
 
 ## Permissions and roles
 
@@ -137,7 +137,7 @@ view](/docs/hub/livestream/) and [Recordings](/docs/hub/recordings/) pages).
 The **Manage alerts** button in the breadcrumb only navigates — it
 does not grant access. Editing alerts still requires the
 `alerts` permission; see the
-[roles documentation]({{< ref "/docs/hub/roles" >}}) for the full
+[roles documentation](/docs/hub/roles) for the full
 matrix.
 
 ## Configuration
@@ -160,7 +160,7 @@ If `hubPipelineAnalysis` is disabled in the deployment, the
 ## Troubleshooting
 
 - **Every KPI is zero.** Check that at least one
-  [alert]({{< ref "/docs/hub/configuration" >}}#alerts) is enabled for the selected site / device and
+  [alert](/docs/hub/configuration#alerts) is enabled for the selected site / device and
   that recordings were uploaded that day. The KPI strip never
   back-fills counts retroactively.
 - **The date picker only lists a single day.** The picker is fed by

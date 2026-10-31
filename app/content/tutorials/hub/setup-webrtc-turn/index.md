@@ -53,7 +53,7 @@ MQTT carries WebRTC signalling, not media. The browser sends an SDP offer and IC
     { "id": "turn", "kind": "turn", "x": 535, "y": 340, "w": 240, "h": 130,
       "header": "STUN / TURN", "title": "coturn", "subtitle": "Relay fallback", "groupId": "services" },
     { "id": "browser", "kind": "frontend", "x": 940, "y": 200, "w": 240, "h": 130,
-      "header": "HUB FRONTEND", "title": "WebRTC peer", "subtitle": "Video + talk", "groupId": "operator" }
+      "header": "HUB FRONTEND", "title": "WebRTC peer", "subtitle": "Live video", "groupId": "operator" }
   ],
   "connections": [
     { "from": "camera", "to": "agent", "fromSide": "right", "toSide": "left", "label": "RTSP" },
@@ -72,7 +72,7 @@ No public inbound port is opened on an Agent. Agents, browsers and TURN all esta
 
 You need:
 
-- A self-hosted Hub and at least one connected Agent.
+- A self-hosted Hub and at least one Agent [connected to Hub](/docs/agent/connect-to-hub/).
 - A public VM or host for coturn. The Hub chart configures TURN but does not deploy it.
 - A DNS name such as `turn.example.com` pointing to the TURN host.
 - Firewall control for the TURN listener and relay port range.
@@ -225,7 +225,7 @@ Avoid command-line secrets in production because they can enter shell history. T
 ## Verify the normal ICE path
 
 1. Open Hub in a browser, select a camera, choose **Live**, then choose **WebRTC** from the transport menu.
-2. Hover the live status indicator and open its **Signalling** and **Network** tabs.
+2. Hover the live status indicator and open its **Signaling** and **Network** tabs.
 3. Confirm the signalling phases progress through offer, candidate gathering, connecting and connected.
 4. Inspect the selected connection type:
 
@@ -269,11 +269,11 @@ Factory does not currently emit `AGENT_FORCE_TURN`, so place a permanent setting
 With WebRTC video connected:
 
 1. Grant microphone permission to Hub.
-2. Press and hold the talk control.
+2. Select the talk (microphone) control to start talking; select it again to stop.
 3. Confirm audio reaches the camera speaker without stopping video.
 4. Check the Agent logs for backchannel codec or camera-write errors if it does not.
 
-Talk is a separate camera capability. A healthy WebRTC video path does not guarantee that the camera accepts backchannel audio.
+Talk is a separate camera capability. A healthy WebRTC video path does not guarantee that the camera accepts backchannel audio. The talk audio itself travels to the Agent over MQTT, not over the WebRTC connection, so TURN does not affect it.
 
 ## Troubleshoot common failures
 
@@ -290,6 +290,8 @@ Talk is a separate camera capability. A healthy WebRTC video path does not guara
 | Every viewer uses TURN | Direct UDP is blocked or candidate priority/network policy prefers relay |
 
 TURN bandwidth is approximately one inbound and one outbound media stream per relayed viewer. Monitor both directions and size the host, relay range and network egress for peak simultaneous live views.
+
+For how WebRTC fits next to the other Live transports, see [Live over WebRTC](/docs/hub/livestream/#live-over-webrtc) in the Live view docs.
 
 For an HTTPS-only alternative that needs no ICE or TURN, continue with [Set up HLS live view](/tutorials/hub/setup-hls-live-view/). For a protocol comparison, read [Choose a live-stream transport: MoQ vs HLS vs WebRTC](/tutorials/hub/moq-vs-hls-vs-webrtc/).
 

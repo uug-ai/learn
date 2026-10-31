@@ -16,7 +16,7 @@ toc: true
 
 Once you have set up Kerberos Vault successfully on your Kubernetes cluster, it is time to set it up and configure the different elements.
 
-The steps we have to go through to get a functional Kerberos Vault are as following,
+The steps we have to go through to get a functional Kerberos Vault are as follows:
 
 1. Mount and connect a storage provider,
 2. implement and configure one or more integrations,
@@ -50,18 +50,18 @@ Vault applies the following rules:
 
 - An environment definition overrides a MongoDB definition with the exact same
   `name`; it does not delete or modify the MongoDB document.
-- Environment definitions appear grayed out in the Providers, Integrations, and
+- Environment definitions appear greyed out in the Providers, Integrations, and
   Accounts pages. Their eye action opens a read-only details view with the source
   environment variable at the top and secret values masked. They cannot be edited
   or deleted through the UI or API.
 - Accounts assign environment-defined providers and integrations by name using
   `provider`, `secondary_providers`, and `queues`.
 - The configuration is loaded once during startup. Restart or redeploy Vault
-  after changing either variable.
+  after changing any of these variables.
 - Invalid JSON, duplicate names within one variable, unsupported types, or
   missing required fields prevent Vault from starting.
 - An unset, empty, or `[]` value adds no environment definitions, leaving the
-  existing MongoDB behavior unchanged.
+  existing MongoDB behaviour unchanged.
 
 Vault assigns stable IDs to environment definitions, so durable outbox retries
 can resolve the same integration after a restart. Do not provide `id`, `type`,
@@ -118,34 +118,34 @@ definition is loaded.
 
 ## 1. Providers
 
-Storage providers are the foundation of Kerberos Vault. As an administrator you bring your own cloud or edge storage, so there is no need to install a specific Kerberos Vault storage, we are open and integrate with others.
+Storage providers are the foundation of Kerberos Vault. As an administrator you bring your own cloud or edge storage, so there is no need to install a specific Kerberos Vault storage; we are open and integrate with others.
 
-Go ahead and [have a look at the provider page]({{< ref "/docs/vault/providers" >}}), there we explain how to add and configure specific providers.
+Go ahead and [have a look at the provider page](/docs/vault/providers), where we explain how to add and configure specific providers.
 
 ## 2. Integrations
 
-Once you have successfully stored your recordings on a storage provider, it is time to do something with it. This is where integrations come into play. An integration is a way to make another third-party solution or custom workload aware that a recording was stored on a storage provider.
+Once you have successfully stored your recordings on a storage provider, it is time to do something with them. This is where integrations come into play. An integration is a way to make another third-party solution or custom workload aware that a recording was stored on a storage provider.
 
 An integration produces an event with relevant information about the recording:
 
-- Where is it stored,
-- its filesize,
+- where it is stored,
+- its file size,
 - metadata about where motion was detected, etc.
 
-By connecting to an integration you will have to power to consume those message and build custom workflows through the programming languages you prefer, or connect [to existing systems such as Kerberos Hub](/docs/hub/first-things-first) for visualisation purposes.
+By connecting to an integration you will have the power to consume those messages and build custom workflows through the programming languages you prefer, or connect [to existing systems such as Kerberos Hub](/docs/hub/first-things-first) for visualisation purposes.
 
-Go ahead and [have a look at the integrations page](/docs/vault/integrations), there we explain how to add and configure specific integrations.
+Go ahead and [have a look at the integrations page](/docs/vault/integrations), where we explain how to add and configure specific integrations.
 
 ## 3. Accounts
 
 You should now have a working storage provider that helps you to persist your recordings, and have an integration in place to produce and consume events. Now it is time to leverage those capabilities through the concept of accounts.
 
-By creating an account you create a secure way of leveraging those capabilities by use authentication credentials; an access key and secret key. 
+By creating an account you create a secure way of leveraging those capabilities by using authentication credentials: an access key and secret key. 
 
-Once those credentials and relevant account has been created and enabled you can link it to your Agents to start forwarding their recordings into your Kerberos Vault installation. On the other hand those credentials can also be leveraged when connecting to Kerberos Hub, so it can read and request recordings from your Kerberos Vault; and underlying storage providers.
+Once those credentials and relevant account have been created and enabled you can [link it to your Agents](/docs/agent/connect-to-vault) to start forwarding their recordings into your Kerberos Vault installation. On the other hand those credentials can also be leveraged when [connecting Kerberos Hub to your Vault](/docs/hub/configuration#connect-kerberos-vault), so it can read and request recordings from your Kerberos Vault and its underlying storage providers.
 
-Go ahead and [have a look at the accounts page](/docs/vault/accounts), there we explain how to add and configure specific accounts.
+Go ahead and [have a look at the accounts page](/docs/vault/accounts), where we explain how to add and configure specific accounts.
 
 ## You're ready
 
-If completed previous configurations, you are now ready to configure your Agents with our without Factory. Learn more here.
+If you completed the previous configurations, you are now ready to configure your Agents, one by one as described in [Connect to Vault](/docs/agent/connect-to-vault), or for many Agents at once with [Factory](/docs/factory/getting-started).

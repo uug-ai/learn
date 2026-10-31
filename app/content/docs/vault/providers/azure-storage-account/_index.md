@@ -10,12 +10,12 @@ draft: false
 
 ## Introduction
 
-[Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs/) is Microsoft's object storage solution for the cloud, optimized for storing massive amounts of unstructured data. It provides highly scalable, secure, and cost-effective storage for video recordings from Kerberos Vault.
+[Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs/) is Microsoft's object storage solution for the cloud, optimised for storing massive amounts of unstructured data. It provides highly scalable, secure, and cost-effective storage for video recordings from Kerberos Vault.
 
 ### Key Features
 
 - **Massive Scalability**: Store exabytes of data with automatic scaling
-- **Multiple Access Tiers**: Hot, Cool, Cold, and Archive for cost optimization
+- **Multiple Access Tiers**: Hot, Cool, Cold, and Archive for cost optimisation
 - **High Availability**: Redundancy options including LRS, ZRS, GRS, and RA-GRS
 - **Enterprise Security**: Azure AD integration, encryption, and advanced threat protection
 - **S3 Compatible**: Supports S3-compatible API for seamless integration
@@ -28,7 +28,7 @@ Azure Blob Storage is ideal for:
 - **Hybrid cloud scenarios**: Combine on-premises and cloud storage
 - **Compliance requirements**: Meet regulatory requirements with geo-redundancy
 - **Large-scale operations**: Handle thousands of cameras with unlimited scaling
-- **Cost optimization**: Tiered storage for different retention requirements
+- **Cost optimisation**: Tiered storage for different retention requirements
 
 ## Prerequisites
 
@@ -54,7 +54,7 @@ Before configuring Azure Blob Storage as a provider:
      - **Standard**: General-purpose (HDD-backed)
      - **Premium**: High-performance (SSD-backed) - typically not needed for recordings
    - **Redundancy**: Select based on your availability requirements:
-     - **LRS (Locally Redundant Storage)**: 3 copies in one datacenter (lowest cost)
+     - **LRS (Locally Redundant Storage)**: 3 copies in one data centre (lowest cost)
      - **ZRS (Zone-Redundant Storage)**: 3 copies across availability zones
      - **GRS (Geo-Redundant Storage)**: 6 copies across two regions
      - **RA-GRS (Read-Access GRS)**: GRS with read access to secondary region
@@ -83,7 +83,7 @@ After the storage account is created:
 
 ### Step 3: Get Storage Account Credentials
 
-Kerberos Vault uses the S3-compatible API to connect to Azure Blob Storage. You'll need:
+Kerberos Vault connects to Azure Blob Storage with the storage account name and an access key. You'll need:
 
 #### Option A: Using Access Keys (Simpler)
 
@@ -182,29 +182,27 @@ spec:
 
 ### Direct Azure Blob Storage Configuration
 
-If Kerberos Vault supports Azure Blob Storage natively:
+Kerberos Vault supports Azure Blob Storage natively:
 
 1. Open the Kerberos Vault web interface
-2. Navigate to **Providers** in the left menu
+2. Navigate to **Storage Providers** in the left menu
 3. Click **+ Add Storage Provider**
-4. Select **Azure Storage Account** from the list
+4. Select **Azure** from the list
 5. Fill in the configuration:
    - **Provider name**: A descriptive name (e.g., "Azure Production Storage")
-   - **Bucket name**: Your container name (e.g., `kerberos-recordings`)
-   - **Region**: Your Azure region (e.g., `eastus`)
-   - **Hostname**: `<storage-account-name>.blob.core.windows.net`
-   - **Access Key**: Your storage account name
-   - **Secret Access Key**: Your storage account access key or SAS token
+   - **Account Name**: Your storage account name
+   - **Container Name**: Your container name (e.g., `kerberos-recordings`)
+   - **Account Key**: Your storage account access key (key1 or key2)
 6. Click **Validate** to test the connection
 7. If successful, you'll see a green confirmation message
-8. Click **Save** to add the provider
+8. Click **Add provider** to save the provider
 
 ### Using MinIO Gateway Configuration
 
 If using MinIO Gateway for S3 compatibility:
 
 1. Open the Kerberos Vault web interface
-2. Navigate to **Providers** in the left menu
+2. Navigate to **Storage Providers** in the left menu
 3. Click **+ Add Storage Provider**
 4. Select **MinIO** or **S3-Compatible** provider
 5. Fill in the configuration:
@@ -215,29 +213,29 @@ If using MinIO Gateway for S3 compatibility:
    - **Access Key**: Your storage account name
    - **Secret Access Key**: Your storage account key
 6. Click **Validate** to test the connection
-7. Click **Save** to add the provider
+7. Click **Add provider** to save the provider
 
 ## Configuration Options
 
-### Access Tiers for Cost Optimization
+### Access Tiers for Cost Optimisation
 
 Azure Blob Storage offers different access tiers:
 
-1. **Hot tier**: Optimized for frequent access
+1. **Hot tier**: Optimised for frequent access
    - Best for: Active recordings, recent videos
    - Highest storage cost, lowest access cost
 
-2. **Cool tier**: Optimized for infrequent access (< 1/month)
+2. **Cool tier**: Optimised for infrequent access (< 1/month)
    - Best for: Recordings 30-90 days old
    - Lower storage cost, higher access cost
    - Minimum storage duration: 30 days
 
-3. **Cold tier**: Optimized for infrequent access (< 1/quarter)
+3. **Cold tier**: Optimised for infrequent access (< 1/quarter)
    - Best for: Recordings 90-180 days old
    - Even lower storage cost
    - Minimum storage duration: 90 days
 
-4. **Archive tier**: Optimized for long-term archival
+4. **Archive tier**: Optimised for long-term archival
    - Best for: Compliance recordings, yearly retention
    - Lowest storage cost, highest retrieval cost
    - Minimum storage duration: 180 days
@@ -315,12 +313,12 @@ Configure network access:
    - Enable trusted Microsoft services if needed
 3. Consider using **Private endpoints** for secure, private connectivity
 
-### Performance Optimization
+### Performance Optimisation
 
 - **Use Premium performance tier**: For high IOPS requirements
 - **Enable large file shares**: For improved throughput
 - **Use appropriate redundancy**: Balance cost and availability needs
-- **Optimize blob block size**: Configure upload chunk sizes
+- **Optimise blob block size**: Configure upload chunk sizes
 - **Use Azure CDN**: For frequently accessed content
 - **Monitor metrics**: Track IOPS, throughput, and latency
 
@@ -372,11 +370,11 @@ Azure Blob Storage pricing includes:
 
 For detailed pricing, visit the [Azure Blob Storage Pricing page](https://azure.microsoft.com/en-us/pricing/details/storage/blobs/).
 
-### Cost Optimization Tips
+### Cost Optimisation Tips
 
 1. Use lifecycle policies to transition to cheaper tiers
 2. Choose appropriate redundancy level (don't over-provision)
-3. Monitor and optimize egress costs
+3. Monitor and optimise egress costs
 4. Use Azure Reserved Capacity for predictable workloads
 5. Delete unnecessary blobs and versions
 6. Use cool/cold tiers for infrequently accessed data
@@ -402,7 +400,7 @@ For detailed pricing, visit the [Azure Blob Storage Pricing page](https://azure.
 - Use a storage account in the same region
 - Check network latency and bandwidth
 - Consider Premium performance tier
-- Optimize upload block sizes
+- Optimise upload block sizes
 - Use Azure ExpressRoute for dedicated connectivity
 
 **High Costs**
@@ -410,7 +408,7 @@ For detailed pricing, visit the [Azure Blob Storage Pricing page](https://azure.
 - Implement lifecycle management policies
 - Monitor transaction costs
 - Reduce unnecessary egress
-- Use Azure Cost Management to analyze spending
+- Use Azure Cost Management to analyse spending
 
 **SAS Token Expired**
 - Generate a new SAS token with extended expiry

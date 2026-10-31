@@ -16,7 +16,7 @@ toc: true
 This page is an **unlisted deep-dive** into a single stage; it is intentionally kept out of the sidebar and search. For the general, capability-agnostic contract every stage codes against, start at [Stages](/docs/hub/workflows/stages/).
 {{< /callout >}}
 
-**`hub-anpr`** is a standalone Kerberos Hub [workflow stage](/docs/hub/workflows/stages/) for **automatic number-plate recognition (ANPR)**. It is the production sibling of the [`hub-loitering`](https://github.com/uug-ai/hub-loitering) example: where `hub-loitering` emits a [marker](/docs/hub/workflows/ingest/marker/) (a timeline span), `hub-anpr` emits a [detection](/docs/hub/workflows/ingest/detection/) — a run of tracks and per-frame boxes the engine persists to the detections collection — **plus** a marker, so the recognised plates show up on the recording's edit-media modal.
+**`hub-anpr`** is a standalone Kerberos Hub [workflow stage](/docs/hub/workflows/stages/) for **automatic number-plate recognition (ANPR)**. It is the production sibling of the [`hub-loitering`](https://github.com/uug-ai/hub-loitering) example: where `hub-loitering` emits a [marker](/docs/hub/workflows/ingest/blocks/marker/) (a timeline span), `hub-anpr` emits a [detection](/docs/hub/workflows/ingest/blocks/detection/) — a run of tracks and per-frame boxes the engine persists to the detections collection — **plus** a marker, so the recognised plates show up on the recording's edit-media modal.
 
 The workflows engine dispatches an `anpr` stage to this worker; the worker reads the plate of every classified vehicle on the recording and routes a `detection` block (the plate boxes) and a `marker` block (one named timeline span per vehicle) back to the engine, which persists them and can fan out further conditional stages that depend on `anpr`.
 
@@ -27,9 +27,9 @@ For each dispatched run the worker:
 1. **Fetches the recording** the run is about, via the dispatch's signed URL (`internal/media`).
 2. **Decodes** a representative frame for each tracked vehicle (`internal/frame`, via the `ffmpeg` binary).
 3. **Reads the plate** off the cropped vehicle region (`internal/plate`). Recognition is pluggable behind the `plate.Recognizer` interface and selected with `ANPR_OCR_ENGINE` (see [Choosing an OCR engine](#choosing-an-ocr-engine)).
-4. **Builds and routes** a `detection` block (the tight plate boxes the engine localized) and a `marker` block (one named span per vehicle) back on the workflows queue.
+4. **Builds and routes** a `detection` block (the tight plate boxes the engine localised) and a `marker` block (one named span per vehicle) back on the workflows queue.
 
-A vehicle whose plate cannot be localized or confidently read falls back to its classify trajectory and is labelled **`unread`** (no synthetic plate) — so a detection is **always** produced and switching engines never fabricates plates; it only changes how many are read successfully.
+A vehicle whose plate cannot be localised or confidently read falls back to its classify trajectory and is labelled **`unread`** (no synthetic plate) — so a detection is **always** produced and switching engines never fabricates plates; it only changes how many are read successfully.
 
 The worker can also **sample plate crops to a dataset** for offline evaluation (`ANPR_DATASET_DIR`, see [Dataset sampling](#dataset-sampling-offline-evaluation)), and the binary ships a `probe` (one-message dry run) and `evaluate` (offline benchmark over a sampled dataset) subcommand alongside the long-lived `serve` worker.
 
@@ -77,7 +77,7 @@ The release pipeline builds **one multi-arch (amd64 + arm64) image per tag** fro
 
 | Image | Bundles | Default engine |
 | ----- | ------- | -------------- |
-| `ghcr.io/uug-ai/hub-anpr:<tag>` (published) | `ffmpeg`, onnxruntime, the YOLOv9 detector + CCT recognizer models, **plus** `tesseract` as a fallback | `fast` |
+| `ghcr.io/uug-ai/hub-anpr:<tag>` (published) | `ffmpeg`, onnxruntime, the YOLOv9 detector + CCT recogniser models, **plus** `tesseract` as a fallback | `fast` |
 
 The image defaults `ANPR_OCR_ENGINE=fast` and points the four model-path variables at its baked-in weights, so the best-accuracy path runs with **no extra configuration**; if the ONNX engine is unavailable it automatically falls back to `tesseract`. No models need to be mounted.
 
@@ -98,7 +98,7 @@ Two alternative images are **not** published — build them yourself if you need
 | `tesseract` | baseline | the `tesseract` binary (present in the published image as the fallback, or the `Dockerfile.static` image) | a lighter footprint, or as the automatic fallback when ONNX is unavailable |
 | `http` | depends on the sidecar | a remote `/recognize` service at `ANPR_OCR_ENDPOINT` | you run your own engine (incl. AGPL/paid, e.g. OpenALPR) as a sidecar |
 
-A vehicle whose plate cannot be localized or confidently read is labelled **`unread`** rather than given a guessed value, so switching engines never fabricates plates — it only changes how many are read successfully.
+A vehicle whose plate cannot be localised or confidently read is labelled **`unread`** rather than given a guessed value, so switching engines never fabricates plates — it only changes how many are read successfully.
 
 ## Register it as a stage
 
@@ -180,9 +180,9 @@ Every value below is read from the environment. In a Hub deployment they are inj
 | ------------------------ | ----------- | ----------------------------------------------------------------------- |
 | `ANPR_OCR_ENGINE`        | `fast`      | OCR engine: `tesseract` \| `http` \| `fast`. `fast` needs the ONNX build and falls back to `tesseract` when the ONNX runtime is unavailable |
 | `ANPR_OCR_ENDPOINT`      | —           | `http` engine: absolute URL of the remote `/recognize` service          |
-| `ANPR_OCR_MODEL_PATH`    | —           | `fast` engine: fast-plate-ocr recognizer model                          |
+| `ANPR_OCR_MODEL_PATH`    | —           | `fast` engine: fast-plate-ocr recogniser model                          |
 | `ANPR_OCR_DETECTOR_PATH` | —           | `fast` engine: YOLOv9 plate-detector model                              |
-| `ANPR_OCR_PLATE_CONFIG`  | —           | `fast` engine: recognizer `plate_config.yaml`                           |
+| `ANPR_OCR_PLATE_CONFIG`  | —           | `fast` engine: recogniser `plate_config.yaml`                           |
 | `ANPR_OCR_DETECTOR_CONF` | —           | `fast` engine: detector confidence threshold (optional)                 |
 | `ONNXRUNTIME_LIB_PATH`   | —           | ONNX engines: path to `libonnxruntime.so` (baked into the published image) |
 | `ANPR_OCR_TIMEOUT`       | —           | Per-call OCR timeout (optional)                                         |
@@ -199,7 +199,7 @@ Every value below is read from the environment. In a Hub deployment they are inj
 | `ANPR_READ_MAX_JUMP` | `0` | Track-stability gate: max single-step jump (box diagonals) before a plate is read; `0` off, e.g. `2` drops wandering tracks from an upstream tracker ID-switch/merge |
 | `ANPR_MOVEMENT_SCALE_WEIGHT` | `1` | Weight of apparent-size change (head-on motion) in the movement signal; `1` counts box growth like centre travel, `0` = pure centre-based (head-on cars gate as static), `>1` amplifies |
 | `ANPR_SAMPLE_VELOCITY_MIN` | `0` | Per-frame sample gate: keep only frames whose local step movement (÷ box size) meets this, so a car that drives in then parks doesn't flood the dataset with its stationary tail; `0` keeps every frame |
-| `ANPR_SAMPLE_REQUIRE_PLATE` | `false` | Drop sampled crops on which no plate was localized, keeping "vehicle only" frames out of the dataset; off preserves hard negatives |
+| `ANPR_SAMPLE_REQUIRE_PLATE` | `false` | Drop sampled crops on which no plate was localised, keeping "vehicle only" frames out of the dataset; off preserves hard negatives |
 | `ANPR_DEBUG_FRAMES`  | `false` | Write per-frame debug overlays (whole frame + vehicle/plate boxes) under `<ANPR_DATASET_DIR>/debug/`; disk-heavy, no-op without `ANPR_DATASET_DIR` |
 | `ANPR_EVAL_RUN`      | —       | `evaluate`: restrict the benchmark to one sampled run                           |
 
@@ -212,7 +212,7 @@ These default off / to sensible values; tune them to trade OCR cost against accu
 | `ANPR_READ_TARGET_PX` | `640`   | Ideal larger side (px) of the vehicle crop fed to the reader; frames closest to this are read first, so even a 1-frame read picks a detector-friendly crop. `0` = read the largest box first |
 | `ANPR_READ_MIN_PX`    | `0`     | Minimum crop larger side (px) to attempt a read; smaller crops are left `unread` instead of producing a low-res misread. `0` = no floor |
 | `ANPR_CROP_PAD`       | `0`     | Fraction each crop side is expanded to keep a fast car's plate in frame when the classify box lags. Keep modest (e.g. `0.1`); too much shrinks the plate under the detector |
-| `ANPR_READ_CONF_MIN`  | `0`     | Recognizer-confidence vote floor: reads below it are dropped from the consensus tally so low-confidence junk can't win or break ties. Distinct from `ANPR_OCR_DETECTOR_CONF` (which gates the detector) |
+| `ANPR_READ_CONF_MIN`  | `0`     | Recogniser-confidence vote floor: reads below it are dropped from the consensus tally so low-confidence junk can't win or break ties. Distinct from `ANPR_OCR_DETECTOR_CONF` (which gates the detector) |
 | `ANPR_READ_QUORUM`    | `0`     | Agreeing-read count that (a) ends a vehicle's OCR early once this many read frames agree on one plate, making `ANPR_READ_FRAMES` a max budget, and (b) acts as an acceptance floor: a plate with fewer agreeing votes is rejected and the vehicle left `unread`, so a lone high-confidence misread can't win. Agreement (not a single high score) is required; set `ANPR_READ_FRAMES` >= this. `0` = off (read the full budget, accept any read) |
 
 ## Observability
@@ -232,7 +232,7 @@ The module pins `github.com/uug-ai/models` and `github.com/uug-ai/queue` in `go.
 
 ### OpenCV-enhanced build (optional)
 
-Plate OCR runs through an optional preprocessing step. The default build is pure-Go (no CGo) and OCRs the raw crop. Building with the `opencv` tag compiles a **gocv/OpenCV** pass (grayscale, upscale, Otsu threshold) that cleans the crop first, materially lifting accuracy on small / low-contrast plates:
+Plate OCR runs through an optional preprocessing step. The default build is pure-Go (no CGo) and OCRs the raw crop. Building with the `opencv` tag compiles a **gocv/OpenCV** pass (greyscale, upscale, Otsu threshold) that cleans the crop first, materially lifting accuracy on small / low-contrast plates:
 
 ```bash
 go build -tags opencv .   # needs OpenCV 4.10+ (pkg-config opencv4) on the host
@@ -244,6 +244,6 @@ This mirrors `hub-pipeline-redaction`'s split: the gocv code lives in `internal/
 
 - [Stages](/docs/hub/workflows/stages/) — the general contract this stage implements.
 - [Ingest](/docs/hub/workflows/ingest/) — how the result envelope is stored.
-- [Detection block](/docs/hub/workflows/ingest/detection/) — the plate-box block this stage emits.
-- [Marker block](/docs/hub/workflows/ingest/marker/) — the per-vehicle timeline span this stage emits.
+- [Detection block](/docs/hub/workflows/ingest/blocks/detection/) — the plate-box block this stage emits.
+- [Marker block](/docs/hub/workflows/ingest/blocks/marker/) — the per-vehicle timeline span this stage emits.
 - [Observability](/docs/hub/workflows/observability/) — following a run end-to-end.

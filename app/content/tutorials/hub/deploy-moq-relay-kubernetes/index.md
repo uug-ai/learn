@@ -403,7 +403,7 @@ The MoQ publisher requires an H.264 camera stream. An H.265-only source can conn
      --follow | grep -i moq
    ```
 
-   Look for `cloud.runLiveStreamMoQ()` publishing the high or low stream to your relay. Connection errors usually point to DNS, UDP 443, TLS trust or relay authorization.
+   Look for `MoQ relay connected` and `MoQ broadcast is live` entries for the high or low quality. Connection errors usually point to DNS, UDP 443, TLS trust or relay authorisation.
 
 2. Inspect announced broadcasts through the relay's private debug listener:
 
@@ -428,7 +428,7 @@ The MoQ publisher requires an H.264 camera stream. An H.265-only source can conn
 | Agent connects but no broadcast appears | `AGENT_LIVE_MOQ_ENABLED=true`, Agent v3.9.2+, non-empty Agent key and H.264 input |
 | Broadcast appears but browser times out | Operator network allows UDP 443 and the browser supports WebTransport over HTTP/3 |
 | Browser connects but waits for video | Wait for a fresh H.264 keyframe; inspect camera GOP interval and Agent stale-packet warnings |
-| Low quality is missing | Configure a camera substream or remove `AGENT_LIVE_MOQ_QUALITY=high` |
+| Low quality is missing | Remove `AGENT_LIVE_MOQ_QUALITY=high`; without a sub-stream, the Agent publishes Low from the main stream |
 | Some sessions fail after scaling | Return to one replica or configure and test a proper relay cluster |
 
 Useful commands:
@@ -442,7 +442,7 @@ kubectl -n moq get events --sort-by=.lastTimestamp
 
 ## Harden the deployment
 
-The `/anon` route allows anyone who can reach the relay to publish and subscribe below that path. Agent keys make broadcast names harder to guess, but they are not authorization.
+The `/anon` route allows anyone who can reach the relay to publish and subscribe below that path. Agent keys make broadcast names harder to guess, but they are not authorisation.
 
 For a controlled trial, restrict LoadBalancer source ranges and firewall rules to known Agent and operator networks. For an internet-facing production service, replace anonymous access with short-lived, path-scoped publisher and subscriber tokens. That requires a credential flow which gives each Agent a device-scoped publisher URL and each browser a subscriber-scoped URL; the current static Hub Helm and Agent environment values do not provide that lifecycle by themselves.
 
@@ -455,7 +455,7 @@ Also add production controls appropriate to your environment:
 - Test certificate rotation. Relay `v0.14.7` watches certificate files for new connections, while existing QUIC sessions keep their original identity.
 - Keep HLS enabled as the operational fallback for networks that block HTTP/3 or UDP.
 
-For the transport tradeoffs and complete firewall comparison, read [Choose a live-stream transport: MoQ vs HLS vs WebRTC](/tutorials/hub/moq-vs-hls-vs-webrtc/).
+For the Live view page and its WebRTC and HLS transports, see [Live view](/docs/hub/livestream/). For the transport tradeoffs and complete firewall comparison, read [Choose a live-stream transport: MoQ vs HLS vs WebRTC](/tutorials/hub/moq-vs-hls-vs-webrtc/).
 
 {{< tutorial-panel tone="success" icon="badge-check" title="The path is complete" >}}
 Your Agent and Hub frontend now share the same `https://moq.example.com/anon` relay URL and `devices` broadcast prefix. The Agent publishes H.264 over UDP 443, the relay fans the broadcast out, and the browser subscribes without a direct connection to the Agent.

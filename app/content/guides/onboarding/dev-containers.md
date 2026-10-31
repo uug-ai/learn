@@ -39,7 +39,7 @@ repository at `/workspaces/monorepo`.
 
 ## What the container installs
 
-The image is based on the Go 1.25 Dev Container and includes the common platform
+The image is based on the Go 1.26 Dev Container and includes the common platform
 toolchain:
 
 - Node.js, npm, Tailwind CSS, and frontend build dependencies.
@@ -56,19 +56,19 @@ GitLens, and GitHub extensions inside the container.
 After the image is created, `.devcontainer/post-create.sh` prepares the
 workspace. It:
 
-1. Initializes or clones repositories listed in `.gitmodules`.
+1. Initialises or clones repositories listed in `.gitmodules`.
 2. Installs dependencies for the Hub, Factory, Admin, Design, and Website
 	 frontends when those repositories are present.
 3. Builds the generated TypeScript bindings in `models`.
-4. Discovers local Go modules, regenerates `go.work`, and tidies each module.
-5. Tidies the Learn Hugo modules.
-6. Verifies optional native Agent support when its verification script exists.
+4. Verifies optional native Agent support when its verification script exists.
+5. Discovers local Go modules, regenerates `go.work`, and tidies each module.
+6. Tidies the Learn Hugo modules.
 
 This process can take several minutes and requires network access. A failed step
 prints a warning and allows container creation to continue, so review the setup
 log before assuming every repository is ready.
 
-You can rerun the initialization after correcting a transient failure:
+You can rerun the initialisation after correcting a transient failure:
 
 ```bash
 bash .devcontainer/post-create.sh

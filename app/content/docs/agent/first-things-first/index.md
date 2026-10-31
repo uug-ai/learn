@@ -11,7 +11,7 @@ weight: 201
 toc: true
 ---
 
-The Agent is an isolated and scalable video management agent with a strong focus on user experience, scalability, resilience, extension and integration. It is the backbone of the entire Kerberos.io ecosystem, and is used as a foundation for small deployments to production level deployments with thousands of cameras.
+The Agent is an isolated and scalable video management agent with a strong focus on user experience, scalability, resilience, extension and integration. It is the backbone of the entire Kerberos.io ecosystem, and is used as a foundation for everything from small deployments to production-level deployments with thousands of cameras.
 
 Next to the Agent, Kerberos.io provides many other tools such as [Factory](/docs/factory/first-things-first), [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/hub/first-things-first) to provide additional capabilities: bring your own cloud, bring your own storage, central overview, live streaming, machine learning etc.
 
@@ -19,8 +19,8 @@ As [explained before](/docs/prologue/how/), there is no need to install all thos
 
 ## Introduction
 
-So by now you'll understand that Kerberos.io [applies the concept of agents](/docs/prologue/how/). An agent is running next to (or on) your camera, and is processing a single camera feed. It applies motion based or continuous recording and make those recordings available through a user friendly web interface. An Agent allows you to connect to other cloud services or integrates with custom applications.
+So by now you'll understand that Kerberos.io [applies the concept of agents](/docs/prologue/how/). An Agent is running next to (or on) your camera, and is processing a single camera feed. It applies motion-based or continuous recording and makes those recordings available through a user-friendly web interface. An Agent allows you to connect to other cloud services, such as [Kerberos Vault](/docs/agent/connect-to-vault) and [Kerberos Hub](/docs/agent/connect-to-hub), or integrate with custom applications.
 
 ![Agent overview](kerberos-agent-overview.gif)
 
-We'll provide a more detailed explanation of the Agent, but it's important to know that the [Agent GitHub repository](https://github.com/kerberos-io/agent) contains the most accurate and latest information. You can find [a brief list of features and functions here](https://github.com/kerberos-io/agent#a-world-of-kerberos-agents).
+We'll provide a more detailed explanation of the Agent, but it's important to know that the [Agent GitHub repository](https://github.com/kerberos-io/agent) contains the most accurate and latest information. The repository also has [a brief list of features and functions](https://github.com/kerberos-io/agent#a-world-of-kerberos-agents).

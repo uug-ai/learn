@@ -11,14 +11,14 @@ the platform repositories in one VS Code workspace while each repository keeps
 its own dependencies and configuration.
 
 For a preconfigured Linux toolchain, use the
-[Dev container]({{< ref "/guides/onboarding/dev-containers" >}}) instead.
+[Dev container](/guides/onboarding/dev-containers) instead.
 
 ## Prerequisites
 
 Install the following tools before cloning the workspace:
 
 - Git with access to the private `uug-ai` repositories.
-- Go 1.25 or later.
+- Go 1.26 or later.
 - A current Node.js LTS release and npm.
 - VS Code, recommended for the bundled workspace and tasks.
 - Docker, when the service you are developing needs local infrastructure or a
@@ -29,14 +29,14 @@ option when the workspace must fetch private repositories and Go modules.
 
 ## Clone the workspace
 
-Clone the monorepo and initialize its child repositories:
+Clone the monorepo and initialise its child repositories:
 
 ```bash
 git clone --recurse-submodules git@github.com:uug-ai/monorepo.git
 cd monorepo
 ```
 
-If you cloned without child repositories, initialize them afterward:
+If you cloned without child repositories, initialise them afterwards:
 
 ```bash
 git submodule update --init --recursive
@@ -51,7 +51,7 @@ code hub.code-workspace
 
 ## Install dependencies
 
-Synchronize the Go workspace and install the frontend dependencies needed for
+Synchronise the Go workspace and install the frontend dependencies needed for
 the area you plan to work on:
 
 ```bash

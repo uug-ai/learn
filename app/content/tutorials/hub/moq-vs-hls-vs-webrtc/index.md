@@ -15,7 +15,7 @@ tags: ['Live video', 'Networking', 'Architecture']
 
 {{< tutorial-header alt="Abstract luminous paths representing three live-video transports" >}}
 
-Live video has no single best transport. The right choice depends on what you are optimizing: the shortest delay, the largest audience, the strictest corporate network, or interactive audio.
+Live video has no single best transport. The right choice depends on what you are optimising: the shortest delay, the largest audience, the strictest corporate network, or interactive audio.
 
 This tutorial compares **Media over QUIC (MoQ)**, **HTTP Live Streaming (HLS)** and **WebRTC** as they are used by Kerberos Hub. You will turn product requirements into a transport choice, then validate that choice on the network where it will run.
 
@@ -37,7 +37,7 @@ By the end, you will know:
 |---|---|---|---|
 | **MoQ** | Low-latency viewing through a shared relay, especially with several viewers | Combines real-time delivery with publish/subscribe fan-out | Newer ecosystem; Hub currently targets Chromium and H.264 video |
 | **HLS** | Locked-down networks, broad playback compatibility and large audiences | Uses familiar HTTPS delivery and scales well through shared infrastructure | Segment buffering adds latency and the path is one-way |
-| **WebRTC** | Interactive monitoring, direct camera viewing and two-way talk | Mature sub-second media with congestion control and bidirectional tracks | ICE/TURN adds operational complexity; each viewer needs a media session |
+| **WebRTC** | Interactive monitoring, direct camera viewing and two-way talk | Mature sub-second media with congestion control | ICE/TURN adds operational complexity; each viewer needs a media session |
 
 {{< callout type="important" >}}
 The latency labels are goals, not guarantees. Camera encoding, keyframe interval, relay distance, packet loss, player buffering and overloaded links can matter more than the protocol name.
@@ -45,7 +45,7 @@ The latency labels are goals, not guarantees. Camera encoding, keyframe interval
 
 ## Understand the three paths
 
-All three options deliver the same camera video, but they organize the path differently. Each diagram below is interactive and can be opened in the [architecture designer](/designer/) with **Edit**.
+All three options deliver the same camera video, but they organise the path differently. Each diagram below is interactive and can be opened in the [architecture designer](/designer/) with **Edit**.
 
 ### MoQ: real-time publish and subscribe
 
@@ -85,10 +85,10 @@ The important benefits are:
 
 - **Low delay without a peer-to-peer topology.** Media remains frame-oriented rather than waiting for complete HLS segments.
 - **Efficient fan-out.** Adding viewers is primarily a relay concern instead of adding one direct Agent-to-browser path per viewer.
-- **Live-edge behavior.** A real-time player can skip data that is already too old instead of making delay grow without bound.
+- **Live-edge behaviour.** A real-time player can skip data that is already too old instead of making delay grow without bound.
 - **Independent delivery.** QUIC avoids TCP head-of-line blocking between independent streams, although loss and congestion still affect playback.
 
-In the current Kerberos implementation, the Agent publishes separate high- and low-quality H.264 broadcasts only while they are being watched. Hub playback uses WebTransport and WebCodecs and currently targets Chromium-based browsers. The initial path is video-only, so it does not replace WebRTC's talk channel.
+In the current Kerberos implementation, the Agent publishes separate high- and low-quality H.264 broadcasts. It sends the full video only while a broadcast is watched; an idle broadcast only refreshes its keyframes. Hub playback uses WebTransport and WebCodecs and currently targets Chromium-based browsers. The initial path is video-only, so it does not replace WebRTC's talk channel.
 
 MoQ is the strongest candidate when you need near-real-time video for multiple viewers and control the browser environment. Its costs are a relay, a newer operational toolchain, HTTP/3/UDP network access and a less mature browser ecosystem.
 
@@ -157,7 +157,7 @@ WebRTC is designed for live, bidirectional communication. In Hub, the Agent and 
     { "id": "webrtc-turn", "kind": "turn", "x": 530, "y": 340, "w": 230, "h": 130,
       "header": "STUN / TURN", "title": "TURN relay", "subtitle": "Fallback media path", "groupId": "services" },
     { "id": "webrtc-viewer", "kind": "frontend", "x": 930, "y": 200, "w": 240, "h": 130,
-      "header": "HUB FRONTEND", "title": "WebRTC peer", "subtitle": "Video + talk", "groupId": "operators" }
+      "header": "HUB FRONTEND", "title": "WebRTC peer", "subtitle": "Live video", "groupId": "operators" }
   ],
   "connections": [
     { "from": "webrtc-camera", "to": "webrtc-agent", "fromSide": "right", "toSide": "left", "label": "RTSP" },
@@ -173,7 +173,7 @@ WebRTC is designed for live, bidirectional communication. In Hub, the Agent and 
 WebRTC provides:
 
 - **The lowest interactive delay.** It is designed to keep conversation and control responsive.
-- **Two-way media.** In Hub, this is the only transport that supports the camera talk back-channel.
+- **Two-way media.** In Hub, this is the only transport that supports the camera talk backchannel.
 - **Mature adaptation.** Congestion control, jitter buffering, retransmission strategies and network statistics are established parts of the ecosystem.
 - **Direct delivery.** A successful peer-to-peer path avoids routing media through Hub infrastructure.
 
@@ -194,7 +194,7 @@ Choose WebRTC when interaction matters, viewer counts per camera are modest, or 
 | **Failure isolation** | Relay is a shared dependency | Hub/API path is a shared dependency | Direct failures can fall back to TURN |
 | **Troubleshooting focus** | Relay session, WebTransport, decode cadence | Playlist, segment upload and HTTP requests | Signalling, ICE candidates, DTLS and RTP stats |
 
-No transport removes the need for capacity planning. MoQ and HLS centralize fan-out, so their relay or Hub egress must be sized for all viewers. WebRTC can distribute that load across direct paths, but TURN becomes the central bottleneck whenever direct connectivity fails.
+No transport removes the need for capacity planning. MoQ and HLS centralise fan-out, so their relay or Hub egress must be sized for all viewers. WebRTC can distribute that load across direct paths, but TURN becomes the central bottleneck whenever direct connectivity fails.
 
 ## Give the firewall team the transport rules
 
@@ -241,7 +241,7 @@ WebRTC uses MQTT for signalling, then ICE chooses either a direct media path or 
 |---|---|---|---|
 | Agent and operator browser networks | Configured STUN/TURN host | Outbound UDP on the configured listener port | Discover NAT mappings and establish the preferred media path |
 | Agent and operator browser networks | Configured TURN host | Outbound TCP on the configured listener port, when TURN-over-TCP is enabled | Relay fallback where direct UDP is blocked |
-| Agent and operator browser networks | Negotiated peer addresses | Outbound UDP on dynamic ICE ports | Direct video and talk media when peer-to-peer succeeds |
+| Agent and operator browser networks | Negotiated peer addresses | Outbound UDP on dynamic ICE ports | Direct video when peer-to-peer succeeds |
 
 There is no universal TURN port in Kerberos configuration. The Helm example uses `turn.yourdomain.com:8443`; the Agent defaults reference `3478`. Use the actual configured value, and include the transport requested by the TURN URI or server policy.
 
@@ -296,7 +296,7 @@ Run the same camera through every viable transport and record:
 1. **Glass-to-glass latency:** show a millisecond clock in the camera view and compare it with the player.
 2. **Time to first frame:** measure from opening Live mode until decoded video appears.
 3. **Recovery time:** interrupt the Agent's network for five seconds and measure how long playback takes to return.
-4. **Packet-loss behavior:** test on a shaped or naturally weak link and watch for freezes, quality reduction and growing delay.
+4. **Packet-loss behaviour:** test on a shaped or naturally weak link and watch for freezes, quality reduction and growing delay.
 5. **Fan-out cost:** add viewers while measuring Agent upload, relay/API egress, CPU and memory.
 6. **Compatibility:** repeat from the browsers, VPNs, proxies and office networks operators actually use.
 
@@ -305,6 +305,8 @@ Test for at least one camera keyframe interval after every reconnect. A transpor
 {{% /steps %}}
 
 ## Apply the choice in Hub
+
+The [Live view](/docs/hub/livestream/) docs describe how WebRTC and HLS behave on the page, and [Feature flags](/docs/hub/feature-flags/#live-view) lists the live-view feature flags.
 
 The Hub Helm chart exposes the transports under `kerberoshub.frontend.features.liveview`. This example offers all three choices and starts Live mode with MoQ:
 
@@ -330,11 +332,11 @@ AGENT_LIVE_MOQ_URL=https://relay.example.com
 AGENT_LIVE_MOQ_BROADCAST_PREFIX=devices
 ```
 
-The Agent and frontend must use the same relay and broadcast prefix. Production relays should issue short-lived, subscriber-scoped credentials; do not treat an anonymous relay endpoint as an authorization boundary.
+The Agent and frontend must use the same relay and broadcast prefix. Production relays should issue short-lived, subscriber-scoped credentials; do not treat an anonymous relay endpoint as an authorisation boundary.
 
 To run the relay yourself, follow [Deploy a MoQ relay on Kubernetes](/tutorials/hub/deploy-moq-relay-kubernetes/). It covers TLS, the UDP LoadBalancer, Hub values, Agent variables and end-to-end verification.
 
-For the other production paths, follow [Set up WebRTC live view with TURN](/tutorials/hub/setup-webrtc-turn/) or [Set up HLS live view](/tutorials/hub/setup-hls-live-view/). Both guides cover Hub values, Agent requirements, firewall rules, diagnostics and a complete fallback-path test.
+For the other production paths, follow [Set up WebRTC live view with TURN](/tutorials/hub/setup-webrtc-turn/) or [Set up HLS live view](/tutorials/hub/setup-hls-live-view/). Both guides cover Hub values, Agent requirements, firewall rules and diagnostics; the WebRTC guide also tests the TURN fallback path.
 
 For the complete Hub live-view flow and troubleshooting steps, continue with [Live view](/docs/hub/livestream/).
 

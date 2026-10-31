@@ -12,12 +12,19 @@ menu:
 weight: 304
 toc: true
 podcast: hub-pipeline
+connects:
+  - page: /docs/vault/integrations#kerberos-hub
+    title: Kerberos Hub integration
+    why: Send an event to Hub for every recording Vault stores.
+  - page: /docs/vault/accounts#hub-pipeline
+    title: Hub pipeline toggle
+    why: Turn Hub analysis on or off per Vault account.
 ---
 
 > [!WARNING] Workflows are the future direction
 > The pipeline described here is the **static default** every recording flows through today. [Workflows](/docs/hub/workflows/) build on it to let each user customise *which* processing runs — per camera, per time window and per model, with no code. Over time, workflows are expected to **supersede this static pipeline** as the primary way recordings are routed and enriched, so treat this page as the current baseline rather than a fixed design.
 
-Hub processes every recording through a pipeline of small, focused microservices. As soon as a camera triggers an Agent, the resulting recording is pushed to Vault, an event lands on the message broker and Hub picks it up — kicking off a chain of services that enrich, classify and alert on that single event.
+Hub processes every recording through a pipeline of small, focused microservices. As soon as a camera triggers an [Agent](/docs/agent), the resulting recording is pushed to [Vault](/docs/vault), an event lands on the message broker and Hub picks it up — kicking off a chain of services that enrich, classify and alert on that single event.
 
 {{< rete caption="Pipelines to scale the processing." alt="Pipelines to scale the processing." height="500" >}}
 {
@@ -89,9 +96,9 @@ Hub processes every recording through a pipeline of small, focused microservices
 
 Each microservice in the Hub pipeline owns a single responsibility. Together they form an event mesh that passes messages from one service to the next asynchronously, so any step can scale, fail or be replaced independently. The pipeline is also open: you can drop in your own microservices, written in whatever language fits the job, and slot them in next to the built-in ones — see [Workflows → Stages](/docs/hub/workflows/stages/) for how to plug your own service in as a workflow stage, and [Ingest](/docs/hub/workflows/ingest/) for the shared layer that receives a result from either the API or the queue and runs the right actions for it.
 
-# How it works
+## How it works
 
-When Vault stores a new recording, it publishes an event to the broker. Hub consumes that event and starts a pipeline run for it. From there messages flow through the services either sequentially (Monitor → Sequence → Analysis → Throttler → Notification) or in parallel (everything fanning out from Analysis), depending on the configuration. Once every service involved in the run has acknowledged its message, the pipeline goes idle until the next event arrives.
+When Vault stores a new recording, its [Hub integration](/docs/vault/integrations#kerberos-hub) sends an event to the Hub API, which publishes it to the broker. Hub consumes that event and starts a pipeline run for it. From there messages flow through the services either sequentially (Monitor → Sequence → Analysis → Throttler → Notification) or in parallel (everything fanning out from Analysis), depending on the configuration. Once every service involved in the run has acknowledged its message, the pipeline goes idle until the next event arrives.
 
 Message distribution is handled by a message broker — Kafka, AMQP/RabbitMQ, or any other supported broker — using queues (or topics, depending on the broker). Each service consumes from its own queue, does its work, and hands off to the next stage. This loose coupling is what makes the pipeline easy to extend: adding a new capability is just a matter of adding a new consumer on a new queue.
 
@@ -105,7 +112,7 @@ The default queues and the services that consume them are:
 - Analyser - `kcloud-analysis-queue`
 - Thumbnail - `kcloud-thumby-queue.fifo`
 - Sprite - `kcloud-sprite-queue.fifo`
-- Dominant color - `kcloud-dominantcolor-queue.fifo`
+- Dominant colour - `kcloud-dominantcolor-queue.fifo`
 - Classification - `kcloud-classify-queue.fifo`
 - Throttler - `kcloud-throttler-queue`
 - Notification - `kcloud-notification-queue`
@@ -141,7 +148,7 @@ It is built to be resilient: even if recordings arrive late or an Agent's connec
 
 > kcloud-analysis-queue
 
-Once recordings are sequenced, the analyser orchestrates the post-processing stage. It fans out the event in parallel to the enrichment services — thumbnail, sprite and dominant color (when enabled), classification, counting, and any custom services you've added. Each of those services runs independently and reports back asynchronously. As soon as the analysis stage as a whole completes, the pipeline continues to the next sequential step.
+Once recordings are sequenced, the analyser orchestrates the post-processing stage. It fans out the event in parallel to the enrichment services — thumbnail, sprite and dominant colour (when enabled), classification, counting, and any custom services you've added. Each of those services runs independently and reports back asynchronously. As soon as the analysis stage as a whole completes, the pipeline continues to the next sequential step.
 
 ## Thumbnail
 
@@ -155,11 +162,11 @@ The thumbnail service generates a poster image for each recording by extracting 
 
 The sprite service builds a video timelapse — a single image strip composed of frames sampled at regular intervals across the recording. The Hub player uses this sprite to power its hover-to-scrub preview, so users can see what is happening at any point in the timeline without seeking through the underlying video.
 
-## Dominant color
+## Dominant colour
 
 > kcloud-dominantcolor-queue.fifo
 
-The dominant color service computes the most prevalent colors in a recording and stores the resulting palette alongside the event metadata. Hub shows the palette on the recording's detail page.
+The dominant colour service computes the most prevalent colours in a recording and stores the resulting palette alongside the event metadata. Hub shows the palette on the recording's detail page.
 
 This stage is optional and off by default. Set `kerberospipeline.dominantColor.enabled: true` in the Hub Helm values to deploy the service and have the analyser schedule it. The same value controls both, so the analyser never publishes to a queue without a consumer. When it is off, recordings have no palette and the rest of the pipeline is unaffected.
 

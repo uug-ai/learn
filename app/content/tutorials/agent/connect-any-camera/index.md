@@ -33,11 +33,11 @@ By the end of this tutorial you will have:
 
 You need:
 
-- A running Agent whose web interface you can open. If you do not have one yet, follow [Install Agent](../install/).
+- A running Agent whose web interface you can open. If you do not have one yet, follow [Install Agent](/tutorials/agent/install/).
 - An IP camera connected to the same network as the machine running Agent.
 - The camera administrator username and password.
 - A camera that can output H264 or H265 over RTSP. Use **H264 for the sub-stream** when you need WebRTC live view.
-- A computer with `ffprobe` or VLC for testing the stream.
+- `ffprobe` or VLC on the machine that runs Agent, for testing the stream.
 
 {{< callout type="warning" >}}
 Keep the camera and Agent on a trusted network. Do not expose the camera's RTSP port directly to the internet. Create a dedicated, read-only camera account when the camera supports one.
@@ -133,8 +133,8 @@ Do not continue until the test succeeds. A timeout usually points to the IP addr
 1. Open the Agent web interface and sign in.
 2. Open **Settings** and select **Camera**.
 3. Paste the tested URL into **RTSP URL**.
-4. Select **Verify connection**. Agent should report that the camera connection was verified.
-5. If the camera has a sub-stream, paste its URL into **Sub RTSP URL (used for livestreaming)** and select **Verify sub connection**.
+4. Select **Verify Connection**. Agent should report that the camera connection was verified.
+5. If the camera has a sub-stream, paste its URL into **Sub RTSP URL (used for livestreaming)** and select **Verify Sub Connection**.
 6. Select **Save**. Agent reloads the capture pipeline with the new camera settings.
 
 The two URLs may differ only by their stream profile. For example:
@@ -199,6 +199,7 @@ Environment variables override values saved through the web interface. If a fiel
 
 ## Next steps
 
-- Tune motion and recording behavior in the [Agent documentation](/docs/agent/).
+- Tune motion and recording behaviour in the [Agent settings](/docs/agent/getting-started/#settings).
 - Add a second camera by deploying a second Agent; one Agent process or container manages one camera.
-- Connect Agent to Hub when you want centralized live monitoring, search, alerts, and remote management.
+- [Connect the Agent to Hub](/docs/agent/connect-to-hub/) when you want centralised live monitoring, search, alerts, and remote management.
+- [Connect the Agent to Vault](/docs/agent/connect-to-vault/) to keep its recordings on storage you control.
