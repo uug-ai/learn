@@ -36,6 +36,93 @@ html.dark .learn-product-page .iso-illustration-figure {
   --iso-accent: color-mix(in srgb, var(--learn-product-accent) 78%, #ffffff);
 }
 
+/* The ecosystem map on the home page colours each zone, and the pulses that
+   leave it, with that product's accent (custom.css, [data-iso-zone]). */
+.iso-illustration-figure [data-iso-zone] {
+  --iso-zone-accent: var(--learn-product-accent);
+}
+
+html.dark .iso-illustration-figure [data-iso-zone] {
+  --iso-zone-accent: color-mix(in srgb, var(--learn-product-accent) 78%, #ffffff);
+}
+
+/* Click hint on figures whose zones are links (assets/js/iso-figure.js): an
+   arrow cursor that clicks each zone in turn, its tip on the zone's centre. */
+.iso-illustration-figure {
+  position: relative;
+}
+
+.iso-hint-hand {
+  --tip-x: 10.5px;
+  --tip-y: 10.5px;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  margin: calc(-1 * var(--tip-y)) 0 0 calc(-1 * var(--tip-x));
+  color: var(--text-primary);
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 0 1.5px var(--background));
+  transition: transform 0.8s cubic-bezier(0.45, 0, 0.2, 1), opacity 0.4s;
+}
+
+.iso-hint-hand.is-visible {
+  opacity: 0.7;
+}
+
+.iso-hint-hand svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: var(--tip-x) var(--tip-y);
+}
+
+.iso-hint-hand .iso-hint-fill {
+  fill: var(--background);
+}
+
+.iso-hint-hand.is-tapping svg {
+  animation: iso-hint-tap 0.45s ease-out;
+}
+
+/* A ring in the clicked zone's colour that spreads from the tip on each click. */
+.iso-hint-ripple {
+  position: absolute;
+  top: var(--tip-y);
+  left: var(--tip-x);
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 1.5px solid var(--hint-color, var(--iso-accent));
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.iso-hint-hand.is-tapping .iso-hint-ripple {
+  animation: iso-hint-ripple 0.7s ease-out;
+}
+
+@keyframes iso-hint-tap {
+  50% {
+    transform: scale(0.88);
+  }
+}
+
+@keyframes iso-hint-ripple {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.3);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
 /* Parts that replay their moment when clicked (assets/js/iso-figure.js); the
    rest of the illustration ignores the pointer. */
 .iso-illustration-figure [data-iso-at] {
@@ -1512,6 +1599,209 @@ html.dark .learn-product-page .iso-illustration-figure {
   }
 }
 
+/* Ecosystem: the four products on one plate, a 12s round of four 3s beats:
+   Factory deploys the Agents (0s), the Agents upload to Vault (3s) and send
+   events to Hub (6s), and Vault plays a recording back to Hub (9s). Pulses and
+   the parts they light carry their beat as an animation delay; a part lights
+   as its pulse arrives (1.5-2.7s into the beat), a source a beat earlier.
+   Each zone recolours its own parts, and each pulse takes the colour of the
+   zone it leaves from: set --iso-zone-accent on [data-iso-zone='…'] (the docs
+   use the product colours); without it everything keeps the figure's accent. */
+.iso-figure--ecosystem {
+  --iso-figure-color: var(--iso-color);
+}
+
+.iso-figure--ecosystem [data-iso-zone] {
+  --iso-color: var(--iso-zone-accent, var(--iso-figure-color));
+  --iso-pane: color-mix(in srgb, var(--iso-color) 12%, var(--iso-base));
+  --iso-pane-on: color-mix(in srgb, var(--iso-color) 75%, var(--iso-base));
+}
+
+:is([data-theme='dark'], .dark-theme, .dark) .iso-illustration--glow-auto .iso-figure--ecosystem [data-iso-zone],
+.iso-illustration--glow-on .iso-figure--ecosystem [data-iso-zone],
+.hub-widgets[data-hub-theme='dark'] .iso-illustration--glow-auto .iso-figure--ecosystem [data-iso-zone] {
+  --iso-pane: color-mix(in srgb, var(--iso-color) 18%, var(--iso-base));
+  --iso-pane-on: var(--iso-color);
+}
+
+.hub-widgets[data-hub-theme='light'] .iso-illustration--glow-auto .iso-figure--ecosystem [data-iso-zone] {
+  --iso-pane: color-mix(in srgb, var(--iso-color) 12%, var(--iso-base));
+  --iso-pane-on: color-mix(in srgb, var(--iso-color) 75%, var(--iso-base));
+}
+
+.iso-figure--ecosystem .iso-zone-tile {
+  fill: transparent;
+  stroke: color-mix(in srgb, var(--iso-color) 35%, transparent);
+  stroke-width: 1;
+  transition: fill 0.2s, stroke 0.2s;
+}
+
+.iso-figure--ecosystem .iso-zone-name {
+  fill: var(--iso-color);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* Linked zones take the pointer (the illustration itself ignores it) and
+   light up on hover and keyboard focus, or when a page script sets
+   data-iso-hint on one (e.g. a hint that shows the zones can be clicked). */
+.iso-figure--ecosystem a.iso-zone {
+  cursor: pointer;
+  outline: none;
+  pointer-events: auto;
+  text-decoration: none;
+}
+
+.iso-figure--ecosystem a.iso-zone:is(:hover, :focus-visible, [data-iso-hint]) .iso-zone-tile {
+  fill: color-mix(in srgb, var(--iso-color) 10%, transparent);
+  stroke: var(--iso-color);
+}
+
+.iso-figure--ecosystem a.iso-zone:focus-visible .iso-zone-tile {
+  stroke-width: 2.5;
+}
+
+.iso-figure--ecosystem a.iso-zone:is(:hover, :focus-visible, [data-iso-hint]) .iso-face {
+  stroke: var(--iso-color);
+}
+
+.iso-figure--ecosystem .iso-pulse {
+  vector-effect: none;
+  stroke-width: 2;
+  stroke-dasharray: 70 2000;
+  stroke-dashoffset: 80;
+  animation: iso-eco-pulse 12s linear infinite;
+}
+
+.iso-figure--ecosystem .iso-eco-flash {
+  animation: iso-eco-flash 12s ease-in-out infinite;
+}
+
+.iso-figure--ecosystem .iso-eco-blink {
+  opacity: 0.3;
+  animation: iso-eco-blink 12s ease-out infinite;
+}
+
+.iso-figure--ecosystem .iso-eco-halo {
+  opacity: 0;
+  animation: iso-eco-halo 12s ease-in-out infinite;
+  animation-delay: 6s;
+}
+
+/* Agents light as Factory deploys them, then as they upload and send events. */
+.iso-figure--ecosystem .iso-eco-agent-led {
+  opacity: 0.3;
+  animation: iso-eco-agent-led 12s ease-out infinite;
+}
+
+.iso-figure--ecosystem .iso-vault-ring {
+  animation: iso-eco-flash 12s ease-in-out infinite;
+  animation-delay: 3s;
+}
+
+.iso-figure--ecosystem .iso-vault-wheel {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: iso-eco-wheel 12s ease-in-out infinite;
+  animation-delay: 3s;
+}
+
+.iso-figure--ecosystem .iso-vault-spoke {
+  stroke: var(--iso-line);
+  stroke-width: 1.6;
+}
+
+@keyframes iso-eco-pulse {
+  0% {
+    stroke-dashoffset: 80;
+  }
+
+  15%,
+  100% {
+    stroke-dashoffset: -1010;
+  }
+}
+
+@keyframes iso-eco-flash {
+  0%,
+  11%,
+  30%,
+  100% {
+    fill: var(--iso-pane);
+  }
+
+  15%,
+  22% {
+    fill: var(--iso-pane-on);
+  }
+}
+
+@keyframes iso-eco-blink {
+  0%,
+  11%,
+  100% {
+    opacity: 0.3;
+  }
+
+  14% {
+    opacity: 1;
+  }
+
+  26% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes iso-eco-halo {
+  0%,
+  12%,
+  40%,
+  100% {
+    opacity: 0;
+  }
+
+  20%,
+  28% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes iso-eco-agent-led {
+  0%,
+  11%,
+  100% {
+    opacity: 0.3;
+  }
+
+  15%,
+  20%,
+  25%,
+  30%,
+  50%,
+  55% {
+    opacity: 1;
+  }
+
+  22%,
+  40%,
+  62% {
+    opacity: 0.3;
+  }
+}
+
+/* Three spokes, so a 60° turn loops seamlessly. */
+@keyframes iso-eco-wheel {
+  0%,
+  12% {
+    transform: rotate(0deg);
+  }
+
+  25%,
+  100% {
+    transform: rotate(60deg);
+  }
+}
+
 /* Reduced motion: hold the lit state and drop the travelling pulses. */
 @media (prefers-reduced-motion: reduce) {
   .iso-illustration :is(.iso-pane, .iso-halo, .iso-beacon, .iso-beacon-halo, .iso-led, .iso-radar, .iso-hub-reveal) {
@@ -1558,6 +1848,22 @@ html.dark .learn-product-page .iso-illustration-figure {
 
   .iso-figure--agent-link .iso-agentlink-variant--first {
     opacity: 1;
+  }
+
+  .iso-figure--ecosystem :is(.iso-eco-flash, .iso-eco-blink, .iso-eco-agent-led, .iso-eco-halo, .iso-vault-ring, .iso-vault-wheel) {
+    animation: none;
+  }
+
+  .iso-figure--ecosystem :is(.iso-eco-blink, .iso-eco-agent-led) {
+    opacity: 1;
+  }
+
+  .iso-figure--ecosystem .iso-eco-halo {
+    opacity: 0.35;
+  }
+
+  .iso-figure--ecosystem a.iso-zone .iso-zone-tile {
+    transition: none;
   }
 
   .iso-illustration .iso-pane {

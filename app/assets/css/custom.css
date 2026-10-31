@@ -43,19 +43,23 @@
   --shadow: rgba(0, 0, 0, 0.5);
 }
 
-[data-product="agent"] {
+[data-product="agent"],
+[data-iso-zone="agent"] {
   --learn-product-accent: #933734;
 }
 
-[data-product="factory"] {
+[data-product="factory"],
+[data-iso-zone="factory"] {
   --learn-product-accent: #4a786a;
 }
 
-[data-product="vault"] {
+[data-product="vault"],
+[data-iso-zone="vault"] {
   --learn-product-accent: #56618f;
 }
 
-[data-product="hub"] {
+[data-product="hub"],
+[data-iso-zone="hub"] {
   --learn-product-accent: #a239d7;
 }
 
@@ -1582,4 +1586,81 @@ main:has(:is(.tutorial-byline, .tutorial-meta)) > .hx\:mb-16 {
 
 .tutorial-byline__date .tutorial-byline__label {
   margin-right: 0.1rem;
+}
+
+/* Home page with hero: true (layouts/home.html): the navbar's width and side
+   padding (.learn-topbar-inner), so the content lines up with the menu. The
+   page grows to fill the window, so on a short page the footer sits at the
+   bottom of the window instead of halfway up. */
+body:has(> .learn-home-hero-page) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.learn-home-hero-page {
+  box-sizing: border-box;
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 20px 0;
+}
+
+/* Home page hero (hero-split shortcode): the intro text with the ecosystem map
+   under it on two thirds, the resource cards (hero-aside) on the last third;
+   stacked in source order on small screens. */
+.learn-hero-split {
+  display: grid;
+  gap: 0 3rem;
+  align-items: start;
+  padding-top: 1.5rem;
+}
+
+.learn-hero-split > figure {
+  margin-top: 2.75rem;
+  margin-bottom: 0;
+}
+
+/* The page title sits in the hero and looks like the aside's "Resources"
+   heading (Hextra's content h2), so the two columns start level. */
+.learn-hero-split > h1 {
+  margin-top: 0;
+  padding-bottom: calc(var(--hx-spacing) * 1);
+  border-bottom: 1px solid color-mix(in oklab, var(--hx-color-neutral-200) 70%, transparent);
+  font-size: var(--hx-text-3xl);
+  line-height: var(--hx-text-3xl--line-height);
+  font-weight: var(--hx-font-weight-semibold);
+}
+
+html.dark .learn-hero-split > h1 {
+  border-bottom-color: color-mix(in oklab, var(--hx-color-primary-100) 10%, transparent);
+}
+
+.learn-hero-aside .hextra-cards {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 768px) {
+  /* The aside spans every row; the last one is flexible, so an aside taller
+     than the main column grows that row instead of spreading the text apart. */
+  .learn-hero-split {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-rows: repeat(19, auto) 1fr;
+    column-gap: clamp(3rem, 10vw, 9rem);
+    padding-top: 2.5rem;
+  }
+
+  .learn-hero-split > * {
+    grid-column: 1;
+  }
+
+  .learn-hero-split > .learn-hero-aside {
+    grid-column: 2;
+    grid-row: 1 / span 20;
+  }
+
+  .learn-hero-aside > h2:first-child {
+    margin-top: 0;
+  }
 }
