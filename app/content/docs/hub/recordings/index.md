@@ -41,8 +41,8 @@ or open its dedicated detail page at `/media/<id>`.
 
 ## How recordings become available
 
-An [Agent](/docs/agent) sends recordings, or recording metadata, through the configured media
-pipeline. Hub stores the information needed to find each recording and resolves
+An [Agent](/docs/agent) sends recordings, or recording metadata, through the configured
+[media pipeline](/docs/hub/media-processing). Hub stores the information needed to find each recording and resolves
 the video from its storage provider when you play it.
 
 Thumbnails, sprite previews, detections, counting results, and other analysis
@@ -242,7 +242,7 @@ The side panel and dedicated detail page expose an **Actions** menu:
 | **View Context** | Opens surrounding footage in the shared player. |
 | **Copy Video URL** | Copies the resolved video URL when one is available. Treat this as a storage access link, not a permanent archive link. |
 | **Request recording** | Requests footage from the source for an eligible metadata-only recording. |
-| **Verify video** | Opens the verification page in a new tab with the video URL prefilled and verification requested. |
+| **Verify video** | Opens the [verification page](/docs/hub/mp4-verification) in a new tab with the video URL prefilled and verification requested. |
 | **Share Recording** | Opens the sharing form for a title, notes, and recipient email addresses. |
 | **New case** | Starts a new case containing this recording. |
 | **Add to case** | Lets you find and select an existing case to attach the recording to. |

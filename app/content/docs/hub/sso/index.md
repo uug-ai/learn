@@ -20,7 +20,7 @@ Kerberos Hub supports multiple users with access controlled by [organisations, p
 
 {{< figure src="hub-add-account.gif" alt="Give another user limited access to Kerberos Hub by creating a sub account." caption="Give another user limited access to Kerberos Hub by creating a sub account." class="stretch">}}
 
-To overcome these challenges, Kerberos Hub can be linked to multiple OIDC providers. Depending on the domain you use to sign in (`@customer1.com` or `@customer2.com`), you will be redirected to the relevant OIDC provider. You can use the following `environment variables` to configure one or more SSO domains having the specific `SSO credentials`; more information can be found in the configuration section.
+Kerberos Hub can be linked to multiple OIDC providers. Depending on the domain you use to sign in (`@customer1.com` or `@customer2.com`), you will be redirected to the relevant OIDC provider. You can use the following `environment variables` to configure one or more SSO domains having the specific `SSO credentials`; more information can be found in the [Configuration](#configuration) section.
 
     sso: # OIDC settings for allowing SSO.
       - domain: "uug.ai"
@@ -51,7 +51,7 @@ To configure Kerberos Hub with one or more OIDC providers you'll need to provide
 
 ### Microsoft Entra (Azure Active Directory)
 
-To connect an existing Azure Active Directory to your Kerberos Hub instance, you might go through [the following tutorial](https://learn.microsoft.com/en-us/power-pages/security/authentication/openid-settings#create-an-app-registration-in-azure). By creating a new app registration in Microsoft Entra, you'll obtain a client ID and client secret. Next to that you'll need to provide the `redirectUrl` variable, so Microsoft Entra knows to which endpoint it should send the tokens for authorisation.
+To connect an existing Azure Active Directory to your Kerberos Hub instance, you might go through [Microsoft's tutorial on creating an app registration in Azure](https://learn.microsoft.com/en-us/power-pages/security/authentication/openid-settings#create-an-app-registration-in-azure). By creating a new app registration in Microsoft Entra, you'll obtain a client ID and client secret. Next to that you'll need to provide the `redirectUrl` variable, so Microsoft Entra knows to which endpoint it should send the tokens for authorisation.
 
 After creating the new `App registration`, you should be able to extract the following details:
 
@@ -72,7 +72,7 @@ An elegant way to boost the user experience for your end users is to reuse the O
 
 {{< figure src="sso-chaining.gif" alt="Forward existing access token to Kerberos Hub to SSO." caption="Forward existing access token to Kerberos Hub to SSO." class="stretch">}}
 
-To make this work you'll need to set up both applications with OpenID Connect (OIDC). This means that the "wrapper" application will need a configuration setup with the OIDC provider (for example Auth0 in previous example), and Kerberos Hub should have a similar configuration with the same OIDC provider.
+To make this work you'll need to set up both applications with OpenID Connect (OIDC). This means that the "wrapper" application will need a configuration setup with the OIDC provider (for example Auth0 in the previous example), and Kerberos Hub should have a similar configuration with the same OIDC provider.
 
 However, there is a difference with this setup, as Kerberos Hub will not be responsible for running the authentication against the OIDC provider; the wrapper application is responsible here. What is happening is that the `accessToken` which is received by the wrapper application is forwarded (or chained) to the Kerberos Hub application. The Kerberos Hub application will receive the `accessToken` on the verification URL: `https://hub.kerberos.io/sso/verify/{domain}?accesstoken={accessToken}`, and will use the `clientVerificationId` value for the specific `domain` you defined.
 
@@ -95,7 +95,7 @@ When leveraging the domain feature, you can force the SSO usage by setting the `
 
 This option also hides the local passkey selector. It changes the login screen; do not treat it alone as an API-wide policy that disables local password or passkey authentication.
 
-{{< figure src="force-sso-domains.gif" alt="Forcing SSO for domains, this will hide the username and password fields." caption="Forcing SSO for domains, this will hide the username and password fields." class="stretch">}}
+{{< figure src="force-sso-domains.gif" alt="Forcing SSO for domains hides the username and password fields." caption="Forcing SSO for domains hides the username and password fields." class="stretch">}}
 
 ### Configuration
 

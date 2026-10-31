@@ -118,33 +118,33 @@ definition is loaded.
 
 ## 1. Providers
 
-Storage providers are the foundation of Kerberos Vault. As an administrator you bring your own cloud or edge storage, so there is no need to install a specific Kerberos Vault storage, we are open and integrate with others.
+Storage providers are the foundation of Kerberos Vault. As an administrator you bring your own cloud or edge storage, so there is no need to install a specific Kerberos Vault storage; we are open and integrate with others.
 
-Go ahead and [have a look at the provider page](/docs/vault/providers), there we explain how to add and configure specific providers.
+Go ahead and [have a look at the provider page](/docs/vault/providers), where we explain how to add and configure specific providers.
 
 ## 2. Integrations
 
-Once you have successfully stored your recordings on a storage provider, it is time to do something with it. This is where integrations come into play. An integration is a way to make another third-party solution or custom workload aware that a recording was stored on a storage provider.
+Once you have successfully stored your recordings on a storage provider, it is time to do something with them. This is where integrations come into play. An integration is a way to make another third-party solution or custom workload aware that a recording was stored on a storage provider.
 
 An integration produces an event with relevant information about the recording:
 
-- Where is it stored,
-- its filesize,
+- where it is stored,
+- its file size,
 - metadata about where motion was detected, etc.
 
 By connecting to an integration you will have the power to consume those messages and build custom workflows through the programming languages you prefer, or connect [to existing systems such as Kerberos Hub](/docs/hub/first-things-first) for visualisation purposes.
 
-Go ahead and [have a look at the integrations page](/docs/vault/integrations), there we explain how to add and configure specific integrations.
+Go ahead and [have a look at the integrations page](/docs/vault/integrations), where we explain how to add and configure specific integrations.
 
 ## 3. Accounts
 
 You should now have a working storage provider that helps you to persist your recordings, and have an integration in place to produce and consume events. Now it is time to leverage those capabilities through the concept of accounts.
 
-By creating an account you create a secure way of leveraging those capabilities by using authentication credentials; an access key and secret key. 
+By creating an account you create a secure way of leveraging those capabilities by using authentication credentials: an access key and secret key. 
 
-Once those credentials and relevant account have been created and enabled you can [link it to your Agents](/docs/agent/connect-to-vault) to start forwarding their recordings into your Kerberos Vault installation. On the other hand those credentials can also be leveraged when connecting to Kerberos Hub, so it can read and request recordings from your Kerberos Vault; and underlying storage providers.
+Once those credentials and relevant account have been created and enabled you can [link it to your Agents](/docs/agent/connect-to-vault) to start forwarding their recordings into your Kerberos Vault installation. On the other hand those credentials can also be leveraged when connecting to Kerberos Hub, so it can read and request recordings from your Kerberos Vault and its underlying storage providers.
 
-Go ahead and [have a look at the accounts page](/docs/vault/accounts), there we explain how to add and configure specific accounts.
+Go ahead and [have a look at the accounts page](/docs/vault/accounts), where we explain how to add and configure specific accounts.
 
 ## You're ready
 

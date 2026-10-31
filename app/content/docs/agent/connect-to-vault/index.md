@@ -43,7 +43,7 @@ Open the Agent's web interface and go to **Settings → Persistence**.
 3. Select **Verify Connection**. The Agent checks the keys against Vault and, when a provider or directory is set, uploads a short test recording to it.
 4. Save the settings.
 
-New recordings are uploaded from then on. Enable **Remove recordings after they are uploaded successfully** if the Agent's disk should only act as a buffer.
+New recordings are uploaded from then on. By default the Agent removes each recording from its own disk once it is uploaded successfully, so its disk only acts as a buffer. Turn off **Enable delete on upload** if you want to keep a local copy as well.
 
 ### Optional settings
 
@@ -65,8 +65,8 @@ For automated deployments, set the same values as environment variables instead 
 | `AGENT_KERBEROSVAULT_DIRECTORY` | Directory |
 | `AGENT_KERBEROSVAULT_CUSTOM_HEADERS` | Custom upload headers (JSON on one line) |
 | `AGENT_KERBEROSVAULT_MAX_RETRIES`, `AGENT_KERBEROSVAULT_TIMEOUT` | Retry behaviour |
-| `AGENT_KERBEROSVAULT_SECONDARY_*` | The same settings for the secondary Vault |
-| `AGENT_REMOVE_AFTER_UPLOAD` | Remove recordings after a successful upload |
+| `AGENT_KERBEROSVAULT_SECONDARY_*` | The same settings for the secondary Vault, except max retries and timeout |
+| `AGENT_REMOVE_AFTER_UPLOAD` | Remove recordings after a successful upload (`true` by default) |
 
 ```bash
 docker run -p 80:80 --name mycamera \
@@ -92,5 +92,5 @@ The Agent also connects to Hub directly, for status, live view and camera contro
 ## Troubleshooting
 
 - **Verify Connection fails.** Check that the URL ends with the API path (usually `/api`) and that the Agent can reach it from its network. A wrong access or secret key is rejected by Vault.
-- **Uploads succeed but you can't find the recordings.** Look in the provider the account uses, under the configured directory. If you set a provider on the Agent, it must exist in Vault.
+- **Uploads succeed but you can't find the recordings.** Look in the provider set on the Agent. If that provider is empty, doesn't exist or is disabled in Vault, Vault uses the provider of the account instead. Recordings are stored under the Agent's directory, unless the account sets a fixed directory (anything other than `*`), which then takes precedence.
 - **Recordings reach Vault but not Hub.** Check the directory and the Hub integration as described in [Using Vault together with Hub](#using-vault-together-with-hub).

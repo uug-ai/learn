@@ -21,9 +21,9 @@ Before we can start installing the different deployments in our cluster, we need
 
 ## Prerequisites
 
-Kerberos Vault is the storage component of the Kerberos Enterprise Suite. It is used to store your recordings at a central place, on the storage system you prefer. Next to that it can be used for extension and integration capabilities. Learn more about [Kerberos Vault here](/docs/vault).
+Kerberos Vault is the storage component of the Kerberos Enterprise Suite. It is used to store your recordings at a central place, on the storage system you prefer. Next to that it can be used for extension and integration capabilities. Learn more about [Kerberos Vault](/docs/vault).
 
-To use Kerberos Vault, you will need to have one or more Agents installed. Independent of that one can also use the Kerberos Vault API `/swagger/index.html` to send recordings from a custom-built VMS. Nothing stops you from developing a custom agent.
+To use Kerberos Vault, you will need to have one or more Agents installed. Independently of that, one can also use the Kerberos Vault API `/swagger/index.html` to send recordings from a custom-built VMS. Nothing stops you from developing a custom agent.
 
 ## Installation
 
@@ -31,7 +31,7 @@ Kerberos Vault requires some initial components to be installed. If you run Kerb
 
 {{< figure src="vault-edge-storage.svg" alt="Store your recordings at the edge with Kerberos Vault" caption="Store your recordings at the edge with Kerberos Vault" class="stretch">}}
 
-If you plan to run Kerberos Vault in a different cluster (which is perfectly possible), you will need to make sure you complete the initial setup of [Factory Edge](/docs/factory/installation-edge) installation. To be more specific you will need the following components running:
+If you plan to run Kerberos Vault in a different cluster (which is perfectly possible), you will need to make sure you complete the initial setup of the [Factory Edge](/docs/factory/installation-edge) installation. To be more specific you will need the following components running:
 
 - Helm
 - Calico
@@ -39,7 +39,7 @@ If you plan to run Kerberos Vault in a different cluster (which is perfectly pos
 - MongoDB
 - Traefik (or alternatively Nginx ingress)
 
-Once this is done start by cloning the configurations from our [GitHub repo](https://github.com/kerberos-io/vault).
+Once this is done, start by cloning the configurations from our [GitHub repo](https://github.com/kerberos-io/vault).
 
     git clone https://github.com/kerberos-io/vault
 
@@ -83,7 +83,7 @@ If you are using Ingress Nginx, do not forget to comment `Traefik` and uncomment
         kubernetes.io/ingress.class: nginx
         nginx.ingress.kubernetes.io/proxy-body-size: 200m
 
-Kerberos Vault requires a MongoDB instance to be running, it uses it to store media, configurations, etc. To specify those credentials a configmap is created and injected into the Kerberos Vault deployment.
+Kerberos Vault requires a MongoDB instance to be running; it uses it to store media, configurations, etc. To specify those credentials a configmap is created and injected into the Kerberos Vault deployment.
 
 Modify the MongoDB credentials in the configmap `./vault/yaml/mongodb.config.yaml`, and make sure they match the credentials of your MongoDB instance.
 
@@ -93,7 +93,7 @@ Modify the MongoDB credentials in the configmap `./vault/yaml/mongodb.config.yam
     -->   value: "yourmongodbpassword"
 
 
-Create namespace
+Create the namespace.
 
     kubectl create namespace kerberos-vault
     
@@ -106,7 +106,7 @@ Once you have corrected the DNS names and MongoDB credentials, install Kerberos 
     kubectl create namespace kerberos-vault
     kubectl apply -f ./vault/yaml/deployment.yaml -n kerberos-vault
 
-## Test out configuration
+## Test the configuration
 
 If everything worked out as expected, you should now have the following services in your cluster:
 
@@ -127,4 +127,4 @@ It should look like this.
 
 Once everything is configured correctly in your cluster and DNS or `/etc/hosts` file, you should be able to access the Kerberos Vault application. By navigating to the domain `vault.domain.com` in your browser you will see the Kerberos Vault login page showing up.
 
-{{< figure src="login.gif" alt="Once successfully installed Kerberos Vault, it will show you the login page." caption="Once successfully installed Kerberos Vault, it will show you the login page." class="stretch">}}
+{{< figure src="login.gif" alt="Once Kerberos Vault is successfully installed, it will show you the login page." caption="Once Kerberos Vault is successfully installed, it will show you the login page." class="stretch">}}

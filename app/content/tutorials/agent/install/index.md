@@ -162,7 +162,7 @@ spec:
       targetPort: 80
 ```
 
-Apply it:
+Save it as `kerberos-agent.yaml` and apply it:
 
 ```bash
 kubectl apply -f kerberos-agent.yaml
@@ -227,7 +227,7 @@ The full list lives in the [Agent README](https://github.com/kerberos-io/agent#c
 
 1. Open `http://<host>:80` in your browser.
 2. Log in with the credentials above.
-3. Open **Settings → Camera** and confirm your RTSP URL — the live preview should appear.
+3. Open **Settings → Camera** and confirm your RTSP URL, then return to the **Dashboard** — the live view should appear.
 4. Trigger motion in front of the camera (or enable `AGENT_CAPTURE_CONTINUOUS=true`) and check **Recordings**.
 
 ## Troubleshooting

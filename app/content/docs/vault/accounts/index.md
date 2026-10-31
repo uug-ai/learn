@@ -27,7 +27,7 @@ for the JSON contract, precedence, and secret-handling guidance.
 
 Having set up `Providers` and `Integrations`, you need a secure way to interact with them through the creation of an account.
 
-By creating an account you will receive credentials that give access to the Kerberos Vault's providers, integrations and APIs. Account credentials are being used by an Agent to send recordings, and/or through custom code by API calls to download and/or forward recordings.
+By creating an account you will receive credentials that give access to the Kerberos Vault's providers, integrations and APIs. Account credentials are used by an Agent to send recordings, and/or through custom code by API calls to download and/or forward recordings.
 
 ## Prerequisites
 
@@ -39,7 +39,7 @@ Once you have set up your Kerberos Vault instance, and have successfully logged 
 
 {{< figure src="account.gif" alt="One or more accounts can be created to secure your storage access." caption="One or more accounts can be created to secure your storage access." class="stretch">}}
 
-When selecting the `+ Add Account` button, a modal will open that allows you to configure a specific account. Go ahead and select one from the list.
+When selecting the `+ Add Account` button, a modal will open that allows you to configure a specific account. Go ahead and fill in the fields.
 
 {{< figure src="add-account.gif" alt="Create a secure account." caption="Create a secure account" class="stretch">}}
 
@@ -53,8 +53,8 @@ There are a couple of interesting configurations you can enable on account level
 
  - Account name: a random name identifying the account.
  - Main provider: the default provider the account is linked to.
- - Day limit: the expiry date of all recordings stored through this account.
- - Integrations: all the integrations which will be executed each time a recording was stored in a storage provider.
+ - Day limit: the number of days recordings stored through this account are kept before they expire.
+ - Integrations: all the integrations which will be executed each time a recording is stored in a storage provider.
 
 #### Directory
 
@@ -70,10 +70,10 @@ These credentials are shared with Agents, Kerberos Vaults (chained/forwarding) a
 
 When connecting Kerberos Vault to Kerberos Hub through the integration, an event is forwarded [to the Kerberos Hub pipeline](/docs/hub/pipeline). By enabling or disabling the cloud analysis you will enable or disable any cloud computing done on the Kerberos Hub.
 
-This is required if you only want to store recordings and avoid any analysis in the cloud, and thus reduce bandwidth from Kerberos Vault to the Kerberos Hub microservices.
+Disable it if you only want to store recordings and avoid any analysis in the cloud, and thus reduce bandwidth from Kerberos Vault to the Kerberos Hub microservices.
 
 #### Edge analysis
 
 When connecting Kerberos Vault to Kerberos Hub through the integration, an event is forwarded [to the Kerberos Hub pipeline](/docs/hub/pipeline). By enabling or disabling the edge analysis you will enable or disable edge computing in Kerberos Vault.
 
-This is useful when you want to compute specific analysis at the edge and forward the relevant results [to the Kerberos Hub pipeline](/docs/hub/pipeline). This avoids bandwidth consumption but increases computing power at the edge.
+This is useful when you want to compute specific analysis at the edge and forward the relevant results [to the Kerberos Hub pipeline](/docs/hub/pipeline). This reduces bandwidth consumption but requires more computing power at the edge.

@@ -37,7 +37,7 @@ If you can express it as *"take a recording, do some work, return a result,"* it
 
 <div class="tutorial-grid">
 {{< cards cols="3" >}}
-  {{< card icon="identification" title="Licence-plate recognition" subtitle="Read plates off vehicles entering a site and file them as markers you can search and alert on." >}}
+  {{< card icon="identification" title="License-plate recognition" subtitle="Read plates off vehicles entering a site and file them as markers you can search and alert on." >}}
   {{< card icon="chart-pie" title="Domain-specific classification" subtitle="Flag PPE compliance, spot empty retail shelves, or detect leaks on equipment with a model you trained." >}}
   {{< card icon="chat-alt-2" title="LLM scene summaries" subtitle="Send a clip to a vision-language model and attach a plain-language description for faster review." >}}
   {{< card icon="puzzle" title="Third-party enrichment" subtitle="Call an external API — weather, access-control logs, an ALPR vendor — and stitch that context onto the recording." >}}
@@ -292,7 +292,7 @@ func envOr(name, fallback string) string {
 ```
 
 {{< callout type="info" >}}
-**Any language works.** The contract is just JSON: consume a `WorkflowRun` from your queue, and return one to `WORKFLOWS_QUEUE` with your result as a **block envelope** on `payload` (its shape is shown below). The [envelope reference](/docs/hub/workflows/stages/#the-workflow-run) lists every field you receive.
+**Any language works.** The contract is just JSON: consume a `WorkflowRun` from your queue, and return one to `WORKFLOWS_QUEUE` with your result as a **block envelope** on `payload` (its shape is shown below). The [workflow run reference](/docs/hub/workflows/stages/#the-workflow-run) lists every field you receive.
 {{< /callout >}}
 
 ### Do the work

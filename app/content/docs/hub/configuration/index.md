@@ -23,11 +23,11 @@ Once you have installed the Kerberos Hub Helm chart and confirmed that all micro
 
 {{< figure src="hub-login.gif" alt="Kerberos Hub login screen after installation." caption="Kerberos Hub login screen after installation." class="stretch">}}
 
-# Accounts
+## Accounts
 
 Once you have executed the post-installation steps, you should now have a user with the role **owner**. The owner role is the highest privileged role and gives access to all features, functions, Agents and related recordings of the specific user. An owner has an overview of all connected Agents, and can create sites, groups, alerts, channels, etc. The owner can also delegate specific Agents, sites or groups to sub accounts.
 
-## Sub accounts
+### Sub accounts
 
 Sub accounts are created to delegate access to other users, and have a limited scope or access to the different Agents and their related recordings and livestreams.
 
@@ -35,7 +35,7 @@ An example of a sub account would be a site owner, a store owner, etc., who only
 
 On top of that a sub account can have a specific role such as **guest** or **editor**. This role will limit the access to specific functions and features.
 
-You can create a new sub account by navigating to the accounts page and clicking on the `(+ Add Account)` button at the left top.
+You can create a new sub account by navigating to the accounts page and clicking on the `(+ Add Account)` button at the top left.
 
 {{< figure src="hub-add-account.gif" alt="Give another user limited access to Kerberos Hub by creating a sub account." caption="Give another user limited access to Kerberos Hub by creating a sub account." class="stretch">}}
 
@@ -47,7 +47,7 @@ By creating sites and assigning Agents to a specific site, it is easier to monit
 
 Next to that, sites also give an additional advantage in terms of authorisation and access control. As described in the accounts paragraph, a sub account can be granted access to only a limited number of sites, and therefore will only be able to view the Agents at a specific location.
 
-You can create a new site, by navigating to the sites page and clicking the `(+ Add Site)` button at the left top.
+You can create a new site by navigating to the sites page and clicking the `(+ Add Site)` button at the top left.
 
 {{< figure src="hub-add-site.gif" alt="Structure your Agents by using sites, and introduce Access Control for sub accounts." caption="Structure your Agents by using sites, and introduce Access Control for sub accounts." class="stretch">}}
 
@@ -55,18 +55,17 @@ You can create a new site, by navigating to the sites page and clicking the `(+ 
 
 Groups are similar to sites; the only difference is that a group is more abstract than a site. A group can be for example "Cash desks", "Entrance gates", "All stores of Belgium", "EMEA sites", etc. A group can be either a collection of sites, what we call then a **site group**, or it can contain a number of cameras from one or more sites, what we call a **group**.
 
-Similar to sites, groups can also be used to give access to specific Agents, and introduces a next level of flexibility and access controls. As illustrated before you could have someone responsible for all "entrance gates" of all buildings within a specific country. By giving a sub account access to this group, he or she will only see the entrance gates of the different sites and not the other Agents belonging to the related sites.
+Similar to sites, groups can also be used to give access to specific Agents, and introduce an extra level of flexibility and access control. As illustrated before you could have someone responsible for all "entrance gates" of all buildings within a specific country. By giving a sub account access to this group, he or she will only see the entrance gates of the different sites and not the other Agents belonging to the related sites.
 
-You can create a new group, by navigating to the groups page and clicking the `(+ Add Group)` button at the left top.
+You can create a new group by navigating to the groups page and clicking the `(+ Add Group)` button at the top left.
 
 {{< figure src="hub-add-group.gif" alt="Structure your Agents by using groups, another level of flexibility." caption="Structure your Agents by using groups, another level of flexibility." class="stretch">}}
 
 ## Cameras
 
-On the cameras page you will have an overview of all the 
- cameras, Agents, your (sub) account has access to. This means that if your account only has access to a couple of sites or groups, the cameras page will only show the Agents that belong to the related groups and sites.
+On the cameras page you will have an overview of all the cameras (Agents) your (sub) account has access to. This means that if your account only has access to a couple of sites or groups, the cameras page will only show the Agents that belong to the related groups and sites.
 
-{{< figure src="hub-cameras.gif" alt="Structure your Agents by using groups, another level of flexibility." caption="Structure your Agents by using groups, another level of flexibility." class="stretch">}}
+{{< figure src="hub-cameras.gif" alt="The cameras page lists every Agent your account has access to." caption="The cameras page lists every Agent your account has access to." class="stretch">}}
 
 By clicking on the `(+ Add Camera)` button, you will see a modal explaining how to connect an Agent to Kerberos Hub, and the different deployments which are available.
 
@@ -88,7 +87,7 @@ You have your accounts set up, sites and groups created and, last but not least,
 
 Now it is time to configure some integrations using alerts and channels. The idea of integrations is that you can send messages to other 3rd-party services, or your own APIs, when an interesting event/alert occurs.
 
-{{< figure src="hub-alerts.gif" alt="Get your credentials to link your Agents." caption="Get your credentials to link your Agents." class="stretch">}}
+{{< figure src="hub-alerts.gif" alt="Configure alerts and channels to send events to other services." caption="Configure alerts and channels to send events to other services." class="stretch">}}
 
 ### Alerts
 
@@ -112,7 +111,7 @@ To be written
 
 ### Channels
 
-Multiple channels can be configured and used as an event endpoint. Each channel has its own API and visualisation to the end user, therefore we will discuss them below.
+Multiple channels can be configured and used as an event endpoint. Each channel has its own API and visualisation to the end user, so we will discuss them below.
 
 #### Webhook
 

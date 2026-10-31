@@ -45,6 +45,8 @@ Use quoted `"true"` and `"false"` values for frontend flags unless the chart fie
 | `kerberoshub.frontend.caseFilterAssigneesDefault` | `CASE_FILTER_ASSIGNEES_DEFAULT` | `"false"` | Applies the current user as the initial assignee filter on case lists. This changes the initial filter state; it does not restrict which cases the user may access. |
 | `kerberoshub.frontend.features.workflows.enabled` | `FEATURE_WORKFLOWS_ENABLED` | `"false"` | Enables workflow pages and navigation. This does not start the workflow engine. |
 | `kerberoshub.frontend.features.audit.enabled` | `FEATURE_AUDIT_ENABLED` | `"true"` | Shows the owner/admin Audit events page and navigation link. This does not deploy the audit dispatcher or change audit-event authorisation. |
+| `kerberoshub.frontend.features.dayOverview.enabled` | `FEATURE_DAY_OVERVIEW_ENABLED` | `"true"` | Shows the Day overview page and its navigation menu. Role page permissions still apply. |
+| `kerberoshub.api.passkeys.enabled` | `FEATURE_PASSKEYS_ENABLED` | `false` | Shows passkey sign-in and passkey management. The chart sets the same variable on Hub API together with the passkey configuration; see [Authentication](/docs/hub/authentication#configure-passkeys-in-a-self-hosted-deployment). |
 | `kerberoshub.frontend.features.floorplan.enabled` | `FEATURE_FLOORPLAN_ENABLED` | `"true"` | Enables floor-plan functionality in the frontend. |
 | `kerberoshub.frontend.features.i18n.enabled` | `FEATURE_I18N_ENABLED` | `"true"` | Shows the language switcher. When disabled, Hub always uses `i18n.defaultLanguage`. |
 | `kerberoshub.frontend.features.devices.hideAgent` | `FEATURE_DEVICES_HIDE_AGENT` | `"false"` | Hides the Add Agent control on the Devices page when set to `"true"`. |
@@ -87,7 +89,7 @@ The organisation and project flags form a hierarchy:
 | Helm value | Container environment variable | Default | Effect |
 | --- | --- | --- | --- |
 | `kerberoshub.frontend.features.videoEdits.enabled` | `FEATURE_VIDEO_EDITS_ENABLED` | `"false"` | Umbrella for in-app video editing tools, including face redaction. |
-| `kerberoshub.frontend.features.faceRedaction.enabled` | `FEATURE_FACE_REDACTION_ENABLED` | `"false"` | Enables the face-redaction tool. `videoEdits.enabled` must also expose the edit surface. |
+| `kerberoshub.frontend.features.faceRedaction.enabled` | `FEATURE_FACE_REDACTION_ENABLED` | `"false"` | Enables the face-redaction tool. `videoEdits.enabled` must also be enabled to expose the edit surface. |
 | `kerberoshub.frontend.features.faceRedaction.classifierTracksEnabled` | `FEATURE_FACE_REDACTION_CLASSIFIER_TRACKS_ENABLED` | `"true"` | Makes legacy classifier/analysis tracks available as a redaction starting point. When disabled, saved edits, detection runs, manual box drawing, and submission remain available. |
 
 These flags expose frontend controls only. Rendering redacted recordings still requires the redaction workflow and worker to be configured.

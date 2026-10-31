@@ -136,7 +136,7 @@ env:
     value: "Example Hub"
 ```
 
-This is a container environment example, not a new top-level Helm values setting. Apply it through your deployment's supported API environment configuration, then restart the API.
+This is a container environment example. Current Hub API and frontend images also require `FEATURE_PASSKEYS_ENABLED=true` on both the API and the frontend. With Hub Helm chart 0.168.1 or later, `kerberoshub.api.passkeys` (`enabled`, `rpId`, `origins`, `rpName`) sets all of these for you; otherwise apply them through your deployment's supported environment configuration, then restart the API and frontend.
 
 Use the **frontend origin**, not the API origin, in `PASSKEY_ORIGINS`: it is the browser page that creates and uses the credential. For multiple frontend origins under the same RP ID, separate the exact origins with commas. Only allow origins that should be trusted to use these credentials. HTTP is accepted only for `localhost` development, for example RP ID `localhost` with origin `http://localhost:4200`.
 
@@ -170,7 +170,7 @@ Plan recovery before making an authentication method mandatory or replacing a de
 | Forgotten local password | Use **Forgot password**, check delivery to the account email address, and complete 2FA if enabled. Ask the deployment administrator to check outgoing email if nothing arrives. |
 | Lost authenticator | Use a previously registered passkey if available. Otherwise, contact your administrator to recover access and arrange re-enrolment. Hub does not provide a backup-code flow in these screens. Resetting the password does not remove 2FA. |
 | Lost passkey device | Use another registered passkey, or the password and authenticator flow where available. Remove the lost device's registration in **Profile > Passkeys**. |
-| Passkey option missing or unavailable | Check HTTPS, browser support, demo mode, API RP configuration, and whether the login page is SSO-only. |
+| Passkey option missing or unavailable | Check HTTPS, browser support, demo mode, API RP configuration, `FEATURE_PASSKEYS_ENABLED`, and whether the login page is SSO-only. |
 | Passkey rejected after a URL change | Verify the RP ID and exact frontend origin, including the port. A credential for an unrelated RP ID cannot be reused. |
 | SSO returns to the login page | Check the selected SSO domain, issuer, client credentials, callback URL, identity claim, and matching Hub account. |
 | Need to add a passkey after SSO | Passkey management still needs the local Hub password and Hub TOTP code if enabled. An identity provider password is not a substitute. |

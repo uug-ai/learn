@@ -26,7 +26,7 @@ For customer upgrades, we always use our internal `production` environment as th
    - `source_branch`: the environment you want to copy versions from; for customer promotions this is always `production`
    - `target_branch`: the environment you want to update in the selected repository
    - `customer`: use `n/a` for internal environments, or select a customer repository
-   - `services`: choose `all`, `hub`, `hub-pipeline`, `vault`, or `factory`
+   - `services`: choose `all`, `hub`, `hub-pipeline`, `vault`, `factory`, `design`, `website`, or `learn`
 4. Start the workflow.
 
 > For customer rollouts, the expected path is **our `production` -> customer `staging`**.
@@ -48,14 +48,14 @@ For internal promotions (`customer = n/a`), it also updates:
 - `environments/<env>/doc.kerberos.io/deployment.yaml`
 - `environments/<env>/learn/deployment.yaml`
 
-After updating the manifests, the workflow creates a branch named `promote-from-<source>-to-<target>`, commits the changes, pushes the branch, and opens a pull request against `main`.
+After updating the manifests, the workflow creates a branch named `promote/<yyyy-mm-dd>-<source>-to-<target>`, commits the changes, pushes the branch, and opens a pull request against `main`.
 
 ## Release notes in the pull request
 
 Every promotion pull request includes generated release notes so reviewers can quickly understand what is changing between the source and target environments. The PR body contains:
 
 - an **overview** of the repositories and version changes (`from -> to`)
-- **statistics** per repository, such as commits, files changed, additions, and deletions
+- **statistics** per repository, such as commits, files changed, additions, and deletions (when `include_diff_stats` is enabled)
 - a short summary of the **major functional changes** included in each upgraded service
 
 A typical release note section looks like this:
@@ -94,7 +94,7 @@ This release includes changes from the following repositories:
 - Improved timeline and chart behavior when filters change, including correct clearing, grouping control, and reduced unnecessary reloads
 ```
 
-This makes the promotion PR both a deployment change and a release communication artifact for reviewers, QA, and customer rollouts.
+This makes the promotion PR both a deployment change and a release communication artefact for reviewers, QA, and customer rollouts.
 
 ## Recommended promotion path
 
@@ -112,12 +112,12 @@ This keeps validation predictable and ensures each environment has been reviewed
 2. Verify the expected image tags, version transitions, and major changes are correct.
 3. Request approval when the target environment is sensitive, especially `production`.
 4. Merge the pull request.
-5. Let ArgoCD sync the updated manifests into the target cluster.
+5. Let Argo CD sync the updated manifests into the target cluster.
 
 ## Practical tips
 
 - Use a specific `services` option when only part of the platform needs promotion.
 - Use the `customer` option for customer-managed environments instead of editing their repository by hand.
 - For customer deployments, never promote directly from our `staging` or `qualityassurance` environments; always start from our validated `production` versions.
-- If no image versions changed between environments, the workflow may finish with no meaningful commit to merge.
+- If no image versions changed between environments, the workflow skips the commit, push, and pull request.
 

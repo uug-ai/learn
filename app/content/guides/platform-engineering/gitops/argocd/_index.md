@@ -1,4 +1,4 @@
 ---
-title: ArgoCD
+title: Argo CD
 toc: false
 ---

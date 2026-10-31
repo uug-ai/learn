@@ -1,8 +1,8 @@
 ---
 podcast: machinelearning-first-things-first
 title: "First things first"
-description: "Machine learning without a UI, is just a model nobody can use."
-lead: "Machine learning without a UI, is just a model nobody can use."
+description: "Machine learning without a UI is just a model nobody can use."
+lead: "Machine learning without a UI is just a model nobody can use."
 date: 2020-10-06T08:49:31+00:00
 lastmod: 2020-10-06T08:49:31+00:00
 draft: false
@@ -14,7 +14,7 @@ weight: 101
 toc: true
 ---
 
-Machine learning or computer vision at scale is one of the key motivations of the entire Kerberos.io software stack. All services going from Agents, Kerberos Vault to Kerberos Hub are designed in such a way that you can scale them independently of each other. 
+Machine learning or computer vision at scale is one of the key motivations of the entire Kerberos.io software stack. All services, from Agents and Kerberos Vault to Kerberos Hub, are designed in such a way that you can scale them independently of each other. 
 
 The design principle of Kerberos.io allows you to decouple video streams from any CPU or GPU workloads, through the creation of video chunks, queueing, event messaging and/or real-time processing. This is perfect for GPU workloads such as machine learning or other AI services.
 
@@ -29,14 +29,14 @@ Especially in the video analytics space, where we apply machine learning to vide
 1. How do you scale the recording of video streams?
 2. How do GPUs process video streams? One by one?
 3. How do you scale your GPUs, and add more in the future?
-4. What happens if you add more video streams, do you need to add more GPUs?
+4. What happens if you add more video streams? Do you need to add more GPUs?
 
 These challenges are where we at Kerberos.io bring value through 
 [the Kerberos Enterprise Suite](/docs/enterprise/first-things-first). We provide an elegant and scalable design for supporting your ever-growing machine learning use cases. Read more below.
 
 ## Video chunks
 
-Agents are responsible for recording video streams into small chunks, mp4s, of which you can configure the length of the recording; pre and post recording. The main motivation of doing this is that small chunks of videos are easier to process and distribute across different workloads. Therefore, video chunks are the building blocks and basis of the scale Kerberos brings. 
+Agents are responsible for recording video streams into small chunks, mp4s, of which you can configure the length of the recording; pre- and post-recording. The main motivation of doing this is that small chunks of videos are easier to process and distribute across different workloads. Therefore, video chunks are the building blocks and basis of the scale Kerberos brings. 
 
 ## Queueing and events
 
@@ -44,7 +44,7 @@ Video chunks prepared by one or more Agents are sent to Kerberos Vault where the
 
 ## Consuming and inference
 
-Once events are being generated, they are ready to be consumed by one or more consumers. Having this publish and subscribe mechanism, for example Kafka, you have one or more producers (Kerberos Vault replicas) and one or more consumers (ML clients). This allows one to scale the number of consumers and workloads as the number of events, and thus recordings, are increasing.
+Once events are being generated, they are ready to be consumed by one or more consumers. Having this publish and subscribe mechanism, for example Kafka, you have one or more producers (Kerberos Vault replicas) and one or more consumers (ML clients). This allows one to scale the number of consumers and workloads as the number of events, and thus recordings, increases.
 
 ## NVIDIA operator
 
@@ -60,13 +60,13 @@ The operator solves two main challenges:
 
 ### Installation
 
-The installation of [the NVIDIA operator can be found here](https://github.com/kerberos-io/nvidia-gpu-kubernetes), with a couple of examples of how to integrate a workload (a machine learning model) with Kerberos Vault.
+The installation of the NVIDIA operator is described in the [nvidia-gpu-kubernetes repository](https://github.com/kerberos-io/nvidia-gpu-kubernetes), with a couple of examples of how to integrate a workload (a machine learning model) with Kerberos Vault.
 
 {{< figure src="yolov3-integration-kerberos-vault.png" alt="The NVIDIA operator brings scale to your GPUs." caption="The NVIDIA operator brings scale to your GPUs." class="stretch">}}
 
 ### An example
 
-The goal of the integration feature of Kerberos Vault is to allow an enterprise to bring its custom logic, while relying on a stable and scalable video management system. One can build its own notification service, triggering IoT or other kind of sensors, or execute a custom machine learning model trying to detect specific objects, patterns or actions in a recording. As described below [you can find a complete answer here](https://github.com/kerberos-io/vault-ml).
+The goal of the integration feature of Kerberos Vault is to allow an enterprise to bring its custom logic, while relying on a stable and scalable video management system. An enterprise can build its own notification service, trigger IoT or other kinds of sensors, or execute a custom machine learning model trying to detect specific objects, patterns or actions in a recording. The [vault-ml repository](https://github.com/kerberos-io/vault-ml) contains the complete example described below.
 
 {{< figure src="yolov3-integration-kerberos-vault-example.png" alt="The NVIDIA operator brings scale to your GPUs." caption="The NVIDIA operator brings scale to your GPUs." class="stretch">}}
 
@@ -74,7 +74,7 @@ So having the above example, let us get a bit more concrete on how this is funct
 
 - **Step 0**: Small chunks of recordings are created, persisted in a storage provider, and a message is sent to a Kafka topic.
 
-- **Step 1**: an extension/workload which executes the YOLOv3 model is consuming Kafka messages from a topic, produced by Kerberos Vault.
+- **Step 1**: An extension/workload which executes the YOLOv3 model is consuming Kafka messages from a topic, produced by Kerberos Vault.
 
 - **Step 2**: Before execution of the model, the extension consumes the relevant messages from a specific topic, and downloads the video chunk from Kerberos Vault in memory.
 
@@ -86,28 +86,28 @@ So having the above example, let us get a bit more concrete on how this is funct
 
 ## Scale and expand
 
-As illustrated in previous example, it should become clear that by chunking videos, distributing them over a flexible pool of GPUs, allows to provide a scalable and flexible way. Video streams are decoupled from GPUs, and each of them can be scaled independently. Video chunks created by one or more Agents are distributed over a pool of GPUs without knowing upfront which GPU will process which video chunk from which Agent.
+As illustrated in the previous example, it should become clear that chunking videos and distributing them over a flexible pool of GPUs provides a scalable and flexible solution. Video streams are decoupled from GPUs, and each of them can be scaled independently. Video chunks created by one or more Agents are distributed over a pool of GPUs without knowing upfront which GPU will process which video chunk from which Agent.
 
 {{< figure src="gpu-to-cpu.svg" alt="GPUs and CPUs are decoupled. Any recording, independent of any video stream, will be distributed to the GPU pool." caption="GPUs and CPUs are decoupled. Any recording, independent of any video stream, will be distributed to the GPU pool." class="stretch">}}
 
 ## Machine learning at the edge 
 
-Execution of your machine learning at the edge will give you a lot of advantages and allow you to distribute and scale more easily and efficiently. By executing at the edge, you will:
+Execution of your machine learning at the edge will give you a lot of advantages and allow you to distribute and scale more easily and efficiently. By executing at the edge, you get:
 
-- Lower cloud storage and compute,
+- lower cloud storage and compute costs,
 - better latency and response times,
 - real distributed processing and computing power,
-- ability to tune and provide only the hardware required.
+- the ability to tune and provide only the hardware required.
 
 ## Let your data scientists do data science
 
-Your data scientists want to do data science, they don't want to set up infrastructure, install GPUs or even modify their models and programming language to select a specific GPU. Hardware, and more specifically GPUs, should remain transparent.
+Your data scientists want to do data science; they don't want to set up infrastructure, install GPUs or even modify their models and programming language to select a specific GPU. Hardware, and more specifically GPUs, should remain transparent.
 
 The entire design behind the Kerberos Enterprise Suite is to support and implement the concept of MLOps. This means that your data scientist should focus on the data science and the creation of specific models. 
 
-When delivering or releasing a model, a data scientist should only be required to make a build, a container, of his release and deploy that inside a Kubernetes cluster. Nothing more than that.
+When delivering or releasing a model, a data scientist should only be required to make a build, a container, of their release and deploy that inside a Kubernetes cluster. Nothing more than that.
 
 A data scientist should make the assumption that once it is deployed:
 1. it is automatically scaled across the different hardware components (GPUs).
-2. it just runs and has fail over and high-availability enabled by default
-3. only works with video chunks and metadata, but not the actual video streams.
+2. it just runs and has failover and high availability enabled by default.
+3. it only works with video chunks and metadata, not the actual video streams.

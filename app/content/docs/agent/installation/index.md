@@ -16,9 +16,9 @@ toc: true
 
 ## Overview
 
-As described before an Agent is a container, which can be deployed through various ways and automation tools such as Docker, Docker Compose, Kubernetes and the list goes on. To simplify your life we have come up with concrete and working examples of deployments to help you speed up your Kerberos.io journey.
+As described before, an Agent is a container, which can be deployed in various ways and with automation tools such as Docker, Docker Compose, Kubernetes and the list goes on. To simplify your life we have come up with concrete and working examples of deployments to help you speed up your Kerberos.io journey.
 
-We have documented the different deployment models in the [Agent GitHub repository](https://github.com/kerberos-io/agent/tree/master/deployments). There you'll learn and find how to deploy using:
+We have documented the different deployment models in the [Agent GitHub repository](https://github.com/kerberos-io/agent/tree/master/deployments). There you'll learn how to deploy using:
 
 - [Static binary](https://github.com/kerberos-io/agent/tree/master/deployments#0-static-binary)
 - [Docker](https://github.com/kerberos-io/agent/tree/master/deployments#1-docker)
@@ -32,7 +32,7 @@ We have documented the different deployment models in the [Agent GitHub reposito
 
 For a step-by-step walkthrough of Docker, Docker Compose, Kubernetes, Snap and the static binary, follow the [Install Agent](/tutorials/agent/install/) tutorial. To deploy and configure many Agents on Kubernetes from a single interface, use [Factory](/docs/factory/first-things-first).
 
-By default your Agents will store all their configuration and recordings inside the container. To help you automate and have a more consistent data governance, you can [attach volumes](https://github.com/kerberos-io/agent#configure-and-persist-with-volume-mounts) to configure and persist data of your Agents, and/or configure each Agent [through environment variables](https://github.com/kerberos-io/agent#configure-with-environment-variables).
+By default your Agents will store all their configuration and recordings inside the container. To help you automate and have more consistent data governance, you can [attach volumes](https://github.com/kerberos-io/agent#configure-and-persist-with-volume-mounts) to configure and persist data of your Agents, and/or configure each Agent [through environment variables](https://github.com/kerberos-io/agent#configure-with-environment-variables).
 
 ## Next steps
 

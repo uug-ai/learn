@@ -21,7 +21,7 @@ and channels can deliver matching events to external services.
 
 Open **Watchlist** in the Hub sidebar or visit `/watchlist` to review your
 notifications. Owners and administrators configure alert rules and channels
-under **Management**.
+under **Integrations**.
 
 ## How a notification is created
 
@@ -44,7 +44,7 @@ classification, device, and read-state filters to narrow the list. Expanding a
 row reveals the event details and its linked recording when media is available.
 
 Unread items are visually distinct. Mark an individual notification as read, or
-use **Mark all** to clear the unread state for the current inbox. Hub checks for
+use **Read all** to clear the unread state for the current inbox. Hub checks for
 new events in the background after the first page loads.
 
 From a notification you can review the triggering footage and, when case

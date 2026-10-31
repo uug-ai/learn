@@ -25,13 +25,13 @@ connects:
 
 Once you've installed Factory, you will have the web application running inside your cluster. This web application allows you to administrate and automate the creation of your Agents through the concept of [Kubernetes deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) and pods.
 
-Important to note is that this web application is relying [on the official Golang Kubernetes API](https://github.com/kubernetes/client-go), so that means from an administration point of view, you could simply use the well known `kubectl` command instead. The web application adds some functionalities on top of the Kubernetes API, which are specific to an Agent; for example regions of interest, livestreaming settings, etc.
+Important to note is that this web application relies [on the official Golang Kubernetes API](https://github.com/kubernetes/client-go), so that means from an administration point of view, you could simply use the well-known `kubectl` command instead. The web application adds some functionalities on top of the Kubernetes API, which are specific to an Agent; for example regions of interest, livestreaming settings, etc.
 
 ## Login page
 
-Once you open a browser, and navigate to the web application (see installation for the url), you will land on the login page.
+Once you open a browser, and navigate to the web application (see installation for the URL), you will land on the login page.
 
-{{< figure src="login.gif" alt="Login into the Factory interface." caption="Login into the Factory interface." class="stretch">}}
+{{< figure src="login.gif" alt="Log in to the Factory interface." caption="Log in to the Factory interface." class="stretch">}}
 
 The default username and password, specified in the [`deployment.yaml`](https://github.com/kerberos-io/enterprise/blob/master/yaml/factory/deployment.yaml#L54) is:
 
@@ -70,13 +70,13 @@ The cameras section will list all the Agents (running as deployments) that you h
 
 ### Adding a new deployment
 
-By specifying a name for your Agent, and its corresponding RTSP url, a new Kubernetes deployment will be created for you, and a Kubernetes pod will be deployed to one of your installed nodes.
+By specifying a name for your Agent, and its corresponding RTSP URL, a new Kubernetes deployment will be created for you, and a Kubernetes pod will be deployed to one of your installed nodes.
 
 {{< figure src="add-kerberos-agent.gif" alt="Deploy a single Agent or in bulk." caption="Deploy a single Agent or in bulk." class="stretch">}}
 
 #### Adding through ONVIF
 
-Instead of creating a new Agent through an RTSP stream, you can discover streams through ONVIF, and enable additional features through ONVIF such as PTZ. Enable the ONVIF toggle, and type in the IP address, ONVIF username and ONVIF password. Click the verify connection, and select an RTSP stream from the profile list.
+Instead of creating a new Agent through an RTSP stream, you can discover streams through ONVIF, and enable additional features through ONVIF such as PTZ. Enable the ONVIF toggle, and type in the IP address, ONVIF username and ONVIF password. Click **Verify Connection**, and select an RTSP stream from the profile list.
 
 {{< figure src="add-through-onvif.gif" alt="Deploy an Agent with ONVIF capabilities." caption="Deploy an Agent with ONVIF capabilities." class="stretch">}}
 
@@ -93,8 +93,8 @@ Once you have a running Agent, you should see a green circle next to the deploym
 The following settings can be changed:
 
 - One or more regions of interest
-- Time based conditions,
-- Pre- and post recording
+- Time-based conditions
+- Pre- and post-recording
 - Continuous recording
 - Linking to [Kerberos Hub SaaS](/docs/hub/first-things-first) or [Kerberos Vault](/docs/vault/first-things-first)
 
@@ -104,9 +104,9 @@ Before the configuration screen opens, Factory runs a quick **reachability check
 
 ### Global configuration
 
-Configuration can be specified in an Agent, this means that you update the configuration of a specific Kubernetes deployment. However, this can also be specified at a higher level. This higher level is what we call the global configuration.
+Configuration can be specified in an Agent; this means that you update the configuration of a specific Kubernetes deployment. However, this can also be specified at a higher level. This higher level is what we call the global configuration.
 
-By specifying configurations at a higher level, any Agents will inherit from that configuration. This is improving the overall maintenance and management of your Agents.
+By specifying configurations at a higher level, any Agents will inherit from that configuration. This improves the overall maintenance and management of your Agents.
 
 The global configuration is stored by Factory itself. Depending on how Factory is set up this is a MongoDB database, a local JSON file, or a Kubernetes ConfigMap/Secret — see [Configuration & engines](/docs/factory/configuration-and-engines) for the details.
 
@@ -118,7 +118,7 @@ At Kerberos, we have agile development cycles, which means that new versions wil
 
 At any moment you can reboot one of your Agents. When pressing the reboot button, next to your deployment, Kubernetes will destroy the pod of your deployment, and schedule a new one.
 
-{{< figure src="upgrade-kerberos-agent.gif" alt="You can specify the configurations on a global level, so all Agents will inherit from that." caption="You can specify the configurations on a global level, so all Agents will inherit from that." class="stretch">}}
+{{< figure src="upgrade-kerberos-agent.gif" alt="Upgrade or downgrade an Agent to another version." caption="Upgrade or downgrade an Agent to another version." class="stretch">}}
 
 ### Live logs and in-browser terminal
 
@@ -152,13 +152,13 @@ This page is most useful when Factory uses the `configmap` or `secret` configura
 
 ## Storage and video management
 
-Factory allows you to scale your video landscape horizontally, using the concept of Kubernetes, and brings a strong backbone for stability and performance. It allows you to avoid reinventing the wheel, and get stuck in the numerous challenges of developing a scalable video platform.
+Factory allows you to scale your video landscape horizontally, using the concept of Kubernetes, and brings a strong backbone for stability and performance. It allows you to avoid reinventing the wheel and getting stuck in the numerous challenges of developing a scalable video platform.
 
 Agents store their recordings locally for a short period. This means that long-term storage is not included in the solution. On top of that it also does not have a visual component, which allows you to review dashboards or recordings. To overcome these two challenges, long-term storage with extensibility/integration capabilities and visualisation features, the following solutions were developed: [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/hub/first-things-first).
 
 ### Kerberos Vault
 
-[Kerberos Vault](/docs/vault/first-things-first) is a solution which makes it possible to store recordings from Agents (across different clusters) at a central place, on the storage provider you want. You can store your recordings in the cloud (AWS S3, Google Cloud Storage, Azure Blob storage) or at the edge (Minio, Ceph).
+[Kerberos Vault](/docs/vault/first-things-first) is a solution which makes it possible to store recordings from Agents (across different clusters) at a central place, on the storage provider you want. You can store your recordings in the cloud (AWS S3, Google Cloud Storage, Azure Blob storage) or at the edge (MinIO, Ceph).
 
 On the other hand it's an open platform, as it allows you to build extensions and integrations (web apps, mobile apps, machine learning services and much more). Kerberos Vault ships with the ability of real-time messaging (Kafka), and a REST API (documented as Swagger).
 
@@ -166,7 +166,7 @@ On the other hand it's an open platform, as it allows you to build extensions an
 
 To connect one or more Agents to your Kerberos Vault instance, you should open the configuration option and navigate to the `cloud` tab. Once selected, you need to fill in the credentials from your [Kerberos Vault account](/docs/vault/accounts).
 
-- Kerberos Vault URI: this is the API endpoint of your Kerberos Vault instance. Usually this is in the following format: `http(s)://yourdomain.com/api`. Where `yourdomain.com` should match your Kerberos Vault endpoint. If you are deploying Kerberos Vault at the edge, in the same cluster, you can use the internal DNS name, as follows: `http://vault.kerberos-vault/api`. Where `vault` is the `service name` and `kerberos-vault` is the `namespace`.
+- Kerberos Vault URI: this is the API endpoint of your Kerberos Vault instance. Usually this is in the following format: `http(s)://yourdomain.com/api`, where `yourdomain.com` should match your Kerberos Vault endpoint. If you are deploying Kerberos Vault at the edge, in the same cluster, you can use the internal DNS name, as follows: `http://vault.kerberos-vault/api`, where `vault` is the `service name` and `kerberos-vault` is the `namespace`.
 
 - Provider: the name of the provider, which you created on the Kerberos Vault [providers page](/docs/vault/providers), to which you want to send your recordings.
 
@@ -180,9 +180,9 @@ To connect one or more Agents to your Kerberos Vault instance, you should open t
 
 ### Kerberos Hub
 
-For the visualisation part Kerberos Hub comes into the picture. Kerberos Hub is a web app, backed up with a number of microservices, that shows dashboards, live streams, filter recordings and much more. Learn more [about the features and functions here](/docs/hub/first-things-first).
+For the visualisation part Kerberos Hub comes into the picture. Kerberos Hub is a web app, backed by a number of microservices, that shows dashboards and live streams, lets you filter recordings and much more. Learn more about [the features and functions of Kerberos Hub](/docs/hub/first-things-first).
 
-You have two choices when using Kerberos Hub, either you send your recordings from your Agents directly to Kerberos Hub, or you send your recordings to Kerberos Vault, and connect Kerberos Vault to Kerberos Hub. The latter is explained in the [Kerberos Hub integration](/docs/vault/integrations#kerberos-hub) of Kerberos Vault.
+You have two choices when using Kerberos Hub: either you send your recordings from your Agents directly to Kerberos Hub, or you send your recordings to Kerberos Vault, and connect Kerberos Vault to Kerberos Hub. The latter is explained in the [Kerberos Hub integration](/docs/vault/integrations#kerberos-hub) of Kerberos Vault.
 
 Select the Kerberos Hub option, and copy-paste the credentials from your Kerberos Hub subscription.
 
@@ -198,7 +198,7 @@ Select the Kerberos Hub option, and copy-paste the credentials from your Kerbero
 
 In the Kerberos Hub section (next to persistence) provide the following information:
 
-- API url: the url of the Kerberos Hub endpoint. By default `https://api.cloud.kerberos.io` for our Kerberos Hub SaaS version.
+- API url: the URL of the Kerberos Hub endpoint. By default `https://api.cloud.kerberos.io` for our Kerberos Hub SaaS version.
 
 - Public Key: this should match the public key of your Kerberos Hub subscription.
 

@@ -225,7 +225,7 @@ Avoid command-line secrets in production because they can enter shell history. T
 ## Verify the normal ICE path
 
 1. Open Hub in a browser, select a camera, choose **Live**, then choose **WebRTC** from the transport menu.
-2. Hover the live status indicator and open its **Signalling** and **Network** tabs.
+2. Hover the live status indicator and open its **Signaling** and **Network** tabs.
 3. Confirm the signalling phases progress through offer, candidate gathering, connecting and connected.
 4. Inspect the selected connection type:
 
@@ -269,7 +269,7 @@ Factory does not currently emit `AGENT_FORCE_TURN`, so place a permanent setting
 With WebRTC video connected:
 
 1. Grant microphone permission to Hub.
-2. Press and hold the talk control.
+2. Select the talk (microphone) control to start talking; select it again to stop.
 3. Confirm audio reaches the camera speaker without stopping video.
 4. Check the Agent logs for backchannel codec or camera-write errors if it does not.
 

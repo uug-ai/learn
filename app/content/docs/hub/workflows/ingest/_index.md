@@ -15,7 +15,7 @@ toc: true
 podcast: hub-workflows-ingest
 ---
 
-A **stage** is a step in a workflow; you implement it as a **microservice**. [Stages](../stages/) covers how your microservice *connects* — the queue it consumes, the `WorkflowRun` envelope it receives, and how to register the stage. This page is the other half: **what your microservice hands back**, and what the platform does with it.
+A **stage** is a step in a workflow; you implement it as a **microservice**. [Stages](/docs/hub/workflows/stages/) covers how your microservice *connects* — the queue it consumes, the `WorkflowRun` envelope it receives, and how to register the stage. This page is the other half: **what your microservice hands back**, and what the platform does with it.
 
 When a stage wants the platform to store its result — rather than running its own database — it returns a **block envelope**: a small, self-describing list of typed *blocks*. One shared **ingest core** (`ingest/pkg/ingest`) routes each block by its own type, runs that block type's ordered, idempotent actions, and writes it into the platform-owned collection. The same core runs whether the result arrived over the workflows queue (a pipeline stage) or the public API (`POST /ingest`) — only the trust level differs.
 
@@ -46,7 +46,7 @@ The envelope replaces the single typed body the old per-kind entry point took, s
 
 The core ships a small, closed set of block types — `detection`, `marker` and `media-patch` today. A producer stamps each block's `type` with one of them, and that `type` names the **result shape**, not the stage that produced it: a stage that finds bounding boxes emits a `detection` block whatever it is detecting, and one envelope may carry several blocks of different types.
 
-The full catalogue — each type's `data` contract, where it is stored, and which transports may emit it — lives under **[Blocks](blocks/)**.
+The full catalogue — each type's `data` contract, where it is stored, and which transports may emit it — lives under **[Blocks](/docs/hub/workflows/ingest/blocks/)**.
 
 ## How the platform processes an envelope
 
@@ -143,6 +143,6 @@ The core is `ingest/pkg/ingest`, a deliberately **infra-free** library: it depen
 
 ## See also
 
-- [Blocks](blocks/) — the catalogue of block types and the `data` contract behind each.
-- [Stages](../stages/) — how your microservice connects, the `WorkflowRun` contract it codes against, and registering a stage.
-- [Detection](blocks/detection/) — the `detection` block's `data` contract: tracks, boxes, coordinate spaces and how a run is stored.
+- [Blocks](/docs/hub/workflows/ingest/blocks/) — the catalogue of block types and the `data` contract behind each.
+- [Stages](/docs/hub/workflows/stages/) — how your microservice connects, the `WorkflowRun` contract it codes against, and registering a stage.
+- [Detection](/docs/hub/workflows/ingest/blocks/detection/) — the `detection` block's `data` contract: tracks, boxes, coordinate spaces and how a run is stored.

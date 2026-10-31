@@ -69,22 +69,22 @@ We've built this platform with community collaboration at its core:
 - **User Feedback Integration**: Real user experiences shape and improve our content
 - **Open Source Philosophy**: Transparency and community contribution drive our content development
 
-### The Benefits of Centralized Learning
+### The Benefits of Centralised Learning
 
 #### For Individual Learners
 - **Reduced Cognitive Load**: No more context switching between multiple platforms and interfaces
 - **Accelerated Learning**: Comprehensive, interconnected content enables faster skill acquisition
 - **Reliable Information**: Single source of truth eliminates confusion from conflicting information
-- **Personalized Experience**: Tailored learning paths based on your goals and current knowledge level
+- **Personalised Experience**: Tailored learning paths based on your goals and current knowledge level
 
-#### For Teams and Organizations  
-- **Standardized Knowledge**: Entire teams learn from the same high-quality, consistent resources
+#### For Teams and Organisations  
+- **Standardised Knowledge**: Entire teams learn from the same high-quality, consistent resources
 - **Improved Onboarding**: New team members can quickly get up to speed with comprehensive, structured content
 - **Enhanced Collaboration**: Shared vocabulary and understanding from unified learning resources
-- **Continuous Improvement**: Centralized feedback and updates benefit everyone simultaneously
+- **Continuous Improvement**: Centralised feedback and updates benefit everyone simultaneously
 
 #### For the Broader Community
-- **Knowledge Democratization**: High-quality educational content accessible to everyone
+- **Knowledge Democratisation**: High-quality educational content accessible to everyone
 - **Accelerated Innovation**: Faster knowledge transfer leads to more rapid technological advancement  
 - **Reduced Duplication**: Eliminates redundant content creation efforts across the community
 - **Collective Intelligence**: Wisdom from diverse contributors creates richer, more comprehensive resources
@@ -95,7 +95,7 @@ This platform represents just the beginning of our vision for the future of lear
 
 **Enhanced Interactivity**: Integration of hands-on coding environments, interactive simulations, and real-time collaboration tools.
 
-**Personalized AI Assistance**: Intelligent tutoring systems that adapt to individual learning styles and provide personalized guidance.
+**Personalised AI Assistance**: Intelligent tutoring systems that adapt to individual learning styles and provide personalised guidance.
 
 **Global Accessibility**: Multi-language support and accessibility features to make learning truly universal.
 

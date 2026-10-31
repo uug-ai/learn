@@ -28,7 +28,7 @@ This page is the **contract your microservice codes against** — the queue it l
 
 {{< callout type="info" >}}
 Does the worker run outside the Hub deployment? Use the
-[workflow forwarder for external stages](../external-stages/) instead. It sends
+[workflow forwarder for external stages](/docs/hub/workflows/external-stages/) instead. It sends
 a sanitised invocation to a customer RabbitMQ broker or HTTPS endpoint and
 accepts the result through a project-scoped API callback.
 {{< /callout >}}
@@ -190,7 +190,7 @@ A condition is `{ path, op, value }`.
 | `inputs.<op>.<field>` | `inputs.classify.details.*.classified` | An upstream result. `classify` is always present (the trigger); its fields are `properties` (array), `objectCount` (int), and `details` (array — fan out with `*`, e.g. `inputs.classify.details.*.classified`). |
 | `results.<op>.<field>` | `results.speed.kmh` | A finished stage's output. Fields of your own custom operations are accepted as-is; array fields can be matched element-wise with `*` (see [Matching inside arrays](#matching-inside-arrays)). |
 | `device.<field>` | `device.deviceKey` | One of `deviceKey`, `deviceName`, `provider`, `storageSolution` (scalars), or `siteIds` — an **array** of the device's linked site ids, matched with `contains` / `in` / `exists` / `matches` (not traversed with `*`). |
-| `user.<field>` | `user.organisationId` | One of `id`, `organisationId`. |
+| `user.<field>` | `user.organisationId` | Only `organisationId`. |
 | scalar | `key`, `operation`, `runId`, `traceId` | Top-level identity values (not traversable). |
 
 Credentials (`storage`, `user.storage`) are deliberately **not** matchable.

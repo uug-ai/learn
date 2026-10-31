@@ -14,9 +14,9 @@ weight: 302
 toc: true
 ---
 
-When running an edge deployment for Factory, Kerberos Vault, Kerberos Hub and/or your storage providers, you can enhance security by bringing your own self-signed certificates. Those certificates will be consumed to create a secure connection between the different applications, and for example encrypt your data while it's being sent or retrieved from your storage provider (Minio, Ceph).
+When running an edge deployment for Factory, Kerberos Vault, Kerberos Hub and/or your storage providers, you can enhance security by bringing your own self-signed certificates. Those certificates will be consumed to create a secure connection between the different applications, and for example encrypt your data while it's being sent or retrieved from your storage provider (MinIO, Ceph).
 
-When using self-signed certificates, the different deployments need to be aware of those certificates and more importantly trust them. To achieve this trust, traditionally you would benefit from services like Certmanager.io and Let's Encrypt which act as a trusted CA (Certificate Authority). However when self-signing you will need to make your deployments aware as there is probably no public CA available.
+When using self-signed certificates, the different deployments need to be aware of those certificates and more importantly trust them. To achieve this trust, traditionally you would benefit from services like cert-manager and Let's Encrypt which act as a trusted CA (Certificate Authority). However, when self-signing you will need to make your deployments aware as there is probably no public CA available.
 
 ## The issue
 

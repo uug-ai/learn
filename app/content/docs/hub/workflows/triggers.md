@@ -19,7 +19,7 @@ Both activation modes described here are live: automatic triggers fan out over
 finished recordings, and manual triggers launch on demand from a case or media
 surface. They resolve **both** deployment-wide config workflows and an
 organisation's own stored workflows — see
-[Deploying and operating](../#deploying-and-operating) for how the engine discovers
+[Deploying and operating](/docs/hub/workflows/#deploying-and-operating) for how the engine discovers
 and dispatches each tier. Current deployments define their workflows through
 Helm; stored organisation workflows are supported but are not yet the established
 deployment path.
@@ -27,7 +27,7 @@ deployment path.
 
 ## Two ways a workflow activates
 
-Every [workflow](../) is a graph of stages, but *what makes it run* is its
+Every [workflow](/docs/hub/workflows/) is a graph of stages, but *what makes it run* is its
 **trigger**. There are two fundamentally different activation modes:
 
 | Mode | Who starts it | Scope | Example |
@@ -103,7 +103,7 @@ device picker simply authors a `device.deviceKey in […]` condition.
 
 ### Scoping devices with conditions
 
-Device selection is expressed with **[conditions](../stages/)** — the exact same
+Device selection is expressed with **[conditions](/docs/hub/workflows/stages/#the-condition-object)** — the exact same
 `(path, op, value)` predicates a stage's `needs` use, evaluated by one shared
 operator engine, so trigger and stage matching stay consistent. Pin a fixed set
 of cameras with `device.deviceKey` `in` `[keys…]`; the editor's device picker
@@ -135,8 +135,9 @@ triggers:
 
 The conditions match against the recording's **pre-run envelope** — the
 credential-free `device.*` and `user.*` scalars known the moment a recording
-arrives (the same roots a stage condition reads, minus the `inputs`/`results` a
-run only accrues once it opens). Besides `device.deviceKey` / `device.deviceName`
+arrives (the same roots a stage condition reads, minus the `results` a run only
+accrues once it opens; of the `inputs`, only the classification hand-off
+`inputs.classify` is present). Besides `device.deviceKey` / `device.deviceName`
 / `device.provider` / `device.storageSolution` and `user.organisationId`, the
 envelope exposes **`device.siteIds`** — the list of sites the recording's device
 is linked to — so you can scope a workflow to a whole site with
@@ -184,9 +185,9 @@ kerberoshub:
 
 The `name`/`source` fields and each stage's `queue` are filled in by the chart —
 you never set them. Every stage `operation` still needs a deployed worker under
-`kerberoshub.services.<operation>`; see [Stages](../stages/#registering-a-stage).
+`kerberoshub.services.<operation>`; see [Stages](/docs/hub/workflows/stages/#registering-a-stage).
 For the full workflow-definition shape (stages, `needs`, `needsMode`) see
-[Defining a workflow in configuration](../#defining-a-workflow-in-configuration).
+[Defining a workflow in configuration](/docs/hub/workflows/#defining-a-workflow-in-configuration).
 
 **Definition vs. run.** The trigger type lives on the `Workflow` — authoring
 metadata ("this can be run manually from a case"). How a *specific* run was opened

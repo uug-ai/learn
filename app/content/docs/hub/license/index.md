@@ -28,6 +28,6 @@ The SaaS offering and the related subscription can be cancelled at any time. If 
 
 ## Self-hosted
 
-When licensing the self-hosted version of Kerberos Hub, you will need to purchase a license key for installing and consuming the application. After you have received a license, you will be able to configure the [Kerberos Hub Helm chart](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/values.yaml#L11). The self-hosted license will allow you to install an unlimited number of accounts and devices. 
+When licensing the self-hosted version of Kerberos Hub, you will need to purchase a license key for installing and consuming the application. After you have received a license, you will be able to configure the [Kerberos Hub Helm chart](https://github.com/kerberos-io/helm-charts/blob/main/charts/hub/values.yaml#L10). The self-hosted license will allow you to install an unlimited number of accounts and devices. 
 
 More information about the self-hosted license [can be found on the public website](https://kerberos.io/product/hub).

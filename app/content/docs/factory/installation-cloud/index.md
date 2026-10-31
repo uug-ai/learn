@@ -13,13 +13,13 @@ weight: 304
 toc: true
 ---
 
-If not already the case, start by creating a Kubernetes cluster. This can be done through one of the hyperscalers (AWS, GCP, Azure), cloud providers (Digital Ocean, Scaleway, etc) or inside your private cloud; for the latter it is advised [to follow the edge installation](/docs/factory/installation-edge).
+If not already the case, start by creating a Kubernetes cluster. This can be done through one of the hyperscalers (AWS, GCP, Azure), cloud providers (Digital Ocean, Scaleway, etc.) or inside your private cloud; for the latter it is advised [to follow the edge installation](/docs/factory/installation-edge).
 
 {{< figure src="factory-cloud.svg" alt="Process your video streams in the cloud." caption="Process your video streams in the cloud" class="stretch">}}
 
 ## Installation
 
-Before setting up Factory, the first thing that we need to do is enabling RBAC permissions (Role Based Access Control). This needs to be enabled to query specific endpoints from the Kubernetes API. By default, these endpoints are blocked, so we need to unlock them.
+Before setting up Factory, the first thing that we need to do is to enable RBAC permissions (Role Based Access Control). This needs to be enabled to query specific endpoints from the Kubernetes API. By default, these endpoints are blocked, so we need to unlock them.
 
 First clone the configurations from the GitHub repository [kerberos-io/factory]( https://github.com/kerberos-io/factory).
 
@@ -37,8 +37,8 @@ This will make several APIs inside your Kubernetes cluster available. We need th
 
 ### Helm
 
-Next we will install a couple of dependencies which are required for Factory. [**Helm**](https://helm.sh/) is a package manager for Kubernetes, it helps you to set up services more easily (this could be a MQTT broker, a database, etc).
-Instead of writing yaml files for every service we need, we use so-called Charts (libraries), that you can reuse and configure them with the appropriate settings.
+Next we will install a couple of dependencies which are required for Factory. [**Helm**](https://helm.sh/) is a package manager for Kubernetes; it helps you to set up services more easily (this could be an MQTT broker, a database, etc.).
+Instead of writing yaml files for every service we need, we use so-called Charts (libraries), that you can reuse and configure with the appropriate settings.
 
 Use one of the preferred OS package managers to install the Helm client:
 
@@ -60,7 +60,7 @@ Add the Helm repository and install Traefik.
     helm repo add traefik https://helm.traefik.io/traefik
     helm install traefik traefik/traefik -n traefik 
 
-After installation, you should have an IP attached to Traefik service, look for it by executing the `get service` command. You will see the ip address in the `EXTERNAL-IP` attribute.
+After installation, you should have an IP attached to the Traefik service; look for it by executing the `get service` command. You will see the IP address in the `EXTERNAL-IP` attribute.
 
     kubectl get svc
 
@@ -151,7 +151,7 @@ Once you have corrected the DNS names (or internal /etc/hosts file), install the
 
 ## Test out configuration
 
-If everything worked out as expected, you should now have following services in your cluster across different namespaces:
+If everything worked out as expected, you should now have the following services in your cluster across different namespaces:
 
 - MongoDB
 - Traefik
@@ -175,4 +175,4 @@ It should look like this.
 
 Once everything is configured correctly in your cluster and DNS, you should be able to set up the Factory application. By navigating to the domain `factory.domain.com` in your browser you will see the login page showing up.
 
-{{< figure src="login.png" alt="Once successfully installed Factory, it will show you the login page." caption="Once successfully installed Factory, it will show you the login page." class="stretch">}}
+{{< figure src="login.png" alt="Once Factory is installed successfully, it will show you the login page." caption="Once Factory is installed successfully, it will show you the login page." class="stretch">}}

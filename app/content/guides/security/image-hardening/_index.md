@@ -81,14 +81,14 @@ main
 
 Add project-specific generated data, local state, test output, and credentials
 to this list. Never rely on a multi-stage build alone to protect sensitive
-files: ignored final-stage files can still be sent to the builder and retained
-in its cache.
+files: anything left out of the final stage can still be sent to the builder
+and retained in its cache.
 
 ### Keep dependency verification enabled
 
 Do not set `GOSUMDB=off` globally. Public Go dependencies must continue to use
 the public checksum database. Scope private modules with `GOPRIVATE`, which
-also sets the default behavior for `GONOPROXY` and `GONOSUMDB`.
+also sets the default behaviour for `GONOPROXY` and `GONOSUMDB`.
 
 ```dockerfile
 ENV GOPRIVATE=github.com/uug-ai/*
@@ -269,7 +269,7 @@ Document the following for customers:
 - Numeric UID and GID.
 - Entrypoint and exposed ports.
 - Required environment variables and secrets, without example credentials.
-- Required CA certificates and timezone behavior.
+- Required CA certificates and timezone behaviour.
 - Writable paths and expected volume mounts.
 - Health and metrics endpoints.
 - Expected outbound connections.
@@ -293,7 +293,7 @@ Before releasing an image, verify:
 - [ ] No shell, package manager, unnecessary utility, capability, setuid file,
       or setgid file is present.
 - [ ] TLS certificates and timezone data are included only when required.
-- [ ] Health-check behavior is valid and documented.
+- [ ] Health-check behaviour is valid and documented.
 - [ ] All supported architectures build and pass tests.
 - [ ] Vulnerability, secret, and configuration scans enforce the release policy.
 - [ ] SBOM, provenance, signature, and immutable image digest are published.

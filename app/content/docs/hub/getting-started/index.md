@@ -107,7 +107,7 @@ Kerberos Hub supports different types of channels, to which notifications can be
 
 Kerberos Hub allows you to visualise live streams from your Agents. A low and a high resolution are made available.
 
-{{< figure src="hub-livestream.gif" alt="Channels allow you to communicate to external services." caption="Channels allow you to communicate to external services." class="stretch">}}
+{{< figure src="hub-livestream.gif" alt="Watch the live streams of your Agents in Kerberos Hub." caption="Watch the live streams of your Agents in Kerberos Hub." class="stretch">}}
 
 ### Low resolution
 
@@ -127,4 +127,4 @@ It is possible to create multiple accounts (also called sub accounts) within you
 
 You can structure your cameras across groups and sites. By creating sites, sub accounts get restricted access to specific cameras or groups of cameras. By grouping Agents it is easier to filter recordings.
 
-{{< figure src="hub-sites.gif" alt="Using sites and groups you can structure your Agents. " caption="Using sites and groups you can structure your Agents." class="stretch">}}
+{{< figure src="hub-sites.gif" alt="Using sites and groups you can structure your Agents." caption="Using sites and groups you can structure your Agents." class="stretch">}}

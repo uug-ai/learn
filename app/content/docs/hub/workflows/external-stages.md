@@ -16,7 +16,7 @@ toc: true
 podcast: hub-workflows-external-stages
 ---
 
-A [custom workflow stage](../stages/) normally runs beside Hub, consumes an
+A [custom workflow stage](/docs/hub/workflows/stages/) normally runs beside Hub, consumes an
 internal `WorkflowRun` from its stage queue, and returns that message to the
 workflows engine. The **workflow forwarder** is the boundary for stages that run
 in a customer-managed environment instead. It keeps the internal queue and
@@ -51,7 +51,7 @@ completion mode. Callback mode also requires a reachable Hub API URL.
    **Active hours**, select **Always**.
 5. Select **Forward to my system** to configure the external destination.
    Choose **RabbitMQ** under **Provider**, and enter your own **Host**, **Port**,
-   **Queue**, **Virtual host**, **Username**, and **Password**. Use **Use TLS**
+   **Queue**, **Virtual host**, **Username**, and **Password**. Enable **Use TLS**
    outside an approved trusted local network. Custom workflows do not inherit
    the deployment's broker, credentials, virtual host, or TLS overrides;
    shared deployment integrations are reserved for global workflows.
@@ -498,5 +498,5 @@ through `env`, volumes, and mounts.
 - Include `traceId` in logs and traces.
 
 For a stage deployed inside the Hub environment instead, use the direct queue
-contract in [Stages](../stages/). For the workflow graph and conditional
-routing model, return to [Workflows](../).
+contract in [Stages](/docs/hub/workflows/stages/). For the workflow graph and conditional
+routing model, return to [Workflows](/docs/hub/workflows/).

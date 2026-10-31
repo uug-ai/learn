@@ -29,7 +29,7 @@ Two HTTP headers are always required:
 | `X-Kerberos-Storage-AccessKey` | The access key of the Vault account. |
 | `X-Kerberos-Storage-SecretAccessKey` | The matching secret. |
 
-The account also has a **default provider** assigned to it; you can override it per request via `X-Kerberos-Storage-Provider` (single-file endpoints) or via the JSON body (bulk endpoint).
+The account also has a **default provider** assigned to it. The single-file endpoint always takes the provider from `X-Kerberos-Storage-Provider`; the bulk endpoint uses the default provider unless the JSON body names another one.
 
 > **Warning:** Treat the access key + secret pair as a long-lived credential.
 > Do not embed them in frontend code or share them with end-users. The
@@ -64,7 +64,7 @@ Returns a signed URL for one file.
 | Header | Required | Description |
 |---|---|---|
 | `X-Kerberos-Storage-FileName` | yes | Object key, e.g. `account-a/1776427171_..._29960.mp4` |
-| `X-Kerberos-Storage-Provider` | yes | Provider name the file lives on (must match the account's provider) |
+| `X-Kerberos-Storage-Provider` | yes | Provider name the file lives on (must be one of the account's providers) |
 | `X-Kerberos-Storage-AccessKey` | yes | Account access key |
 | `X-Kerberos-Storage-SecretAccessKey` | yes | Account secret |
 

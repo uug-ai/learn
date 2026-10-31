@@ -11,26 +11,26 @@ weight: 3
 
 ---
 
-### Overview
+## Overview
 
 Checks a destination MongoDB database for missing indexes against a recommended index set, reports differences, and optionally creates missing indexes.
 
-### Prerequisites
+## Prerequisites
 
 - A reachable MongoDB instance with appropriate credentials.
 - An index source file exported from a reference database (see below).
 
-### Kubernetes
+## Kubernetes
 
 Run the checker as a Kubernetes Job using the provided template. The Job image wraps the CLI and accepts the same flags via environment variables.
 
-You can find the .yaml template for this job in [this source file.](https://github.com/uug-ai/cli/blob/main/jobs/check-indexes.yaml)
+You can find the .yaml template for this job in [`jobs/check-indexes.yaml`](https://github.com/uug-ai/cli/blob/main/jobs/check-indexes.yaml) on GitHub.
 
 ```sh
 kubectl apply -f jobs/check-indexes.yaml
 ```
 
-### Usage
+## Usage
 
 Run in dry-run mode to preview changes:
 
@@ -54,7 +54,7 @@ go run main.go -action check-indexes \
   -mode live
 ```
 
-### Arguments
+## Arguments
 
 - `-mongodb-uri`: MongoDB connection URI with credentials (required).
 - `-mongodb-destination-database`: Destination database name to check (required).
@@ -62,7 +62,7 @@ go run main.go -action check-indexes \
 - `-mode`: One of `dry-run` (no changes, report only) or `live` (create missing indexes).
 - `-index-version`: Version key used to resolve the index source file containing the recommended indexes.
 
-### Index Source File
+## Index Source File
 
 You can find available index versions in the [indexes directory on GitHub](https://github.com/uug-ai/cli/tree/main/indexes). The source file should be a plain text dump of collection names followed by their index definitions from the reference database. To generate it, use the MongoDB shell:
 
@@ -94,20 +94,20 @@ counting
 ]
 ```
 
-### How It Works
+## How It Works
 
 - Parses the index source file into a map of collections → index definitions.
 - Fetches current indexes from the destination database.
 - Compares by index `key` and `name` to find missing indexes.
 - In `dry-run`, prints a report; in `live`, creates missing indexes where permitted.
 
-### Output
+## Output
 
 - Missing indexes listed per collection.
 - Status codes per operation (created, existing, skipped on error).
 - Summary totals at the end in both modes.
 
-### Notes
+## Notes
 
 - Creating indexes may lock or impact performance; prefer running `live` during low traffic windows.
 - Ensure roles permit `createIndex` on target collections.

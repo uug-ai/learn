@@ -14,11 +14,11 @@ weight: 102
 toc: true
 ---
 
-As described at the [introduction page](/docs/) and [mission statement](/docs/prologue/mission/), Kerberos.io has a strong vision and roadmap to help anyone on this planet to set up a video management platform to fit its needs. In this section we'll describe the different building blocks and illustrate how they complement and enrich each other, to build up an [ideal deployment model](/docs/prologue/deployments/).
+As described on the [introduction page](/docs/) and [mission statement](/docs/prologue/mission/), Kerberos.io has a strong vision and roadmap to help anyone on this planet to set up a video management platform to fit their needs. In this section we'll describe the different building blocks and illustrate how they complement and enrich each other, to build up an [ideal deployment model](/docs/prologue/deployments/).
 
 ## An overview
 
-As shown below there are 3 critical steps in setting up a video management solution: camera processing, persisting of recordings and analysing. Instead of building a single solution, which many other vendors have built, which covers those 3 functions, we have divided and conquered each role and responsibility in a stand-alone solution: [Agents](/docs/agent/first-things-first/), [Factory](/docs/factory/first-things-first/), [Kerberos Vault](/docs/vault/first-things-first/) and [Kerberos Hub](/docs/hub/first-things-first/).
+As shown below there are 3 critical steps in setting up a video management solution: camera processing, persisting recordings and analysing. Instead of building a single solution, which many other vendors have built, which covers those 3 functions, we have divided and conquered each role and responsibility in a stand-alone solution: [Agents](/docs/agent/first-things-first/), [Factory](/docs/factory/first-things-first/), [Kerberos Vault](/docs/vault/first-things-first/) and [Kerberos Hub](/docs/hub/first-things-first/).
 
 {{< figure src="overview.svg" alt="The Kerberos.io solution stack" caption="The Kerberos.io solution stack" class="stretch">}}
 
@@ -30,7 +30,7 @@ At the foundation of any Kerberos.io deployment you'll find one or more [Agents]
 
 {{< figure src="agent-explanation.svg" alt="An Agent consists of both a backend and frontend." caption="An Agent consists of both a backend and frontend." class="stretch">}}
 
-The Agent is responsible for a single camera. It is a piece of software which has two responsibilities: it acts as a user interface (frontend) and an API server (backend). The API processes the video stream, applies computer vision techniques, makes recordings and takes desired actions; e.g. a webhook. On the other hand, the user interface allows a user to review recordings and configure specific settings for the API.
+The Agent is responsible for a single camera. It is a piece of software which has two responsibilities: it acts as a user interface (frontend) and an API server (backend). The API processes the video stream, applies computer vision techniques, makes recordings and takes desired actions, e.g. a webhook. On the other hand, the user interface allows a user to review recordings and configure specific settings for the API.
 
 The Agent itself is bundled in a single container, which includes all the dependencies and libraries required to have it running. For each camera, an Agent container will be created.
 
@@ -44,7 +44,7 @@ Starting with a few Agents is straightforward, and scaling your Agents is not a 
 
 {{< figure src="scaling-out.svg" alt="Scaling out your Agents is not a complex task." caption="Scaling out your Agents is not a complex task." class="stretch">}}
 
-Depending on your scenario [you choose one deployment over the other](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent). There is no golden rule for the best deployment, you should move forward with your preference and experience. A few examples:
+Depending on your scenario [you choose one deployment over the other](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent). There is no golden rule for the best deployment; you should move forward with your preference and experience. A few examples:
 
 - If you are not into `kubernetes`, and you have only a dozen cameras, it might be more suitable to utilise `docker compose`.
 
@@ -52,11 +52,11 @@ Depending on your scenario [you choose one deployment over the other](https://gi
 
 - If you would rather have non-technical users managing a video landscape, then [Factory](/docs/factory/first-things-first/) might be a good choice.
 
-Whatever you choose, you can always migrate from one option to the other, it's just the engine on which the Agent containers are running that is updated.
+Whatever you choose, you can always migrate from one option to the other; it's just the engine on which the Agent containers are running that is updated.
 
 ## Storing data where you want
 
-Agents are responsible for storing recordings and triggering events. By default all recordings are stored within the Agent container, this means that if the container stops, all your data will be lost. Luckily [there are a couple of techniques to persist](https://github.com/kerberos-io/agent#configure-and-persist-with-volume-mounts) the data outside the container, without losing any information.
+Agents are responsible for storing recordings and triggering events. By default all recordings are stored within the Agent container. This means that if the container stops, all your data will be lost. Luckily [there are a couple of techniques to persist](https://github.com/kerberos-io/agent#configure-and-persist-with-volume-mounts) the data outside the container, without losing any information.
 
 In most cases, especially with a growing video landscape, it's more convenient to have a central storage system in place that scales, like Ceph, MinIO, or cloud storage like S3 and other blob storage. This is exactly where Kerberos Vault comes into the picture.
 
@@ -68,9 +68,9 @@ Next to persisting your data in your storage system, [Kerberos Vault](/docs/vaul
 
 ## Centralise and governance
 
-Scaling your [Agents](/docs/agent/first-things-first/) and having a scalable and flexible storage system with [Kerberos Vault](/docs/vault/first-things-first/) is a strong foundation. However data just being stored in your storage system doesn't bring any value.
+Scaling your [Agents](/docs/agent/first-things-first/) and having a scalable and flexible storage system with [Kerberos Vault](/docs/vault/first-things-first/) is a strong foundation. However, data that is just stored in your storage system doesn't bring any value.
 
-Utilising that data to give your stakeholders insights through analytics, providing them with a decent data governance and combining it with live data is where the magic starts.
+Utilising that data to give your stakeholders insights through analytics, providing them with decent data governance and combining it with live data is where the magic starts.
 
 {{< figure src="introduction-hub.svg" alt="Kerberos Vault connected to Kerberos Hub." caption="Kerberos Vault connected to Kerberos Hub." class="stretch">}}
 
@@ -80,6 +80,6 @@ Utilising that data to give your stakeholders insights through analytics, provid
 
 ## Takeaways
 
-Kerberos.io comes with different components which you only install when required, there is no need to set up a sophisticated system from the beginning. Each component works on its own and is open and extensible through APIs. Our vision is to start small, with just a few [Agents](/docs/agent/first-things-first/), scaling up and introducing more components such as [Kerberos Vault](/docs/vault/first-things-first/) and [Kerberos Hub](/docs/hub/first-things-first/) when required for your use case.
+Kerberos.io comes with different components which you only install when required; there is no need to set up a sophisticated system from the beginning. Each component works on its own and is open and extensible through APIs. Our vision is to start small, with just a few [Agents](/docs/agent/first-things-first/), scaling up and introducing more components such as [Kerberos Vault](/docs/vault/first-things-first/) and [Kerberos Hub](/docs/hub/first-things-first/) when required for your use case.
 
 If you need some help on possible deployments, have [a look at the deployment page](/docs/prologue/deployments/) where we illustrate some examples.

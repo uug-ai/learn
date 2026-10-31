@@ -58,7 +58,7 @@ Because the Agent version is part of the fingerprint, you also get a tamper-evid
 
 Hub ships with a public verification page that runs entirely in the browser. It does not upload the file to the backend — the parsing, hashing, and signature check all happen client-side using the Web Crypto API.
 
-The page is reachable at **`/verification`** on your Hub deployment. You can also link directly to it with a query parameter that points at a recording URL, in which case the verification runs automatically:
+The page is reachable at **`/verification`** on your Hub deployment. You can also link directly to it with a query parameter that points at a recording URL, in which case the verification runs automatically unless you add `autoVerify=false`:
 
 ```text
 https://<your-hub>/verification?url=https://example.com/path/to/recording.mp4

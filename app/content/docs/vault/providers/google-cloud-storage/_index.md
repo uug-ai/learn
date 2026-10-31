@@ -119,7 +119,7 @@ Ensure the service account has the necessary permissions on the bucket:
 Now you're ready to configure Google Cloud Storage as a provider in Kerberos Vault:
 
 1. Open the Kerberos Vault web interface
-2. Navigate to **Providers** in the left menu
+2. Navigate to **Storage Providers** in the left menu
 3. Click **+ Add Storage Provider**
 4. Select **Google Cloud Platform: storage** from the list
 5. Fill in the configuration:
@@ -128,7 +128,7 @@ Now you're ready to configure Google Cloud Storage as a provider in Kerberos Vau
    - **Service key**: The contents of the service account JSON key file from Step 3
 6. Click **Validate** to test the connection
 7. If successful, you'll see a green confirmation message
-8. Click **Save** to add the provider
+8. Click **Add provider** to save the provider
 
 ## Configuration Options
 

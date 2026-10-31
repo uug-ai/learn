@@ -14,11 +14,11 @@ weight: 300
 toc: true
 ---
 
-It all starts with your [Agents](/docs/agent). You might set up one or more Agents at several locations, sites, rooms, offices, etc. Each Agent will monitor a particular video stream and persist recordings on a local disk; taking into account the specific conditions such as region of interest, time window, etc.
+It all starts with your [Agents](/docs/agent). You might set up one or more Agents at several locations, sites, rooms, offices, etc. Each Agent will monitor a particular video stream and persist recordings on a local disk, taking into account the specific conditions such as region of interest, time window, etc.
 
 [![Bring Your Own Storage and extend/integrate your video landscape with Kerberos Vault](youtube-vault-kerberosio.png)](https://www.youtube.com/watch?v=QuRHTziIc30 "Bring Your Own Storage and extend/integrate your video landscape with Kerberos Vault")
 
-While growing your video landscape, and adding more and more Agents, it will become interesting, and probably also required to have a central place of storage. That central place might be at the edge, in the cloud, or both depending on the use case.
+While growing your video landscape, and adding more and more Agents, it will become interesting, and probably also required, to have a central place of storage. That central place might be at the edge, in the cloud, or both depending on the use case.
 
 {{< figure src="vault-edge-cloud-storage.svg" alt="Bring your own storage using Vault" caption="Bring your own storage using Kerberos Vault" class="stretch">}}
 
@@ -32,9 +32,10 @@ Besides the flexible storage capabilities, Kerberos Vault is also an open platfo
 
 ## Storage Providers
 
-When deploying Agents you have the possibility to Bring Your Own Storage; at the edge or in the cloud. By configuring Kerberos Vault you persist your recordings in your preferred storage providers. The following providers are supported:
+When deploying Agents you have the possibility to Bring Your Own Storage, at the edge or in the cloud. By configuring Kerberos Vault you persist your recordings in your preferred storage providers. The following providers are supported:
 
 - [Google Cloud Platform Storage](https://cloud.google.com/storage)
+- [Azure Blob Storage](https://azure.microsoft.com/products/storage/blobs/)
 - [Amazon Web Services S3](https://aws.amazon.com/s3/)
 - [Storj](https://storj.io/)
 - [Minio](https://min.io/)
@@ -56,11 +57,12 @@ Each time an Agent sends a recording to Kerberos Vault, it is persisted on a sto
 
 - [Apache Kafka](https://kafka.apache.org/)
 - [Amazon Web Services SQS](https://aws.amazon.com/sqs/)
+- [RabbitMQ](https://www.rabbitmq.com/)
 - [Kerberos Hub](/docs/hub/first-things-first/)
 - Kerberos Vault (remote forwarding)
 
 Every time an event is delivered, it will be consumed by the configured integrations. For example in case of a Kafka
-integration, one can build a Kafka consumer with custom application logic; a notification manager, a machine learning
+integration, one can build a Kafka consumer with custom application logic: a notification manager, a machine learning
 service, etc. Find more information about events and integrations on [the integrations page](/docs/vault/integrations).
 
 {{< figure src="vault-integrations.svg" alt="Build integrations and create your own workflows using the event capability of Kerberos Vault." caption="Build integrations and create your own workflows using the event capability of Kerberos Vault." class="stretch">}}
@@ -69,9 +71,9 @@ service, etc. Find more information about events and integrations on [the integr
 
 Kerberos Vault allows scaling machine learning and computer vision algorithms through the concept of queueing, decoupling of Agents to recordings and the NVIDIA Kubernetes Operator.
 
-Agents send recordings to Kerberos Vault. Every time a recording is stored, the Kafka integration is producing an event in a Kafka topic. A machine learning or computer vision consumer is reading from a Kafka topic, downloads the relevant recording from Kerberos Vault, and starts a prediction or execution of an algorithm on one or more GPUs.
+Agents send recordings to Kerberos Vault. Every time a recording is stored, the Kafka integration produces an event in a Kafka topic. A machine learning or computer vision consumer reads from a Kafka topic, downloads the relevant recording from Kerberos Vault, and starts a prediction or execution of an algorithm on one or more GPUs.
 
-By combining the intelligence of making recordings in small chunks, and distributing them across multiple GPUs, we allow you to scale your machine learning or computer vision independent of the number of video streams. Learn more about developing your own [machine learning model or computer vision algorithm](/docs/vault/machine-learning/).
+By combining the intelligence of making recordings in small chunks, and distributing them across multiple GPUs, we allow you to scale your machine learning or computer vision independently of the number of video streams. Learn more about developing your own [machine learning model or computer vision algorithm](/docs/vault/machine-learning/).
 
 {{< figure src="vault-ml-cv.svg" alt="Machine learning and Computer Vision with Kerberos Vault." caption="Machine learning and Computer Vision with Kerberos Vault" class="stretch">}}
 
@@ -87,7 +89,7 @@ An example of remote forwarding is a machine learning filter. Recordings are sto
 
 ## Open API
 
-All Kerberos products ship with Swagger APIs, which can be used to communicate with, configure and start specific actions of the related solution. Simply type `/swagger/index.html` at the end of the URL, and a Swagger UI will be shown. There is no need to explain the different APIs, use the Swagger and see what is available.
+All Kerberos products ship with Swagger APIs, which can be used to communicate with, configure and start specific actions of the related solution. Simply type `/swagger/index.html` at the end of the URL, and a Swagger UI will be shown. There is no need to explain the different APIs; use the Swagger UI and see what is available.
 
 {{< figure src="open-api.png" alt="All capabilities of Kerberos Vault are documented through Swagger APIs." caption="All capabilities of Kerberos Vault are documented through Swagger APIs" class="stretch">}}
 

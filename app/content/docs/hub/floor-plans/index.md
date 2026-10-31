@@ -24,13 +24,14 @@ top-level route.
 
 > [!NOTE] Feature flag
 > Floor-plan controls are available when the deployment enables the Floor plans
-> feature. See [Feature flags](/docs/hub/feature-flags) for the
+> feature. See [Feature flags](/docs/hub/feature-flags#general-and-navigation) for the
 > deployment's current frontend settings.
 
 ## Create a floor plan
 
 1. Open **Sites** and select a site.
-2. Open the floor-plan section and choose **Add floor plan**.
+2. In the **Floor plans** section, choose **Add new** (or **Upload first floor plan**
+   when the site has none yet).
 3. Enter a name that is unique within the site.
 4. Select a PNG or JPEG image no larger than 10 MiB.
 5. Save the floor plan.

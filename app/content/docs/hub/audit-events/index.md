@@ -68,7 +68,7 @@ browser or IP evidence. Events without a resource display no target.
 
 The footer shows the visible result range and the total number of matching
 events. Choose 25, 50, or 100 rows per page, or use the numbered, previous,
-next, first, and last controls to move through the result.
+next, first, and last controls to move through the results.
 
 Filtering and pagination happen on the server. The browser does not download
 the complete audit history before displaying the table.
@@ -101,11 +101,11 @@ from Hub's own database.
 | Feature | Helm chart | `hub-audit` image |
 | --- | --- | --- |
 | Webhook destinations | 0.137.0 or later | Any release |
-| S3 Object Lock destinations | 0.168.0 or later | v1.0.9 or later |
+| S3 Object Lock destinations | 0.168.1 or later | v1.0.9 or later |
 | `s3.allowUnlockedBucket` | 0.168.2 or later | v1.0.10 or later |
 
-The chart's default `kerberoshub.audit.tag` is older than v1.0.9, so set it
-explicitly when you use S3 destinations.
+Before chart 0.168.4, the default `kerberoshub.audit.tag` was older than v1.0.9, so
+set it explicitly when you use S3 destinations with an older chart.
 
 Auditing is off by default. `audit.enabled: true` deploys `hub-audit` and turns
 on audit publishing in every Hub service that supports it. Each service can opt

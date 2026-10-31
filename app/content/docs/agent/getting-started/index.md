@@ -16,7 +16,7 @@ toc: true
 
 Once you've installed one or more Agents, you should have access to the Agent user interface. The interface allows you to interact with the Agent, and more specifically configure the camera stream, set up a cloud connection to [Vault](/docs/agent/connect-to-vault) or [Hub](/docs/agent/connect-to-hub), watch recordings and live views, etc.
 
-Having a UI in place, it is important to note that Agent also ships numerous APIs, that allow you to automate the configuration. The APIs are exposed as Swagger documentation, and can be used for configuration of Agent but also development of custom applications or business logic.
+Next to the UI, it is important to note that the Agent also ships numerous APIs that allow you to automate the configuration. The APIs are exposed as Swagger documentation, and can be used for configuration of Agent but also development of custom applications or business logic.
 
 ## Login page
 
@@ -39,7 +39,7 @@ On the dashboard page, you'll find a summary of the most relevant information an
 
 ## Media
 
-At the media page you'll find all your past and future recordings. It shows the recordings in a latest to oldest view and allows you to filter and browse through your recordings.
+On the media page you'll find all your past and future recordings. It shows the recordings in a latest to oldest view and allows you to filter and browse through your recordings.
 
 {{< figure src="media.gif" alt="All your recordings in a single place." caption="All your recordings in a single place." class="stretch">}}
 

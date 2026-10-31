@@ -51,7 +51,7 @@ Open the Agent's web interface and go to **Settings → Persistence**.
 
 The Agent starts sending heartbeats, and shows up in Hub as soon as the first one arrives.
 
-Live view and camera control also use the **MQTT** broker and the **STUN/TURN** servers under **Settings → Streaming**. The defaults point to the Kerberos-hosted services. For self-hosted Hub, use the broker and TURN server of your installation; [Live view](/docs/hub/livestream) explains how the pieces fit together, and [Set up WebRTC live view with TURN](/tutorials/hub/setup-webrtc-turn/) walks through running your own TURN server.
+Live view and camera control also use the **MQTT** broker and the **STUN/TURN** servers under **Settings → Streaming**. The defaults point to the Kerberos-hosted services. For self-hosted Hub, use the broker and TURN server of your installation; [Live view](/docs/hub/livestream) explains how the pieces fit together, and [Set up WebRTC live view with TURN](/tutorials/hub/setup-webrtc-turn) walks through running your own TURN server.
 
 ## Choose where recordings go
 

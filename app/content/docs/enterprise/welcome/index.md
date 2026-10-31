@@ -14,19 +14,19 @@ weight: 301
 toc: true
 ---
 
-Welcome to our family! This page will explain and showcase how to connect and configure the Kerberos Enterprise Suite. We will go through some configuration steps, so your data will flow from your Factory and Agents to Kerberos Vault to Kerberos Hub. What are we waiting for, let's go.
+Welcome to our family! This page will explain and showcase how to connect and configure the Kerberos Enterprise Suite. We will go through some configuration steps, so your data will flow from your Factory and Agents to Kerberos Vault to Kerberos Hub. What are we waiting for? Let's go.
 
 ## Prerequisites
 
 This section expects you have a working setup with all components installed: Factory, Kerberos Vault and Kerberos Hub.
 
-Typically you will host Factory (including the Agents) and Kerberos Vault on your side and leverage the Kerberos Hub SaaS environment. However nothing stops you from hosting it all yourself, or only being in charge of Factory and letting us handle Kerberos Vault and Kerberos Hub in a private installation.
+Typically you will host Factory (including the Agents) and Kerberos Vault on your side and leverage the Kerberos Hub SaaS environment. However, nothing stops you from hosting it all yourself, or only being in charge of Factory and letting us handle Kerberos Vault and Kerberos Hub in a private installation.
 
 ## The Architecture
 
 Everything starts at your Agent. The Agents are connected to camera streams (RTSP) and depending on the configuration they might record videos and store them locally on their local disk.
 
-To get those recordings in a central storage like S3, Storj, Ceph, Minio or any other compatible S3 storage we will leverage the Kerberos Vault solution.
+To get those recordings in a central storage like S3, Storj, Ceph, MinIO or any other compatible S3 storage we will leverage the Kerberos Vault solution.
 
 Once recordings are entering the underlying central storage an event is sent to Kerberos Hub through a message broker like SQS or Kafka. The event is parsed and passed through different microservices. Each microservice will perform a specific action on the recording varying from generating metadata to machine learning and computer vision.
 
@@ -96,26 +96,26 @@ When setting up the Offset Explorer, you can use the following configuration to 
 
 ### TURN server
 
-A TURN server is required for high definition live streaming, by default only a low resolution is provided while using the MQTT broker. When using our Kerberos Hub SaaS edition you can use the following information:
+A TURN server is required for high-definition live streaming; by default only a low resolution is provided while using the MQTT broker. When using our Kerberos Hub SaaS edition you can use the following information:
 
 - stun: `stun:stun.l.google.com:19302`
 - turn: `turn:turn.kerberos.io:8443`
 - username: `username1`
 - password: `password1`
 
-When running a self-hosted installation you should make sure to have your TURN server configured on a stand-alone virtual machine. More information on how to run our TURN server in a Docker container, [can be found here](https://github.com/kerberos-io/turn-and-stun).
+When running a self-hosted installation you should make sure to have your TURN server configured on a stand-alone virtual machine. More information on how to run our TURN server in a Docker container can be found in the [turn-and-stun repository](https://github.com/kerberos-io/turn-and-stun).
 
 If you are running a private edition of Kerberos Hub managed by the Kerberos.io team you will receive the above information as part of the license contract.
 
 ## Kerberos Vault
 
-Once we have above information we can start by setting up our Kerberos Vault, create a storage provider and create an integration with our Kerberos Hub.
+Once we have the above information we can start by setting up our Kerberos Vault, create a storage provider and create an integration with our Kerberos Hub.
 
 ![Kerberos Vault and components](./kerberos-vault-architecture.svg)
 
 ### Storage Provider 
 
-Before starting you should have made a decision where you want to have your recordings stored. At the moment of writing we are supporting all S3 compliant providers such as: S3, Minio, Storj, Ceph, etc. and Google Cloud Storage as well. To get a better understanding of how to set up and configure your storage provider [have a look at our providers page in the Kerberos Vault section](/docs/vault/providers).
+Before starting you should have made a decision where you want to have your recordings stored. At the moment of writing we are supporting all S3 compliant providers such as: S3, MinIO, Storj, Ceph, etc. and Google Cloud Storage as well. To get a better understanding of how to set up and configure your storage provider [have a look at our providers page in the Kerberos Vault section](/docs/vault/providers).
 
 ![Storage provider](./storage-provider.png)
 
@@ -135,7 +135,7 @@ When testing the Kafka integration, you should see a message published in your K
 
 If you have purchased a Kerberos Hub SaaS subscription or you don't like to use the Kafka integration you can leverage the Kerberos Hub integration. Under the hood it will still use Kafka to distribute to the different microservices. The advantage of the Kerberos Hub integration is that it will hide the Kafka configuration for you, or in the case of the Hub SaaS subscription not available to you at all.
 
-You will find more information about [the Kerberos Hub integration here](/docs/vault/integrations/#kerberos-hub).
+You will find more information in [the Kerberos Hub integration section of the Kerberos Vault docs](/docs/vault/integrations/#kerberos-hub).
 
 ### Account creation
 
@@ -150,7 +150,7 @@ To finish the Kerberos Vault installation we will need to create a security acco
 - Secret key
 - Kerberos Vault API url (you retrieve this by opening the Swagger API docs in the left navigation)
 
-We are done here, you now have set up your Kerberos Vault and linked it to Kerberos Hub. Next we will configure our Agents and Factory so that they will store recordings into your storage provider and trigger an event in Kerberos Hub so you will be able to see your recordings in a single pane of glass.
+We are done here: you have now set up your Kerberos Vault and linked it to Kerberos Hub. Next we will configure our Agents and Factory so that they will store recordings into your storage provider and trigger an event in Kerberos Hub so you will be able to see your recordings in a single pane of glass.
 
 ## Factory
 
@@ -158,7 +158,7 @@ Yes, we are ready to hook up our Factory and Agents to Kerberos Vault and Kerber
 
 ![Factory and components](./kerberos-factory-architecture.svg)
 
-When running the stand-alone Agent go to the settings page of your Agent, when running Factory go to your Factory portal and navigate to the Global settings. We will focus on Factory for now as Agent is similar but easier.
+When running the stand-alone Agent go to the settings page of your Agent; when running Factory go to your Factory portal and navigate to the Global settings. We will focus on Factory for now as Agent is similar but easier.
 
 ![Global settings](./global-settings.png)
 

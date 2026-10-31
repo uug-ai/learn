@@ -16,15 +16,15 @@ podcast: hub-domains
 
 By default the Kerberos Hub project can be used in a multi-tenancy mode. By creating multiple user and related (sub) accounts you can provide multiple users/customers/companies access to the (same) central platform. Each master user will have a set of sites, groups and cameras attached which can be further delegated to (sub) accounts. This means that sites in a geography can be managed by a specific user working in that specific timezone, etc.
 
-By using domains you can bring multi-tenancy to another level. A domain adds another abstraction layer on top of the default user account. It creates a context in which usernames and users are unique, in other words the same username can be used in multiple domains.
+By using domains you can bring multi-tenancy to another level. A domain adds another abstraction layer on top of the default user account. It creates a context in which usernames and users are unique; in other words, the same username can be used in multiple domains.
 
 ## Introduction
 
-The domain feature works through the concept of a subdomain. By prefixing the `BASE_DOMAIN` with a subdomain you indicate to Kerberos Hub which domain the user belongs to. When opening the login page, the page will show the name of the domain you are trying to sign in to.
+The domain feature works through the concept of a subdomain. By prefixing the `tenantBaseDomain` with a subdomain you indicate to Kerberos Hub which domain the user belongs to. When opening the login page, the page will show the name of the domain you are trying to sign in to.
 
 ![Login page of a domain](login.png)
 
-Once logged in, you will see the domain badge next to your username in the profile section (left top). This indicates which domain the user is currently signed in to.
+Once logged in, you will see the domain badge next to your username in the profile section (top left). This indicates which domain the user is currently signed in to.
 
 ![Domain badge](domain-badge.png)
 
@@ -40,9 +40,9 @@ To enable the domain feature, you will need to set two environment variables in 
     multiTenant: true
     tenantBaseDomain: "yourdomain.com" 
 
-By setting `multiTenant` to true you indicate to Kerberos Hub you want to enable the domain feature. Once enabled you can provide the `tenantBaseDomain`, which you use as a basis for your domains as DNS sub domains. 
+By setting `multiTenant` to true you indicate to Kerberos Hub that you want to enable the domain feature. Once enabled you can provide the `tenantBaseDomain`, which you use as a basis for your domains as DNS sub domains. 
 
-When configured and deployed you can start using sub domains to differentiate the domains in Kerberos Hub, for example `hub.kerberos.live` is used as the `tenantBaseDomain` and the following subdomains will result in the equivalent Kerberos Hub domain.
+When configured and deployed you can start using sub domains to differentiate the domains in Kerberos Hub. For example, if `hub.kerberos.live` is used as the `tenantBaseDomain`, the following subdomains will result in the equivalent Kerberos Hub domain.
 
   - `customera.hub.kerberos.live` -> `customera` domain
   - `customerb.hub.kerberos.live` -> `customerb` domain

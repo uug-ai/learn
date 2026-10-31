@@ -21,7 +21,7 @@ Different recycling rules can be defined. A rule determines when and how recordi
 
 ### Account day limit
 
-When creating an `account` in Kerberos Vault, you have the option to specify a day limit. This day limit is used by the recycle service, to determine if one or more recordings are ready to be removed from the selected storage provider.
+When creating an `account` in Kerberos Vault, you have the option to specify a day limit. This day limit is used by the recycle service to determine if one or more recordings are ready to be removed from the selected storage provider.
 
 {{< figure src="vault-recycle.gif" alt="You can remove your recordings by specifying the day limit field." caption="You can remove your recordings by specifying the day limit field." class="stretch">}}
 

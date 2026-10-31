@@ -37,7 +37,7 @@ You need:
 - An IP camera connected to the same network as the machine running Agent.
 - The camera administrator username and password.
 - A camera that can output H264 or H265 over RTSP. Use **H264 for the sub-stream** when you need WebRTC live view.
-- A computer with `ffprobe` or VLC for testing the stream.
+- `ffprobe` or VLC on the machine that runs Agent, for testing the stream.
 
 {{< callout type="warning" >}}
 Keep the camera and Agent on a trusted network. Do not expose the camera's RTSP port directly to the internet. Create a dedicated, read-only camera account when the camera supports one.

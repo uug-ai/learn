@@ -216,7 +216,7 @@ A **track** represents one subject (a face, a licence plate, a person) followed 
 ### Linking a track to a marker
 
 A workflow stage can give a detection track a named, searchable timeline span by
-emitting a [`marker`](../marker/) block in the same result envelope. The marker
+emitting a [`marker`](/docs/hub/workflows/ingest/blocks/marker/) block in the same result envelope. The marker
 must explicitly reference the track:
 
 ```json
@@ -241,7 +241,7 @@ the link automatically.
 Always supply a stable `source.runId` when a marker will reference the run.
 Server-generated run ids are suitable for standalone detections, but the stage
 does not know that generated value when it constructs the marker. See
-[Marker → Detection-track link](../marker/#detection-track-link-detections) for
+[Marker → Detection-track link](/docs/hub/workflows/ingest/blocks/marker/#detection-track-link-detections) for
 a complete paired-block example.
 
 ### Track boxes

@@ -54,7 +54,7 @@ Before configuring Azure Blob Storage as a provider:
      - **Standard**: General-purpose (HDD-backed)
      - **Premium**: High-performance (SSD-backed) - typically not needed for recordings
    - **Redundancy**: Select based on your availability requirements:
-     - **LRS (Locally Redundant Storage)**: 3 copies in one datacenter (lowest cost)
+     - **LRS (Locally Redundant Storage)**: 3 copies in one data centre (lowest cost)
      - **ZRS (Zone-Redundant Storage)**: 3 copies across availability zones
      - **GRS (Geo-Redundant Storage)**: 6 copies across two regions
      - **RA-GRS (Read-Access GRS)**: GRS with read access to secondary region
@@ -185,7 +185,7 @@ spec:
 Kerberos Vault supports Azure Blob Storage natively:
 
 1. Open the Kerberos Vault web interface
-2. Navigate to **Providers** in the left menu
+2. Navigate to **Storage Providers** in the left menu
 3. Click **+ Add Storage Provider**
 4. Select **Azure** from the list
 5. Fill in the configuration:
@@ -195,14 +195,14 @@ Kerberos Vault supports Azure Blob Storage natively:
    - **Account Key**: Your storage account access key (key1 or key2)
 6. Click **Validate** to test the connection
 7. If successful, you'll see a green confirmation message
-8. Click **Save** to add the provider
+8. Click **Add provider** to save the provider
 
 ### Using MinIO Gateway Configuration
 
 If using MinIO Gateway for S3 compatibility:
 
 1. Open the Kerberos Vault web interface
-2. Navigate to **Providers** in the left menu
+2. Navigate to **Storage Providers** in the left menu
 3. Click **+ Add Storage Provider**
 4. Select **MinIO** or **S3-Compatible** provider
 5. Fill in the configuration:
@@ -213,7 +213,7 @@ If using MinIO Gateway for S3 compatibility:
    - **Access Key**: Your storage account name
    - **Secret Access Key**: Your storage account key
 6. Click **Validate** to test the connection
-7. Click **Save** to add the provider
+7. Click **Add provider** to save the provider
 
 ## Configuration Options
 

@@ -67,10 +67,12 @@ Agent's pod with `envFrom`. The Agent therefore no longer needs to read MongoDB 
 runtime. Two kinds of stores are created:
 
 - A **global** store (`agent-global-config`) and a **template** store
-  (`agent-template-config`), bootstrapped on start-up. The global store carries the
-  settings that every Agent inherits, exposed as `GLOBAL_AGENT_*` variables.
-- A **per-agent** store (named after the deployment, with a `-config` / `-secret`
-  suffix) that carries the overrides for a single Agent, exposed as `AGENT_*`
+  (`agent-template-config`), bootstrapped on start-up. With `secret`, these are
+  named `agent-global-config-secret` and `agent-template-config-secret`. The
+  global store carries the settings that every Agent inherits, exposed as
+  `GLOBAL_AGENT_*` variables.
+- A **per-agent** store (named after the deployment, with a `-config` /
+  `-config-secret` suffix) that carries the overrides for a single Agent, exposed as `AGENT_*`
   variables.
 
 The Agent merges the two: it starts from the inherited `GLOBAL_AGENT_*` values and

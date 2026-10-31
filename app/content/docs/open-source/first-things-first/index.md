@@ -19,9 +19,9 @@ As a result of the developments of the Agent, previously called Kerberos Open So
 
 Kerberos Enterprise Suite is taking the Agent to another level, by building additional tools on top such as [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/hub/first-things-first). It scales your Agents through the concept of [Factory](/docs/factory/first-things-first) which helps to deploy your Agents in bulk.
 
-## Kubernetes: flexible and scale
+## Kubernetes: flexible and scalable
 
-Kubernetes is a proven, and a widely spread technology which is gaining more momentum every single day. Although many enterprises still have to adopt and embrace Kubernetes, many already do. It's just a matter of time.
+Kubernetes is a proven and widespread technology which is gaining more momentum every single day. Although many enterprises still have to adopt and embrace Kubernetes, many already do. It's just a matter of time.
 
 {{< figure src="kubernetes-enterprise.svg" alt="" caption="" class="stretch">}}
 
@@ -33,11 +33,11 @@ By using Kubernetes as a basis for [Factory](/docs/factory/first-things-first), 
 
 ### Bring your own storage
 
-One thing you don't want, is to store your most precious data on someone else's storage. We believe you should be the one and only owner of your data, and therefore we have built [Kerberos Vault](/docs/vault/first-things-first), in such a way that you bring your own storage. Bringing your own storage is great, but actually you want to bring multiple storage providers, for example edge storage and cloud storage. The concept of keeping a vast amount of storage at the edge, and [forward only the most important data](/docs/vault/forwarding/) to a cloud environment, is a core feature of [Kerberos Vault](/docs/vault/first-things-first).
+One thing you don't want is to store your most precious data on someone else's storage. We believe you should be the one and only owner of your data, and therefore we have built [Kerberos Vault](/docs/vault/first-things-first) in such a way that you bring your own storage. Bringing your own storage is great, but actually you want to bring multiple storage providers, for example edge storage and cloud storage. The concept of keeping a vast amount of storage at the edge, and [forwarding only the most important data](/docs/vault/forwarding/) to a cloud environment, is a core feature of [Kerberos Vault](/docs/vault/first-things-first).
 
 ### Bring your own technology
 
-Kubernetes brings a lot of advantages in terms of deployment, scalability, resilience, and also high availability, but there is more. Due to the nature of Kubernetes, enterprises and administrators can bring any tool, service, solution or application inside their cluster. As the Kerberos Enterprise Suite has specific dependencies, there is no need to install already existing tools, but you can reuse the ones you already have.
+Kubernetes brings a lot of advantages in terms of deployment, scalability, resilience, and also high availability, but there is more. Due to the nature of Kubernetes, enterprises and administrators can bring any tool, service, solution or application inside their cluster. Although the Kerberos Enterprise Suite has specific dependencies, there is no need to install already existing tools: you can reuse the ones you already have.
 
 Next to that, all solutions within the Kerberos Enterprise Suite ship Swagger APIs by default. This allows you to extend or integrate your own solutions or extend them with the technology you already master or prefer within your organisation.
 
@@ -67,7 +67,7 @@ Events and messages [are sent through integrations](/docs/vault/integrations/) t
 
 ### Kerberos Hub
 
-[Kerberos Hub](/docs/hub/first-things-first) is a scale UI that consolidates the entire Kerberos ecosystem. It shows livestreams/alerts from your Agents and recordings stored in Kerberos Vault through a single pane of glass.
+[Kerberos Hub](/docs/hub/first-things-first) is a scalable UI that consolidates the entire Kerberos ecosystem. It shows livestreams/alerts from your Agents and recordings stored in Kerberos Vault through a single pane of glass.
 
 [Kerberos Hub](/docs/hub/first-things-first) is built out of modular and scalable microservices which you can install and scale independently, wherever you want.
 

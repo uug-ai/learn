@@ -4,7 +4,7 @@ title: Logging
 toc: false
 ---
 
-In Go projects we use Logrus as our logging tool. We use the provided Logrus logging levels wrapped in a function defined in our [api models](https://github.com/uug-ai/models/blob/main/pkg/api/api.go), each with a custom response type initiated by its constructor function. 
+In Go projects we use Logrus as our logging tool. We use the provided Logrus logging levels wrapped in a function defined in our [API models](https://github.com/uug-ai/models/blob/main/pkg/api/api.go), each with a custom response type created by its constructor function. 
 
 Response types should at least contain the following:
 ```go
@@ -13,7 +13,7 @@ applicationStatusCode string
 entityStatusCode EntityStatus
 ```
     
-### Levels
+## Levels
 
 - Trace: Extremely low-level, noisy details.
     ```go
@@ -86,7 +86,7 @@ entityStatusCode EntityStatus
     ), nil)
     ```
 
-### Usage
+## Usage
 
 For example:
 
@@ -107,7 +107,7 @@ api.LogError(logger, api.CreateError(
 ))
 ```
 
-Logger initialization example:
+Logger initialisation example:
 
 ```go
 import (

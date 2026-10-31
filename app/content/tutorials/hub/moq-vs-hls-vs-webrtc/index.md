@@ -173,7 +173,7 @@ WebRTC is designed for live, bidirectional communication. In Hub, the Agent and 
 WebRTC provides:
 
 - **The lowest interactive delay.** It is designed to keep conversation and control responsive.
-- **Two-way media.** In Hub, this is the only transport that supports the camera talk back-channel.
+- **Two-way media.** In Hub, this is the only transport that supports the camera talk backchannel.
 - **Mature adaptation.** Congestion control, jitter buffering, retransmission strategies and network statistics are established parts of the ecosystem.
 - **Direct delivery.** A successful peer-to-peer path avoids routing media through Hub infrastructure.
 
@@ -306,7 +306,7 @@ Test for at least one camera keyframe interval after every reconnect. A transpor
 
 ## Apply the choice in Hub
 
-The [Live view](/docs/hub/livestream/) docs describe how each transport behaves on the page, and [Feature flags](/docs/hub/feature-flags/) lists every live-view setting.
+The [Live view](/docs/hub/livestream/) docs describe how WebRTC and HLS behave on the page, and [Feature flags](/docs/hub/feature-flags/#live-view) lists the live-view feature flags.
 
 The Hub Helm chart exposes the transports under `kerberoshub.frontend.features.liveview`. This example offers all three choices and starts Live mode with MoQ:
 

@@ -15,7 +15,7 @@ toc: true
 
 This is the way to go if you want to install Factory on your Kubernetes cluster at the edge or inside a private cloud.  Before installing the different deployments in our cluster, we need to make sure we have one available.
 
-{{< figure src="factory-edge.svg" alt="Process your video streams at the edge. " caption="Process your video streams at the edge." class="stretch">}}
+{{< figure src="factory-edge.svg" alt="Process your video streams at the edge." caption="Process your video streams at the edge." class="stretch">}}
 
 ## Prerequisites
 
@@ -63,12 +63,12 @@ And if you want to make it permanent after every boot.
 
 ## Installation
 
-Before initiating a new Kubernetes cluster, make sure you have properly cleaned up previous installation (if this was the case ofc).
+Before initiating a new Kubernetes cluster, make sure you have properly cleaned up any previous installation (if there was one, of course).
 
     kubeadm reset
     rm -rf $HOME/.kube
 
-Initiate a new Kubernetes cluster using following command. This will use the current CIDR. If you want to use another CIDR, specify following arguments: `--pod-network-cidr=10.244.0.0/16`.
+Initiate a new Kubernetes cluster using the following command. This will use the current CIDR. If you want to use another CIDR, specify the following argument: `--pod-network-cidr=10.244.0.0/16`.
 
     kubeadm init
 
@@ -91,7 +91,7 @@ Once successful you should see the following. Note the `discovery token` which y
     kubeadm join 192.168.1.103:6443 --token ej7ckt.uof7o2iplqf0r2up \
         --discovery-token-ca-cert-hash sha256:9cbcc00d34be2dbd605174802d9e52fbcdd617324c237bf58767b369fa586209
 
-Now we have a Kubernetes cluster, we need to make sure we make it available in our `kubeconfig`. This will allow us to query our Kubernetes cluster with the `kubectl` command.
+Now that we have a Kubernetes cluster, we need to make sure we make it available in our `kubeconfig`. This will allow us to query our Kubernetes cluster with the `kubectl` command.
 
     mkdir -p $HOME/.kube
     cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -99,7 +99,7 @@ Now we have a Kubernetes cluster, we need to make sure we make it available in o
 
 ### Untaint all nodes
 
-By default, and in this example, we only have one node, our master node. In a production scenario we would have additional worker nodes. By default the master nodes are marked as `tainted`, this means they cannot run workloads. To allow master nodes to run workloads, we need to untaint them. If we wouldn't do this our pods would never be scheduled, as we do not have worker nodes at this moment.
+By default, and in this example, we only have one node, our master node. In a production scenario we would have additional worker nodes. By default the master nodes are marked as `tainted`, which means they cannot run workloads. To allow master nodes to run workloads, we need to untaint them. If we didn't do this, our pods would never be scheduled, as we do not have worker nodes at this moment.
 
     kubectl taint nodes --all node-role.kubernetes.io/master-
 
@@ -112,7 +112,7 @@ Calico is an open source networking and network security solution for containers
 
 ### Permissions and namespace
 
-Before setting up Factory, the first thing that we need to do is enabling RBAC permissions (Role Based Access Control). This needs to be enabled to query specific endpoints from the Kubernetes API. By default, these endpoints are blocked, so we need to unlock them.
+Before setting up Factory, the first thing that we need to do is to enable RBAC permissions (Role Based Access Control). This needs to be enabled to query specific endpoints from the Kubernetes API. By default, these endpoints are blocked, so we need to unlock them.
 
 First clone the configurations from the GitHub repository [kerberos-io/factory]( https://github.com/kerberos-io/factory).
 
@@ -130,7 +130,7 @@ This will make several APIs inside your Kubernetes cluster available. We need th
 
 ### MetalLB
 
-In the Edge world, we do not have fancy Load balancers and Public IP from which we can benefit. To overcome this solutions such as MetalLB - Baremetal Load Balancer - have been developed (https://metallb.universe.tf/installation/). MetalLB will dedicate an internal IP address, or IP range, which will be assigned to one or more Load Balancers.
+In the Edge world, we do not have fancy Load balancers and Public IP from which we can benefit. To overcome this, solutions such as MetalLB - Baremetal Load Balancer - have been developed (https://metallb.universe.tf/installation/). MetalLB will dedicate an internal IP address, or IP range, which will be assigned to one or more Load Balancers.
 
     kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.5/manifests/namespace.yaml
     kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.5/manifests/metallb.yaml
@@ -157,7 +157,7 @@ You can change the IP range above to match your needs. MetalLB will use this ran
 
 ### Helm
 
-Before we can start with the real work, I know we had to do a lot of preparation, we have to install another helpful tool `Helm`. Helm is a package manager for Kubernetes, and really makes your life easier.
+Before we can start with the real work (I know, we had to do a lot of preparation), we have to install another helpful tool: `Helm`. Helm is a package manager for Kubernetes, and really makes your life easier.
 
     curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
     chmod 700 get_helm.sh
@@ -169,7 +169,7 @@ This will make sure Helm 3 is installed.
 
 To access the Factory application, we will create a service in the next paragraphs. This service will expose the web application as an Ingress. Thanks to our previous installation with MetalLB and Traefik (what we will do now), we will have a neat solution for managing our hostnames and Load Balancing IPs.
 
-The idea is that Traefik, will have a dedicated IP address assigned from MetalLB, and will resolve the Ingress of our Factory application. Let's go ahead with installing Traefik.
+The idea is that Traefik will have a dedicated IP address assigned from MetalLB, and will resolve the Ingress of our Factory application. Let's go ahead with installing Traefik.
 
     helm repo add traefik https://helm.traefik.io/traefik
     kubectl create namespace traefik
@@ -186,9 +186,7 @@ If you don't like `Traefik` but you prefer `Ingress Nginx`, that works as well.
 
 ### MongoDB
 
-The last step is to install the Factory application. Factory is responsible for installing and creating the Kubernetes deployments inside your Kubernetes cluster.
-
-Before we can move into the installation of MongoDB, we will need to prepare some storage or persistent volume. To simplify this we can leverage the OpenEBS storage solution, which can automatically provision PV (Persistent volumes) for us.
+Before we can move into the installation of MongoDB, we will need to prepare some storage or persistent volumes. To simplify this we can leverage the OpenEBS storage solution, which can automatically provision PV (Persistent volumes) for us.
 
 Let us start with installing the OpenEBS operator. Please note that you might need to change the mount folder. Download the `openebs-operator.yaml` and scroll to the bottom, until you hit the `StorageClass` section. Modify the `BasePath` value to the destination (external mount) you prefer.
 
@@ -277,7 +275,7 @@ Once you have corrected the DNS names (or internal /etc/hosts file), install the
 
 ## Test out configuration
 
-If everything worked out as expected, you should now have following services in your cluster across different namespaces:
+If everything worked out as expected, you should now have the following services in your cluster across different namespaces:
 
 - MongoDB
 - Traefik
@@ -301,4 +299,4 @@ It should look like this.
 
 Once everything is configured correctly in your cluster and DNS, you should be able to set up the Factory application. By navigating to the domain `factory.domain.com` in your browser you will see the login page showing up.
 
-{{< figure src="login.png" alt="Once successfully installed Factory, it will show you the login page." caption="Once successfully installed Factory, it will show you the login page." class="stretch">}}
+{{< figure src="login.png" alt="Once Factory is installed successfully, it will show you the login page." caption="Once Factory is installed successfully, it will show you the login page." class="stretch">}}

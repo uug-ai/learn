@@ -17,7 +17,7 @@ connects:
     why: Point Agents at Vault, and optionally at a specific provider.
 ---
 
-When [connecting Agents to Vault](/docs/agent/connect-to-vault) you have the possibility to Bring Your Own Storage; at the edge or in the cloud. By configuring Vault you persist your recordings in your preferred storage providers. The following providers are supported:
+When [connecting Agents to Vault](/docs/agent/connect-to-vault) you have the possibility to Bring Your Own Storage, at the edge or in the cloud. By configuring Vault you persist your recordings in your preferred storage providers. The following providers are supported:
 
 - [Google Cloud Platform Storage](/docs/vault/providers/google-cloud-storage/)
 - [Azure Blob Storage](/docs/vault/providers/azure-storage-account/)
@@ -26,7 +26,7 @@ When [connecting Agents to Vault](/docs/agent/connect-to-vault) you have the pos
 - [Minio](https://min.io/)
 - [Ceph](https://ceph.io/)
 
-Kerberos Vault allows you to attach one or more (and different) storage providers. Depending on the use case: Kerberos Vault in a cloud environment or at the edge, you will opt for a specific storage provider. For example in the case of a Kerberos Vault installation at the edge, it makes more sense to store your recordings also at the edge, so you avoid cloud storage costs, have better latency, and reduce expensive bandwidth.
+Kerberos Vault allows you to attach one or more (and different) storage providers. Depending on the use case (Kerberos Vault in a cloud environment or at the edge), you will opt for a specific storage provider. For example in the case of a Kerberos Vault installation at the edge, it makes more sense to store your recordings also at the edge, so you avoid cloud storage costs, have better latency, and reduce expensive bandwidth.
 
 ## Prerequisites
 
@@ -42,7 +42,7 @@ When selecting the `+ Add Storage Provider` button, a modal will open that allow
 
 {{< figure src="add-provider.gif" alt="Configure, add and validate a new storage provider." caption="Configure, add and validate a new storage provider." class="stretch">}}
 
-Once completed the necessary credentials, specific to your storage provider, you can verify the connection by clicking the `Validate` button. If ok, it should return a `green` confirmation box, if something went wrong you should see the relevant error message in a `red` alert box.
+Once you have completed the necessary credentials, specific to your storage provider, you can verify the connection by clicking the `Validate` button. If ok, it should return a `green` confirmation box; if something went wrong you should see the relevant error message in a `red` alert box.
 
 Once configured you can add multiple and different providers. Have some fun.
 
@@ -69,7 +69,7 @@ for JSON examples, required fields, precedence, and secret-handling guidance.
 
 ## Cloud storage providers
 
-Kerberos Vault integrates with storage providers in the cloud such as AWS S3, GCP Storage, Azure Storage and Storj. The advantage of previously mentioned storage providers, is that they take complete control of your ever-growing storage requirements. They scale with your needs at a low TCO.
+Kerberos Vault integrates with storage providers in the cloud such as AWS S3, GCP Storage, Azure Storage and Storj. The advantage of the previously mentioned storage providers is that they take complete control of your ever-growing storage requirements. They scale with your needs at a low TCO.
 
 ### GCP Storage
 
@@ -91,9 +91,9 @@ Kerberos Vault integrates with storage providers in the cloud such as AWS S3, GC
 
 #### Introduction
 
-Storj DCS is the world’s first open-source, decentralised cloud storage layer that’s private by design and secure by default - enabling developers to build in the best data protection and privacy into their applications as possible. The zero trust architecture, multi-region high availability, default encryption and edge-based access controls minimise risk and give only you, or those you grant permission to, access to your files. The result is that you take back full ownership and control of your data.
+Storj DCS is the world’s first open-source, decentralised cloud storage layer that’s private by design and secure by default - enabling developers to build the best possible data protection and privacy into their applications. The zero trust architecture, multi-region high availability, default encryption and edge-based access controls minimise risk and give only you, or those you grant permission to, access to your files. The result is that you take back full ownership and control of your data.
 
-The Storj DCS Satellite Admin Console supports uploading and managing objects directly through the browser with no command-line tool required. This component uses our hosted S3-compatible Gateway service.
+The Storj DCS Satellite Admin Console supports uploading and managing objects directly through the browser with no command-line tool required. This component uses Storj's hosted S3-compatible Gateway service.
 
 #### Create an Account
 
@@ -103,32 +103,32 @@ To start using Storj, an account has to be created [on the public Storj cloud ap
 
 #### Configure Object Browser Access
 
-Once you activated your account, go ahead and sign in to your profile. The first time you've signed in you will be asked to create a Bucket. Select the Upload In Browser, and give a specific name to your Bucket.
+Once you have activated your account, go ahead and sign in to your profile. The first time you sign in, you will be asked to create a Bucket. Select the Upload In Browser, and give a specific name to your Bucket.
 
 {{< figure src="storj-create-bucket.gif" alt="Create a Storj bucket." caption="Create a Storj bucket." class="stretch">}}
 
 #### Create Access Grant
 
-So now we have created a Bucket, we will need to have credentials to interact with it. Go to the "Access" page, select the (Create Access Grant) button at the top. Provide the required fields, and select the option (Generate S3 Gateway Credentials).
+Now that we have created a Bucket, we will need to have credentials to interact with it. Go to the "Access" page, select the (Create Access Grant) button at the top. Provide the required fields, and select the option (Generate S3 Gateway Credentials).
 
 {{< figure src="storj-access.gif" alt="Create a Storj Access Grant." caption="Create a Storj Access Grant." class="stretch">}}
 
 #### Integrate
 
-Now you are ready to assign Storj as a storage provider to Kerberos Vault. Open the `Providers` page of Kerberos Vault, and select the Storj provider.
+Now you are ready to assign Storj as a storage provider to Kerberos Vault. Open the `Storage Providers` page of Kerberos Vault, and select the Storj provider.
 
 {{< figure src="storj-integrate.gif" alt="Integrate Storj.io with Kerberos Vault." caption="Integrate Storj.io with Kerberos Vault." class="stretch">}}
 
 - Provider name: this is a preferred name for the provider.
-- Bucket name: the name of a bucket created in Storj, make sure this matches.
-- Region: this is not relevant for an edge deployment and can be left blank.
-- Hostname: this is the DNS name for the Storj Gateway and relevant region, for example: **gateway.eu1.storjshare.io**.
+- Bucket name: the name of a bucket created in Storj; make sure this matches.
+- Region: Vault requires a value for this field.
+- Internal hostname: this is the DNS name for the Storj Gateway and relevant region, for example: **gateway.eu1.storjshare.io**.
 - Access Key: the `access key` you've received when generating the S3 Gateway credentials.
 - Secret Access Key: the `secret key` you've received when generating the S3 Gateway credentials.
 
 ## Edge storage providers
 
-Kerberos Vault also integrates with storage providers that are more suitable for edge deployments. Examples are Minio and Ceph, these are storage providers that you can install wherever you want. Therefore, they are interesting when considering edge computing to reduce latency, cloud billing and bandwidth. Examples are machine learning use cases, to trigger events or limit the transfer to a cloud storage.
+Kerberos Vault also integrates with storage providers that are more suitable for edge deployments. Examples are Minio and Ceph; these are storage providers that you can install wherever you want. Therefore, they are interesting when considering edge computing to reduce latency, cloud billing and bandwidth. Examples are machine learning use cases, to trigger events or limit the transfer to a cloud storage.
 
 ### Minio
 
@@ -154,13 +154,13 @@ Run the following command to create a local proxy to the MinIO Operator Console:
 
 {{< figure src="minio-operator-console.gif" alt="Open the MinIO Operator Console, where your tenants are managed." caption="Open the MinIO Operator Console, where your tenants are managed." class="stretch">}}
 
-Once you have the Console open, you can go ahead and create/configure a MinIO tenant. To simplify the creation of a tenant we will apply following manifests, this will create a tenant for us with the proper configuration; feel free to tweak this to your own needs (testing/production).
+Once you have the Console open, you can go ahead and create/configure a MinIO tenant. To simplify the creation of a tenant we will apply the following manifests. This will create a tenant for us with the proper configuration; feel free to tweak this to your own needs (testing/production).
 
-In the below manifests we have been using the OpenEBS storage class for local-storage. Please note that you can use whatever storage provider you like, make sure you change the relevant configuration files.
+In the below manifests we have been using the OpenEBS storage class for local-storage. Please note that you can use whatever storage provider you like; make sure you change the relevant configuration files.
 
     kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
 
-Once you have selected your storage class, or installed OpenEBS, go ahead by applying the different manifests. Below configuration will deploy a single server, with 4 volumes of 10Gb. It will also create a default access key (`minio`) and secret key (`minio123`).
+Once you have selected your storage class, or installed OpenEBS, go ahead and apply the different manifests. The configuration below will deploy a single server, with 4 volumes of 10Gb. It will also create a default access key (`minio`) and secret key (`minio123`).
 
     git clone https://github.com/kerberos-io/vault && cd kubernetes/minio
     kubectl create namespace minio-tenant
@@ -179,14 +179,14 @@ While accessing the console, you can create a new Bucket.
 
 #### Integrate
 
-Now you are ready to assign Minio as a storage provider to Kerberos Vault. Open the `Providers` page of Kerberos Vault, and select the Minio provider.
+Now you are ready to assign Minio as a storage provider to Kerberos Vault. Open the `Storage Providers` page of Kerberos Vault, and select the Minio provider.
 
 {{< figure src="minio-setup.gif" alt="Configuring the minio provider in Kerberos Vault." caption="Configuring the minio provider in Kerberos Vault." class="stretch">}}
 
 - Provider name: this is a preferred name for the provider.
-- Bucket name: the name of a bucket created in minio, make sure this matches.
-- Region: this is not relevant for an edge deployment and can be left blank.
-- Hostname: this is the internal DNS name of the Minio instance, for example: **minio.minio-tenant**.
+- Bucket name: the name of a bucket created in Minio; make sure this matches.
+- Region: this is not relevant for an edge deployment, but Vault requires a value, for example `us-east-1`.
+- Internal hostname: this is the internal DNS name of the Minio instance, for example: **minio.minio-tenant**.
 - Access Key: the `access key` you've defined in the `minio.config.tenant.yaml` file
 - Secret Access Key: the `secret key` you've defined in the `minio.config.tenant.yaml` file
 

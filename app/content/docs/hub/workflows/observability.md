@@ -92,7 +92,7 @@ These are the lines to **alert on** and the ones most useful to send us. All car
 | `warning` | `workflow event dropped` | An inbound message was discarded before it could open or advance a run. `reason` says why (e.g. `empty media key`); `operation` is the message's op. A steady stream means a malformed upstream producer. |
 | `error` | `workflow stage dispatch failed` | The engine could **not** enqueue a stage — the run never reached it. `operation` names the stage; `error` is the cause (queue publish error, or the dispatch payload failed to marshal). Check broker connectivity and the stage's `queue`. |
 | `error` | `workflow stage dispatched but recording it failed` | The stage **was** published, but the engine couldn't record it on the run's dispatched tier. The worker will still run; the run's bookkeeping may be slightly off. Usually a transient database blip. |
-| `error` | `HandleNewRun: failed to load workflow run` / `… failed to insert workflow run` | The engine couldn't read or seed the run document — a database problem. The run did not open. |
+| `error` | `openScopedRun: failed to load workflow run` / `… failed to insert workflow run` | The engine couldn't read or seed the run document — a database problem. The run did not open. |
 | `error` | `finalizeIfComplete: failed to stamp run end` | The engine couldn't mark a run finished. The run stays open; the watchdog will retry on a later message. |
 
 ### Result-persistence (ingest) failures
@@ -172,7 +172,7 @@ If runs are disappearing, check the dead-letter queue and the `workflow stage re
 
 ## Sending us accurate logs
 
-When you open an issue, the single most useful thing is the engine's **JSON log lines for the affected recording**, unredacted of the correlation fields:
+When you open an issue, the single most useful thing is the engine's **JSON log lines for the affected recording**, with the correlation fields left unredacted:
 
 1. Find the recording's **`mediaKey`** (or `traceId`).
 2. Grep the `hub-workflows` logs for it and include the **whole** run — `started` through `completed`/`timed out`.

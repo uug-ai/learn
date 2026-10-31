@@ -54,9 +54,10 @@ mode you pick selects how the video reaches the browser:
   so it works through even the strictest proxies — at the cost of a few
   seconds of extra latency compared with WebRTC.
 
-Whether the **Live** mode is backed by WebRTC or HLS is a deployment-wide
-choice, not a per-tile one: an administrator sets it once on the
-hub-frontend (see [Live over HLS](#live-over-hls) below). The Preview/Live
+Which transport backs the **Live** mode by default is a deployment-wide
+choice: an administrator sets it once on the hub-frontend (see
+[Live over HLS](#live-over-hls) below). When HLS is also offered, viewers
+can switch an individual stream between the transports. The Preview/Live
 toggle itself behaves identically either way — when you flip a tile from
 Preview to Live, only the underlying stream component changes; the rest
 of the UI (camera name, controls, badges) stays in place.
@@ -309,23 +310,22 @@ Every tile shares the same three pieces of chrome: a header with the
 device name and a status badge, the live video itself, and a control bar
 that appears on hover.
 
-{{< figure src="hub-livestream-badges.png" alt="A Live view tile header with the device name and its current status badge." caption="Each tile header shows the device name (clickable, links to the device detail page) and a status badge driven by MQTT — Active, Idle, Alert or Offline." class="stretch">}}
+{{< figure src="hub-livestream-badges.png" alt="A Live view tile header with the device name and its current status badge." caption="Each tile header shows the device name (clickable, links to the device detail page) and a status badge driven by MQTT — Online, Idle, Event detected or Offline." class="stretch">}}
 
 ### Status badges
 
 The badge to the right of the device name is driven by the messages the
 Agent publishes over MQTT:
 
-- **Active** *(green)* — the Agent is connected and is currently
-  streaming or processing motion.
-- **Idle** *(neutral)* — the Agent is connected but the device is
-  configured as inactive (for example outside of its schedule).
-- **Alert** *(red)* — motion was detected on this device in the last 30
-  seconds. The badge automatically returns to *Active* once the motion
-  window expires.
-- **Updating / Reconnecting** *(blue)* — the Agent has lost its MQTT
-  connection. Click the badge to jump to the device's detail page and
+- **Online** *(green)* — the Agent is online and its camera stream is
+  connected.
+- **Idle** *(yellow)* — the Agent is online, but its video stream appears
+  to be offline. Click the badge to jump to the device's detail page and
   troubleshoot the connection.
+- **Event detected** *(red)* — motion was detected on this device in the
+  last 30 seconds. The badge automatically returns to *Online* once the
+  motion window expires.
+- **Offline** *(neutral)* — the Agent is not online.
 
 ### Stream controls
 
@@ -380,12 +380,15 @@ configuration page (see the [roles documentation](/docs/hub/roles)).
 A tile that cannot show a video falls back to a friendly placeholder
 explaining why:
 
-- **Camera offline** — the Agent reports the camera as disconnected.
-  The tile links to the device detail page so you can review the Agent
-  configuration.
-- **Live view disabled** — your role (or the device's role override)
-  does not grant the *Live view* permission. The tile shows a lock icon
-  and a link back to the *Manage devices* page.
+- **Device Offline** — the Agent is offline. Check the Agent (or the
+  Factory deployment that runs it). A **Manage Devices** button links to
+  the Devices page.
+- **Device Idle** — the Agent is online, but the camera stream seems to be
+  offline. A **Manage Devices** button links to the Devices page so you
+  can review the Agent configuration.
+- **No permissions** — your role (or the device's role override) does
+  not grant the *Live view* permission. The tile also shows a
+  **Manage Devices** button.
 - **Stream paused** — the tile is currently out of the viewport. Hub
   pauses tiles that are not on screen to save CPU and bandwidth, and
   resumes them automatically when you scroll back.
