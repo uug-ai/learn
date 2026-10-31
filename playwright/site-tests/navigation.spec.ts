@@ -63,7 +63,7 @@ for (const mobile of [false, true]) {
         const figure = content.locator('.iso-illustration-figure');
         await expect(figure).toBeVisible();
         await expect(figure.locator('.iso-illustration')).toHaveAttribute('aria-label',
-          product.slug === 'vault' ? /Kerberos Vault/ : /Kerberos Hub/);
+          new RegExp(`Kerberos ${product.slug}`, 'i'));
         await expect(figure.locator('svg')).toBeVisible();
         await expect(page.locator('link[rel="stylesheet"][href*="iso-illustration"]')).toHaveCount(1);
         const figureBounds = await figure.boundingBox();
