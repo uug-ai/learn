@@ -12,9 +12,12 @@ menu:
     parent: "prologue"
 weight: 103
 toc: true
+glossary: true
 ---
 
 The words you'll meet across Agent, Factory, Vault and Hub, from A to Z. Each term links to the page that explains it in full.
+
+<div class="learn-glossary-search"><label for="glossary-search" class="learn-sr-only">Search the glossary</label><input id="glossary-search" type="search" placeholder="Search the glossary" autocomplete="off" spellcheck="false"><p id="glossary-search-status" role="status" aria-live="polite"></p></div>
 
 <nav class="learn-glossary-index" aria-label="Glossary letters"><a href="#a">A</a><a href="#b">B</a><a href="#c">C</a><a href="#d">D</a><a href="#e">E</a><a href="#f">F</a><a href="#g">G</a><a href="#h">H</a><a href="#i">I</a><span aria-hidden="true">J</span><a href="#k">K</a><a href="#l">L</a><a href="#m">M</a><a href="#n">N</a><a href="#o">O</a><a href="#p">P</a><span aria-hidden="true">Q</span><a href="#r">R</a><a href="#s">S</a><a href="#t">T</a><span aria-hidden="true">U</span><a href="#v">V</a><a href="#w">W</a><span aria-hidden="true">X</span><span aria-hidden="true">Y</span><span aria-hidden="true">Z</span></nav>
 
