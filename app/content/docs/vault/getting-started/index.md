@@ -16,7 +16,7 @@ toc: true
 
 Once you've installed Kerberos Vault, you should have access to the Kerberos Vault application. The application allows you to administrate Kerberos Vault, and more specifically create storage providers, integrations and accounts, through a single interface. Isn't that great?
 
-Having a UI in place, it is important to note that Kerberos Vault also ships numerous APIs, that allow you to automate the configurations. The APIs are exposed as Swagger documentation, and can be used for configuration of Kerberos Vault but also [integration]({{< ref "/docs/vault/integrations" >}}) and development of custom applications or business logic.
+Having a UI in place, it is important to note that Kerberos Vault also ships numerous APIs, that allow you to automate the configurations. The APIs are exposed as Swagger documentation, and can be used for configuration of Kerberos Vault but also [integration](/docs/vault/integrations) and development of custom applications or business logic.
 
 ## Login page
 

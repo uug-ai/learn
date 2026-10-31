@@ -11,7 +11,7 @@ the platform repositories in one VS Code workspace while each repository keeps
 its own dependencies and configuration.
 
 For a preconfigured Linux toolchain, use the
-[Dev container]({{< ref "/guides/onboarding/dev-containers" >}}) instead.
+[Dev container](/guides/onboarding/dev-containers) instead.
 
 ## Prerequisites
 

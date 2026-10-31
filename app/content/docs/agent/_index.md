@@ -25,12 +25,12 @@ Kerberos Agent is the recording service that runs next to, or on, your camera. E
 
 1. **Connect a camera.** Configure the camera stream in your Agent. Each Agent looks after one camera, so you can start small and add more as your installation grows.
 2. **Record at the edge.** Choose motion-based or continuous recording, adjust regions of interest and time windows, and keep recordings on the Agent's local disk. Use its web interface to watch live video and browse past events.
-3. **Connect the wider platform.** Send recordings to [Kerberos Vault]({{< relref "/docs/vault" >}}) for storage on your own infrastructure, use [Kerberos Hub]({{< relref "/docs/hub" >}}) for a central view, or let [Factory]({{< relref "/docs/factory" >}}) deploy and configure many Agents on Kubernetes.
+3. **Connect the wider platform.** Send recordings to [Kerberos Vault](/docs/vault) for storage on your own infrastructure, use [Kerberos Hub](/docs/hub) for a central view, or let [Factory](/docs/factory) deploy and configure many Agents on Kubernetes.
 
 An Agent can run on its own. Its web interface and APIs let you configure and integrate it without installing the rest of the platform.
 
 ## Where to start
 
-- [First things first]({{< relref "/docs/agent/first-things-first" >}}): what an Agent does and how it fits into the platform.
-- [Getting started]({{< relref "/docs/agent/getting-started" >}}): a tour of live views, recordings and settings.
-- [Installation]({{< relref "/docs/agent/installation" >}}): deploy your first Agent.
+- [First things first](/docs/agent/first-things-first): what an Agent does and how it fits into the platform.
+- [Getting started](/docs/agent/getting-started): a tour of live views, recordings and settings.
+- [Installation](/docs/agent/installation): deploy your first Agent.

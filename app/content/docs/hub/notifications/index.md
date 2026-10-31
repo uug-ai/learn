@@ -49,7 +49,7 @@ new events in the background after the first page loads.
 
 From a notification you can review the triggering footage and, when case
 creation is enabled, start a case with that recording already selected. See
-[Cases]({{< ref "/docs/hub/cases" >}}) for the evidence workflow.
+[Cases](/docs/hub/cases) for the evidence workflow.
 
 ## Configure alerts
 
@@ -78,10 +78,10 @@ v1.4.10) to collect the other cameras of the same outage. Grouping applies to
 email, Slack, Telegram, Pushover,
 Pushbullet, SMS and Alexa; webhooks and IFTTT keep receiving one notification
 per camera, unchanged, so existing integrations keep working. See
-[White-label]({{< ref "/docs/hub/whitelabel" >}}) for the grouped email template.
+[White-label](/docs/hub/whitelabel) for the grouped email template.
 
 Alert management is restricted to users with the relevant administrative page
-permission. See [Configuration]({{< ref "/docs/hub/configuration" >}}#alerts)
+permission. See [Configuration](/docs/hub/configuration#alerts)
 for the existing alert setup reference.
 
 ## Configure channels

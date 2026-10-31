@@ -89,7 +89,7 @@ Fingerprint verification turns a regular MP4 into a piece of evidence you can de
 
 ### Police, legal, and insurance hand-overs
 
-When footage is exported from Hub and handed over to a third party (police investigation, legal counsel, insurance claim), the receiving party usually needs to demonstrate that what they reviewed is exactly what the camera recorded. By archiving the original MP4 in a [case]({{< ref "/docs/hub/cases" >}}) and providing the verification URL alongside it, the recipient can prove on their own machine — without trusting Hub or the camera owner — that the file is intact.
+When footage is exported from Hub and handed over to a third party (police investigation, legal counsel, insurance claim), the receiving party usually needs to demonstrate that what they reviewed is exactly what the camera recorded. By archiving the original MP4 in a [case](/docs/hub/cases) and providing the verification URL alongside it, the recipient can prove on their own machine — without trusting Hub or the camera owner — that the file is intact.
 
 ### Compliance and regulated environments
 
@@ -97,7 +97,7 @@ In regulated industries (banking, critical infrastructure, healthcare, public tr
 
 ### Chain of custody for incidents
 
-When an incident is opened in [Cases]({{< ref "/docs/hub/cases" >}}), the associated recording is copied to a long-term storage provider in Vault. Re-running verification at any point in the case lifecycle (initial triage, legal review, court submission) confirms that the archived copy is byte-identical (in its signed structural fields) to the file the Agent originally produced. Each verification can be screenshotted or logged, building an explicit chain of custody.
+When an incident is opened in [Cases](/docs/hub/cases), the associated recording is copied to a long-term storage provider in Vault. Re-running verification at any point in the case lifecycle (initial triage, legal review, court submission) confirms that the archived copy is byte-identical (in its signed structural fields) to the file the Agent originally produced. Each verification can be screenshotted or logged, building an explicit chain of custody.
 
 ### Detecting re-encoded or "improved" footage
 

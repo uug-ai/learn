@@ -15,7 +15,7 @@ toc: true
 podcast: hub-workflows
 ---
 
-The [Pipeline]({{< relref "/docs/hub/pipeline" >}}) section describes the fixed chain of microservices that every recording flows through by default. **Workflows** build on top of that pipeline and let an organisation *customise* how its events are routed, filtered and processed — without changing a single line of code or touching the platform configuration.
+The [Pipeline](/docs/hub/pipeline) section describes the fixed chain of microservices that every recording flows through by default. **Workflows** build on top of that pipeline and let an organisation *customise* how its events are routed, filtered and processed — without changing a single line of code or touching the platform configuration.
 
 {{< callout type="info" >}}
 **Current deployment path.** Production deployments currently define workflows through Helm and `WORKFLOW_DEFINITIONS`. Database-backed `source: user` workflows and their API/editor path are implemented, but are not yet the established deployment path.
@@ -97,7 +97,7 @@ A few starting points to give an idea of what's possible:
 
 ## Relationship with the fixed pipeline
 
-Workflows do not replace the Hub [Pipeline]({{< relref "/docs/hub/pipeline" >}}); they steer it. The pipeline microservices (sequence, analysis, throttler, notification, classifier, …) keep doing their job for every recording. What a workflow does is to declare, per organisation and per device, *which* of those services should run, *when* they should run and *with which* configuration — turning a one-size-fits-all pipeline into something each organisation can tailor to its own use-case.
+Workflows do not replace the Hub [Pipeline](/docs/hub/pipeline); they steer it. The pipeline microservices (sequence, analysis, throttler, notification, classifier, …) keep doing their job for every recording. What a workflow does is to declare, per organisation and per device, *which* of those services should run, *when* they should run and *with which* configuration — turning a one-size-fits-all pipeline into something each organisation can tailor to its own use-case.
 
 ## Bring your own processing
 
@@ -164,7 +164,7 @@ Everything above can be authored **in the editor** as an organisation-scoped wor
 > **It's the engine switch, not the front-end one.** The workflows engine is off by default; set `kerberoshub.workflows.enabled: true` to run it. Don't confuse it with the unrelated `kerberoshub.…features.workflows.enabled` front-end feature flag.
 
 > [!NOTE] Feature flags
-> Set `kerberoshub.frontend.features.workflows.enabled: "true"` to expose the workflow UI and `kerberoshub.workflows.enabled: true` to run the engine. Neither switch replaces the other. See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#backend-and-deployment-switches).
+> Set `kerberoshub.frontend.features.workflows.enabled: "true"` to expose the workflow UI and `kerberoshub.workflows.enabled: true` to run the engine. Neither switch replaces the other. See [Feature flags](/docs/hub/feature-flags#backend-and-deployment-switches).
 
 **Workflow definition — `kerberoshub.workflows.definitions.<workflow>`**
 

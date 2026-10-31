@@ -1,0 +1,9 @@
+{{- /* Returns the product (agent, vault, hub, factory) a page belongs to, read
+     from the nearest sidebar.product front matter, or "" outside product docs. */ -}}
+{{- $product := .Params.sidebar.product | default "" -}}
+{{- range .Ancestors -}}
+  {{- if not $product -}}
+    {{- $product = .Params.sidebar.product | default "" -}}
+  {{- end -}}
+{{- end -}}
+{{- return $product -}}

@@ -24,7 +24,7 @@ top-level route.
 
 > [!NOTE] Feature flag
 > Floor-plan controls are available when the deployment enables the Floor plans
-> feature. See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}) for the
+> feature. See [Feature flags](/docs/hub/feature-flags) for the
 > deployment's current frontend settings.
 
 ## Create a floor plan

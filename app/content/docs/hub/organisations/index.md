@@ -19,7 +19,7 @@ An **organisation** is the tenant boundary for shared resources. A **project** s
 A user can own or belong to more than one organisation without creating another login. Membership, resource ownership, authorisation, and the currently selected workspace are separate concerns: selecting a workspace does not grant access to it.
 
 > [!NOTE] Feature flags
-> Organisation and project controls are opt-in and hierarchical. The organisation umbrella can override both families; otherwise their group and child flags apply independently. See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#organisations-and-projects) before enabling switching, creation, or settings.
+> Organisation and project controls are opt-in and hierarchical. The organisation umbrella can override both families; otherwise their group and child flags apply independently. See [Feature flags](/docs/hub/feature-flags#organisations-and-projects) before enabling switching, creation, or settings.
 
 ## Core concepts
 
@@ -297,7 +297,7 @@ Sites and groups organise operational resources, not people. They must remain wi
 
 Assignments name a principal so that groups of people can be added later without changing assignments. Only users are supported today. Teams, managed in Hub or synced from an identity provider, are planned as a second principal type; the identity provider would decide who belongs to a team, and assignments in Hub would decide what the team can do.
 
-For the currently available account and custom-role controls, see [Roles]({{< ref "/docs/hub/roles" >}}). The workspace users pane continues to lead to that existing account-management flow.
+For the currently available account and custom-role controls, see [Roles](/docs/hub/roles). The workspace users pane continues to lead to that existing account-management flow.
 
 ## Ownership and isolation
 
@@ -352,7 +352,7 @@ The form is divided into three tabs:
 
 All fields except the organisation name are optional. After creation, the frontend selects the new organisation, stores the refreshed session token, and reloads the application.
 
-The optional organisation domain is metadata stored on the organisation. It does not configure the subdomain-based login feature described in [Domains]({{< ref "/docs/hub/domains" >}}).
+The optional organisation domain is metadata stored on the organisation. It does not configure the subdomain-based login feature described in [Domains](/docs/hub/domains).
 
 ## Switching organisations and projects
 
@@ -385,7 +385,7 @@ Ownership, membership, and roles answer different access questions:
 
 The organisation model supports pending, active, suspended, and revoked memberships, as well as an optional expiry date. Invitation and membership-management screens are not part of the initial organisation-switcher rollout. Existing account and subaccount administration remains the way to manage user access during this phase.
 
-For permission details, see [Roles]({{< ref "/docs/hub/roles" >}}).
+For permission details, see [Roles](/docs/hub/roles).
 
 ## Organisation settings
 
@@ -406,7 +406,7 @@ A login domain and an organisation solve different multi-tenancy problems:
 
 A domain does not automatically combine its users into one organisation. Existing domain-prefixed users keep their login namespace when organisations are introduced. Likewise, setting the domain field on an organisation does not create DNS records or enable domain-based login.
 
-For login-domain configuration, see [Domains]({{< ref "/docs/hub/domains" >}}).
+For login-domain configuration, see [Domains](/docs/hub/domains).
 
 ## Configuration and rollout
 
@@ -428,7 +428,7 @@ kerberoshub:
         settingsEnabled: "true"
 ```
 
-An explicit organisation umbrella overrides both feature families; when it is empty, the project group and individual flags apply. Creation needs the corresponding switching UI. See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#organisations-and-projects) for the complete hierarchy and environment-variable mappings.
+An explicit organisation umbrella overrides both feature families; when it is empty, the project group and individual flags apply. Creation needs the corresponding switching UI. See [Feature flags](/docs/hub/feature-flags#organisations-and-projects) for the complete hierarchy and environment-variable mappings.
 
 These flags control the interface. They neither grant backend permissions nor select the database ownership contract.
 
@@ -452,7 +452,7 @@ Existing login domains are preserved. They remain sign-in namespaces and are not
 
 ### The current organisation is visible but cannot be selected
 
-Check the effective organisation/project flag hierarchy. A disabled umbrella overrides enabled child controls. See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#organisations-and-projects).
+Check the effective organisation/project flag hierarchy. A disabled umbrella overrides enabled child controls. See [Feature flags](/docs/hub/feature-flags#organisations-and-projects).
 
 ### The create action is missing
 

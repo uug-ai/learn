@@ -1,0 +1,47 @@
+{{- /* Hextra's link render hook, extended to mark links that leave the current
+     product's docs. Such links take the destination product's accent colour
+     (see .learn-xlink in custom.css) so readers notice the boundary. */ -}}
+{{- $dest := .Destination -}}
+{{- $url := urls.Parse $dest -}}
+{{- $xproduct := "" -}}
+
+{{- if and $dest (hasPrefix $dest "/") -}}
+  {{- $target := .PageInner.GetPage $url.Path -}}
+  {{- with or $target (.PageInner.Resources.Get $url.Path) (resources.Get $url.Path) -}}
+    {{- $query := cond $url.RawQuery (printf "?%s" $url.RawQuery) "" -}}
+    {{- $fragment := cond $url.Fragment (printf "#%s" $url.Fragment) "" -}}
+    {{- $dest = printf "%s%s%s" .RelPermalink $query $fragment -}}
+  {{- else -}}
+    {{- /* Page-style paths (no file extension) must resolve to a page, as relref
+         would require; aliases don't count, link to the canonical page. */ -}}
+    {{- if and (not (path.Ext $url.Path)) (ne $url.Path "/") -}}
+      {{- warnf "%s: link %q does not resolve to a page" $.Page.File.Path $dest -}}
+    {{- end -}}
+    {{- $hasBasePrefix := and (ne site.Home.RelPermalink "/") (hasPrefix $dest site.Home.RelPermalink) -}}
+    {{- if not $hasBasePrefix -}}
+      {{- $dest = (relURL (strings.TrimPrefix "/" $dest)) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- with $target -}}
+    {{- $to := partial "docs/product.html" . -}}
+    {{- if and $to (ne $to (partial "docs/product.html" $.Page)) -}}
+      {{- $xproduct = $to -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- with . -}}
+{{- $isExternal := strings.HasPrefix .Destination "http" -}}
+{{- $productName := index hugo.Data.products $xproduct -}}
+<a href="{{ $dest | safeURL }}"
+   {{- with .Title }} title="{{ . }}"{{ else }}{{ with $productName }} title="{{ . }} documentation"{{ end }}{{ end -}}
+   {{- with $xproduct }} class="learn-xlink" data-product="{{ . }}"{{ end -}}
+   {{- if $isExternal -}}target="_blank" rel="noopener"{{- end -}}
+>
+  {{- .Text | safeHTML -}}
+  {{- with $productName }}<span class="learn-sr-only"> ({{ . }} documentation)</span>{{ end -}}
+  {{- if and .Page.Site.Params.externalLinkDecoration $isExternal -}}
+    {{- partial "utils/icon.html" (dict "name" "arrow-up-right" "attributes" `class="hx:inline hx:rtl:rotate-270 hx:align-baseline" height="1em" aria-hidden="true"`) -}}
+  {{- end -}}
+</a>
+{{- end -}}

@@ -14,9 +14,9 @@ toc: true
 podcast: hub-sso
 ---
 
-This guide covers the integration details for single sign-on (SSO) through OpenID Connect (OIDC). For an overview of all sign-in options, including passwords, authenticator-based 2FA, passkeys, and recovery, start with [Authentication]({{< relref "/docs/hub/authentication" >}}).
+This guide covers the integration details for single sign-on (SSO) through OpenID Connect (OIDC). For an overview of all sign-in options, including passwords, authenticator-based 2FA, passkeys, and recovery, start with [Authentication](/docs/hub/authentication).
 
-Kerberos Hub supports multiple users with access controlled by [organisations, projects]({{< relref "/docs/hub/organisations" >}}), and [roles]({{< relref "/docs/hub/roles" >}}). Local sign-in uses a username or email address and a Hub password. OIDC delegates authentication to an external identity provider so users can use their centrally managed identity rather than another application-specific password.
+Kerberos Hub supports multiple users with access controlled by [organisations, projects](/docs/hub/organisations), and [roles](/docs/hub/roles). Local sign-in uses a username or email address and a Hub password. OIDC delegates authentication to an external identity provider so users can use their centrally managed identity rather than another application-specific password.
 
 {{< figure src="hub-add-account.gif" alt="Give another user limited access to Kerberos Hub by creating a sub account." caption="Give another user limited access to Kerberos Hub by creating a sub account." class="stretch">}}
 

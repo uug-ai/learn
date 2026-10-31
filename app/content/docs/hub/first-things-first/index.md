@@ -55,7 +55,7 @@ Kerberos Hub is part of the Kerberos Enterprise Suite, and is made available as 
 
 Kerberos Hub is available as a software as a service made available through [app.kerberos.io](https://app.kerberos.io). This SaaS offering is completely controlled by the Kerberos.io team and makes it possible for end users who would like to connect a couple of Agents, or who just want to test out the capabilities of the solution.
 
-Behind the scenes we use all previously mentioned components such as [Kerberos Vault]({{< ref "/docs/vault/first-things-first" >}}) and Kerberos Hub. This means we are using our own products in production.
+Behind the scenes we use all previously mentioned components such as [Kerberos Vault](/docs/vault/first-things-first) and Kerberos Hub. This means we are using our own products in production.
 
 Learn more about [the SaaS offering and pricing here](https://kerberos.io/product/hub/).
 

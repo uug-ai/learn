@@ -18,7 +18,7 @@ The **Kerberos.io** project, pronounced as `/kuh buh ruhs dot ai o/`, is a video
 
 [![An Introduction to Kerberos.io](youtube-introduction-kerberosio.png)](https://www.youtube.com/watch?v=HkMJHCsRd9M "An Introduction to Kerberos.io")
 
-Next to being stable and feature-rich, Kerberos.io's main differentiator is scale. It helps you move from a small home deployment to a large scale enterprise deployment. To illustrate the art of the possible, we recommend having a look [at the deployments page]({{< ref "/docs/prologue/deployments" >}}) to find out the most suitable architecture for your use case.
+Next to being stable and feature-rich, Kerberos.io's main differentiator is scale. It helps you move from a small home deployment to a large scale enterprise deployment. To illustrate the art of the possible, we recommend having a look [at the deployments page](/docs/prologue/deployments) to find out the most suitable architecture for your use case.
 
 ## The name: Kerberos.io
 
@@ -28,27 +28,27 @@ After all those years, we still believe that the name Kerberos.io makes sense fo
 
 ## What is Kerberos.io
 
-[Kerberos.io]({{< ref "/docs/prologue/how" >}}) is a video analytics and monitoring platform for everyone, from a traditional user to a multinational corporation. We have different solutions and components to help you grow.
+[Kerberos.io](/docs/prologue/how) is a video analytics and monitoring platform for everyone, from a traditional user to a multinational corporation. We have different solutions and components to help you grow.
 
-Within the portfolio of [Kerberos.io]({{< ref "/docs/prologue/how" >}}) you leverage more or less components depending on the stage you are in, there is no need to overcomplicate things.
+Within the portfolio of [Kerberos.io](/docs/prologue/how) you leverage more or less components depending on the stage you are in, there is no need to overcomplicate things.
 
 {{< figure src="overview.svg" alt="The Kerberos.io solution stack" caption="The Kerberos.io solution stack" class="stretch">}}
 
-The backbone of the Kerberos.io ecosystem is the [Agent]({{< ref "/docs/agent/first-things-first" >}}). This [Agent]({{< ref "/docs/agent/first-things-first" >}}), installed [through various possibilities](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent), is deployed to a compute - VM, baremetal, Kubernetes cluster or other - of choice and connected to a camera stream you control.
+The backbone of the Kerberos.io ecosystem is the [Agent](/docs/agent/first-things-first). This [Agent](/docs/agent/first-things-first), installed [through various possibilities](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent), is deployed to a compute - VM, baremetal, Kubernetes cluster or other - of choice and connected to a camera stream you control.
 
 {{< figure src="introduction-kerberos-io.svg" alt="An Agent is monitoring a single camera stream." caption="An Agent is monitoring a single camera stream." class="stretch">}}
 
-With [Kerberos.io]({{< ref "/docs/prologue/how" >}}) you start small, with just one or more [Agents]({{< ref "/docs/agent/first-things-first" >}}), and grow over time while introducing more and more components like [Factory]({{< ref "/docs/factory/first-things-first" >}}), [Kerberos Vault]({{< ref "/docs/vault/first-things-first" >}}) and [Kerberos Hub]({{< ref "/docs/hub/first-things-first" >}}); which we refer to as the [Kerberos Enterprise Suite]({{< ref "/docs/enterprise/first-things-first" >}}). Each solution is shipped through the concept of containers and can be leveraged by using Docker, Docker Compose, Kubernetes, OpenShift, Terraform, Ansible, and many more.
+With [Kerberos.io](/docs/prologue/how) you start small, with just one or more [Agents](/docs/agent/first-things-first), and grow over time while introducing more and more components like [Factory](/docs/factory/first-things-first), [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/hub/first-things-first); which we refer to as the [Kerberos Enterprise Suite](/docs/enterprise/first-things-first). Each solution is shipped through the concept of containers and can be leveraged by using Docker, Docker Compose, Kubernetes, OpenShift, Terraform, Ansible, and many more.
 
 {{< figure src="./introduction-enterprise.svg" alt="A scalable video platform for an ever-growing video landscape." caption="A scalable video platform for an ever-growing video landscape." class="stretch">}}
 
-As previously mentioned, the [Kerberos Enterprise Suite]({{< ref "/docs/enterprise/first-things-first" >}}) brings additional components into the picture which help you build a more scalable and resilient video landscape through concepts such as Kubernetes, bring your own storage, bring your own cloud, single pane of glass, live streaming, machine learning, etc.
+As previously mentioned, the [Kerberos Enterprise Suite](/docs/enterprise/first-things-first) brings additional components into the picture which help you build a more scalable and resilient video landscape through concepts such as Kubernetes, bring your own storage, bring your own cloud, single pane of glass, live streaming, machine learning, etc.
 
 ## Why Kerberos.io
 
 Kerberos.io was initiated as a side project, due to inspiration and motivation in the space of video analytics, computer vision and machine learning. Its first focus was video surveillance only, as nowadays burglary and attacks are very common in this world.
 
-Over time we have grown an amazing community, collaborated with lots of international companies and received a lot of kudos for the work we've done. To consolidate our efforts, [we have written down our mission statement]({{< ref "/docs/prologue/mission" >}}), which explains why this project exists.
+Over time we have grown an amazing community, collaborated with lots of international companies and received a lot of kudos for the work we've done. To consolidate our efforts, [we have written down our mission statement](/docs/prologue/mission), which explains why this project exists.
 
 ## Integration and extension
 
@@ -64,4 +64,4 @@ You decide where (cloud, self-hosted) and how (Docker, Kubernetes, OpenShift, Te
 
 ## Machine learning
 
-Machine learning and Artificial Intelligence is a critical component of the Kerberos.io ecosystem. Within Kerberos Vault you can integrate your own machine learning models, and run them at scale. [Learn more about how we support]({{< ref "/docs/vault/machine-learning" >}}) machine learning use cases.
+Machine learning and Artificial Intelligence is a critical component of the Kerberos.io ecosystem. Within Kerberos Vault you can integrate your own machine learning models, and run them at scale. [Learn more about how we support](/docs/vault/machine-learning) machine learning use cases.

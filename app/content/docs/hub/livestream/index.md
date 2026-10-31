@@ -26,7 +26,7 @@ The page is reachable from the main sidebar under **Live view** and
 serves the route `/livestream`.
 
 > [!NOTE] Feature flags
-> HLS and MoQ are optional Live transports. Use `kerberoshub.frontend.features.liveview.hlsEnabled` and `.moqEnabled` to offer them in the frontend; their relay, Agent, and backend prerequisites must also be configured. See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#live-view).
+> HLS and MoQ are optional Live transports. Use `kerberoshub.frontend.features.liveview.hlsEnabled` and `.moqEnabled` to offer them in the frontend; their relay, Agent, and backend prerequisites must also be configured. See [Feature flags](/docs/hub/feature-flags#live-view).
 
 {{< figure src="hub-livestream-overview.png" alt="The Live view page showing every connected device in a grid." caption="The Live view page lists every connected device in a grid. Each tile streams its camera live in either SD (MQTT/JPEG) or HD quality, where HD is delivered over WebRTC or HLS depending on how your Hub is configured." class="stretch">}}
 
@@ -364,7 +364,7 @@ permission, an additional overlay is rendered on top of the stream:
   the same view.
 
 Each individual feature can be turned off per role from the **Roles**
-configuration page (see the [roles documentation]({{< ref "/docs/hub/roles" >}})).
+configuration page (see the [roles documentation](/docs/hub/roles)).
 
 ### Empty and offline states
 

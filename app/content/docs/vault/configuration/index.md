@@ -120,7 +120,7 @@ definition is loaded.
 
 Storage providers are the foundation of Kerberos Vault. As an administrator you bring your own cloud or edge storage, so there is no need to install a specific Kerberos Vault storage, we are open and integrate with others.
 
-Go ahead and [have a look at the provider page]({{< ref "/docs/vault/providers" >}}), there we explain how to add and configure specific providers.
+Go ahead and [have a look at the provider page](/docs/vault/providers), there we explain how to add and configure specific providers.
 
 ## 2. Integrations
 

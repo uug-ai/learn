@@ -171,7 +171,7 @@ for (const mobile of [false, true]) {
           await expect(page.locator('.learn-product-page')).toHaveAttribute('data-product', product.slug);
           const title = page.locator('#content h1');
           await expect(title).not.toHaveCSS('color', color);
-          const contentLink = page.locator('#content .content p a[href]').first();
+          const contentLink = page.locator('#content .content p a[href]:not(.learn-xlink)').first();
           const breadcrumb = page.locator('#content > div:first-child a').last();
           const pager = page.locator('#content > div > a[title]').first();
           const tocLink = page.locator('.hextra-toc a[href^="#"]').first();

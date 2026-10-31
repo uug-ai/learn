@@ -90,7 +90,7 @@ Combining several filters can produce an empty result even when footage exists
 for the day. Clear the analysis filters first when checking whether a camera
 recorded anything.
 
-See [Markers]({{< ref "/docs/hub/markers" >}}) for marker categories, events,
+See [Markers](/docs/hub/markers) for marker categories, events,
 tags, and occurrence details.
 
 ### Timeline and chart
@@ -291,7 +291,7 @@ archive provider. Follow the export progress on the **Cases** page before
 assuming the evidence has been preserved. Case lifetime and archived-video
 retention are separate settings.
 
-See [Cases]({{< ref "/docs/hub/cases" >}}) for the full creation form, assignment,
+See [Cases](/docs/hub/cases) for the full creation form, assignment,
 privacy, archive configuration, and export behaviour.
 
 ## Permissions and retention
@@ -305,7 +305,7 @@ Ordinary recordings remain subject to the deployment's retention policy.
 Neither a star nor an edited description protects a recording from cleanup.
 Use cases for important evidence and confirm that archiving succeeds.
 
-See [Cleanup]({{< ref "/docs/hub/cleanup" >}}) for the retention service.
+See [Cleanup](/docs/hub/cleanup) for the retention service.
 
 ## Configuration
 
@@ -314,7 +314,7 @@ groups, devices, regions, marker fields, starred recordings, descriptions, the
 **With analysis** filter, and case creation. The default overview and fallback
 frame rate are also configurable.
 
-See [Feature flags]({{< ref "/docs/hub/feature-flags" >}}#media-filters) for the
+See [Feature flags](/docs/hub/feature-flags#media-filters) for the
 current recording settings. Feature flags control the UI; they do not replace
 backend authorisation or configure analysis processing by themselves.
 

@@ -15,7 +15,7 @@ toc: true
 
 Kerberos Hub supports local password sign-in, authenticator-based two-factor authentication (2FA), passkeys, and single sign-on (SSO) through OpenID Connect (OIDC). This page explains how they work together, what users can set up themselves, and what an administrator needs to configure.
 
-Authentication establishes **who you are**. It does not grant access to every camera or project: [organisation and project membership]({{< relref "/docs/hub/organisations" >}}) and [roles]({{< relref "/docs/hub/roles" >}}) determine what you can see and do after signing in.
+Authentication establishes **who you are**. It does not grant access to every camera or project: [organisation and project membership](/docs/hub/organisations) and [roles](/docs/hub/roles) determine what you can see and do after signing in.
 
 ## Choose a sign-in method
 
@@ -30,7 +30,7 @@ Available choices depend on your deployment and browser. For local accounts, ena
 
 ## Password sign-in
 
-Enter your Hub **username or email address** and **password** on the login page. If the deployment uses [domains]({{< relref "/docs/hub/domains" >}}), open the correct tenant URL or supply the domain requested by the login screen.
+Enter your Hub **username or email address** and **password** on the login page. If the deployment uses [domains](/docs/hub/domains), open the correct tenant URL or supply the domain requested by the login screen.
 
 Hub stores local passwords as bcrypt hashes, not plaintext. A successful password check can be followed by a 2FA challenge or required 2FA enrolment. Password sign-in also checks account activation, the deployment's license, and any configured account access-time window.
 
@@ -159,7 +159,7 @@ Set MFA and conditional-access requirements **at the identity provider** for SSO
 
 The `forceSSO` domain option changes the login experience to show SSO and hide the local password form and passkey selector. It is not, by itself, an API-wide policy disabling local credentials.
 
-See the [SSO integration guide]({{< relref "/docs/hub/sso" >}}) for provider configuration, domain settings, and SSO chaining when embedding Hub in another application.
+See the [SSO integration guide](/docs/hub/sso) for provider configuration, domain settings, and SSO chaining when embedding Hub in another application.
 
 ## Recovery and troubleshooting
 

@@ -1,0 +1,5 @@
+# Display names of the product doc sections, keyed by sidebar.product.
+agent: Agent
+vault: Vault
+hub: Hub
+factory: Factory

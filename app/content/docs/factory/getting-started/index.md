@@ -145,7 +145,7 @@ This page is most useful when Factory uses the `configmap` or `secret` configura
 
 Factory allows you to scale your video landscape horizontally, using the concept of Kubernetes, and brings a strong backbone for stability and performance. It allows you to avoid reinventing the wheel, and get stuck in the numerous challenges of developing a scalable video platform.
 
-Agents store their recordings locally for a short period. This means that long-term storage is not included in the solution. On top of that it also does not have a visual component, which allows you to review dashboards or recordings. To overcome these two challenges, long-term storage with extensibility/integration capabilities and visualisation features, the following solutions were developed: [Kerberos Vault]({{< ref "/docs/vault/first-things-first" >}}) and [Kerberos Hub]({{< ref "/docs/hub/first-things-first" >}}).
+Agents store their recordings locally for a short period. This means that long-term storage is not included in the solution. On top of that it also does not have a visual component, which allows you to review dashboards or recordings. To overcome these two challenges, long-term storage with extensibility/integration capabilities and visualisation features, the following solutions were developed: [Kerberos Vault](/docs/vault/first-things-first) and [Kerberos Hub](/docs/hub/first-things-first).
 
 ### Kerberos Vault
 
@@ -171,9 +171,9 @@ To connect one or more Agents to your Kerberos Vault instance, you should open t
 
 ### Kerberos Hub
 
-For the visualisation part Kerberos Hub comes into the picture. Kerberos Hub is a web app, backed up with a number of microservices, that shows dashboards, live streams, filter recordings and much more. Learn more [about the features and functions here]({{< ref "/docs/hub/first-things-first" >}}).
+For the visualisation part Kerberos Hub comes into the picture. Kerberos Hub is a web app, backed up with a number of microservices, that shows dashboards, live streams, filter recordings and much more. Learn more [about the features and functions here](/docs/hub/first-things-first).
 
-You have two choices when using Kerberos Hub, either you send your recordings from your Agents directly to Kerberos Hub, or you send your recordings to Kerberos Vault, and connect Kerberos Vault to Kerberos Hub. About the latter more is explained on the [Kerberos Vault page]({{< ref "/docs/vault/getting-started" >}}).
+You have two choices when using Kerberos Hub, either you send your recordings from your Agents directly to Kerberos Hub, or you send your recordings to Kerberos Vault, and connect Kerberos Vault to Kerberos Hub. About the latter more is explained on the [Kerberos Vault page](/docs/vault/getting-started).
 
 Select the Kerberos Hub option, and copy-paste the credentials from your Kerberos Hub subscription.
 

@@ -18,7 +18,7 @@ You might wonder what is inside the Kerberos Hub solution. We'll provide you wit
 
 ## Sign in securely
 
-Hub supports local passwords, authenticator-based two-factor authentication (2FA), passkeys, and single sign-on (SSO) through OpenID Connect. See [Authentication]({{< relref "/docs/hub/authentication" >}}) to compare the options, set up your account, and plan recovery. Administrators integrating an identity provider can continue with the detailed [SSO guide]({{< relref "/docs/hub/sso" >}}).
+Hub supports local passwords, authenticator-based two-factor authentication (2FA), passkeys, and single sign-on (SSO) through OpenID Connect. See [Authentication](/docs/hub/authentication) to compare the options, set up your account, and plan recovery. Administrators integrating an identity provider can continue with the detailed [SSO guide](/docs/hub/sso).
 
 ## Bring your own storage
 
