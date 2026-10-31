@@ -1745,3 +1745,11 @@ html.dark .learn-hero-split > h1 {
 .content :is(dt > span[id], h2) {
   scroll-margin-top: calc(var(--navbar-height, 4rem) + 1.5rem);
 }
+
+/* Hextra's cards push their text to the bottom (mt-auto), which suits cards
+   with an image on top. In a row of image-less cards, a card stretched to a
+   taller neighbour's height would show its text at the bottom; keep the text
+   at the top instead. */
+.hextra-card > div:first-child {
+  margin-top: 0;
+}
