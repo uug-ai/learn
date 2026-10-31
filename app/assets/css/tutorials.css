@@ -38,9 +38,12 @@
 }
 
 .tutorial-catalog h1 {
+  /* The same title style as the other pages (Hextra's content h1, as on Guides). */
   max-width: 700px;
-  font-size: clamp(2.75rem, 5vw, 4.5rem);
-  line-height: 1;
+  font-size: var(--hx-text-4xl);
+  line-height: var(--hx-text-4xl--line-height);
+  font-weight: var(--hx-font-weight-bold);
+  letter-spacing: var(--hx-tracking-tight);
 }
 
 .tutorial-catalog__lead {
@@ -520,10 +523,6 @@
 
   .tutorial-catalog__intro {
     padding: 2rem 0;
-  }
-
-  .tutorial-catalog h1 {
-    font-size: 2.7rem;
   }
 
   .tutorial-catalog__stats {
