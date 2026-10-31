@@ -18,7 +18,7 @@ Factory is a closed source solution that is made available free of charge. The s
 
 ## The MIT License (MIT)
 
-Copyright © `2021` `Kerberos.io`
+Copyright © `2026` `UUG.AI`
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
