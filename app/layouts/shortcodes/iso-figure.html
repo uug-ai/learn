@@ -12,7 +12,9 @@
   stylesheet after the first one). The figure animates with
   CSS only, glows in dark mode and holds a lit frame under reduced motion.
   Parts the figure marks with data-iso-at replay their moment when clicked
-  (assets/js/iso-figure.js).
+  (assets/js/iso-figure.js). A figure with links (the ecosystem map, exported
+  with renderIsoSvg's links option) is labelled as a group, not an image, so
+  its links stay reachable for keyboard and screen-reader users.
 */ -}}
 
 {{- $figure := .Get "figure" | default "hub" -}}
@@ -23,9 +25,10 @@
   {{- errorf "iso-figure: no assets/iso/%s.svg (used at %s)" $figure .Position -}}
 {{- end -}}
 {{- $id := printf "iso-%s-%d" $figure .Ordinal -}}
+{{- $role := cond (strings.Contains $svg.Content "<a ") "group" "img" -}}
 
 <figure class="iso-illustration-figure">
-  <div class="iso-illustration iso-illustration--glow-auto" {{ with $alt }}role="img" aria-label="{{ . }}"{{ else }}aria-hidden="true"{{ end }}>
+  <div class="iso-illustration iso-illustration--glow-auto" {{ with $alt }}role="{{ $role }}" aria-label="{{ . }}"{{ else }}aria-hidden="true"{{ end }}>
     {{- replace $svg.Content "ISO_ID" $id | safeHTML -}}
   </div>
   {{ with $caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}

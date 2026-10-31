@@ -1,0 +1,22 @@
+{{- /*
+  hero-split shortcode — two columns: the main content (two thirds) and a
+  hero-aside (one third) beside it. Below the md breakpoint the columns stack
+  in source order, the aside last.
+
+  Usage (markdown notation, so the inner text is rendered as markdown):
+    {{% hero-split %}}
+    Intro text …
+    {{< iso-figure figure="ecosystem" … >}}
+    {{% hero-aside %}}
+    ## Resources
+    {{< cards >}} … {{< /cards >}}
+    {{% /hero-aside %}}
+    {{% /hero-split %}}
+
+  Styles: .learn-hero-split in assets/css/custom.css.
+*/ -}}
+<div class="learn-hero-split">
+
+{{ .Inner }}
+
+</div>
