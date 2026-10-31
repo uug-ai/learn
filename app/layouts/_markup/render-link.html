@@ -36,7 +36,7 @@
 <a href="{{ $dest | safeURL }}"
    {{- with .Title }} title="{{ . }}"{{ else }}{{ with $productName }} title="{{ . }} documentation"{{ end }}{{ end -}}
    {{- with $xproduct }} class="learn-xlink" data-product="{{ . }}"{{ end -}}
-   {{- if $isExternal -}}target="_blank" rel="noopener"{{- end -}}
+   {{- if $isExternal }} target="_blank" rel="noopener"{{ end -}}
 >
   {{- .Text | safeHTML -}}
   {{- with $productName }}<span class="learn-sr-only"> ({{ . }} documentation)</span>{{ end -}}
