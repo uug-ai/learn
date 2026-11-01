@@ -93,6 +93,11 @@ the theme.
 Run `npm run test:navigation` in `playwright/` to check desktop/mobile grouping,
 alphabetical ordering, nested guides, footer navigation, and product colors.
 
+The global header matches the website and design toolkit at 77px tall: a 4px
+gradient accent, a 72px content row, and a 1px bottom border. Topbar controls use
+flex layout to avoid extra inline baseline spacing. The navigation tests also
+verify this height on home, documentation, and tutorial pages in both themes.
+
 Each product's content hyperlinks and hover/focus states use its product
 accent. Headings, idle menu links, breadcrumbs, page
 overview, and previous/next links stay neutral. Product names have no decorative
@@ -220,7 +225,7 @@ on every published episode, plus the shared player's interaction tests.
 
 ## Google Analytics and calls to action
 
-Production Learn uses its own **UUG.AI Learn** web stream
+Production Learn uses its own **Learn** web stream
 (`G-ZW744GSN4M`, stream ID `16226732617`) in the existing UUG.AI GA4 property
 (`540298183`). The public website retains its separate stream
 (`G-PLRKXEQ42W`). Filter by Stream name, hostname, or `site_area = learn`.
