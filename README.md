@@ -225,7 +225,7 @@ on every published episode, plus the shared player's interaction tests.
 
 ## Google Analytics and calls to action
 
-Production Learn uses its own **Learn** web stream
+Production Learn uses its own **UUG.AI Learn** web stream
 (`G-ZW744GSN4M`, stream ID `16226732617`) in the existing UUG.AI GA4 property
 (`540298183`). The public website retains its separate stream
 (`G-PLRKXEQ42W`). Filter by Stream name, hostname, or `site_area = learn`.
