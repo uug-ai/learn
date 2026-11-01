@@ -509,6 +509,11 @@
   z-index: 1;
 }
 
+.learn-topbar-control {
+  display: flex;
+  align-items: center;
+}
+
 .learn-topbar-brand {
   display: inline-flex;
   align-items: center;

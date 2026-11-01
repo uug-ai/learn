@@ -49,6 +49,26 @@ for (const mobile of [false, true]) {
       colorScheme: 'light',
     });
 
+    test('matches the website and design header height across pages and themes', async ({ page }) => {
+      for (const path of ['/', '/docs/hub/', '/tutorials/']) {
+        await page.goto(path);
+        const header = page.locator('.learn-topbar');
+        const inner = page.getByRole('navigation', { name: 'Primary navigation' });
+        const control = header.locator('.learn-topbar-control');
+        for (const theme of ['light', 'dark']) {
+          if (theme === 'dark') {
+            await header.getByRole('button', { name: 'Switch to dark mode', exact: true }).click();
+          }
+          await expect(header).toHaveCSS('height', '77px');
+          await expect(inner).toHaveCSS('height', '76px');
+          await expect(control).toHaveCSS('height', '44px');
+          expect(await header.evaluate(element => getComputedStyle(element, '::before').height))
+            .toBe('4px');
+        }
+        await header.getByRole('button', { name: 'Switch to light mode', exact: true }).click();
+      }
+    });
+
     for (const product of products) {
       test(`${product.slug}: renders a product overview with an illustration and getting-started links`, async ({ page }) => {
         await page.goto(`/docs/${product.slug}/`);
