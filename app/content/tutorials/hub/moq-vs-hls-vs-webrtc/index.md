@@ -46,7 +46,7 @@ The latency labels are goals, not guarantees. Camera encoding, keyframe interval
 
 ## Understand the three paths
 
-All three options deliver the same camera video, but they organise the path differently. Each diagram below is interactive and can be opened in the [architecture designer](/designer/) with **Edit**.
+All three options deliver the same camera video, but they organise the path differently. Each diagram below is interactive and can be opened as an editable board in [Draw](https://draw.uug.ai/) with **Edit in Draw**.
 
 ### MoQ: real-time publish and subscribe
 

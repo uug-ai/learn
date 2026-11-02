@@ -21,6 +21,25 @@ background as the website and design toolkit: ICO, 16/32px browser PNGs, a
 use `?v=uug-midnight` URLs to refresh older cached artwork. The manifest names
 the app **UUG.AI Learn**.
 
+## Architecture drawings
+
+[Draw - Augment Vision](https://draw.uug.ai/) is the single drawing and architecture
+editor. The navigation and documentation card open Draw, and every `rete` diagram's
+**Edit in Draw** link carries its original editable configuration as base64-encoded
+UTF-8 JSON in `#diagram=…`. No diagram payload is sent in an HTTP path or query.
+Learn keeps the embedded diagram renderer for documentation, not a second editor.
+
+The legacy `/designer/` page redirects to Draw while preserving its raw fragment,
+so existing standard-base64 and unpadded URL-safe share links continue to work.
+Draw waits for onboarding and a live board connection before importing, fits and
+selects the shapes, and replaces the fragment with the collaboration URL only after
+server acknowledgement. Publish Draw's automatic-import support before promoting
+these Learn changes.
+
+Run `npm run test:draw` in `playwright/` to check navigation, every architecture
+diagram's payload and legacy redirects. The suite discovers diagram pages from
+the content tree automatically, so new diagrams are covered too.
+
 ## Prerequisites
 
 - [Hugo](https://gohugo.io/installation/) (Extended version >= 0.112.0)
