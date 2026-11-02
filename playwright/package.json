@@ -9,6 +9,7 @@
     "podcast": "playwright test --config=podcast.config.ts",
     "test:learn-analytics": "playwright test --config=learn-analytics.config.ts",
     "test:navigation": "playwright test --config=navigation.config.ts",
+    "test:draw": "playwright test --config=draw.config.ts",
     "test:code-blocks": "playwright test --config=code-blocks.config.ts",
     "new": "node scripts/new-hub-page.mjs",
     "tutorial-headers": "node scripts/generate-tutorial-headers.mjs",

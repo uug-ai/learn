@@ -1,0 +1,12 @@
+{{ define "main" }}
+<main class="hextra-max-content-width hx:mx-auto hx:px-6 hx:py-12">
+  <h1 class="hx:text-3xl hx:font-bold">{{ .Title }}</h1>
+  <div class="content hx:mt-4">{{ .Content }}</div>
+  <p class="hx:mt-4" role="status">Opening Draw… <a id="draw-redirect" href="https://draw.uug.ai/">Continue to Draw</a></p>
+  <noscript><p>Enable JavaScript to carry an existing diagram into Draw automatically.</p></noscript>
+</main>
+{{- with resources.Get "js/draw-redirect.js" -}}
+  {{- $js := . | minify | fingerprint -}}
+  <script defer src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script>
+{{- end }}
+{{ end }}

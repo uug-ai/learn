@@ -76,7 +76,7 @@ Each product has its own section. Start with its **First things first** page to 
   {{< card link="/guides/" title="Guides" subtitle="In-depth how-tos for common tasks and workflows." icon="light-bulb" >}}
   {{< card link="/release-notes/" title="Release notes" subtitle="What changed in each platform release." icon="tag" >}}
   {{< card link="/blog/" title="Blog" subtitle="News, announcements and deep-dives from the team." icon="newspaper" >}}
-  {{< card link="/designer/" title="Designer" subtitle="Draw your architecture with drag and drop." icon="template" >}}
+  {{< card link="https://draw.uug.ai/" title="Draw" subtitle="Create and collaborate on architecture diagrams." icon="template" >}}
   {{< card link="/support/" title="Support" subtitle="Get help from the team and the community." icon="support" >}}
 {{< /cards >}}
 
