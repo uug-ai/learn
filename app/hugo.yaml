@@ -81,6 +81,12 @@ params:
   analytics:
     productionHost: learn.uug.ai
 
+  # Iso illustrations (iso-figure shortcode, tutorial banners and cards).
+  # Off by default: pages show the tutorial photos and no iso figures.
+  # Turn on for a build with HUGO_PARAMS_ISOILLUSTRATIONS_ENABLE=true.
+  isoIllustrations:
+    enable: false
+
   navbar:
     displayTitle: true
     displayLogo: false

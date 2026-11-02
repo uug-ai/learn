@@ -15,7 +15,7 @@
   data-search="{{ $searchText }}"
 >
   {{- $illustration := "" -}}
-  {{- with $page.Params.illustration -}}
+  {{- with and site.Params.isoIllustrations.enable $page.Params.illustration -}}
     {{- with resources.Get (printf "iso/%s.svg" .) -}}
       {{- $illustration = replace .Content "ISO_ID" (printf "iso-%s-card-%s" $page.Params.illustration $variant) -}}
     {{- end -}}

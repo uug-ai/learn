@@ -15,7 +15,10 @@
   (assets/js/iso-figure.js). A figure with links (the ecosystem map, exported
   with renderIsoSvg's links option) is labelled as a group, not an image, so
   its links stay reachable for keyboard and screen-reader users.
+
+  Renders nothing while params.isoIllustrations.enable is off.
 */ -}}
+{{- if site.Params.isoIllustrations.enable -}}
 
 {{- $figure := .Get "figure" | default "hub" -}}
 {{- $caption := .Get "caption" -}}
@@ -33,3 +36,4 @@
   </div>
   {{ with $caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}
 </figure>
+{{- end -}}

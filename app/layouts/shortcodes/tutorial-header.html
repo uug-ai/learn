@@ -4,9 +4,13 @@
   With `illustration: tutorial-…` in the front matter it draws that iso scene
   (assets/iso/<name>.svg, exported from the design library) in the
   tutorial's product colour; otherwise it shows header-art.jpg (or `src`).
+  While params.isoIllustrations.enable is off it always shows the image, with
+  the page title as alt (the alt text describes the iso scene), and draws
+  nothing when the page has no image.
 */ -}}
-{{- $alt := .Get "alt" | default .Page.Title -}}
-{{- with .Page.Params.illustration -}}
+{{- $iso := site.Params.isoIllustrations.enable -}}
+{{- $alt := cond $iso (.Get "alt" | default .Page.Title) .Page.Title -}}
+{{- with and $iso .Page.Params.illustration -}}
   {{- $svg := resources.Get (printf "iso/%s.svg" .) -}}
   {{- if not $svg -}}
     {{- errorf "tutorial-header: no assets/iso/%s.svg (illustration of %s)" . $.Page.RelPermalink -}}
@@ -40,6 +44,8 @@
     </picture>
   </figure>
 {{- else -}}
-  {{- errorf "Tutorial header image %q not found for %s" $src .Page.RelPermalink -}}
+  {{- if or $iso (not .Page.Params.illustration) -}}
+    {{- errorf "Tutorial header image %q not found for %s" $src .Page.RelPermalink -}}
+  {{- end -}}
 {{- end -}}
 {{- end -}}
