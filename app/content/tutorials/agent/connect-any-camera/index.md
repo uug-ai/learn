@@ -3,6 +3,7 @@ podcast: tutorials-agent-connect-any-camera
 title: 'Connect any IP camera to Agent'
 description: 'Find and test a camera RTSP stream, connect it to Kerberos Agent, and verify live video and recordings.'
 date: '2026-08-20'
+lastmod: '2026-11-04'
 weight: 2
 toc: true
 product: 'Agent'
@@ -176,6 +177,8 @@ services:
       AGENT_CAPTURE_IPCAMERA_RTSP: rtsp://agent-viewer:change-me@192.168.1.50:554/stream1
       AGENT_CAPTURE_IPCAMERA_SUB_RTSP: rtsp://agent-viewer:change-me@192.168.1.50:554/stream2
 ```
+
+This example targets published images with internal HTTP port `80`. When selecting a forthcoming hardened image that contains the [port migration](/docs/agent/installation/#container-image-migration-http-port-8080), use `"8080:8080"` instead; the browser URL remains `http://localhost:8080`.
 
 Recreate the container after changing the environment:
 

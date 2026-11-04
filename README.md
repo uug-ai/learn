@@ -50,6 +50,24 @@ Run `npm run test:draw` in `playwright/` to check navigation, every architecture
 diagram's payload and legacy redirects. The suite discovers diagram pages from
 the content tree automatically, so new diagrams are covered too.
 
+## Agent container examples
+
+The [Quick Start](app/content/docs/prologue/quick-start/index.md) and
+[Install Agent tutorial](app/content/tutorials/agent/install/index.md) distinguish
+published images (internal HTTP port `80`) from the forthcoming hardened image
+in [kerberos-io/agent#350](https://github.com/kerberos-io/agent/pull/350)
+(internal port `8080`). Do not change released-image commands until a matching
+image is available. For the new image, `-p 80:8080` preserves the usual host URL;
+`-p 8080:8080` preserves an intended host port of `8080`.
+
+Keep Compose container ports, Kubernetes `targetPort`/probes and `/health` checks
+consistent with the selected image, without unnecessarily changing Service or
+host ports. The [Agent installation page](app/content/docs/agent/installation/index.md#container-image-migration-http-port-8080)
+documents migration and writable paths. It describes the pinned Go 1.26
+multi-stage scratch runtime with required dynamic media dependencies, and
+explicitly records retained remote-terminal shell support as a pending policy
+exception, not full baseline or CIS compliance.
+
 ## Prerequisites
 
 - [Hugo](https://gohugo.io/installation/) (Extended version >= 0.112.0)

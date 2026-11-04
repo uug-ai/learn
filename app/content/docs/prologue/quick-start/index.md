@@ -3,7 +3,7 @@ title: "Quick Start"
 description: "Run your first Agent in a few minutes, see your camera live, then grow into the full platform."
 lead: "Run your first Agent in a few minutes, see your camera live, then grow into the full platform."
 date: 2020-11-16T13:59:39+01:00
-lastmod: 2026-10-31T00:00:00+00:00
+lastmod: 2026-11-04T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -22,6 +22,10 @@ Every Augment Vision deployment starts with an [Agent](/docs/agent/): one per ca
 - Port `80` free on that machine, or another port you map instead.
 
 ## 1. Start an Agent
+
+{{< callout type="info" >}}
+These commands use currently published images, which listen on container port `80`. The forthcoming hardened image in [kerberos-io/agent#350](https://github.com/kerberos-io/agent/pull/350) moves that listener to `8080`; it is not released yet. When selecting a tag or digest containing that change, use `-p 80:8080` to keep the URL below, or `-p 8080:8080` for `http://localhost:8080`. See the [image migration guide](/docs/agent/installation/#container-image-migration-http-port-8080) for health checks, volumes and other deployment options.
+{{< /callout >}}
 
 Run the public image with your camera's RTSP URL and your own login:
 

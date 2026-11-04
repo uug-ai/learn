@@ -3,7 +3,7 @@ title: "Connect to Vault"
 description: "Upload an Agent's recordings to Vault, on the storage you choose."
 lead: "Upload an Agent's recordings to Vault, on the storage you choose."
 date: 2026-10-31T00:00:00+00:00
-lastmod: 2026-10-31T00:00:00+00:00
+lastmod: 2026-11-04T00:00:00+00:00
 draft: false
 images: []
 weight: 205
@@ -79,6 +79,8 @@ docker run -p 80:80 --name mycamera \
 ```
 
 The [Agent repository](https://github.com/kerberos-io/agent#configure-with-environment-variables) lists every variable. If you manage many Agents on Kubernetes, [Factory](/docs/factory/getting-started) sets these values for you.
+
+This command targets published images with internal HTTP port `80`. For the forthcoming hardened image, select a tag or digest containing the update and use `-p 80:8080`; the Vault settings stay the same. See the [image migration guide](/docs/agent/installation/#container-image-migration-http-port-8080).
 
 ## Using Vault together with Hub
 

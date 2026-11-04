@@ -3,6 +3,7 @@ podcast: tutorials-agent-install
 title: 'Install Agent'
 description: 'Run your first Agent on Docker, Docker Compose, Kubernetes, Snap or as a static binary.'
 date: '2026-05-15'
+lastmod: '2026-11-04'
 weight: 1
 toc: true
 product: 'Agent'
@@ -24,6 +25,10 @@ By the end you will have:
 4. Optional: a camera (RTSP) configured through environment variables.
 
 For an overview of every deployment option, see the [Agent installation docs](/docs/agent/installation/).
+
+{{< callout type="info" >}}
+The container examples below use **currently published images**, with HTTP on internal port `80`. The hardened image proposed in [kerberos-io/agent#350](https://github.com/kerberos-io/agent/pull/350) is not released yet and moves internal HTTP to `8080`. Keep these examples unchanged for existing releases; use the [migration adjustments](#migrating-to-the-forthcoming-hardened-image) only with an image containing the update.
+{{< /callout >}}
 
 ## Prerequisites
 
@@ -177,6 +182,23 @@ kubectl port-forward svc/kerberos-agent-frontdoor 8080:80
 Then open [http://localhost:8080](http://localhost:8080).
 
 For OpenShift, see the [Ansible playbook](https://github.com/kerberos-io/agent/tree/master/deployments/ansible-openshift). For infrastructure-as-code, see the [Terraform examples](https://github.com/kerberos-io/agent/tree/master/deployments/terraform).
+
+## Migrating to the forthcoming hardened image
+
+First select a release tag or digest that actually contains the port change; the open PR is not a published image tag. Then apply these changes to the container examples above, including the volume and environment-variable Docker commands:
+
+| Example | Adjustment for internal port `8080` |
+| --- | --- |
+| Docker on host port 80 | Replace `-p 80:80` with `-p 80:8080`; keep `http://localhost`. |
+| Docker on host port 8080 | Use `-p 8080:8080`; open `http://localhost:8080`. |
+| Compose frontdoor / garage | Use `"8080:8080"` / `"8081:8080"`; keep the existing host URLs. |
+| Kubernetes Deployment | Set `containerPort: 8080`; point HTTP probes at port `8080`, path `/health`. |
+| Kubernetes Service | Set `targetPort: 8080`; keep `port: 80` and `kubectl port-forward svc/kerberos-agent-frontdoor 8080:80`. |
+| Host networking | There is no port translation; the default UI moves to `http://<host>:8080`. |
+
+For a host-port-80 Docker mapping, `curl --fail http://localhost/health` still checks the same host URL; inside the forthcoming container the equivalent endpoint is `http://localhost:8080/health`. Keep any explicit `AGENT_PORT` setting consistent with the mappings and probes.
+
+See [runtime and writable storage](/docs/agent/installation/#runtime-and-writable-storage) before migrating volumes or enabling a read-only root filesystem. The container update does not by itself change the Snap or static-binary commands below.
 
 ## Option 5 — Snap (Linux)
 
