@@ -34,6 +34,11 @@ Agent internals, single-camera processing, scaling, Vault storage and Hub
 integration. Keep these as `rete` shortcodes rather than static image exports so
 readers can open each architecture in Draw.
 
+Diagram fullscreen fills the browser viewport, including the header area, and
+can be closed with its toolbar button or Escape. While active, the podcast
+article's stacking isolation is released so it cannot trap the drawing below
+the site navigation; normal podcast highlighting is unchanged after exit.
+
 The legacy `/designer/` page redirects to Draw while preserving its raw fragment,
 so existing standard-base64 and unpadded URL-safe share links continue to work.
 Draw waits for onboarding and a live board connection before importing, fits and

@@ -163,7 +163,26 @@ for (const width of [1280, 390]) {
       const firstDiagram = figures.first().locator('.rete-diagram');
       await firstDiagram.getByRole('button', { name: 'Toggle fullscreen' }).click();
       await expect(firstDiagram).toHaveClass(/rete-diagram--pseudo-fullscreen/);
+      await expect.poll(() => firstDiagram.evaluate(container => {
+        const points = [[8, 8], [innerWidth / 2, 30], [innerWidth - 8, 8],
+          [8, innerHeight - 8], [innerWidth - 8, innerHeight - 8]];
+        const button = container.querySelector('.rete-toolbar__btn');
+        if (!button) throw new Error('Fullscreen exit button is missing');
+        const buttonBounds = button.getBoundingClientRect();
+        return {
+          covered: points.every(([x, y]) => container.contains(document.elementFromPoint(x, y))),
+          exitVisible: button.contains(document.elementFromPoint(
+            buttonBounds.x + buttonBounds.width / 2, buttonBounds.y + buttonBounds.height / 2)),
+        };
+      })).toMatchObject({ covered: true, exitVisible: true });
+      const fullscreenBounds = await firstDiagram.boundingBox();
+      expect(fullscreenBounds).toEqual({ x: 0, y: 0, width, height: 900 });
       await page.keyboard.press('Escape');
+      await expect(firstDiagram).not.toHaveClass(/rete-diagram--pseudo-fullscreen/);
+      await expect(page.locator('body')).not.toHaveClass(/rete-diagram-fs-lock/);
+      await expect(page.locator('.learn-podcast-topic-content')).toHaveCSS('isolation', 'isolate');
+      await firstDiagram.getByRole('button', { name: 'Toggle fullscreen' }).click();
+      await firstDiagram.getByRole('button', { name: 'Toggle fullscreen' }).click();
       await expect(firstDiagram).not.toHaveClass(/rete-diagram--pseudo-fullscreen/);
       expect(errors).toEqual([]);
     });

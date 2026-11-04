@@ -359,6 +359,12 @@ html.dark .rete-toolbar__btn:hover,
 
 /* Window-level fullscreen: pin the diagram to fill the browser viewport
    without invoking the native OS Fullscreen API. */
+.learn-podcast-topic-content:has(.rete-diagram--pseudo-fullscreen) {
+    /* Let fullscreen escape the podcast highlight's stacking context so the
+       site header cannot cover the canvas or its exit button. */
+    isolation: auto;
+}
+
 .rete-diagram--pseudo-fullscreen {
     position: fixed !important;
     inset: 0 !important;
