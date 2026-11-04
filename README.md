@@ -101,6 +101,17 @@ hugo server -D
 
 The site will automatically reload when you make changes to the content.
 
+### Platform Engineering guides
+
+The [Platform Engineering section](app/content/guides/platform-engineering/_index.md)
+connects the monorepo development workspace to GitHub delivery, GitOps
+promotion, Argo CD reconciliation, and rollout verification. Its
+[source map](app/content/guides/platform-engineering/sources.md) records the
+private repository revisions supporting UUG-specific behavior. When changing
+these guides, recheck the consuming workflow or Application, keep recommendations
+distinct from configured controls, and use sanitized examples rather than raw
+environment values. Existing section URLs remain unchanged.
+
 ### Product documentation navigation
 
 Agent, Factory, Vault, and Hub keep **First things first**, **Getting started**,

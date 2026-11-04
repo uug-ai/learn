@@ -116,6 +116,12 @@ need only the appropriate install command or workspace task.
 Repository branches remain independent inside the container. Check `git status`
 in the repository you are editing before running workspace-wide update tasks.
 
+For the difference between pinned checkouts, remote-first bootstrap, local Go
+workspace dependencies, and released versions, continue with
+[Development workspace](/guides/platform-engineering/workspace). For the path
+from a component release to an environment, read
+[Platform Engineering](/guides/platform-engineering).
+
 ## Troubleshooting
 
 - **A private repository fails to clone.** Confirm that the host SSH agent is
