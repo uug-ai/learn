@@ -196,9 +196,9 @@ First select a release tag or digest that actually contains the port change; the
 | Kubernetes Service | Set `targetPort: 8080`; keep `port: 80` and `kubectl port-forward svc/kerberos-agent-frontdoor 8080:80`. |
 | Host networking | There is no port translation; the default UI moves to `http://<host>:8080`. |
 
-For a host-port-80 Docker mapping, `curl --fail http://localhost/health` still checks the same host URL; inside the forthcoming container the equivalent endpoint is `http://localhost:8080/health`. Keep any explicit `AGENT_PORT` setting consistent with the mappings and probes.
+For a host-port-80 Docker mapping, run `curl --fail http://localhost/health` from the host to check the same host URL. The forthcoming container does not include curl: its built-in check runs `/home/agent/main -action healthcheck`, also available as `docker exec mycamera /home/agent/main -action healthcheck`. It probes localhost `/health` on the resolved port with a five-second timeout and validates the Agent JSON response. Keep any explicit `AGENT_PORT` setting consistent with the mappings and probes.
 
-See [runtime and writable storage](/docs/agent/installation/#runtime-and-writable-storage) before migrating volumes or enabling a read-only root filesystem. The container update does not by itself change the Snap or static-binary commands below.
+The forthcoming production image runs as numeric UID/GID `999:999` and supports `--cap-drop=ALL --security-opt=no-new-privileges:true`. Only `/home/agent/data/` needs application writes; UI assets stay read-only, including demo mode. Writable `/tmp` and `/var/tmp` are also required, with `/tmp/agent-cache` owned by `999:999` and mode `0700`. See [runtime and writable storage](/docs/agent/installation/#runtime-and-writable-storage) before migrating volumes or enabling a read-only root filesystem. This production-image update does not change the separate `kerberos/agent-dev` image, Snap or static-binary defaults.
 
 ## Option 5 — Snap (Linux)
 

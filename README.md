@@ -63,10 +63,14 @@ image is available. For the new image, `-p 80:8080` preserves the usual host URL
 Keep Compose container ports, Kubernetes `targetPort`/probes and `/health` checks
 consistent with the selected image, without unnecessarily changing Service or
 host ports. The [Agent installation page](app/content/docs/agent/installation/index.md#container-image-migration-http-port-8080)
-documents migration and writable paths. It describes the pinned Go 1.26
-multi-stage scratch runtime with required dynamic media dependencies, and
-explicitly records retained remote-terminal shell support as a pending policy
-exception, not full baseline or CIS compliance.
+documents migration and the confirmed forthcoming runtime contract: numeric
+`999:999`, capability-free HTTP, writable `data/` and temporary storage, read-only
+UI assets, and an Agent-native exec health check (no curl). It describes the
+pinned Go 1.26 multi-stage scratch runtime with required dynamic media
+dependencies, and explicitly records retained remote-terminal shell support as
+a pending policy exception, not full baseline or CIS compliance. The separate
+`agent-dev` image, standalone binary and Snap defaults are unchanged; no hardened
+release digest or signature is available yet.
 
 ## Prerequisites
 
