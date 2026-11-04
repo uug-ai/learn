@@ -29,6 +29,11 @@ editor. The navigation and documentation card open Draw, and every `rete` diagra
 UTF-8 JSON in `#diagram=…`. No diagram payload is sent in an HTTP path or query.
 Learn keeps the embedded diagram renderer for documentation, not a second editor.
 
+The **How it works** guide uses six editable diagrams for the solution stack,
+Agent internals, single-camera processing, scaling, Vault storage and Hub
+integration. Keep these as `rete` shortcodes rather than static image exports so
+readers can open each architecture in Draw.
+
 The legacy `/designer/` page redirects to Draw while preserving its raw fragment,
 so existing standard-base64 and unpadded URL-safe share links continue to work.
 Draw waits for onboarding and a live board connection before importing, fits and
