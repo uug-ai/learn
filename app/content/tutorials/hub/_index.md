@@ -8,6 +8,7 @@ Hands-on tutorials for [Hub](https://github.com/kerberos-io/hub) — the central
 
 ## Tutorials
 
+- [Apply MongoDB indexes with the CLI](/tutorials/hub/apply-mongodb-indexes/) — select a versioned contract, preview and apply missing indexes, then verify the result locally or with Kubernetes Jobs.
 - [Set up your own workflow stage](/tutorials/hub/custom-workflow-stage/) — bring your own microservice into the Hub as a workflow stage, end to end: register it in the Helm chart, receive recordings, and ingest results back. A loitering / dwell-time stage serves as the worked example.
 - [Choose a live-stream transport: MoQ vs HLS vs WebRTC](/tutorials/hub/moq-vs-hls-vs-webrtc/) — compare latency, fan-out, firewall compatibility, browser support and two-way media, then validate the choice on your own network.
 - [Deploy a MoQ relay on Kubernetes](/tutorials/hub/deploy-moq-relay-kubernetes/) — expose a TLS-enabled relay over UDP 443, then connect the Hub Helm chart and MoQ-capable Agents to it.
