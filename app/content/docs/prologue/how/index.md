@@ -1,12 +1,12 @@
 ---
 podcast: prologue-how
 title: "How it works"
-description: "From zero to a myriad of cameras"
-lead: "From zero to a myriad of cameras"
+description: "How Agent, Vault, Factory and Hub work together in the UUG ecosystem."
+lead: "Record with Agent, store with Vault, manage Agents with Factory and bring it together in Hub."
 date: 2020-10-06T08:48:57+00:00
-lastmod: 2022-12-14T22:37:57+00:00
+lastmod: 2026-11-05T00:00:00+00:00
 draft: false
-images: ["camera.png"]
+images: []
 menu:
   docs:
     parent: "prologue"
@@ -14,13 +14,22 @@ weight: 102
 toc: true
 ---
 
-As described on the [introduction page](/docs/) and [mission statement](/docs/prologue/mission/), Kerberos.io has a strong vision and roadmap to help anyone on this planet to set up a video management platform to fit their needs. In this section we'll describe the different building blocks and illustrate how they complement and enrich each other, to build up an [ideal deployment model](/docs/prologue/deployments/).
+The UUG ecosystem brings together four products for recording, storing, managing and working with video. Start with one camera and an Agent, then add the products your deployment needs. You do not have to install the whole ecosystem to get started.
 
 ## An overview
 
-As shown below there are 3 critical steps in setting up a video management solution: camera processing, persisting recordings and analysing. Instead of building a single solution, which many other vendors have built, which covers those 3 functions, we have divided and conquered each role and responsibility in a stand-alone solution: [Agents](/docs/agent/first-things-first/), [Factory](/docs/factory/first-things-first/), [Vault](/docs/vault/first-things-first/) and [Hub](/docs/hub/first-things-first/).
+Each product has a distinct responsibility:
 
-{{< rete caption="The Kerberos.io solution stack" alt="Cameras feed Agents, optionally managed by Factory. Vault persists recordings to object storage and sends events to Hub for analysis." height="540" >}}
+| Product | Role | When to add it |
+| --- | --- | --- |
+| [Agent](/docs/agent/first-things-first/) | Processes and records one camera stream, with its own web interface. | Start here to record and review a camera. |
+| [Vault](/docs/vault/first-things-first/) | Receives recordings, stores them on your chosen storage providers and publishes events to integrations. | When you need central storage or want other applications to consume recordings. |
+| [Factory](/docs/factory/first-things-first/) | Deploys and configures Agents on Kubernetes through a web interface. | When you want to manage a fleet of Agents on a cluster. |
+| [Hub](/docs/hub/first-things-first/) | Provides a shared workspace for live view, recordings, alerts and access control across cameras and sites. | When people need a central view rather than separate Agent interfaces. |
+
+The diagram shows a deployment using all four products. Factory manages the Agents; it is not part of the recording upload path. Agents send recordings to Vault, which stores them and notifies Hub through its configured integration.
+
+{{< rete caption="The UUG ecosystem" alt="Cameras feed Agents, optionally managed by Factory. Vault persists recordings to object storage and sends recording events to Hub." height="540" >}}
 {
   "groups": [
     { "id": "capture", "label": "1. Camera processing - edge / cloud", "x": 0, "y": 20, "w": 540, "h": 520 },
@@ -58,11 +67,11 @@ As shown below there are 3 critical steps in setting up a video management solut
 }
 {{< /rete >}}
 
-Due to this approach the Kerberos.io solution stack can be scaled and deployed independently. This means you can deploy specific parts on-premise and other parts on a cloud provider, or the other way around. Next to that it also allows you to only install what you need: start small and grow over time when your business requires it.
+These responsibilities let you choose where the components run: at the edge, in the cloud or across both. The right arrangement depends on camera connectivity, storage requirements and who needs access. See [Deployments](/docs/prologue/deployments/) for example architectures.
 
 ## The Agent
 
-At the foundation of any Kerberos.io deployment you'll find one or more [Agents](/docs/agent/first-things-first/). These Agents are installed [through various possibilities](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent) and are deployed to a compute - VM, baremetal, Kubernetes cluster or other - of choice and connected to camera streams you control.
+[Agent](/docs/agent/first-things-first/) connects to a camera stream you control and records on motion or continuously. Each Agent looks after one camera and provides its own interface for live view, recordings and settings.
 
 {{< rete caption="An Agent consists of both a backend and frontend." alt="A single Agent container contains an API server that processes its camera stream and a user interface that communicates with the API." height="320" >}}
 {
@@ -84,9 +93,9 @@ At the foundation of any Kerberos.io deployment you'll find one or more [Agents]
 }
 {{< /rete >}}
 
-The Agent is responsible for a single camera. It is a piece of software which has two responsibilities: it acts as a user interface (frontend) and an API server (backend). The API processes the video stream, applies computer vision techniques, makes recordings and takes desired actions, e.g. a webhook. On the other hand, the user interface allows a user to review recordings and configure specific settings for the API.
+The backend processes the stream and makes recordings. The frontend uses the API to let you review activity and configure the Agent. This makes an Agent useful on its own, without Factory, Vault or Hub.
 
-The Agent itself is bundled in a single container, which includes all the dependencies and libraries required to have it running. For each camera, an Agent container will be created.
+You can run an Agent on a VM, a bare-metal machine, a Raspberry Pi or a Kubernetes cluster. With a container deployment, each camera has its own Agent container. Follow [Agent installation](/docs/agent/installation/) to choose a deployment method.
 
 {{< rete caption="An Agent is monitoring a single camera stream." alt="One camera streams to one Agent container, deployed on Linux, Docker, Raspberry Pi or Kubernetes at the edge or in the cloud." height="380" >}}
 {
@@ -106,13 +115,13 @@ The Agent itself is bundled in a single container, which includes all the depend
 }
 {{< /rete >}}
 
-The appealing thing with this approach is that you'll experience complete isolation. If one Agent goes down, it will not affect any other Agent (or camera). It also makes it elegant to scale.
+Separate Agent containers let you configure and restart one camera's recorder independently of the others. They can still share a host, network or storage, so plan capacity and availability for those shared dependencies.
 
 ## Scaling out Agents
 
-Starting with a few Agents is straightforward, and scaling your Agents is not a complex task at all. You can benefit [from the different deployment models](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent) we have documented, to start exploring and scaling your Kerberos.io configuration.
+Add a camera, add an Agent. A small deployment can use Docker or Docker Compose; a Kubernetes deployment can schedule Agents across a cluster. Choose based on your infrastructure and operating experience, not just the number of cameras.
 
-{{< rete caption="Scaling out your Agents is not a complex task." alt="Four cameras each connect to their own isolated Agent container. Scale with Docker or Kubernetes, or manage the Agents through Factory." height="620" >}}
+{{< rete caption="One Agent per camera" alt="Four cameras each connect to their own Agent container. Run the Agents with Docker or Kubernetes, and optionally manage them through Factory on Kubernetes." height="620" >}}
 {
   "groups": [
     { "id": "cameras", "label": "Cameras", "x": 0, "y": 20, "w": 260, "h": 640 },
@@ -145,21 +154,19 @@ Starting with a few Agents is straightforward, and scaling your Agents is not a 
 }
 {{< /rete >}}
 
-Depending on your scenario [you choose one deployment over the other](https://github.com/kerberos-io/agent#how-to-run-and-deploy-a-kerberos-agent). There is no golden rule for the best deployment; you should move forward with your preference and experience. A few examples:
+## Factory: managing Agents on Kubernetes
 
-- If you are not into `kubernetes`, and you have only a dozen cameras, it might be more suitable to utilise `docker compose`.
+[Factory](/docs/factory/first-things-first/) provides a web interface for deploying and configuring Agents on Kubernetes. It interacts with the Kubernetes API and creates a deployment for each Agent.
 
-- On the other hand if you have hundreds of cameras, and plan to install more over the next months and years, you will benefit from the elasticity `kubernetes` provides to you out of the box.
+Administrators can add cameras, use ONVIF discovery and apply global settings instead of configuring every Agent separately. Factory manages how Agents run; the Agents still process streams and create recordings.
 
-- If you would rather have non-technical users managing a video landscape, then [Factory](/docs/factory/first-things-first/) might be a good choice.
-
-Whatever you choose, you can always migrate from one option to the other; it's just the engine on which the Agent containers are running that is updated.
+Factory is optional: you can run Agents without it. Its current scheduling engine is Kubernetes; do not assume it manages Docker or host-based Agents. See [Configuration & engines](/docs/factory/configuration-and-engines/) and [Factory installation](/docs/factory/installation/) for details.
 
 ## Storing data where you want
 
-Agents are responsible for storing recordings and triggering events. By default all recordings are stored within the Agent container. This means that if the container stops, all your data will be lost. Luckily [there are a couple of techniques to persist](https://github.com/kerberos-io/agent#configure-and-persist-with-volume-mounts) the data outside the container, without losing any information.
+By default, an Agent keeps recordings on its own disk. For container deployments, plan persistent storage: recordings kept only in the container's writable layer will not survive container removal or replacement. Stopping a container is not the same as removing it.
 
-In most cases, especially with a growing video landscape, it's more convenient to have a central storage system in place that scales, like Ceph, MinIO, or cloud storage like S3 and other blob storage. This is exactly where Vault comes into the picture.
+[Vault](/docs/vault/first-things-first/) adds a central storage layer. Agents upload recordings to Vault, and Vault writes them to the storage providers you configure. Providers include Amazon S3, Azure Blob Storage, Google Cloud Storage, MinIO and Ceph. The storage can be at the edge or in the cloud; see [Storage providers](/docs/vault/providers/) for supported options.
 
 {{< rete caption="Bring your own storage using Vault" alt="Multiple Agents upload recordings to Vault, which writes to your object storage and publishes recording events to a configured integration." height="540" >}}
 {
@@ -192,15 +199,15 @@ In most cases, especially with a growing video landscape, it's more convenient t
 }
 {{< /rete >}}
 
-[Vault](/docs/vault/first-things-first/) acts as an interface between your Agents and your storage system. It is responsible for receiving recordings from your Agents, and storing them in the storage system you've configured. By decoupling your Agents from [Vault](/docs/vault/first-things-first/), you can switch the underlying storage system on the fly, without having to reconfigure all your Agents.
+Vault separates camera recording from storage and downstream processing. Configure a provider and an account in Vault, then [connect an Agent to Vault](/docs/agent/connect-to-vault/) using that account's credentials.
 
-Next to persisting your data in your storage system, [Vault](/docs/vault/first-things-first/) also acts as an event producer. Each time a recording is successfully stored in your storage system, it will send a message to the configured [Integration](/docs/vault/integrations/), such as Kafka, RabbitMQ, SQS, etc.
+After storing a recording, Vault can publish an event to a configured [integration](/docs/vault/integrations/), such as Hub, Kafka, RabbitMQ or Amazon SQS. Those events let applications process recordings without moving that work into every Agent.
 
-## Centralise and governance
+## Hub: a central workspace {#centralise-and-governance}
 
-Scaling your [Agents](/docs/agent/first-things-first/) and having a scalable and flexible storage system with [Vault](/docs/vault/first-things-first/) is a strong foundation. However, data that is just stored in your storage system doesn't bring any value.
+[Hub](/docs/hub/first-things-first/) brings cameras and recordings into one web application. Teams can organise Agents into sites and groups, watch live streams, find recordings, receive alerts and control access through roles.
 
-Utilising that data to give your stakeholders insights through analytics, providing them with decent data governance and combining it with live data is where the magic starts.
+In a deployment using your own Vault, its Hub integration sends recording events to the [Hub pipeline](/docs/hub/pipeline/). Hub uses the configured Vault connection to access recordings. Analytics and detections depend on the processing workflows you configure; Hub does not replace the Agents that record the camera streams.
 
 {{< rete caption="Vault connected to Hub." alt="Agents upload recordings to Vault. Vault stores them in object storage and sends recording events to Hub for monitoring, analytics and governance." height="540" >}}
 {
@@ -232,12 +239,17 @@ Utilising that data to give your stakeholders insights through analytics, provid
 }
 {{< /rete >}}
 
-[Hub](/docs/hub/first-things-first/) is our answer. It's a highly scalable platform to connect stakeholders to sites and groups of cameras. It comes with all the features you would imagine: live streaming, object detection, fine-grained user access, alerts and more.
+The recording path is only part of the connection. Agents also [connect directly to Hub](/docs/agent/connect-to-hub/) for status, live view and camera control. Configuring that connection alone does not deliver recordings: persistence must be configured separately.
 
-[Hub](/docs/hub/first-things-first/) is built on top of Kubernetes and can be deployed, just like all the other components, where you want. It's composed of a series of microservices that can independently scale towards any demand, and utilises Open Source components such as Kafka, RabbitMQ, SQS, and others for high throughput messaging.
+Factory and Hub serve different users and tasks: Factory deploys and configures Agents on Kubernetes, while Hub is the workspace for monitoring and reviewing video across the deployment. See [Hub installation](/docs/hub/installation/) for deployment options.
 
 ## Takeaways
 
-Kerberos.io comes with different components which you only install when required; there is no need to set up a sophisticated system from the beginning. Each component works on its own and is open and extensible through APIs. Our vision is to start small, with just a few [Agents](/docs/agent/first-things-first/), scaling up and introducing more components such as [Vault](/docs/vault/first-things-first/) and [Hub](/docs/hub/first-things-first/) when required for your use case.
+Start with the responsibility you need to solve:
 
-If you need some help on possible deployments, have [a look at the deployment page](/docs/prologue/deployments/) where we illustrate some examples.
+- **Record a camera:** follow [Agent getting started](/docs/agent/getting-started/).
+- **Keep recordings on your own central storage:** [connect Agent to Vault](/docs/agent/connect-to-vault/).
+- **Manage Agents on Kubernetes:** follow [Factory getting started](/docs/factory/getting-started/).
+- **Give users a shared view:** follow [Hub getting started](/docs/hub/getting-started/) and [connect Agent to Hub](/docs/agent/connect-to-hub/).
+
+Use the [deployment examples](/docs/prologue/deployments/) to choose how these products fit your environment. Grow the ecosystem around your requirements rather than installing everything at once.
