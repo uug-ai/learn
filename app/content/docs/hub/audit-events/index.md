@@ -255,9 +255,7 @@ kerberoshub:
           region: eu-west-1
           prefix: hub
         credentialsSecret:
-          name: audit-immutable-archive
-          accessKeyIdKey: access-key-id
-          secretAccessKeyKey: secret-access-key
+          name: audit-immutable-archive # Secret holding the S3 keys, see Credentials below
 ```
 
 | `s3` setting | Value |
@@ -269,10 +267,43 @@ kerberoshub:
 | `forcePathStyle` | `true` for stores that need path-style URLs (`<endpoint>/<bucket>/<key>`). |
 | `allowUnlockedBucket` | `true` skips the Object Lock check. See below. |
 
-**Credentials.** With `credentialsSecret`, the access key and secret key are read
-from that Secret (keys `access-key-id` and `secret-access-key` unless you set
-`accessKeyIdKey` and `secretAccessKeyKey`), and rotated keys are picked up within
-a minute. Without it, `hub-audit` uses the pod's AWS identity: the default AWS
+**Credentials.** `credentialsSecret` points `hub-audit` at a Kubernetes Secret,
+in the Hub namespace, that holds the access key and secret key. The values never
+hold the keys unless you let the chart create that Secret. There are two ways to
+provide it:
+
+- **Create the Secret yourself** (default). Use `kubectl`, or whatever manages
+  your secrets, such as Sealed Secrets or External Secrets:
+
+  ```bash
+  kubectl -n <hub-namespace> create secret generic audit-immutable-archive \
+    --from-literal=access-key-id='<access key>' \
+    --from-literal=secret-access-key='<secret key>'
+  ```
+
+- **Let the chart create it** (chart 0.171.0 or later). Set `create: true` and put
+  the keys in the values:
+
+  ```yaml
+  credentialsSecret:
+    name: audit-immutable-archive
+    create: true
+    accessKeyId: <access key>
+    secretAccessKey: <secret key>
+  ```
+
+  To switch from a Secret you made yourself, delete it first: Helm doesn't take
+  over a resource it didn't create.
+
+| `credentialsSecret` setting | Value |
+| --- | --- |
+| `name` | Name of the Secret. Required. |
+| `create` | `true` lets the chart create the Secret from `accessKeyId` and `secretAccessKey`. Default `false`. |
+| `accessKeyId`, `secretAccessKey` | The keys themselves. Only with `create: true`. |
+| `accessKeyIdKey`, `secretAccessKeyKey` | The *names* of the keys inside the Secret, not the credentials. Defaults `access-key-id` and `secret-access-key`; change them only to match an existing Secret. |
+
+Rotated keys in the Secret are picked up within a minute, without a redeploy.
+Without `credentialsSecret`, `hub-audit` uses the pod's AWS identity: the default AWS
 chain, such as an instance profile, or IRSA through a ServiceAccount of its own.
 That only works for AWS S3; every other store needs `credentialsSecret`.
 
