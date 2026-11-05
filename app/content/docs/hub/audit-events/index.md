@@ -181,9 +181,8 @@ Every request carries an `Idempotency-Key` header,
 `audit:<destination id>:<first event id>:<last event id>`. Use it to drop
 resent batches. Add your own headers with `headers`. Credentials go in
 `bearerToken`, sent as `Authorization: Bearer <token>`, and `secretHeaders`, for
-headers such as an API key. Set them inline, like the other Hub services'
-credentials; see [Credentials](#credentials) for referencing an existing Secret
-instead.
+headers such as an API key. Set them inline, or see [Credentials](#credentials)
+to reference an existing Secret instead.
 
 ```yaml
 kerberoshub:
@@ -280,8 +279,7 @@ kerberoshub:
 ```
 
 With `create: false` and a `name`, an existing ServiceAccount is used instead.
-Without either, `hub-audit` runs as `kerberoshub.serviceAccount` like the other
-Hub services.
+Without either, `hub-audit` runs as `kerberoshub.serviceAccount`.
 
 **Stores without Object Lock.** Some S3-compatible stores, such as Garage, don't
 support Object Lock, so the check above always fails. Set
