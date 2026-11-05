@@ -1,6 +1,6 @@
 ---
 title: Development workspace
-description: Develop across UUG repositories without confusing local checkouts with released dependencies.
+description: Develop across product repositories without confusing local checkouts with released dependencies.
 weight: 10
 toc: true
 type: docs

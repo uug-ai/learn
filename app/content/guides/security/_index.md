@@ -4,4 +4,4 @@ toc: false
 type: docs
 ---
 
-Security guidance for building, delivering, and operating Augment Vision software with secure defaults and a minimal attack surface.
+Security guidance for building, delivering, and operating the products with secure defaults and a minimal attack surface.

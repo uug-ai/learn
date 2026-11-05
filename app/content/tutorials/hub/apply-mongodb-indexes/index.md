@@ -11,13 +11,13 @@ tags: ['MongoDB', 'CLI', 'Kubernetes']
 illustration: 'hub'
 ---
 
-{{< tutorial-byline author="UUG.AI" github="uug-ai" created="Nov 4, 2026" updated="Nov 4, 2026" >}}
+{{< tutorial-byline author="Documentation team" github="uug-ai" avatar="/android-chrome-192x192.png" created="Nov 4, 2026" updated="Nov 4, 2026" >}}
 
 {{< tutorial-header alt="Hub connects camera sites, processing services and operators." >}}
 
 MongoDB indexes support the queries that Hub uses to find devices, recordings, markers and other resources. When a release introduces a new query, its supporting indexes may need to be installed before the application rollout.
 
-The [UUG.AI CLI](https://github.com/uug-ai/cli) provides a `check-indexes` action that compares your database with a versioned index specification. The safe operating sequence is **choose a contract, dry-run, review, apply, then dry-run again**.
+The [CLI](https://github.com/uug-ai/cli) provides a `check-indexes` action that compares your database with a versioned index specification. The safe operating sequence is **choose a contract, dry-run, review, apply, then dry-run again**.
 
 {{< tutorial-meta time="~20 min, plus index build time" level="Intermediate" stack="MongoDB / CLI / Kubernetes" prerequisites="Database access and a CLI release containing the required index specification" >}}
 

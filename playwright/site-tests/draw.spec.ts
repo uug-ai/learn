@@ -65,7 +65,7 @@ for (const fragment of ['', '#diagram=eyJub2RlcyI6W119+///==&fullscreen=1', '#di
 
 const howItWorksDiagrams = [
   {
-    caption: 'The Kerberos.io solution stack',
+    caption: 'The ecosystem',
     nodes: ['camera-1', 'camera-2', 'factory', 'agent-1', 'agent-2', 'vault', 'storage', 'hub'],
     connections: ['camera-1:agent-1', 'camera-2:agent-2', 'factory:agent-1', 'factory:agent-2',
       'agent-1:vault', 'agent-2:vault', 'vault:storage', 'vault:hub'],
@@ -81,7 +81,7 @@ const howItWorksDiagrams = [
     connections: ['camera:agent'],
   },
   {
-    caption: 'Scaling out your Agents is not a complex task.',
+    caption: 'One Agent per camera',
     nodes: ['camera-1', 'camera-2', 'camera-3', 'camera-4', 'agent-1', 'agent-2', 'agent-3', 'agent-4'],
     connections: ['camera-1:agent-1', 'camera-2:agent-2', 'camera-3:agent-3', 'camera-4:agent-4'],
   },
@@ -96,6 +96,32 @@ const howItWorksDiagrams = [
     connections: ['agent-1:vault', 'agent-2:vault', 'vault:storage', 'vault:hub'],
   },
 ];
+
+test('introduces the ecosystem without company naming or broken product links', async ({ page, request }) => {
+  const response = await page.goto('/docs/prologue/how/');
+  expect(response?.status()).toBe(200);
+  await expect(page.locator('h1')).toHaveText('How it works');
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    'content', 'How Agent, Vault, Factory and Hub work together in the ecosystem.',
+  );
+  const content = page.locator('#content .content');
+  await expect(content).not.toContainText(/kerberos|uug/i);
+  await expect(content.locator('a[href*="kerberos"], img[src*="kerberos"], [alt*="Kerberos"]')).toHaveCount(0);
+  expect(await page.locator('head').innerHTML()).not.toMatch(/kerberos/i);
+  for (const product of ['Agent', 'Vault', 'Factory', 'Hub']) {
+    await expect(content.locator('table').getByRole('link', { name: new RegExp(`^${product}\\b`) })).toBeVisible();
+  }
+  for (const anchor of ['an-overview', 'the-agent', 'scaling-out-agents', 'storing-data-where-you-want',
+    'centralise-and-governance', 'takeaways']) {
+    await expect(content.locator(`[id="${anchor}"]`)).toHaveCount(1);
+  }
+  const links = await content.locator('a[href^="/docs/"]').evaluateAll(
+    anchors => [...new Set(anchors.map(anchor => anchor.getAttribute('href')!))],
+  );
+  for (const href of links) {
+    expect((await request.get(href)).status(), href).toBe(200);
+  }
+});
 
 for (const width of [1280, 390]) {
   for (const theme of ['light', 'dark']) {

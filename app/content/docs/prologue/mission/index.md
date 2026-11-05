@@ -1,8 +1,8 @@
 ---
 podcast: prologue-mission
 title: "Mission"
-description: "The Augment Vision mission statement"
-lead: "The Augment Vision mission statement"
+description: "The principles behind Agent, Factory, Vault and Hub."
+lead: "The principles behind Agent, Factory, Vault and Hub."
 date: 2020-10-06T08:48:57+00:00
 lastmod: 2026-10-31T00:00:00+00:00
 draft: false
@@ -14,11 +14,11 @@ weight: 104
 toc: false
 ---
 
-At Augment Vision, our mission is to make vision AI work at scale for everyone who depends on cameras: from a single home to organisations running thousands of cameras across many sites.
+Our mission is to make vision AI work at scale for everyone who depends on cameras: from a single home to organisations running thousands of cameras across many sites.
 
 We hold ourselves to three principles:
 
-- **Open at the core.** The [Kerberos Agent](/docs/agent/) has been open source (MIT license) from the start and stays free for anyone to run. What we build exposes open APIs, so it fits into the tools you already use instead of locking you in.
+- **Open at the core.** The [Agent](/docs/agent/) has been open source (MIT license) from the start and stays free for anyone to run. What we build exposes open APIs, so it fits into the tools you already use instead of locking you in.
 - **Your data, your infrastructure.** You decide where the platform runs, on-premise, hybrid or in the cloud, and your recordings stay in storage you own.
 - **Scale without starting over.** Begin with one Agent on one camera, then add [Factory](/docs/factory/), [Vault](/docs/vault/) and [Hub](/docs/hub/) as you grow, keeping the cameras and Agents you already have under one control layer.
 

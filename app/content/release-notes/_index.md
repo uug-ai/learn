@@ -1,6 +1,6 @@
 ---
 title: Release notes
-description: Changes included in each UUG.AI platform release.
+description: Changes included in each platform release.
 layout: list
 pagerSize: 10
 ---

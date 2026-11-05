@@ -234,7 +234,7 @@ LABEL org.opencontainers.image.title="service-name" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${REVISION}" \
       org.opencontainers.image.created="${CREATED}" \
-      org.opencontainers.image.vendor="UUG.AI"
+      org.opencontainers.image.vendor="Your organisation"
 ```
 
 Publish immutable image digests alongside readable version tags.

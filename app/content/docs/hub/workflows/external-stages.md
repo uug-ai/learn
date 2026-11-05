@@ -122,7 +122,7 @@ disable the exercise workflow and delete its token.
 
 For a complete walkthrough with an Agent, development container, illustrated
 designer/token guides, YOLO person detection, and result verification, follow
-the [Augment Vision workflow exercise](https://github.com/uug-ai/exercise).
+the [workflow exercise](https://github.com/uug-ai/exercise).
 
 ## End-to-end flow
 

@@ -1,5 +1,5 @@
 {{- $logoLink := .Site.Params.navbar.logo.link | default .Site.Home.RelPermalink -}}
-{{- $brandText := .Site.Params.navbar.brandText | default .Site.Title | default "UUG" -}}
+{{- $brandText := .Site.Params.navbar.brandText | default .Site.Title | default "Learn" -}}
 
 <a class="learn-topbar-brand" href="{{ $logoLink }}">
   <span class="learn-topbar-brand-text" title="{{ $brandText }}">{{- $brandText -}}</span>

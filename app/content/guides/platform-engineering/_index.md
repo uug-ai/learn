@@ -1,12 +1,12 @@
 ---
 title: Platform Engineering
-description: How UUG connects a shared development workspace, GitHub delivery workflows, and GitOps-managed environments.
+description: How a shared development workspace connects to GitHub delivery workflows and GitOps-managed environments.
 weight: 30
 toc: true
 type: docs
 ---
 
-Platform engineering at UUG connects the tools used to develop Augment Vision
+Platform engineering connects the tools used to develop the products
 with the tools used to deliver it. The aim is to share repeatable workflows
 without making every service use one language or one release version.
 

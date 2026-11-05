@@ -1,6 +1,6 @@
 ---
 title: Sources and scope
-description: Trace UUG-specific platform guidance to the repository configuration it describes.
+description: Trace platform guidance to the repository configuration it describes.
 weight: 60
 toc: true
 type: docs

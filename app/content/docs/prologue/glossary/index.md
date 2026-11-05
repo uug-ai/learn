@@ -1,8 +1,8 @@
 ---
 podcast: prologue-glossary
 title: "Glossary"
-description: "The terms you'll meet across the Augment Vision docs, from A to Z."
-lead: "The terms you'll meet across the Augment Vision docs, from A to Z."
+description: "The terms you'll meet across Agent, Factory, Vault and Hub, from A to Z."
+lead: "The terms you'll meet across Agent, Factory, Vault and Hub, from A to Z."
 date: 2020-10-06T08:48:57+00:00
 lastmod: 2026-10-31T00:00:00+00:00
 draft: false
@@ -27,7 +27,7 @@ The words you'll meet across Agent, Factory, Vault and Hub, from A to Z. Each te
 : Credentials an Agent or application uses to upload to and read from [Vault](#vault). Each account is linked to the storage providers and integrations it may use. [Read more](/docs/vault/accounts/).
 
 <span id="agent"></span>Agent
-: The Kerberos Agent: the recording service that runs next to, or on, a camera. Each Agent handles one camera stream, records on motion or continuously, and has its own web interface for live view, recordings and settings. It is open source under the MIT license and the foundation of every deployment. [Read more](/docs/agent/).
+: The recording service that runs next to, or on, a camera. Each Agent handles one camera stream, records on motion or continuously, and has its own web interface for live view, recordings and settings. It is open source under the MIT license and the foundation of every deployment. [Read more](/docs/agent/).
 
 <span id="alert"></span>Alert
 : A rule in [Hub](#hub) that decides which detection and device events matter. Matching events land in each recipient's [watchlist](#watchlist) and can be sent to external channels. [Read more](/docs/hub/notifications/).
@@ -38,9 +38,6 @@ The words you'll meet across Agent, Factory, Vault and Hub, from A to Z. Each te
 
 <span id="audit-events"></span>Audit events
 : A read-only history in Hub of security, configuration and data operations in an [organisation](#organisation): who changed what, and whether an authorisation check succeeded. [Read more](/docs/hub/audit-events/).
-
-<span id="augment-vision"></span>Augment Vision
-: The company (UUG.AI) behind the platform: a single control layer to deploy, monitor and scale vision AI across camera fleets, built from Agent, Factory, Vault and Hub. It grew out of the open source [Kerberos.io](#kerberosio) project. [Read more](/docs/prologue/).
 
 ## B
 
@@ -76,6 +73,9 @@ The words you'll meet across Agent, Factory, Vault and Hub, from A to Z. Each te
 : A multi-tenancy layer in Hub on top of user accounts, to give several customers or companies their own space on one platform. [Read more](/docs/hub/domains/).
 
 ## E
+
+<span id="augment-vision"></span><span id="ecosystem"></span>Ecosystem
+: Agent, Factory, Vault and Hub working together to record camera streams, manage Agents, store recordings and provide a shared operator workspace. Add the products your deployment needs. [Read more](/docs/prologue/how/).
 
 <span id="edge"></span>Edge
 : On site, close to the cameras, as opposed to in the cloud. Agents record at the edge; Factory and Vault can be installed at the edge or in the cloud. [Read more](/docs/prologue/deployments/).
@@ -124,7 +124,7 @@ The words you'll meet across Agent, Factory, Vault and Hub, from A to Z. Each te
 ## K
 
 <span id="kerberosio"></span>Kerberos.io
-: The open source project, started in 2014 around the [Agent](#agent), that Augment Vision's platform grew out of. The products keep its name, as in Kerberos Agent, Vault and Hub. [Read more](/docs/).
+: The open source project, started in 2014 around the [Agent](#agent), that the ecosystem grew out of. [Read more](/docs/prologue/).
 
 ## L
 
