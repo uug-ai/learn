@@ -37,10 +37,22 @@ const products = [
     accent: '#56618f',
     article: 'getting-started',
     gettingStarted: 'Getting Started',
-    topics: ['Accounts', 'API', 'Configuration', 'Forwarding', 'Integrations', 'License', 'Machine learning', 'Providers'],
+    topics: ['Accounts', 'API', 'Configuration', 'Forwarding', 'Integrations', 'License', 'Machine learning', 'Providers', 'Quickstart'],
     topic: { slug: 'accounts', title: 'Accounts' },
   },
 ];
+
+test('vault: links the installation guide to the Docker and Kubernetes quickstart', async ({ page }) => {
+  await page.goto('/docs/vault/installation/');
+  await page.locator('#content').getByRole('link', { name: 'Quickstart', exact: true }).click();
+  await expect(page).toHaveURL(/\/docs\/vault\/quickstart\/$/);
+  await expect(page.locator('#content h1')).toHaveText('Quickstart');
+  await expect(page.locator('#content h2')).toHaveText(['Docker', 'Kubernetes', 'Store your first recording']);
+  await expect(page.locator('#content pre').filter({ hasText: 'docker run -d --name kerberos-vault' }))
+    .toContainText('ghcr.io/uug-ai/vault:v1.7.19');
+  await expect(page.locator('#content pre').filter({ hasText: 'kubectl rollout status' }))
+    .toContainText('kubectl port-forward -n kerberos-vault svc/vault-nodeport 8080:80');
+});
 
 for (const mobile of [false, true]) {
   test.describe(mobile ? 'mobile product navigation' : 'desktop product navigation', () => {

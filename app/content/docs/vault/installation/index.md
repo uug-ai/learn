@@ -14,6 +14,8 @@ weight: 302
 toc: true
 ---
 
+For a short Docker or Kubernetes deployment, follow the [Quickstart](/docs/vault/quickstart). The [deployment repository](https://github.com/uug-ai/deployment/tree/main/base/vault) contains the detailed Kubernetes instructions and manifests.
+
 Vault is shipped as a container image and is preferably installed inside a Kubernetes cluster. This means that you can run it where and how you want. Depending on your setup (home installation or production-ready deployment), you might decide to install it using standard `Docker` or `Kubernetes` depending on your needs and requirements.
 
 ## Docker 
