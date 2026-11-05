@@ -20,18 +20,18 @@ Hub supports multiple users with access controlled by [organisations, projects](
 
 {{< figure src="hub-add-account.gif" alt="Give another user limited access to Hub by creating a sub account." caption="Give another user limited access to Hub by creating a sub account." class="stretch">}}
 
-Hub can be linked to multiple OIDC providers. Depending on the domain you use to sign in (`@customer1.com` or `@customer2.com`), you will be redirected to the relevant OIDC provider. You can use the following `environment variables` to configure one or more SSO domains having the specific `SSO credentials`; more information can be found in the [Configuration](#configuration) section.
+Hub can be linked to multiple OIDC providers. Depending on the domain you use to sign in (`@customer1.example.com` or `@customer2.example.com`), you will be redirected to the relevant OIDC provider. You can use the following `environment variables` to configure one or more SSO domains having the specific `SSO credentials`; more information can be found in the [Configuration](#configuration) section. The domains and endpoints below are examples; replace them with those of your deployment.
 
     sso: # OIDC settings for allowing SSO.
-      - domain: "uug.ai"
-        redirectUrl: "https://api.cloud.kerberos.io/sso/callback/uug.ai"
+      - domain: "customer1.example.com"
+        redirectUrl: "https://api.hub.example.com/sso/callback/customer1.example.com"
         issuer: "https://xxx.eu.auth0.com/"
         claimId: "email"
         clientId: "xxx"
         clientSecret: "xxx"
         clientVerificationId: "" # This is only required for SSO chaining.
-      - domain: "kerberos.io"
-        redirectUrl: "https://api.cloud.kerberos.io/sso/callback/kerberos.io"
+      - domain: "customer2.example.com"
+        redirectUrl: "https://api.hub.example.com/sso/callback/customer2.example.com"
         issuer: "https://accounts.google.com"
         claimId: "email"
         clientId: "xxx"
@@ -47,7 +47,7 @@ The identity provider manages the password and MFA policy for OIDC sign-in. Hub'
 
 ## Configuration
 
-To configure Hub with one or more OIDC providers you'll need to provide a configuration in the `values.yaml` file (as shown above). Each OIDC provider is assigned to a domain, which is then activated by signing in. For example, if your user signs in with an email address like `tom@uug.ai`, the user will be redirected to the `auth0` OIDC provider; if signing in with an email address like `john@kerberos.io`, the user will be redirected to the `google` OIDC provider.
+To configure Hub with one or more OIDC providers you'll need to provide a configuration in the `values.yaml` file (as shown above). Each OIDC provider is assigned to a domain, which is then activated by signing in. For example, if your user signs in with an email address like `tom@customer1.example.com`, the user will be redirected to the `auth0` OIDC provider; if signing in with an email address like `john@customer2.example.com`, the user will be redirected to the `google` OIDC provider.
 
 ### Microsoft Entra (Azure Active Directory)
 
@@ -74,14 +74,14 @@ An elegant way to boost the user experience for your end users is to reuse the O
 
 To make this work you'll need to set up both applications with OpenID Connect (OIDC). This means that the "wrapper" application will need a configuration setup with the OIDC provider (for example Auth0 in the previous example), and Hub should have a similar configuration with the same OIDC provider.
 
-However, there is a difference with this setup, as Hub will not be responsible for running the authentication against the OIDC provider; the wrapper application is responsible here. What is happening is that the `accessToken` which is received by the wrapper application is forwarded (or chained) to the Hub application. The Hub application will receive the `accessToken` on the verification URL: `https://hub.kerberos.io/sso/verify/{domain}?accesstoken={accessToken}`, and will use the `clientVerificationId` value for the specific `domain` you defined.
+However, there is a difference with this setup, as Hub will not be responsible for running the authentication against the OIDC provider; the wrapper application is responsible here. What is happening is that the `accessToken` which is received by the wrapper application is forwarded (or chained) to the Hub application. The Hub application will receive the `accessToken` on the verification URL: `https://hub.example.com/sso/verify/{domain}?accesstoken={accessToken}`, and will use the `clientVerificationId` value for the specific `domain` you defined.
 
 What happens behind the scenes is that Hub will look for the SSO definition you have provided in the Helm chart, by selecting the `domain` you've defined.
 
-    - domain: "uug.ai"
-      redirectUrl: "https://api.cloud.kerberos.io/sso/callback/uug.ai"
+    - domain: "customer1.example.com"
+      redirectUrl: "https://api.hub.example.com/sso/callback/customer1.example.com"
       forceSSO: "false"
-      issuer: "https://uugai.eu.auth0.com/"
+      issuer: "https://tenant.eu.auth0.com/"
       claimId: "email"
       clientId: "xxx"
       clientSecret: "xxx"
@@ -101,15 +101,15 @@ This option also hides the local passkey selector. It changes the login screen; 
 
 To make this work you might need to create two different app registrations with two different callback URLs:
   - an application registration for the wrapper application with a specific `redirectUrl` to the wrapper application.
-  - (optional) an application registration for Hub with a `redirectUrl` to `https://hub.kerberos.io/sso/callback/{domain}`.
+  - (optional) an application registration for Hub with a `redirectUrl` to `https://hub.example.com/sso/callback/{domain}`.
   
 By creating two app registrations you will be able to SSO against both applications independently. Once you have obtained the different credentials for each app registration: `issuer`, `clientId` and `clientSecret`, you also need to make sure a correct `redirectUrl` is configured in the chosen OIDC provider (this is typically configured through the OIDC provider's web UI).
 
 While having both applications set up with their own OIDC configuration (targeting the same OIDC provider), you can now close the loop by configuring the `clientVerificationId`. This value should equal the `clientId` of the wrapper application. You can simply copy-paste the `clientId` into the `clientVerificationId` value and you are done.
 
-Once you have deployed this new configuration and set up the relevant wrapper application, you will be able to receive an `accessToken` from the OIDC provider. By sending that `accessToken` to the following endpoint `https://hub.kerberos.io/sso/verify/{domain}?accesstoken={accessToken}`, it will be validated against the `clientVerificationId` value in your Hub configuration (linked to the specific domain).
+Once you have deployed this new configuration and set up the relevant wrapper application, you will be able to receive an `accessToken` from the OIDC provider. By sending that `accessToken` to the following endpoint `https://hub.example.com/sso/verify/{domain}?accesstoken={accessToken}`, it will be validated against the `clientVerificationId` value in your Hub configuration (linked to the specific domain).
 
-By embedding the following URL `https://hub.kerberos.io/sso/verify/{domain}?accesstoken={accessToken}` in, for example, an `iframe`, you will be seamlessly logged in to Hub without providing any credentials.
+By embedding the following URL `https://hub.example.com/sso/verify/{domain}?accesstoken={accessToken}` in, for example, an `iframe`, you will be seamlessly logged in to Hub without providing any credentials.
 
 ## Database
 
@@ -125,16 +125,16 @@ There are two options to configure the SSO domain feature.
 Within the `values.yaml` of the Hub installation you have the option to specify one or more SSO domains by creating separate list items. When applying the `values.yaml` configuration you will have those SSO domains available in the Hub application. 
 
     sso: # OIDC settings for allowing SSO.
-      - domain: "uug.ai"
-        redirectUrl: "https://api.cloud.kerberos.io/sso/callback/uug.ai"
+      - domain: "customer1.example.com"
+        redirectUrl: "https://api.hub.example.com/sso/callback/customer1.example.com"
         forceSSO: "false"
         issuer: "https://xxx.eu.auth0.com/"
         claimId: "email"
         clientId: "xxx"
         clientSecret: "xxx"
         clientVerificationId: "" # This is only required for SSO chaining.
-      - domain: "kerberos.io"
-        redirectUrl: "https://api.cloud.kerberos.io/sso/callback/kerberos.io"
+      - domain: "customer2.example.com"
+        redirectUrl: "https://api.hub.example.com/sso/callback/customer2.example.com"
         forceSSO: "false"
         issuer: "https://accounts.google.com"
         claimId: "email"
@@ -151,21 +151,21 @@ Another possibility to provide SSO domains is by defining them in the database. 
         "_id" : ObjectId("xxxxx"), 
         "key" : "sso", 
         "map" : {
-            "uug.ai" : {
-                "domain" : "uug.ai", 
-                "redirect_url" : "https://xxxx/sso/callback/uug.ai",
+            "customer1.example.com" : {
+                "domain" : "customer1.example.com",
+                "redirect_url" : "https://api.hub.example.com/sso/callback/customer1.example.com",
                 "force_sso": "false",
-                "issuer" : "https://uugai.xxx.com/", 
+                "issuer" : "https://tenant.eu.auth0.com/",
                 "claim_id" : "email",
                 "client_id" : "xxxx", 
                 "client_secret" : "xxxx", 
                 "client_verification_id" : "xxxx"
             },
-            "kerberos.io" : {
-                "domain" : "kerberos.io", 
-                "redirect_url" : "https://xxxx/sso/callback/kerberos.io",
+            "customer2.example.com" : {
+                "domain" : "customer2.example.com",
+                "redirect_url" : "https://api.hub.example.com/sso/callback/customer2.example.com",
                 "force_sso": "false",
-                "issuer" : "https://kerberosio.xxx.com/", 
+                "issuer" : "https://accounts.google.com",
                 "claim_id" : "email",
                 "client_id" : "xxxx", 
                 "client_secret" : "xxxx", 

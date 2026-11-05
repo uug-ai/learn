@@ -1,13 +1,13 @@
 ---
 title: GitOps
-description: Locate and change the desired deployment state in UUG's GitOps repository.
+description: Locate and change the desired deployment state in the GitOps repository.
 weight: 30
 toc: true
 type: docs
 ---
 
 GitOps keeps deployment intent in Git and uses a controller to reconcile it with
-Kubernetes. At UUG, `uug-ai/gitops` contains environment manifests, Helm values,
+Kubernetes. The `uug-ai/gitops` repository contains environment manifests, Helm values,
 Argo CD configuration, shared components, and release automation.
 
 This separates **what was built** in a component repository from **what an

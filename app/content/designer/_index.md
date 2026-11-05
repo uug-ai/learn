@@ -1,6 +1,6 @@
 ---
 title: 'Design with Draw'
-description: 'Create and collaborate on architecture diagrams in Draw - Augment Vision.'
+description: 'Create and collaborate on architecture diagrams in Draw.'
 type: draw-redirect
 toc: false
 excludeSearch: true

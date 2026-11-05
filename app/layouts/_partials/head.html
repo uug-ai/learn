@@ -19,9 +19,9 @@
   {{- end -}}
   <title>
     {{- if gt (len $pageTitleParts) 0 -}}
-      Augment Vision - {{ delimit $pageTitleParts " – " -}}
+      {{ delimit $pageTitleParts " – " -}}
     {{- else -}}
-      Augment Vision
+      Learn
     {{- end -}}
   </title>
   <meta name="description" content="{{ partial "utils/page-description.html" . }}" />

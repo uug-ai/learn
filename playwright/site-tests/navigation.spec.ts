@@ -1,5 +1,51 @@
 import { test, expect } from '@playwright/test';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { textContrast } from './utils/contrast';
+
+test('keeps company naming out of editorial content while preserving technical identifiers and legal notices', () => {
+  const contentRoot = resolve(__dirname, '../../app/content');
+  const companyNaming = /(?<![\w./@-])(?:augment\s+vision|uug(?:\.ai)?)(?![\w/@-]|\.\w)/i;
+  for (const file of readdirSync(contentRoot, { recursive: true })) {
+    if (!file.endsWith('.md')) continue;
+    const editorial = readFileSync(join(contentRoot, file), 'utf8').replace(/^Copyright[^\n]*$/gm, '');
+    expect(editorial, file).not.toMatch(companyNaming);
+  }
+});
+
+test('uses neutral Learn naming in navigation, page metadata and installable app assets', async ({ page, request }) => {
+  for (const path of ['/', '/docs/', '/docs/prologue/', '/docs/prologue/how/', '/docs/prologue/mission/',
+    '/docs/prologue/glossary/', '/docs/agent/license/', '/docs/factory/license/', '/docs/vault/license/',
+    '/guides/', '/guides/onboarding/', '/guides/platform-engineering/',
+    '/tutorials/hub/apply-mongodb-indexes/', '/release-notes/']) {
+    await page.goto(path);
+    await expect(page.locator('.learn-topbar-brand')).toHaveText('Learn');
+    await expect(page).toHaveTitle(/Learn$/);
+    expect(await page.title()).not.toMatch(/augment vision|\buug\b/i);
+    await expect(page.locator('meta[name="description"]')).not.toHaveAttribute('content', /augment vision|\buug\b/i);
+    await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute('content', 'Learn');
+    await expect(page.locator('link[rel="icon shortcut"]')).toHaveAttribute('href', '/favicon.ico?v=learn-neutral');
+  }
+  await page.goto('/docs/prologue/glossary/');
+  await expect(page.locator('#ecosystem')).toHaveCount(1);
+  await expect(page.locator('#augment-vision')).toHaveCount(1);
+  await page.goto('/tutorials/hub/apply-mongodb-indexes/');
+  await expect(page.locator('.tutorial-byline__name')).toHaveText('Documentation team');
+  await expect(page.locator('.tutorial-byline__avatar')).toHaveAttribute('src', '/android-chrome-192x192.png');
+
+  const manifestResponse = await request.get('/site.webmanifest');
+  expect(manifestResponse.status()).toBe(200);
+  const manifest = await manifestResponse.json();
+  expect(manifest).toMatchObject({ name: 'Learn', short_name: 'Learn' });
+  for (const icon of manifest.icons) {
+    expect(icon.src).toContain('?v=learn-neutral');
+    expect((await request.get(icon.src)).status()).toBe(200);
+  }
+  for (const icon of ['/favicon.svg', '/favicon.ico', '/favicon-16x16.png',
+    '/favicon-32x32.png', '/apple-touch-icon.png']) {
+    expect((await request.get(icon)).status(), icon).toBe(200);
+  }
+});
 
 const products = [
   {

@@ -3,7 +3,7 @@
 # Without it, recent Hugo releases (the image installs hugo@latest) fall back
 # to https://example.org/.
 baseURL: https://learn.uug.ai/
-title: 
+title: Learn
 
 services:
   googleAnalytics:
@@ -78,16 +78,17 @@ menu:
         icon: github
 
 params:
+  title: Learn
   analytics:
     productionHost: learn.uug.ai
 
   navbar:
     displayTitle: true
     displayLogo: false
-    brandText: UUG
+    brandText: Learn
     logo:
-      path: images/logo.svg
-      dark: images/logo-dark.svg
+      path: favicon.svg
+      dark: favicon.svg
       link: /
       width: 40
 

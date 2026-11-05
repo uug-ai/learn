@@ -13,7 +13,7 @@ weight: 101
 toc: true
 ---
 
-Every Augment Vision deployment starts with an [Agent](/docs/agent/): one per camera, recording its stream and detecting what happens in front of it. This page gets a first Agent running with Docker in a few minutes. From there you can add Vault, Hub and Factory as your deployment grows.
+Every deployment starts with an [Agent](/docs/agent/): one per camera, recording its stream and detecting what happens in front of it. This page gets a first Agent running with Docker in a few minutes. From there you can add Vault, Hub and Factory as your deployment grows.
 
 ## Before you start
 

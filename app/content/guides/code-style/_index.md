@@ -4,4 +4,4 @@ toc: false
 type: docs
 ---
 
-Within Augment Vision, we use a combination of programming languages, where one language is preferred over another depending on its purpose and goal.
+The products use a combination of programming languages, with each language chosen for its purpose and goal.

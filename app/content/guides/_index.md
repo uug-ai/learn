@@ -3,7 +3,7 @@ title: Guides
 toc: false
 ---
 
-Engineering guides for developing, delivering, and securing Augment Vision.
+Engineering guides for developing, delivering, and securing the products.
 
 Start with [onboarding](/guides/onboarding) to prepare your workspace.
 [Platform Engineering](/guides/platform-engineering) explains how that workspace

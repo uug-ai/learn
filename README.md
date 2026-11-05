@@ -14,16 +14,19 @@ A modern, fast, and feature-rich documentation website built with [Hugo](https:/
 
 ## Favicons
 
-The icons in `app/static/` use the same white UUG wordmark on a midnight
-background as the website and design toolkit: ICO, 16/32px browser PNGs, a
-180px Apple touch icon, and 192/512px app icons. The custom
+The icons in `app/static/` use the neutral book artwork in `favicon.svg`:
+ICO, 16/32px browser PNGs, a 180px Apple touch icon, and 192/512px app icons.
+The custom
 `app/layouts/_partials/favicons.html` partial and `app/static/site.webmanifest`
-use `?v=uug-midnight` URLs to refresh older cached artwork. The manifest names
-the app **UUG.AI Learn**.
+use `?v=learn-neutral` URLs to refresh older cached artwork. The manifest names
+the app **Learn**. Page titles and navigation also use Learn, while the
+documentation refers to Agent, Factory, Vault and Hub without a company prefix.
+Keep functional domains, repository and package names, API schemas, and legal
+copyright notices unchanged when updating editorial naming.
 
 ## Architecture drawings
 
-[Draw - Augment Vision](https://draw.uug.ai/) is the single drawing and architecture
+[Draw](https://draw.uug.ai/) is the single drawing and architecture
 editor. The navigation and documentation card open Draw, and every `rete` diagram's
 **Edit in Draw** link carries its original editable configuration as base64-encoded
 UTF-8 JSON in `#diagram=…`. No diagram payload is sent in an HTTP path or query.
@@ -107,7 +110,7 @@ The [Platform Engineering section](app/content/guides/platform-engineering/_inde
 connects the monorepo development workspace to GitHub delivery, GitOps
 promotion, Argo CD reconciliation, and rollout verification. Its
 [source map](app/content/guides/platform-engineering/sources.md) records the
-private repository revisions supporting UUG-specific behavior. When changing
+private repository revisions supporting the documented behavior. When changing
 these guides, recheck the consuming workflow or Application, keep recommendations
 distinct from configured controls, and use sanitized examples rather than raw
 environment values. Existing section URLs remain unchanged.
@@ -157,7 +160,7 @@ the same product color, without repeating front matter. The color rules live
 in `app/assets/css/custom.css`. Link text and highlights adapt to light/dark
 mode for at least 4.5:1 text contrast, which
 the navigation tests measure. The global navbar and non-product sections retain
-the UUG palette. A link into another product's docs takes the *destination*
+the shared palette. A link into another product's docs takes the *destination*
 product's color (see [Linking between products](#linking-between-products));
 sidebar branches always retain their own product colors.
 
@@ -212,7 +215,7 @@ getting-started links on desktop and mobile.
 ### Code blocks
 
 Indented and fenced code use a single padded surface with a darkened product
-accent background. Pages outside product documentation use the UUG blue accent.
+accent background. Pages outside product documentation use the default blue accent.
 Code inside a block has no inline-code chip, border, or extra padding; inline
 code in prose keeps its existing treatment. Long lines scroll horizontally and
 retain whitespace.
@@ -265,8 +268,8 @@ on every published episode, plus the shared player's interaction tests.
 
 ## Google Analytics and calls to action
 
-Production Learn uses its own **UUG.AI Learn** web stream
-(`G-ZW744GSN4M`, stream ID `16226732617`) in the existing UUG.AI GA4 property
+Production Learn uses its own web stream
+(`G-ZW744GSN4M`, stream ID `16226732617`) in the existing GA4 property
 (`540298183`). The public website retains its separate stream
 (`G-PLRKXEQ42W`). Filter by Stream name, hostname, or `site_area = learn`.
 Separate streams and consent choices are not a guarantee of uninterrupted

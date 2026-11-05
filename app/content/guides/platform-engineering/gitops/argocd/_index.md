@@ -1,6 +1,6 @@
 ---
 title: Argo CD
-description: Read UUG Application and ApplicationSet configuration before syncing or diagnosing a deployment.
+description: Read Application and ApplicationSet configuration before syncing or diagnosing a deployment.
 weight: 10
 toc: true
 type: docs

@@ -1,12 +1,12 @@
 ---
 title: GitHub
-description: Understand UUG's workflow callers and the boundary between component releases and GitOps changes.
+description: Understand workflow callers and the boundary between component releases and GitOps changes.
 weight: 10
 toc: true
 type: docs
 ---
 
-UUG uses GitHub repositories for component source and GitHub Actions for delivery
+The products use GitHub repositories for component source and GitHub Actions for delivery
 automation. In Learn, small workflow callers delegate common jobs to
 `uug-ai/workflows`, while repository-specific inputs describe what to build and
 which GitOps image field to update.
