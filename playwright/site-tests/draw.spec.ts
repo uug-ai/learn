@@ -65,7 +65,7 @@ for (const fragment of ['', '#diagram=eyJub2RlcyI6W119+///==&fullscreen=1', '#di
 
 const howItWorksDiagrams = [
   {
-    caption: 'The UUG ecosystem',
+    caption: 'The ecosystem',
     nodes: ['camera-1', 'camera-2', 'factory', 'agent-1', 'agent-2', 'vault', 'storage', 'hub'],
     connections: ['camera-1:agent-1', 'camera-2:agent-2', 'factory:agent-1', 'factory:agent-2',
       'agent-1:vault', 'agent-2:vault', 'vault:storage', 'vault:hub'],
@@ -97,15 +97,15 @@ const howItWorksDiagrams = [
   },
 ];
 
-test('introduces the UUG ecosystem without legacy branding or broken product links', async ({ page, request }) => {
+test('introduces the ecosystem without company naming or broken product links', async ({ page, request }) => {
   const response = await page.goto('/docs/prologue/how/');
   expect(response?.status()).toBe(200);
   await expect(page.locator('h1')).toHaveText('How it works');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
-    'content', 'How Agent, Vault, Factory and Hub work together in the UUG ecosystem.',
+    'content', 'How Agent, Vault, Factory and Hub work together in the ecosystem.',
   );
   const content = page.locator('#content .content');
-  await expect(content).not.toContainText(/kerberos/i);
+  await expect(content).not.toContainText(/kerberos|uug/i);
   await expect(content.locator('a[href*="kerberos"], img[src*="kerberos"], [alt*="Kerberos"]')).toHaveCount(0);
   expect(await page.locator('head').innerHTML()).not.toMatch(/kerberos/i);
   for (const product of ['Agent', 'Vault', 'Factory', 'Hub']) {

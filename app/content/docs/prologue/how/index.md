@@ -1,7 +1,7 @@
 ---
 podcast: prologue-how
 title: "How it works"
-description: "How Agent, Vault, Factory and Hub work together in the UUG ecosystem."
+description: "How Agent, Vault, Factory and Hub work together in the ecosystem."
 lead: "Record with Agent, store with Vault, manage Agents with Factory and bring it together in Hub."
 date: 2020-10-06T08:48:57+00:00
 lastmod: 2026-11-05T00:00:00+00:00
@@ -14,7 +14,7 @@ weight: 102
 toc: true
 ---
 
-The UUG ecosystem brings together four products for recording, storing, managing and working with video. Start with one camera and an Agent, then add the products your deployment needs. You do not have to install the whole ecosystem to get started.
+The ecosystem brings together four products for recording, storing, managing and working with video. Start with one camera and an Agent, then add the products your deployment needs. You do not have to install the whole ecosystem to get started.
 
 ## An overview
 
@@ -29,7 +29,7 @@ Each product has a distinct responsibility:
 
 The diagram shows a deployment using all four products. Factory manages the Agents; it is not part of the recording upload path. Agents send recordings to Vault, which stores them and notifies Hub through its configured integration.
 
-{{< rete caption="The UUG ecosystem" alt="Cameras feed Agents, optionally managed by Factory. Vault persists recordings to object storage and sends recording events to Hub." height="540" >}}
+{{< rete caption="The ecosystem" alt="Cameras feed Agents, optionally managed by Factory. Vault persists recordings to object storage and sends recording events to Hub." height="540" >}}
 {
   "groups": [
     { "id": "capture", "label": "1. Camera processing - edge / cloud", "x": 0, "y": 20, "w": 540, "h": 520 },
