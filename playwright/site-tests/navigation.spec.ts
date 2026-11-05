@@ -75,7 +75,7 @@ const products = [
     accent: '#4a786a',
     article: 'getting-started',
     gettingStarted: 'Getting Started',
-    topics: ['Configuration & engines', 'License'],
+    topics: ['Configuration & engines', 'License', 'Quickstart'],
     topic: { slug: 'configuration-and-engines', title: 'Configuration & engines' },
   },
   {
