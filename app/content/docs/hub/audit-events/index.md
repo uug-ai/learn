@@ -189,9 +189,6 @@ resent batches.
 | `bearerToken` | Optional. Sent as `Authorization: Bearer <token>`. |
 | `secretHeaders.<name>.value` | Optional. A header with a secret value, such as an API key. |
 
-`bearerToken` and `secretHeaders` can also reference an existing Secret; see
-[Credentials](#credentials).
-
 ```yaml
 kerberoshub:
   audit:
@@ -272,7 +269,7 @@ kerberoshub:
 | `allowUnlockedBucket` | Optional, default `false`. `true` skips the Object Lock check. See below. |
 | `accessKey`, `secretKey` | Optional, both or neither, not empty. The S3 access key and secret key. See [Credentials](#credentials). |
 
-Without `accessKey` and `secretKey` (or `credentialsSecret`), `hub-audit` uses the
+Without `accessKey` and `secretKey`, `hub-audit` uses the
 pod's AWS identity: the default AWS chain, such as an instance profile, or IRSA
 through a ServiceAccount of its own. That only works for AWS S3; every other
 store needs keys.
@@ -312,37 +309,6 @@ webhooks, `s3.accessKey` and `s3.secretKey` on S3 destinations. The chart
 stores them in a Secret named `hub-audit-<id>-credentials` and mounts it into
 `hub-audit`. They never appear in the rendered ConfigMap or Deployment, and a
 changed value takes effect within a few minutes, without a restart.
-
-To keep credentials out of the Helm values, for example with Sealed Secrets or
-External Secrets, create a Secret in the Hub namespace yourself and reference it
-instead of the inline value:
-
-| Inline value | Reference to an existing Secret |
-| --- | --- |
-| `bearerToken` | `bearerTokenSecret: {name, key}` (`key` defaults to `token`) |
-| `secretHeaders.<name>.value` | `secretHeaders.<name>: {secretName, secretKey}` |
-| `s3.accessKey`, `s3.secretKey` | `credentialsSecret: {name, accessKeyIdKey, secretAccessKeyKey}` |
-
-`key`, `secretKey`, `accessKeyIdKey` and `secretAccessKeyKey` are the *names*
-of keys inside the Secret, not the credentials. `credentialsSecret` reads
-`access-key-id` and `secret-access-key` unless you set them:
-
-```bash
-kubectl -n <hub-namespace> create secret generic audit-immutable-archive \
-  --from-literal=access-key-id='<access key>' \
-  --from-literal=secret-access-key='<secret key>'
-```
-
-```yaml
-        credentialsSecret:
-          name: audit-immutable-archive
-```
-
-Use one or the other for each credential; setting both fails the Helm render.
-Helm doesn't take over a resource it didn't create, so delete a Secret you made
-yourself before the chart creates one with the same name. Since chart 0.171.0,
-`credentialsSecret.create: true` with `accessKeyId` and `secretAccessKey` also
-works; it does the same as `s3.accessKey` and `s3.secretKey`.
 
 ### S3 providers
 
