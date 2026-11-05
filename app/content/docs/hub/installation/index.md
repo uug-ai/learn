@@ -18,6 +18,8 @@ Hub is the single pane of glass for your Agents. It comes with a best-of-breed o
 
 No matter how many Agents you have running in the field, Hub will manage them.
 
+For a concise Kubernetes deployment with dependency checks and local UI access, follow the [Quickstart](/docs/hub/quickstart). It also explains the current Docker limitation.
+
 ## Helm and Kubernetes
 
 Hub is composed of a couple of microservices which are all installed in a Kubernetes cluster. Because we are dealing with many containers, we can benefit from package managers such as [Helm](https://helm.sh/) to deploy our resources more easily. In the near future we might use the [Kubernetes operator](https://kubernetes.io/docs/concepts/extend-kubernetes/operator) as well.

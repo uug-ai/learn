@@ -57,7 +57,7 @@ const products = [
       'Analytics', 'Audit events', 'Authentication', 'Cases', 'Cleanup', 'Configuration', 'Domains',
       'Feature flags', 'Floor plans', 'License', 'Live view', 'Maps', 'Markers',
       'Media processing', 'MP4 Verification', 'Notifications', 'ONVIF',
-      'Organisations and projects', 'Pipeline', 'Recordings', 'Roles', 'SSO',
+      'Organisations and projects', 'Pipeline', 'Quickstart', 'Recordings', 'Roles', 'SSO',
       'White-label', 'Workflows',
     ],
     topic: { slug: 'organisations', title: 'Organisations and projects' },
@@ -87,6 +87,23 @@ const products = [
     topic: { slug: 'accounts', title: 'Accounts' },
   },
 ];
+
+test('hub: links installation to a multi-service Kubernetes quickstart and states the Docker limitation', async ({ page }) => {
+  await page.goto('/docs/hub/installation/');
+  await page.locator('#content').getByRole('link', { name: 'Quickstart', exact: true }).click();
+  await expect(page).toHaveURL(/\/docs\/hub\/quickstart\/$/);
+  const content = page.locator('#content');
+  await expect(content.locator('h1')).toHaveText('Quickstart');
+  await expect(content.locator('h2')).toHaveText(['Docker', 'Kubernetes']);
+  await expect(content).toContainText('There is no verified standalone Docker quickstart');
+  await expect(content.locator('pre').filter({ hasText: 'helm upgrade --install hub' }))
+    .toContainText('--version 0.170.1');
+  await expect(content.locator('pre').filter({ hasText: 'svc/hub-api-svc' }))
+    .toContainText('8081:8081');
+  await expect(content.locator('pre').filter({ hasText: 'svc/hub-frontend-svc' }))
+    .toContainText('8080:80');
+  await expect(content).toContainText('Replace both seeded users');
+});
 
 test('vault: links the installation guide to the Docker and Kubernetes quickstart', async ({ page }) => {
   await page.goto('/docs/vault/installation/');
