@@ -103,6 +103,8 @@ from Hub's own database.
 | Webhook destinations | 0.137.0 or later | Any release |
 | S3 Object Lock destinations | 0.168.1 or later | v1.0.9 or later |
 | `s3.allowUnlockedBucket` | 0.168.2 or later | v1.0.10 or later |
+| Inline credentials (`bearerToken`, `secretHeaders.<name>.value`, `s3.accessKey` / `s3.secretKey`) | 0.172.0 or later | Any release that supports the destination type |
+| Destinations enabled unless `enabled: false` | 0.174.0 or later | Any release |
 
 Before chart 0.168.4, the default `kerberoshub.audit.tag` was older than v1.0.9, so
 set it explicitly when you use S3 destinations with an older chart.
@@ -157,7 +159,7 @@ Settings shared by both types:
 | --- | --- | --- |
 | `id` | Unique name: lowercase letters, digits and `-`, starting with a letter, at most 63 characters. Keeps the checkpoint, so don't rename it casually. | Required |
 | `type` | `webhook` or `s3`. | `webhook` |
-| `enabled` | `true` to deliver. A destination without `enabled: true` is skipped; its checkpoint is kept, so switching it back on resumes delivery. | `false` |
+| `enabled` | `false` pauses delivery. The checkpoint is kept, so switching it back on resumes delivery. Charts before 0.174.0 need `enabled: true`. | `true` |
 | `timeoutSeconds` | Timeout for one delivery, at most 60. | `10` |
 | `batchSize` | Events per batch, at most 1000. | `100` |
 | `maxAttempts` | Attempts before a batch is dead-lettered. | `10` |
@@ -178,9 +180,14 @@ A webhook destination posts each batch as JSON to `url` (`http` or `https`):
 
 Every request carries an `Idempotency-Key` header,
 `audit:<destination id>:<first event id>:<last event id>`. Use it to drop
-resent batches. Add your own headers with `headers` (plain values) and
-`secretHeaders` (values from a Kubernetes Secret). For a bearer token, use
-`bearerTokenSecret`: its value is sent as `Authorization: Bearer <token>`.
+resent batches.
+
+| Webhook setting | Value |
+| --- | --- |
+| `url` | Required. `http` or `https` endpoint that receives each batch. |
+| `headers` | Optional. Public request headers. `Authorization` and `Idempotency-Key` are reserved. |
+| `bearerToken` | Optional. Sent as `Authorization: Bearer <token>`. |
+| `secretHeaders.<name>.value` | Optional. A header with a secret value, such as an API key. |
 
 ```yaml
 kerberoshub:
@@ -196,19 +203,13 @@ kerberoshub:
         startAt: latest
         headers:
           X-Source: kerberos-hub
-        bearerTokenSecret:
-          name: audit-primary-siem
-          key: token
+        bearerToken: <token>
         secretHeaders:
           X-Api-Key:
-            secretName: audit-primary-siem
-            secretKey: api-key
+            value: <api key>
         filters:
           outcomes: [failure]
 ```
-
-Secrets must exist in the Hub namespace. The chart mounts them as files into
-`hub-audit`; their values never appear in the rendered ConfigMap.
 
 ### S3 Object Lock destination
 
@@ -254,27 +255,24 @@ kerberoshub:
           bucket: hub-audit-archive
           region: eu-west-1
           prefix: hub
-        credentialsSecret:
-          name: audit-immutable-archive
-          accessKeyIdKey: access-key-id
-          secretAccessKeyKey: secret-access-key
+          accessKey: <access key>
+          secretKey: <secret key>
 ```
 
 | `s3` setting | Value |
 | --- | --- |
 | `bucket` | Bucket name. Required. |
 | `region` | Bucket region. Required, also for S3-compatible stores; see [S3 providers](#s3-providers) for the value to use. |
-| `prefix` | Optional key prefix. |
-| `endpoint` | Base URL of an S3-compatible store, including `https://` or `http://`, without the bucket name. Leave empty for AWS S3. |
-| `forcePathStyle` | `true` for stores that need path-style URLs (`<endpoint>/<bucket>/<key>`). |
-| `allowUnlockedBucket` | `true` skips the Object Lock check. See below. |
+| `prefix` | Optional. Key prefix. |
+| `endpoint` | Optional. Base URL of an S3-compatible store, including `https://` or `http://`, without the bucket name. Leave empty for AWS S3. |
+| `forcePathStyle` | Optional, default `false`. `true` for stores that need path-style URLs (`<endpoint>/<bucket>/<key>`). |
+| `allowUnlockedBucket` | Optional, default `false`. `true` skips the Object Lock check. See below. |
+| `accessKey`, `secretKey` | Optional, both or neither, not empty. The S3 access key and secret key. See [Credentials](#credentials). |
 
-**Credentials.** With `credentialsSecret`, the access key and secret key are read
-from that Secret (keys `access-key-id` and `secret-access-key` unless you set
-`accessKeyIdKey` and `secretAccessKeyKey`), and rotated keys are picked up within
-a minute. Without it, `hub-audit` uses the pod's AWS identity: the default AWS
-chain, such as an instance profile, or IRSA through a ServiceAccount of its own.
-That only works for AWS S3; every other store needs `credentialsSecret`.
+Without `accessKey` and `secretKey`, `hub-audit` uses the
+pod's AWS identity: the default AWS chain, such as an instance profile, or IRSA
+through a ServiceAccount of its own. That only works for AWS S3; every other
+store needs keys.
 
 ```yaml
 kerberoshub:
@@ -286,8 +284,7 @@ kerberoshub:
 ```
 
 With `create: false` and a `name`, an existing ServiceAccount is used instead.
-Without either, `hub-audit` runs as `kerberoshub.serviceAccount` like the other
-Hub services.
+Without either, `hub-audit` runs as `kerberoshub.serviceAccount`.
 
 **Stores without Object Lock.** Some S3-compatible stores, such as Garage, don't
 support Object Lock, so the check above always fails. Set
@@ -304,6 +301,14 @@ s3:
   forcePathStyle: true
   allowUnlockedBucket: true
 ```
+
+### Credentials
+
+Destination credentials are set inline in the values: `bearerToken` and `secretHeaders.<name>.value` on
+webhooks, `s3.accessKey` and `s3.secretKey` on S3 destinations. The chart
+stores them in a Secret named `hub-audit-<id>-credentials` and mounts it into
+`hub-audit`. They never appear in the rendered ConfigMap or Deployment, and a
+changed value takes effect within a few minutes, without a restart.
 
 ### S3 providers
 
@@ -379,7 +384,7 @@ for the reason a destination fails.
   are not necessarily recorded as user-intent audit events.
 - **A value is cut off.** Hover over the table value or expand the row to view
   the complete metadata.
-- **A destination receives nothing.** Check that it has `enabled: true`, that
+- **A destination receives nothing.** Check that it isn't set to `enabled: false`, that
   `audit.enabled` is `true`, and that its `filters` match the events you expect.
   A new destination with `startAt: latest` only receives events created after it
   was first loaded.
