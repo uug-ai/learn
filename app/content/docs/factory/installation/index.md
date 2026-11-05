@@ -16,6 +16,8 @@ toc: true
 
 Factory is shipped as a container image and is required to be installed inside a Kubernetes cluster. Factory integrates with the Kubernetes API server to automatically provision Agents on your behalf. This means that Factory is out-of-scope if you are planning to use a `docker` or `docker compose` setup.
 
+For a short, database-free Kubernetes installation, follow the [Quickstart](/docs/factory/quickstart).
+
 You can run Factory wherever you can run a Kubernetes cluster, so it can run at the edge, or in the cloud. Although you might expect that Kubernetes at the edge or Kubernetes in the cloud is the same installation, you will notice that there are a few differences.
 
 When running a managed Kubernetes cluster, such as [GKE](https://cloud.google.com/kubernetes-engine), [EKS](https://aws.amazon.com/eks/) or [AKS](https://azure.microsoft.com/en-us/products/kubernetes-service/), you will have a wide range of superpowers such as a `LoadBalancer` service, automatic `Volume` creation, etc. These are missing in a self-hosted deployment, where you will have to prepare the volumes yourself and install an edge load balancer like `MetalLB`.
