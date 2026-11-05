@@ -299,8 +299,7 @@ s3:
 
 ### Credentials
 
-Destination credentials are set inline in the values, like the credentials of
-the other Hub services: `bearerToken` and `secretHeaders.<name>.value` on
+Destination credentials are set inline in the values: `bearerToken` and `secretHeaders.<name>.value` on
 webhooks, `s3.accessKey` and `s3.secretKey` on S3 destinations. The chart
 stores them in a Secret named `hub-audit-<id>-credentials` and mounts it into
 `hub-audit`. They never appear in the rendered ConfigMap or Deployment, and a
