@@ -136,6 +136,8 @@ the theme.
 Run `npm run test:navigation` in `playwright/` to check desktop/mobile grouping,
 alphabetical ordering, nested guides, footer navigation, and product colors.
 
+The header wordmark is **UUG**, configured by `params.navbar.brandText` in
+`app/hugo.yaml`; page titles and installable app metadata retain **Learn**.
 The global header matches the website and design toolkit at 77px tall: a 4px
 gradient accent, a 72px content row, and a 1px bottom border. Topbar controls use
 flex layout to avoid extra inline baseline spacing. The navigation tests also

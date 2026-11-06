@@ -85,7 +85,7 @@ params:
   navbar:
     displayTitle: true
     displayLogo: false
-    brandText: Learn
+    brandText: UUG
     logo:
       path: favicon.svg
       dark: favicon.svg
