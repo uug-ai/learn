@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { textContrast } from './utils/contrast';
@@ -13,7 +14,7 @@ test('keeps company naming out of editorial content while preserving technical i
   }
 });
 
-test('uses UUG header branding while retaining Learn metadata and installable app assets', async ({ page, request }) => {
+test('uses UUG header and favicon artwork while retaining Learn metadata', async ({ page, request }) => {
   for (const path of ['/', '/docs/', '/docs/prologue/', '/docs/prologue/how/', '/docs/prologue/mission/',
     '/docs/prologue/glossary/', '/docs/agent/license/', '/docs/factory/license/', '/docs/vault/license/',
     '/guides/', '/guides/onboarding/', '/guides/platform-engineering/',
@@ -24,7 +25,15 @@ test('uses UUG header branding while retaining Learn metadata and installable ap
     expect(await page.title()).not.toMatch(/augment vision|\buug\b/i);
     await expect(page.locator('meta[name="description"]')).not.toHaveAttribute('content', /augment vision|\buug\b/i);
     await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute('content', 'Learn');
-    await expect(page.locator('link[rel="icon shortcut"]')).toHaveAttribute('href', '/favicon.ico?v=learn-neutral');
+    await expect(page.locator('link[rel="icon shortcut"]')).toHaveAttribute('href', '/favicon.ico?v=uug-midnight');
+    for (const size of [16, 32]) {
+      await expect(page.locator(`link[rel="icon"][sizes="${size}x${size}"]`))
+        .toHaveAttribute('href', `/favicon-${size}x${size}.png?v=uug-midnight`);
+    }
+    await expect(page.locator('link[rel="apple-touch-icon"]'))
+      .toHaveAttribute('href', '/apple-touch-icon.png?v=uug-midnight');
+    await expect(page.locator('link[rel="manifest"]'))
+      .toHaveAttribute('href', '/site.webmanifest?v=uug-midnight');
   }
   await page.goto('/docs/prologue/glossary/');
   await expect(page.locator('#ecosystem')).toHaveCount(1);
@@ -38,12 +47,20 @@ test('uses UUG header branding while retaining Learn metadata and installable ap
   const manifest = await manifestResponse.json();
   expect(manifest).toMatchObject({ name: 'Learn', short_name: 'Learn' });
   for (const icon of manifest.icons) {
-    expect(icon.src).toContain('?v=learn-neutral');
+    expect(icon.src).toContain('?v=uug-midnight');
     expect((await request.get(icon.src)).status()).toBe(200);
   }
-  for (const icon of ['/favicon.svg', '/favicon.ico', '/favicon-16x16.png',
-    '/favicon-32x32.png', '/apple-touch-icon.png']) {
-    expect((await request.get(icon)).status(), icon).toBe(200);
+  for (const [icon, hash] of Object.entries({
+    'favicon.ico': 'd9b96051c5b6a75741d9e1c8983c0e6bd1f971fa99d36de1a7a6e8ab0e4bb9eb',
+    'favicon-16x16.png': '03bfeb9505d5b58423fbc6076f407a539d1efccf6f8a71a19bb8b5ab94eae409',
+    'favicon-32x32.png': '65bdd9cb2cafbd9e55900d3f6ee70720a5389742c4a43bf4b058b58e92938412',
+    'apple-touch-icon.png': 'ed86bd5522deaab2219720cab66498fe9e50185df94d4d28b8f67f97e58e46be',
+    'android-chrome-192x192.png': 'f0da0ec1c130d0548c8efb2ef1a1ff6010fc7908b3ebeadb9028e7c7bed9d8d2',
+    'android-chrome-512x512.png': '5e2b33290650b5c951941de7ce664abb517f6809d50903050b4570b18c8bb04f',
+  })) {
+    const response = await request.get(`/${icon}?v=uug-midnight`);
+    expect(response.status(), icon).toBe(200);
+    expect(createHash('sha256').update(await response.body()).digest('hex'), icon).toBe(hash);
   }
 });
 

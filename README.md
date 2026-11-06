@@ -14,12 +14,12 @@ A modern, fast, and feature-rich documentation website built with [Hugo](https:/
 
 ## Favicons
 
-The icons in `app/static/` use the neutral book artwork in `favicon.svg`:
-ICO, 16/32px browser PNGs, a 180px Apple touch icon, and 192/512px app icons.
-The custom
+The icons in `app/static/` use the same white UUG wordmark on a midnight
+background as the website: ICO, 16/32px browser PNGs, a 180px Apple touch icon,
+and 192/512px app icons. The custom
 `app/layouts/_partials/favicons.html` partial and `app/static/site.webmanifest`
-use `?v=learn-neutral` URLs to refresh older cached artwork. The manifest names
-the app **Learn**. Page titles and navigation also use Learn, while the
+use `?v=uug-midnight` URLs to refresh older cached artwork. The manifest and
+page titles retain **Learn**, while the header wordmark is **UUG**. The
 documentation refers to Agent, Factory, Vault and Hub without a company prefix.
 Keep functional domains, repository and package names, API schemas, and legal
 copyright notices unchanged when updating editorial naming.

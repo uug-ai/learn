@@ -87,8 +87,8 @@ params:
     displayLogo: false
     brandText: UUG
     logo:
-      path: favicon.svg
-      dark: favicon.svg
+      path: android-chrome-192x192.png
+      dark: android-chrome-192x192.png
       link: /
       width: 40
 
