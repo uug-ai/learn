@@ -13,13 +13,13 @@ test('keeps company naming out of editorial content while preserving technical i
   }
 });
 
-test('uses neutral Learn naming in navigation, page metadata and installable app assets', async ({ page, request }) => {
+test('uses UUG header branding while retaining Learn metadata and installable app assets', async ({ page, request }) => {
   for (const path of ['/', '/docs/', '/docs/prologue/', '/docs/prologue/how/', '/docs/prologue/mission/',
     '/docs/prologue/glossary/', '/docs/agent/license/', '/docs/factory/license/', '/docs/vault/license/',
     '/guides/', '/guides/onboarding/', '/guides/platform-engineering/',
     '/tutorials/hub/apply-mongodb-indexes/', '/release-notes/']) {
     await page.goto(path);
-    await expect(page.locator('.learn-topbar-brand')).toHaveText('Learn');
+    await expect(page.getByRole('link', { name: 'UUG', exact: true })).toHaveAttribute('href', '/');
     await expect(page).toHaveTitle(/Learn$/);
     expect(await page.title()).not.toMatch(/augment vision|\buug\b/i);
     await expect(page.locator('meta[name="description"]')).not.toHaveAttribute('content', /augment vision|\buug\b/i);
@@ -130,7 +130,7 @@ for (const width of [320, 390, 767, 768, 900, 1024, 1280]) {
     const github = header.getByRole('link', { name: 'GitHub', exact: true });
 
     for (const theme of ['light', 'dark']) {
-      await expect(brand).toHaveText('Learn');
+      await expect(brand).toHaveText('UUG');
       await expect(brand).toHaveAttribute('href', '/');
       await expect(brandText).toHaveCSS('font-family', 'Outfit, sans-serif');
       await expect(brandText).toHaveCSS('font-size', '18.4px');
