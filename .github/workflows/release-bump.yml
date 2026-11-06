@@ -12,38 +12,51 @@ on:
           - major
           - minor
           - patch
+      existing_tag:
+        description: Existing release to retry without moving its source tag
+        type: string
+        default: ""
+      publish:
+        description: Publish images (false builds without creating a version)
+        type: boolean
+        default: true
+      hardened:
+        description: Run image hardening checks, SBOM, provenance and signing (slower)
+        type: boolean
+        default: false
 
 permissions:
   contents: write
   packages: write
+  id-token: write
 
 jobs:
-  # Determine the next version, create the GitHub release and expose the tag.
   bump-release:
+    if: inputs.publish && inputs.existing_tag == ''
     uses: uug-ai/workflows/.github/workflows/release-bump.yml@main
     with:
       bump: ${{ github.event.inputs.bump }}
+      draft: true
     secrets: inherit
 
-  verify-release:
-    needs: [bump-release, release]
-    uses: ./.github/workflows/security-scan.yml
-    with:
-      image_ref: ghcr.io/uug-ai/learn:${{ needs.bump-release.outputs.tag }}
-    secrets: inherit
-
-  # Run the original release pipeline for the freshly created tag.
-  # A release created with the default GITHUB_TOKEN does not emit the
-  # `release: created` event, so we invoke the reusable workflow directly.
   release:
     needs: bump-release
+    if: ${{ always() && !cancelled() && (needs.bump-release.result == 'success' || needs.bump-release.result == 'skipped') }}
     uses: uug-ai/workflows/.github/workflows/release-create.yml@main
     with:
       organization: uug-ai
       project: ${{ github.event.repository.name }}
-      tag: ${{ needs.bump-release.outputs.tag }}
+      tag: ${{ inputs.existing_tag || needs.bump-release.outputs.tag }}
       docker_context: "."
-      create_gitops_pr: true
+      hardened: ${{ inputs.hardened }}
+      hardened_profile: standalone
+      hardened_entrypoint: '["/usr/sbin/nginx"]'
+      hardened_command: '["-e","/dev/stderr","-g","daemon off;"]'
+      hardened_workdir: /usr/share/nginx/html
+      use_private_module_auth: false
+      publish: ${{ inputs.publish }}
+      finalize_release: true
+      create_gitops_pr: ${{ inputs.publish }}
       runner_matrix: >-
         [
           {"architecture":"amd64","runner":"ubuntu-24.04"},
@@ -52,5 +65,5 @@ jobs:
       gitops_repo: "uug-ai/gitops"
       gitops_file: "environments/staging/learn/deployment.yaml"
       gitops_key: ".spec.template.spec.containers[0].image"
-      gitops_value: "ghcr.io/uug-ai/learn:${{ needs.bump-release.outputs.tag }}"
+      gitops_value: "ghcr.io/uug-ai/learn:${{ inputs.existing_tag || needs.bump-release.outputs.tag }}"
     secrets: inherit

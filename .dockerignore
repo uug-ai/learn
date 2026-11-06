@@ -1,0 +1,10 @@
+**
+!Dockerfile
+!nginx.conf
+!app/
+!app/**
+app/.git
+app/node_modules
+app/public
+app/resources
+app/.hugo_build.lock

@@ -456,14 +456,34 @@ The generated site will be in the `app/public/` directory.
 The hosted `https://learn.uug.ai` site uses versioned
 `ghcr.io/uug-ai/learn` images managed by `uug-ai/gitops` and Argo CD.
 After merging a change, run the **Bump release** workflow with a patch bump.
-It publishes amd64/arm64 images, scans the published release, and opens a
-GitOps PR for `environments/staging/learn/deployment.yaml`.
+Like Hub Frontend, it offers a **hardened** checkbox (off by default), a
+**publish** checkbox (on by default), and **existing_tag** for retries without
+creating a new version or moving its source tag.
+With hardening enabled, both amd64/arm64 images must pass the native build,
+runtime smoke, vulnerability and secret checks before publication with SBOMs,
+provenance and signatures. The release remains a draft until publication and
+verification succeed, and its notes record whether hardening was verified.
+Without hardening, the standard image build runs without those additional gates.
+Turning **publish** off validates without creating a release, pushing images or
+opening a GitOps PR. Leave **existing_tag** empty to validate the selected branch;
+set it to validate or retry an existing tag that includes the hardening setup.
+
+The bump workflow is the sole release entrypoint; the old automatic
+`release: created` workflow is removed so it cannot bypass draft-release gating.
+Successful publication opens a GitOps PR for
+`environments/staging/learn/deployment.yaml`.
 That PR does not deploy production. After the release checks pass, merge the
 staging update and promote the same versioned image in
 `environments/production/learn/deployment.yaml` through a separate GitOps PR.
 Argo CD automatically reconciles the merged production manifest. Verify the
 public HTTPS site after rollout; publishing a GitHub release alone is not
 confirmation of a production deployment.
+
+For the first image using this runtime, include the container port change from
+80 to 8080 in the same GitOps change as the new image tag, in each environment.
+Services keep public port 80 and use the container's named `http` target port.
+Do not roll out the port change on its own while an older port-80 image is
+still selected.
 
 The site can be deployed to various platforms:
 
@@ -478,19 +498,32 @@ Build and run with Docker:
 
 ```bash
 docker build -t docs-site .
-docker run -p 8080:80 docs-site
+docker run --read-only --cap-drop ALL --security-opt no-new-privileges \
+  --tmpfs /tmp:rw,noexec,nosuid,size=16m,mode=1777 -p 8080:8080 docs-site
 ```
 
-The Nginx runtime requires `brotli-libs>=1.2.1-r0`, which fixes
-CVE-2026-111497. The image build installs that minimum even when the upstream
-Nginx image still contains an older Brotli package.
+Hugo and both base images are pinned. The final Chainguard Nginx image contains
+only the server and generated site, runs as `65532:65532` on port 8080, and has
+no shell, package manager or credential build arguments. Site files are owned
+by root and readable, not writable, by the runtime user. Only `/tmp` needs to
+be writable; `/healthz` provides readiness without invoking tools in the image.
 
-Security CI builds and smoke-tests both amd64 and arm64 runtimes, reports all
-Trivy vulnerability severities, and fails on HIGH or CRITICAL findings without
-excluding unfixed vulnerabilities. Release workflows also scan both platforms
-of the actual published image. To rescan an existing image, run the **Security
-scan** workflow with its `image_ref` input set to the image tag or immutable
-digest.
+Security CI runs the same shared hardening pipeline on pull requests, main
+pushes and manual **Security scan** runs for both amd64 and arm64 without
+publishing. It checks the image identity, entrypoint, working directory, runtime
+files and package inventory, emits scan reports/SBOMs, and blocks MEDIUM, HIGH
+or CRITICAL vulnerabilities (including unfixed findings) and detected secrets.
+Learn uses the shared `standalone` profile with the Nginx entrypoint because
+it serves Hugo-generated files, not Hub Frontend's Go configuration launcher
+and npm-built application.
+
+Run the native build checks and actual-container smoke locally with Docker:
+
+```bash
+docker build --target test .
+docker build -t learn:smoke .
+bash image/smoke-test.sh learn:smoke
+```
 
 ## Contributing
 
