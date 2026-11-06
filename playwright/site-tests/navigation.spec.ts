@@ -117,6 +117,84 @@ test('vault: links the installation guide to the Docker and Kubernetes quickstar
     .toContainText('kubectl port-forward -n kerberos-vault svc/vault-nodeport 8080:80');
 });
 
+for (const width of [320, 390, 767, 768, 900, 1024, 1280]) {
+  test(`navbar: keeps website text and icon spacing without overlap at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.goto('/docs/hub/');
+    await page.evaluate(() => document.fonts.ready);
+    const header = page.locator('.learn-topbar');
+    const brand = header.locator('.learn-topbar-brand');
+    const brandText = header.locator('.learn-topbar-brand-text');
+    const toggle = header.locator('.learn-theme-toggle');
+    const github = header.getByRole('link', { name: 'GitHub', exact: true });
+
+    for (const theme of ['light', 'dark']) {
+      await expect(brand).toHaveText('Learn');
+      await expect(brand).toHaveAttribute('href', '/');
+      await expect(brandText).toHaveCSS('font-family', 'Outfit, sans-serif');
+      await expect(brandText).toHaveCSS('font-size', '18.4px');
+      await expect(brandText).toHaveCSS('font-weight', '600');
+      await expect(brandText).toHaveCSS('letter-spacing', '2.208px');
+      await expect(toggle).toHaveAttribute('aria-pressed', String(theme === 'dark'));
+      await expect(github).toHaveAttribute('href', 'https://github.com/uug-ai/documentation');
+      await expect(github).toHaveAttribute('target', '_blank');
+      await expect(github).toHaveAttribute('rel', 'noreferrer');
+      for (const control of [toggle, github]) {
+        await expect(control).toHaveCSS('width', '44px');
+        await expect(control).toHaveCSS('height', '44px');
+      }
+
+      const bounds = await header.evaluate(element => {
+        const box = (selector: string) => {
+          const target = element.querySelector(selector);
+          if (!target) throw new Error(`Missing navbar element: ${selector}`);
+          return target.getBoundingClientRect();
+        };
+        const toggle = box('.learn-theme-toggle');
+        const github = box('.learn-topbar-icon-link');
+        const children = [...element.querySelectorAll('.learn-topbar-inner > *')]
+          .map(child => child.getBoundingClientRect())
+          .filter(rect => rect.width > 0);
+        return {
+          centerGap: github.x + github.width / 2 - toggle.x - toggle.width / 2,
+          brandWidth: box('.learn-topbar-brand').width,
+          textWidth: box('.learn-topbar-brand-text').width,
+          gaps: children.slice(1).map((child, index) => child.left - children[index].right),
+          overflow: document.documentElement.scrollWidth - innerWidth,
+        };
+      });
+      expect(bounds.centerGap).toBe(50);
+      expect(bounds.brandWidth).toBeGreaterThanOrEqual(bounds.textWidth);
+      expect(bounds.gaps.every(gap => gap >= -0.5)).toBe(true);
+      expect(bounds.overflow).toBe(0);
+      if (width >= 768) {
+        await expect(header.locator('.learn-topbar-inner')).toHaveCSS('column-gap', '8px');
+        const search = header.getByRole('searchbox');
+        await search.focus();
+        await expect(search).toBeFocused();
+        await search.fill('Hub');
+        await expect(search).toHaveValue('Hub');
+        await search.fill('');
+        await search.press('Escape');
+      }
+      await toggle.focus();
+      await toggle.press('Enter');
+    }
+
+    if (width < 768) {
+      await header.getByRole('button', { name: 'Menu', exact: true }).click();
+      await expect(page.locator('aside.hextra-sidebar-container')).toBeInViewport();
+      await expect(page.locator('aside.hextra-sidebar-container')
+        .getByRole('link', { name: 'Documentation', exact: true })).toBeVisible();
+    } else {
+      const knowledgeBase = header.getByRole('button', { name: 'Knowledge base', exact: true });
+      await knowledgeBase.click();
+      await expect(header.getByRole('link', { name: /Tutorials/ })).toBeVisible();
+    }
+  });
+}
+
 for (const mobile of [false, true]) {
   test.describe(mobile ? 'mobile product navigation' : 'desktop product navigation', () => {
     test.use({
