@@ -501,7 +501,7 @@
   padding: calc(14px + var(--navbar-accent-height)) 20px 14px;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 0.5rem;
 }
 
 .learn-topbar-inner > * {
@@ -514,9 +514,22 @@
   align-items: center;
 }
 
+.learn-topbar-actions {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  /* Match the website's 50px icon centers while keeping 44px touch targets. */
+  gap: 6px;
+}
+
+.learn-topbar-actions > * {
+  flex-shrink: 0;
+}
+
 .learn-topbar-brand {
   display: inline-flex;
   align-items: center;
+  flex: 0 0 auto;
   gap: 0.65rem;
   margin-right: auto;
   color: var(--text-primary);
@@ -728,7 +741,6 @@
 }
 
 .learn-topbar-toggle {
-  margin-left: auto;
   cursor: pointer;
 }
 
@@ -896,6 +908,13 @@ main > h1 {
   .learn-topbar-brand-text {
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .learn-topbar-link,
+  .learn-topbar-dropdown-toggle {
+    padding-inline: 0.5rem;
   }
 }
 /* ==========================================================================
