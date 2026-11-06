@@ -202,6 +202,7 @@ Aside from the in-template `{{variables}}`, each email type has two values in th
 | Event / detection alert | `detection` | `alertTitle` | `detection` |
 | Device status change | `device` | `deviceTitle` | `device` |
 | Grouped device status change | `deviceGroup` | `deviceGroupTitle` | `device_group` |
+| Camera recordings (recording check) | `recording` | `recordingTitle` | `recording` |
 
 **Template variables**
 
@@ -308,6 +309,34 @@ The device monitor sends both device emails, so custom `device` and `device_grou
 **Which channels are grouped.** Grouping applies to the channels people read: email, Slack, Telegram, Pushover, Pushbullet, SMS and Alexa. Webhooks, IFTTT and the real-time feed are never grouped: they keep receiving one notification per camera, with the same fields and at the same moment as without grouping, so existing integrations keep working.
 
 **When email stays per camera.** The grouped email is only sent with the SMTP mail provider. With SendGrid or Mailgun the template name is a template id in that account, so those keep one `device` email per camera. With SMTP, a deployment that mounts its own `device` template but no `device_group` template also keeps one email per camera, so a white-labelled device email never falls back to the default layout. Add a `device_group` template next to your `device` template to get grouped emails.
+
+**Camera recordings email (`recording`)**
+
+Sent by the device monitor for the **Recording check** (Alerts → Devices): a selected camera that records continuously is online but has not uploaded a recording for the account's period (1 to 72 hours, default 2), and again once it records. The same template serves one camera and several; with **Group notifications** on, cameras that stop recording at the same time arrive in one email. The subject is the `recordingTitle` value; when it is empty, the subject is "[Device] A camera stopped recording", "[Device] A camera is recording again" or the form for several cameras.
+
+The `recording` value is empty by default, which uses the `recording` template with SMTP. With SendGrid or Mailgun, set it to the template id in that account; while it is empty, those providers send the `device` template.
+
+| Variable | Value |
+| --- | --- |
+| `{{user}}` | Name of the account the cameras belong to: first and last name, or the username when both are empty. |
+| `{{title}}` | The email subject. |
+| `{{text}}` | For one camera, "`<camera>` is online, but hasn't uploaded a recording for 2 hours." (followed by "The account reached its upload limit, so new recordings are not stored." when it has) or "`<camera>` is recording again.". For several cameras, "3 cameras stopped recording.", "2 cameras are recording again." or "3 cameras: 2 stopped recording, 1 recording again." |
+| `{{count}}` | Number of cameras in the email. |
+| `{{status}}` | `no_recordings` or `recording` when all cameras have the same change, otherwise `mixed`. |
+| `{{sections}}` | The cameras as HTML, in the same sections as `device_group`. The change labels are `No recordings` and `Recording again`; the camera details are `online, no recording for 3 hours` (with `, upload limit reached` when it applies) and `recording again`. |
+| `{{sectionsText}}` | The same sections as plain text, for `recording.txt`. |
+| `{{link}}` | The cameras page: `<tenant URL>/devices`. |
+| `{{eventdate}}`, `{{eventtime}}`, `{{eventdatetime}}` | When the email was sent, in the server's timezone (normally UTC). |
+
+`{{sectionsText}}` example:
+
+```text
+Site Gate · No recordings · all 2 cameras
+- Gate camera 1 (online, no recording for 2 hours)
+- Gate camera 2 (online, no recording for 2 hours)
+```
+
+Mount the template volume on `kerberoshub.monitordevice` for a custom `recording` template to take effect. With SMTP, a deployment that mounts its own `device` template but no `recording` template keeps getting its `device` template, one email per camera, so a white-labelled email never falls back to the default layout. Add a `recording` template next to your `device` template to get this email; the chart's `custom-layout/templates` folder has one to start from.
 
 **Account, sharing and task emails**
 
