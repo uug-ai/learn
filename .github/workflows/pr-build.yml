@@ -11,5 +11,6 @@ jobs:
       project: ${{ github.event.repository.name }}
       language: javascript
       docker_context: "."
+      use_private_module_auth: false
       runner_matrix: '[{"architecture":"amd64","runner":"ubuntu-24.04"},{"architecture":"arm64","runner":"ubuntu-24.04-arm"}]'
     secrets: inherit

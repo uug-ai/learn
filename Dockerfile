@@ -1,55 +1,37 @@
-FROM mcr.microsoft.com/devcontainers/go:1.25-bookworm AS builder
-
-ARG github_username
-ARG github_token
-
-# For maximum backward compatibility with Hugo modules
+# syntax=docker/dockerfile:1
+FROM golang:1.26.10-bookworm@sha256:632dff7351799a5a9954a48dc06670ade72ee44e8c351cdc0e5a57af2fea21af AS builder
 ENV HUGO_ENVIRONMENT=production
 ENV HUGO_ENV=production
+ENV GOTOOLCHAIN=local
 
-# Allow Go to download a newer toolchain when a dependency (e.g. Hugo)
-# requires a Go version newer than the one bundled in the base image.
-ENV GOTOOLCHAIN=auto
-
-WORKDIR /build
-
-# Copy the code necessary to build the application
-# You may want to change this to copy only what you actually need.
-COPY . .
-
-# Get local dependencies from private repo.
-RUN git config --global \
-    url."https://${github_username}:${github_token}@github.com/".insteadOf \
-    "https://github.com/"
-
-# Set working directory to the app folder
+RUN go install -tags extended github.com/gohugoio/hugo@v0.165.0
 WORKDIR /build/app
+COPY app/ ./
+RUN hugo --gc --minify --destination /site && \
+    find /site -type d -exec chmod 0755 {} + && \
+    find /site -type f -exec chmod 0444 {} +
 
-# Install Go dependencies
-RUN go mod tidy
+FROM builder AS test
+RUN test -s /site/index.html && \
+    test -s /site/docs/index.html && \
+    test -s /site/docs/hub/index.html && \
+    test -s /site/tutorials/index.html && \
+    test -s /site/sitemap.xml
 
-# Install Hugo
-RUN go install -tags extended,withdeploy github.com/gohugoio/hugo@latest && \
-    hugo version && \
-    hugo --gc --minify
-
-# Copy or create other directories/files your app needs during runtime.
-# E.g. this example uses /data as a working directory that would probably
-#      be bound to a perstistent dir when running the container normally
-RUN mkdir /data
-RUN cp -r public /data/site
-
-# ---- Final Stage ----
-FROM nginx:alpine
-
-RUN apk add --no-cache 'brotli-libs>=1.2.1-r0' 'curl>=8.23.0-r0' 'libcurl>=8.23.0-r0' 'libexpat>=2.10.0-r0'
-
-COPY --from=builder /data/site /usr/share/nginx/html
-
-# Permissions for nginx to access the files
-RUN chown -R nginx:nginx /usr/share/nginx/html
-
-COPY nginx.conf /etc/nginx/nginx.conf
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+FROM cgr.dev/chainguard/nginx:latest@sha256:9aa6c46648f17b2835d009fd4338b38591b2396670a07270ee19b532f83dbbb5
+ARG VERSION=dev
+ARG REVISION=unknown
+ARG CREATED
+LABEL org.opencontainers.image.title="learn" \
+      org.opencontainers.image.source="https://github.com/uug-ai/learn" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${REVISION}" \
+      org.opencontainers.image.created="${CREATED}" \
+      org.opencontainers.image.vendor="UUG.AI"
+COPY --from=builder --chown=0:0 /site /usr/share/nginx/html
+COPY --chown=0:0 --chmod=0444 nginx.conf /etc/nginx/nginx.conf
+USER 65532:65532
+WORKDIR /usr/share/nginx/html
+EXPOSE 8080
+ENTRYPOINT ["/usr/sbin/nginx"]
+CMD ["-e", "/dev/stderr", "-g", "daemon off;"]
