@@ -3,6 +3,11 @@ podcast: tutorials-hub-deploy-moq-relay-kubernetes
 title: 'Deploy a MoQ relay on Kubernetes'
 description: 'Run a TLS-enabled Media over QUIC relay behind a Kubernetes UDP LoadBalancer, then connect Hub and Agent to it.'
 date: '2026-08-19'
+author:
+  name: 'Cedric Verstraeten'
+  url: 'https://github.com/cedricve'
+  avatar: 'https://github.com/cedricve.png?size=72'
+images: ['social.png']
 weight: 3
 toc: true
 product: 'Hub'
@@ -12,7 +17,7 @@ tags: ['MoQ', 'Kubernetes', 'Networking']
 illustration: 'tutorial-hub-moq-relay'
 ---
 
-{{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
+{{< tutorial-byline >}}
 
 {{< tutorial-header alt="One stream from an Agent enters MoQ relay pods on a three-node Kubernetes cluster, which fan it out to a monitor, a laptop and a phone." >}}
 

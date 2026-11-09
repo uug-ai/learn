@@ -2,6 +2,11 @@
 title: 'Connect your VMS to Claude'
 description: 'Connect your Hub video management system to the Claude web UI with a custom MCP connector, then discover cameras and search recordings from a conversation.'
 date: '2026-11-09'
+author:
+  name: 'Cedric Verstraeten'
+  url: 'https://github.com/cedricve'
+  avatar: 'https://github.com/cedricve.png?size=72'
+images: ['social.png']
 weight: 8
 toc: true
 product: 'Hub'
@@ -11,7 +16,7 @@ tags: ['MCP', 'Claude', 'Access tokens']
 header: 'images/tutorial-claude-uug.svg'
 ---
 
-{{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Nov 9, 2026" updated="Nov 9, 2026" >}}
+{{< tutorial-byline >}}
 
 {{< tutorial-header alt="Claude and the platform wordmark side by side on a black background." >}}
 

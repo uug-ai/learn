@@ -1,7 +1,7 @@
 :root {
   --hx-text-base: 1rem;
-  --primary-hue: 339deg;
-  --primary-saturation: 93%;
+  --primary-hue: 245deg;
+  --primary-saturation: 100%;
   --primary-lightness: 50%;
   --secondary-hue: 245deg;
   --secondary-saturation: 100%;
@@ -14,6 +14,7 @@
   --hx-font-sans: var(--font-family-body);
   --hx-default-font-family: var(--font-family-body);
   --primary-color: #2713ff;
+  --link-color: var(--primary-color);
   --primary-dark: #1807c7;
   --secondary-color: #ff0059;
   --brand-gradient: linear-gradient(90deg, #2713ff 0%, #ff0059 100%);
@@ -31,6 +32,7 @@
    to dark mode alongside Hextra's content styling. */
 .dark {
   --primary-color: #6f5cff;
+  --link-color: #9c8fff;
   --primary-dark: #4b38e6;
   --secondary-color: #ff4d85;
   --brand-gradient: linear-gradient(90deg, #6f5cff 0%, #ff4d85 100%);
@@ -187,9 +189,25 @@
 }
 
 .content {
-  --learn-code-bg: color-mix(in srgb, var(--learn-product-accent, #2713ff) 28%, #0b1114);
-  --learn-code-border: color-mix(in srgb, var(--learn-product-accent, #2713ff) 35%, #36423e);
+  --learn-code-bg: color-mix(in srgb, var(--learn-product-accent, #2713ff) 6%, #1b1b20);
+  --learn-code-border: color-mix(in srgb, var(--learn-product-accent, #2713ff) 12%, #3a3a43);
   --learn-code-text: #edf5f2;
+}
+
+.content :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--link-color);
+}
+
+.content [class~="hx:bg-amber-100"] {
+  background-color: #f3f1e7;
+  border-color: #d7d0b6;
+  color: #625b45;
+}
+
+.dark .content [class~="hx:bg-amber-100"] {
+  background-color: #292820;
+  border-color: #514c38;
+  color: #d4cfb9;
 }
 
 .content pre:not(.mermaid) {
@@ -229,6 +247,10 @@
   background: var(--learn-code-bg);
   color: var(--learn-code-text);
   overflow: hidden;
+}
+
+.content .hextra-code-block .chroma .nb {
+  color: #79c0ff;
 }
 
 .content .hextra-code-block pre {
@@ -1119,16 +1141,12 @@ body.lightbox-open {
 
 .tutorial-panel--brand {
   border-color: rgba(39, 19, 255, 0.18);
-  background:
-    radial-gradient(120% 140% at 0% 0%, rgba(39, 19, 255, 0.08), transparent 60%),
-    linear-gradient(180deg, rgba(39, 19, 255, 0.045), rgba(255, 0, 89, 0.03));
+  background: var(--surface-strong);
 }
 
 .dark .tutorial-panel--brand {
   border-color: rgba(86, 66, 255, 0.35);
-  background:
-    radial-gradient(120% 140% at 0% 0%, rgba(86, 66, 255, 0.22), transparent 60%),
-    linear-gradient(180deg, rgba(39, 19, 255, 0.12), rgba(255, 0, 89, 0.05));
+  background: var(--surface-strong);
 }
 
 .tutorial-panel__head {

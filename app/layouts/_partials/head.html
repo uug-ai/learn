@@ -33,7 +33,11 @@
   {{- end -}}
 
   {{- partial "opengraph.html" . -}}
-  {{- partial "schema.html" . -}}
+  {{- if and .IsPage (eq .Section "tutorials") -}}
+    {{- partial "tutorial-seo.html" . -}}
+  {{- else -}}
+    {{- partial "schema.html" . -}}
+  {{- end -}}
   {{- partial "twitter_cards.html" . -}}
 
   {{- /* Fonts are self-hosted so no visitor data reaches Google. */}}

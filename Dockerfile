@@ -16,6 +16,8 @@ RUN test -s /site/index.html && \
     test -s /site/docs/index.html && \
     test -s /site/docs/hub/index.html && \
     test -s /site/tutorials/index.html && \
+    test -s /site/404.html && \
+    test -s /site/robots.txt && \
     test -s /site/sitemap.xml
 
 FROM cgr.dev/chainguard/nginx:latest@sha256:9aa6c46648f17b2835d009fd4338b38591b2396670a07270ee19b532f83dbbb5

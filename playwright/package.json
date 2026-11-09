@@ -13,6 +13,7 @@
     "test:code-blocks": "playwright test --config=code-blocks.config.ts",
     "new": "node scripts/new-hub-page.mjs",
     "tutorial-headers": "node scripts/generate-tutorial-headers.mjs",
+    "tutorial-social-images": "node scripts/generate-tutorial-social-images.mjs",
     "tutorial-header:comparison": "node scripts/generate-transport-comparison-header.mjs",
     "tutorial-header:moq-relay": "node scripts/generate-moq-relay-kubernetes-header.mjs",
     "tutorial-header:camera-agent": "node scripts/generate-camera-agent-header.mjs",

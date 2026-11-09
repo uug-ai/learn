@@ -3,6 +3,11 @@ podcast: tutorials-hub-custom-workflow-stage
 title: 'Set up your own workflow stage'
 description: 'Bring your own microservice into the Hub as a workflow stage — register it in the Helm chart, receive recordings, do the work, and ingest results back. A loitering / dwell-time stage serves as the worked example.'
 date: '2026-06-16'
+author:
+  name: 'Kilian Boute'
+  url: 'https://github.com/kilianboute'
+  avatar: 'https://github.com/kilianboute.png?size=72'
+images: ['social.png']
 weight: 1
 toc: true
 product: 'Hub'
@@ -12,7 +17,7 @@ tags: ['Workflows', 'Go', 'Kubernetes']
 illustration: 'tutorial-hub-workflow-stage'
 ---
 
-{{< tutorial-byline author="Kilian Boute" github="kilianboute" created="Jun 16, 2026" updated="Jun 16, 2026" >}}
+{{< tutorial-byline >}}
 
 {{< tutorial-header alt="An event runs through Hub's workflow stages: workflows, analyse, your own stage and notify, ending as an alert on a phone." >}}
 

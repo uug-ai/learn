@@ -3,6 +3,7 @@ podcast: tutorials-agent-install
 title: 'Install Agent'
 description: 'Run your first Agent on Docker, Docker Compose, Kubernetes, Snap or as a static binary.'
 date: '2026-05-15'
+images: ['social.png']
 weight: 1
 toc: true
 product: 'Agent'
