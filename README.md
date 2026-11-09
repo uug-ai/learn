@@ -24,6 +24,26 @@ documentation refers to Agent, Factory, Vault and Hub without a company prefix.
 Keep functional domains, repository and package names, API schemas, and legal
 copyright notices unchanged when updating editorial naming.
 
+## Tutorial artwork
+
+The Claude Code and Claude web UI tutorials share the black Claude/UUG banner in
+`app/assets/images/tutorial-claude-uug.svg`, selected by their `header` front
+matter for article headers and catalog cards. Tutorial headers also accept
+`header-art.*` page resources (including SVGs); other tutorials retain their
+product illustrations.
+The banner's UUG lettering is outlined from the self-hosted Outfit font at weight
+600 with 0.12em tracking, matching the navbar without relying on fonts inside images.
+The MongoDB indexes tutorial uses `app/assets/images/tutorial-mongodb-cli.svg`
+for a matching black banner with the MongoDB leaf and a CLI terminal.
+
+The **Connect your VMS to Claude** tutorial documents the web connector flow
+inspected on 9 November 2026: Settings > Customize > Connectors, No sign-in,
+the built-in authorization request header, and Streamable HTTP. It does not
+require an OAuth flow or an `Accept` override. Recheck the UI before updating
+these steps; inspecting setup is not proof of a successful live connection.
+Its screenshots retain the full landscape browser viewport at 1600px wide
+(approximately 16:10), with the sidebar collapsed and placeholder credentials.
+
 ## Architecture drawings
 
 [Draw](https://draw.uug.ai/) is the single drawing and architecture
@@ -221,6 +241,8 @@ accent background. Pages outside product documentation use the default blue acce
 Code inside a block has no inline-code chip, border, or extra padding; inline
 code in prose keeps its existing treatment. Long lines scroll horizontally and
 retain whitespace.
+Fenced code resets Hextra's inner `pre` margin so its text has balanced vertical
+spacing, including single-line examples.
 
 Fenced blocks use a component-local dark theme in the tracked Hextra
 `app/_vendor/github.com/imfing/hextra/layouts/_markup/render-codeblock.html`

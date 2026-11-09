@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import sharp from 'sharp';
 import { textContrast } from './utils/contrast';
 
 test('keeps company naming out of editorial content while preserving technical identifiers and legal notices', () => {
@@ -39,8 +40,8 @@ test('uses UUG header and favicon artwork while retaining Learn metadata', async
   await expect(page.locator('#ecosystem')).toHaveCount(1);
   await expect(page.locator('#augment-vision')).toHaveCount(1);
   await page.goto('/tutorials/hub/apply-mongodb-indexes/');
-  await expect(page.locator('.tutorial-byline__name')).toHaveText('Documentation team');
-  await expect(page.locator('.tutorial-byline__avatar')).toHaveAttribute('src', '/android-chrome-192x192.png');
+  await expect(page.locator('.tutorial-byline__name')).toHaveText('Cedric Verstraeten');
+  await expect(page.locator('.tutorial-byline__avatar')).toHaveAttribute('src', 'https://github.com/cedricve.png?size=72');
 
   const manifestResponse = await request.get('/site.webmanifest');
   expect(manifestResponse.status()).toBe(200);
@@ -61,6 +62,140 @@ test('uses UUG header and favicon artwork while retaining Learn metadata', async
     const response = await request.get(`/${icon}?v=uug-midnight`);
     expect(response.status(), icon).toBe(200);
     expect(createHash('sha256').update(await response.body()).digest('hex'), icon).toBe(hash);
+  }
+});
+
+test('shows the Claude and UUG banner on the tutorial and its catalog card', async ({ page, request }) => {
+  const tutorials = [
+    {
+      path: '/tutorials/hub/connect-mcp-to-claude/', title: 'Connect Hub MCP to Claude Code',
+      alt: 'Claude and UUG logos side by side on a black background.',
+    },
+    {
+      path: '/tutorials/hub/connect-your-vms-to-claude/', title: 'Connect your VMS to Claude',
+      alt: 'Claude and the platform wordmark side by side on a black background.',
+    },
+  ];
+  const artworkPath = '/images/tutorial-claude-uug.svg';
+  const artwork = await request.get(artworkPath);
+  expect(artwork.ok()).toBe(true);
+  expect(artwork.headers()['content-type']).toContain('image/svg+xml');
+  const svg = await artwork.text();
+  expect(svg).toContain('fill="#000"');
+  expect(svg).toContain('>Claude</text>');
+  expect(svg).toContain('id="uug-wordmark" aria-label="UUG" data-font-family="Outfit" data-font-weight="600"');
+  expect(svg).not.toContain('Arial');
+
+  for (const tutorial of tutorials) {
+    for (const width of [1440, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const theme of ['light', 'dark']) {
+        await page.goto(tutorial.path);
+        await expect(page.locator('.tutorial-byline__name')).toHaveText('Cedric Verstraeten');
+        await expect(page.locator('.tutorial-byline__author')).toHaveAttribute('href', 'https://github.com/cedricve');
+        await expect(page.locator('.tutorial-byline__avatar')).toHaveAttribute('src', 'https://github.com/cedricve.png?size=72');
+        await page.evaluate((mode) => {
+          document.documentElement.classList.toggle('dark', mode === 'dark');
+        }, theme);
+        const banner = page.locator('.tutorial-header img');
+        await expect(banner).toHaveAttribute('src', artworkPath);
+        await expect(banner).toHaveAttribute('alt', tutorial.alt);
+        await expect(banner).toBeVisible();
+        await expect(banner).toHaveJSProperty('complete', true);
+        await expect(banner).toHaveJSProperty('naturalWidth', 1200);
+        const bounds = await banner.boundingBox();
+        if (!bounds) throw new Error('The Claude tutorial banner must have layout bounds');
+        expect(bounds.width / bounds.height).toBeCloseTo(10 / 3, 1);
+        expect(bounds.x).toBeGreaterThanOrEqual(0);
+        expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+        const pixel = await sharp(await banner.screenshot())
+          .extract({ left: 20, top: 20, width: 1, height: 1 })
+          .removeAlpha().raw().toBuffer();
+        expect([...pixel]).toEqual([0, 0, 0]);
+      }
+    }
+  }
+
+  await page.goto('/tutorials/');
+  for (const tutorial of tutorials) {
+    const card = page.locator('.tutorial-card').filter({
+      has: page.getByRole('heading', { name: tutorial.title, exact: true }),
+    }).first();
+    await expect(card.locator('.tutorial-card__media')).toHaveAttribute('href', tutorial.path);
+    await expect(card.locator('.tutorial-card__media img')).toHaveAttribute('src', artworkPath);
+    await expect(card.locator('.tutorial-card__media img')).toHaveJSProperty('naturalWidth', 1200);
+  }
+});
+
+test('shows MongoDB and CLI artwork with Cedric as the indexes tutorial author', async ({ page, request }) => {
+  const path = '/tutorials/hub/apply-mongodb-indexes/';
+  const artworkPath = '/images/tutorial-mongodb-cli.svg';
+  const artwork = await request.get(artworkPath);
+  expect(artwork.ok()).toBe(true);
+  expect(await artwork.text()).toContain('<title>MongoDB and CLI</title>');
+
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const theme of ['light', 'dark']) {
+      await page.goto(path);
+      await page.evaluate(mode => document.documentElement.classList.toggle('dark', mode === 'dark'), theme);
+      await expect(page.locator('.tutorial-byline__name')).toHaveText('Cedric Verstraeten');
+      await expect(page.locator('.tutorial-byline__author')).toHaveAttribute('href', 'https://github.com/cedricve');
+      const banner = page.locator('.tutorial-header img');
+      await expect(banner).toHaveAttribute('src', artworkPath);
+      await expect(banner).toHaveAttribute('alt', 'MongoDB logo and a CLI terminal side by side on a black background.');
+      await expect(banner).toHaveJSProperty('naturalWidth', 1200);
+      const bounds = await banner.boundingBox();
+      if (!bounds) throw new Error('The MongoDB tutorial banner must have layout bounds');
+      expect(bounds.width / bounds.height).toBeCloseTo(10 / 3, 1);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+      const pixel = await sharp(await banner.screenshot())
+        .extract({ left: 20, top: 20, width: 1, height: 1 }).removeAlpha().raw().toBuffer();
+      expect([...pixel]).toEqual([0, 0, 0]);
+    }
+  }
+
+  await page.goto('/tutorials/');
+  const card = page.locator('.tutorial-card').filter({
+    has: page.getByRole('heading', { name: 'Apply MongoDB indexes with the CLI', exact: true }),
+  }).first();
+  await expect(card.locator('.tutorial-card__media img')).toHaveAttribute('src', artworkPath);
+  await expect(card.locator('.tutorial-card__media img')).toHaveJSProperty('naturalWidth', 1200);
+});
+
+test('publishes the Claude web connector tutorial with working screenshots and cross-links', async ({ page, request }) => {
+  const path = '/tutorials/hub/connect-your-vms-to-claude/';
+  await page.goto(path);
+  await expect(page.getByRole('heading', { name: 'Connect your VMS to Claude', exact: true })).toBeVisible();
+  for (const heading of [
+    '1. Create a dedicated Hub access token', '2. Open Claude',
+    '3. Enter your VMS endpoint', '4. Configure authentication and request headers',
+    '5. Enable the connector in a conversation', '6. Search recordings, then request one link',
+    '7. Disconnect or rotate the token', 'Troubleshooting',
+  ]) {
+    await expect(page.getByRole('heading', { name: heading })).toBeVisible();
+  }
+  const content = page.locator('main');
+  await expect(content).toContainText('No sign-in');
+  await expect(content).toContainText('Streamable HTTP');
+  await expect(content).toContainText('Bearer <HUB_ACCESS_TOKEN>');
+  await expect(content).toContainText('do not need to add an Accept override');
+  for (const filename of ['claude-connector-endpoint.webp', 'claude-connector-authentication.webp']) {
+    const image = content.locator(`img[src$="${filename}"]`);
+    await expect(image).toHaveCount(1);
+    await image.scrollIntoViewIfNeeded();
+    await expect(image).toHaveJSProperty('complete', true);
+    await expect(image).toHaveJSProperty('naturalWidth', 1600);
+    const aspectRatio = await image.evaluate((element: HTMLImageElement) => element.naturalWidth / element.naturalHeight);
+    expect(aspectRatio).toBeCloseTo(1.6, 2);
+    expect((await request.get(`${path}${filename}`)).ok()).toBe(true);
+  }
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto(path);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  for (const source of ['/tutorials/hub/', '/docs/hub/mcp/', '/tutorials/hub/connect-mcp-to-claude/']) {
+    await page.goto(source);
+    await expect(page.locator(`main a[href="${path}"]`).first()).toBeVisible();
   }
 });
 

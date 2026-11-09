@@ -8,6 +8,7 @@ Hands-on tutorials for [Hub](https://github.com/kerberos-io/hub) — the central
 
 ## Tutorials
 
+- [Connect your VMS to Claude](/tutorials/hub/connect-your-vms-to-claude/) — add a custom connector in Claude's web UI, supply a scoped access token through Request headers, and query cameras and recordings in a conversation.
 - [Connect Hub MCP to Claude Code](/tutorials/hub/connect-mcp-to-claude/) — configure an access-token authorization header, verify the connection, and use Claude to discover devices and search recordings.
 - [Apply MongoDB indexes with the CLI](/tutorials/hub/apply-mongodb-indexes/) — select a versioned contract, preview and apply missing indexes, then verify the result locally or with Kubernetes Jobs.
 - [Set up your own workflow stage](/tutorials/hub/custom-workflow-stage/) — bring your own microservice into the Hub as a workflow stage, end to end: register it in the Helm chart, receive recordings, and ingest results back. A loitering / dwell-time stage serves as the worked example.

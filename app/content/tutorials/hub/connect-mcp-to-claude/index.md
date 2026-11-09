@@ -8,16 +8,16 @@ product: 'Hub'
 level: 'Beginner'
 duration: '10 min'
 tags: ['MCP', 'Claude', 'Access tokens']
-illustration: 'hub'
+header: 'images/tutorial-claude-uug.svg'
 ---
 
-{{< tutorial-byline author="Documentation team" github="uug-ai" avatar="/android-chrome-192x192.png" created="Nov 9, 2026" updated="Nov 9, 2026" >}}
+{{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Nov 9, 2026" updated="Nov 9, 2026" >}}
 
-{{< tutorial-header alt="Hub connects camera sites, processing services and operators." >}}
+{{< tutorial-header alt="Claude and UUG logos side by side on a black background." >}}
 
 Connect **Claude Code** to Hub so you can ask about accessible devices and recordings without copying API responses into a conversation. Claude Code calls Hub's read-only MCP tools over HTTPS using your dedicated access token.
 
-This walkthrough uses Claude Code's terminal client because it supports custom HTTP headers. It is not a Claude.ai **Add connector** or Claude Desktop chat configuration walkthrough. Do not assume another Claude client's connector screen accepts a bearer header; it must support the [Hub MCP connection requirements](/docs/hub/mcp/#connection-details).
+This walkthrough uses Claude Code's terminal client. To use Claude in the browser instead, follow [Connect your VMS to Claude](/tutorials/hub/connect-your-vms-to-claude/), which configures **No sign-in** and an authorization request header in the web UI. Other clients must support the [Hub MCP connection requirements](/docs/hub/mcp/#connection-details).
 
 {{< tutorial-meta time="~10 min" level="Beginner" stack="Hub / MCP / Claude Code" prerequisites="An enabled Hub MCP endpoint and a scoped Hub access token" >}}
 

@@ -63,6 +63,28 @@ for (const colorScheme of ['light', 'dark'] as const) {
       }
     });
 
+    test('centers single-line tutorial code vertically without extra bottom space', async ({ page }) => {
+      await page.goto('/tutorials/hub/apply-mongodb-indexes/');
+      for (const text of [
+        '-index-version migration-hub-workflow-device-groups-08-10-2026',
+        'indexes/migration-hub-workflow-device-groups-08-10-2026.txt',
+      ]) {
+        const block = page.locator('.hextra-code-block').filter({ hasText: text }).first();
+        const pre = block.locator('pre').first();
+        const code = pre.locator('code');
+        await expect(code).toHaveText(text);
+        await expect(pre).toHaveCSS('margin', '0px');
+        await expect(pre).toHaveCSS('padding-top', '16px');
+        await expect(pre).toHaveCSS('padding-bottom', '16px');
+        const blockBounds = await block.boundingBox();
+        const codeBounds = await code.boundingBox();
+        if (!blockBounds || !codeBounds) throw new Error('The code block and its text must have layout bounds');
+        const topSpace = codeBounds.y - blockBounds.y;
+        const bottomSpace = blockBounds.y + blockBounds.height - codeBounds.y - codeBounds.height;
+        expect(Math.abs(topSpace - bottomSpace)).toBeLessThanOrEqual(1);
+      }
+    });
+
     test('keeps fenced syntax readable and the copy button keyboard and touch accessible', async ({ page }) => {
       await page.goto('/docs/hub/installation/');
       const block = page.locator('.hextra-code-block').first();

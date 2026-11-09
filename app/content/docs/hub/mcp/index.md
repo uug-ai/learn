@@ -15,7 +15,7 @@ toc: true
 
 Hub's **Model Context Protocol (MCP)** server lets compatible AI assistants discover devices, search recording metadata, and request temporary links to selected recording assets. It runs inside the Hub API and uses the same organisation, project, and resource permissions as Hub.
 
-The server is **read-only**: it cannot change camera configuration, delete recordings, or create workflows. To connect it to Claude, follow [Connect Hub MCP to Claude Code](/tutorials/hub/connect-mcp-to-claude/).
+The server is **read-only**: it cannot change camera configuration, delete recordings, or create workflows. For Claude's web UI, follow [Connect your VMS to Claude](/tutorials/hub/connect-your-vms-to-claude/). For the terminal client, follow [Connect Hub MCP to Claude Code](/tutorials/hub/connect-mcp-to-claude/).
 
 ## Connection details
 
@@ -24,10 +24,12 @@ The server is **read-only**: it cannot change camera configuration, delete recor
 | Endpoint | Your Hub **API** base URL followed by `/mcp`, for example `https://api.hub.example.com/mcp` |
 | Transport | Streamable HTTP (`http` in Claude Code), not legacy SSE |
 | Authentication | `Authorization: Bearer <HUB_ACCESS_TOKEN>` on every request |
-| Accept header | `application/json; version=2026-01-01, text/event-stream` |
+| Accept header | `application/json, text/event-stream`; clients that support version pinning can use `application/json; version=2026-01-01, text/event-stream` |
 | Access | Read-only, limited by token permissions and current resource grants |
 
 Use the API address, which may differ from the Hub web application's address. The `2026-01-01` value pins the **Hub API contract**; it is not an MCP protocol revision. Let your client negotiate the MCP protocol version separately.
+
+An explicit API-version parameter is optional: Hub also accepts unversioned MCP clients. In Claude's web connector, leave the transport's `Accept` header alone and configure only the built-in `authorization` request header.
 
 ## Enable the server
 

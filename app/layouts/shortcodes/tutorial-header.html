@@ -3,7 +3,7 @@
 
   With `illustration: tutorial-…` in the front matter it draws that iso scene
   (assets/iso/<name>.svg, exported from the design library) in the
-  tutorial's product colour; otherwise it shows header-art.jpg (or `src`).
+  tutorial's product colour; otherwise it shows `header`, header-art.* or `src`.
 */ -}}
 {{- $alt := .Get "alt" | default .Page.Title -}}
 {{- with .Page.Params.illustration -}}
@@ -17,8 +17,17 @@
     </div>
   </figure>
 {{- else -}}
-{{- $src := .Get "src" | default "header-art.jpg" -}}
-{{- with .Page.Resources.GetMatch $src -}}
+{{- $src := .Get "src" | default (.Page.Params.header | default "header-art.*") -}}
+{{- $image := .Page.Resources.GetMatch $src -}}
+{{- if not $image -}}
+  {{- $image = resources.Get $src -}}
+{{- end -}}
+{{- with $image -}}
+  {{- if eq .MediaType.SubType "svg" -}}
+  <figure class="tutorial-header not-prose">
+    <img src="{{ .RelPermalink }}" alt="{{ $alt }}" loading="eager" fetchpriority="high" decoding="async">
+  </figure>
+  {{- else -}}
   {{- $small := .Resize "800x webp q82" -}}
   {{- $large := .Resize "1200x webp q84" -}}
   <figure class="tutorial-header not-prose">
@@ -39,6 +48,7 @@
       >
     </picture>
   </figure>
+  {{- end -}}
 {{- else -}}
   {{- errorf "Tutorial header image %q not found for %s" $src .Page.RelPermalink -}}
 {{- end -}}
