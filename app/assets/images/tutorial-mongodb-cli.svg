@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <title>MongoDB and CLI</title>
+  <rect width="1200" height="675" fill="#000"/>
+  <g transform="translate(250 277.5) scale(5)" fill="#00ed64" aria-label="MongoDB logo">
+    <path d="M17.193 9.555c-1.264-5.58-4.252-7.414-4.573-8.115-.28-.394-.53-.954-.735-1.44-.036.495-.055.685-.523 1.184-.723.566-4.438 3.682-4.74 10.02-.282 5.912 4.27 9.435 4.888 9.884l.07.05A73.49 73.49 0 0111.91 24h.481c.114-1.032.284-2.056.51-3.07.417-.296.604-.463.85-.693a11.342 11.342 0 003.639-8.464c.01-.814-.103-1.662-.197-2.218zm-5.336 8.195s0-8.291.275-8.29c.213 0 .49 10.695.49 10.695-.381-.045-.765-1.76-.765-2.405z"/>
+  </g>
+  <text x="350" y="360" fill="#fff" font-family="Georgia, serif" font-size="64" letter-spacing="-2">MongoDB</text>
+  <path d="M660 287.5v100" stroke="#333" stroke-width="2"/>
+  <g aria-label="CLI terminal">
+    <rect x="712" y="292.5" width="90" height="90" rx="12" fill="#111" stroke="#555" stroke-width="3"/>
+    <path d="m735 317.5 16 16-16 16" fill="none" stroke="#00ed64" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M765 351.5h15" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="820" y="360" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="600" letter-spacing="3">CLI</text>
+</svg>

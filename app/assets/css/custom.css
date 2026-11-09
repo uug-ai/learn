@@ -240,6 +240,7 @@
 }
 
 .content .hextra-code-block pre:not(.lntable pre) {
+  margin: 0;
   padding-block: 1rem;
   padding-inline: 1.25rem 3.5rem;
 }
