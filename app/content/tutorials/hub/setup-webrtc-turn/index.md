@@ -3,6 +3,11 @@ podcast: tutorials-hub-setup-webrtc-turn
 title: 'Set up WebRTC live view with TURN'
 description: 'Configure STUN and TURN for reliable Hub WebRTC live video, then verify direct and relayed ICE paths.'
 date: '2026-08-19'
+author:
+  name: 'Cedric Verstraeten'
+  url: 'https://github.com/cedricve'
+  avatar: 'https://github.com/cedricve.png?size=72'
+images: ['social.png']
 weight: 4
 toc: true
 product: 'Hub'
@@ -12,7 +17,7 @@ tags: ['WebRTC', 'TURN', 'Networking']
 illustration: 'tutorial-hub-webrtc-turn'
 ---
 
-{{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
+{{< tutorial-byline >}}
 
 {{< tutorial-header alt="The Agent and the viewer each sit behind a firewall. Hub signals the session and the video is relayed through a coturn server." >}}
 

@@ -2,6 +2,11 @@
 title: 'Connect Hub MCP to Claude Code'
 description: 'Connect Claude Code to the Hub MCP server using an access token in the Authorization header, then discover devices and search recordings.'
 date: '2026-11-09'
+author:
+  name: 'Cedric Verstraeten'
+  url: 'https://github.com/cedricve'
+  avatar: 'https://github.com/cedricve.png?size=72'
+images: ['social.png']
 weight: 7
 toc: true
 product: 'Hub'
@@ -11,7 +16,7 @@ tags: ['MCP', 'Claude', 'Access tokens']
 header: 'images/tutorial-claude-uug.svg'
 ---
 
-{{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Nov 9, 2026" updated="Nov 9, 2026" >}}
+{{< tutorial-byline >}}
 
 {{< tutorial-header alt="Claude and UUG logos side by side on a black background." >}}
 

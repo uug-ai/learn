@@ -6,6 +6,7 @@ const accents = [
   { product: 'factory', rgb: [74, 120, 106] },
   { product: 'vault', rgb: [86, 97, 143] },
   { product: 'hub', rgb: [162, 57, 215] },
+  { product: 'tutorial', rgb: [39, 19, 255] },
 ];
 
 for (const colorScheme of ['light', 'dark'] as const) {
@@ -29,9 +30,9 @@ for (const colorScheme of ['light', 'dark'] as const) {
       await expect(inline).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
     });
 
-    test('uses a darker product accent and scrolls long code without wrapping', async ({ page }) => {
+    test('uses a subtle charcoal tint and scrolls long code without wrapping', async ({ page }) => {
       for (const { product, rgb } of accents) {
-        await page.goto(`/docs/${product}/`);
+        await page.goto(product === 'tutorial' ? '/tutorials/hub/apply-mongodb-indexes/' : `/docs/${product}/`);
         await page.locator('#content .content').evaluate(element => {
           const pre = document.createElement('pre');
           pre.dataset.codeFixture = 'palette';
@@ -50,16 +51,27 @@ for (const colorScheme of ['light', 'dark'] as const) {
           context.fillRect(0, 0, 1, 1);
           return Array.from(context.getImageData(0, 0, 1, 1).data).slice(0, 3);
         });
-        const expected = rgb.map((channel, index) => channel * 0.28 + [11, 17, 20][index] * 0.72);
+        const expected = rgb.map((channel, index) => channel * 0.06 + [27, 27, 32][index] * 0.94);
         for (const [index, channel] of actual.entries()) {
           expect(Math.abs(channel - expected[index]), `${product} background channel ${index}`).toBeLessThanOrEqual(1);
         }
+        expect(Math.max(...actual) - Math.min(...actual), `${product} background saturation`).toBeLessThanOrEqual(20);
         await expect(pre).toHaveCSS('overflow-x', 'auto');
         await expect(pre.locator('code')).toHaveCSS('white-space', 'pre');
         expect(await pre.evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
         await pre.evaluate(element => { element.scrollLeft = 100; });
         expect(await pre.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
         expect(await textContrast(pre.locator('code'))).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+
+    test('keeps the MongoDB shell example readable on the subtle surface', async ({ page }) => {
+      await page.goto('/tutorials/hub/apply-mongodb-indexes/');
+      const block = page.locator('.hextra-code-block').filter({ hasText: "read -r -s -p 'MongoDB URI:" }).first();
+      for (const token of await block.locator('.chroma span').all()) {
+        if ((await token.textContent())?.trim()) {
+          expect(await textContrast(token)).toBeGreaterThanOrEqual(4.5);
+        }
       }
     });
 

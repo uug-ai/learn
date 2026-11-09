@@ -3,6 +3,11 @@ podcast: tutorials-hub-moq-vs-hls-vs-webrtc
 title: 'Choose a live-stream transport: MoQ vs HLS vs WebRTC'
 description: 'Compare Media over QUIC, HLS and WebRTC for live video, then choose the right transport for your latency, scale, network and browser constraints.'
 date: '2026-08-19'
+author:
+  name: 'Cedric Verstraeten'
+  url: 'https://github.com/cedricve'
+  avatar: 'https://github.com/cedricve.png?size=72'
+images: ['social.png']
 weight: 2
 toc: true
 product: 'Hub'
@@ -12,7 +17,7 @@ tags: ['Live video', 'Networking', 'Architecture']
 illustration: 'tutorial-hub-transports'
 ---
 
-{{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
+{{< tutorial-byline >}}
 
 {{< tutorial-header alt="One camera reaches the same viewer over three lanes: WebRTC fastest, MoQ close behind and HLS slower, in segments." >}}
 

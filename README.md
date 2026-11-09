@@ -44,6 +44,42 @@ these steps; inspecting setup is not proof of a successful live connection.
 Its screenshots retain the full landscape browser viewport at 1600px wide
 (approximately 16:10), with the sidebar collapsed and placeholder credentials.
 
+Branded tutorial panels, including "What you'll do", use the solid
+`--surface-strong` background in both themes, retaining accent borders and icons.
+Editorial hyperlinks use the blue-purple `--link-color`, matching the primary
+accent in light mode with a lighter tint for dark-mode contrast. Product
+documentation retains its product-specific link accents.
+Warning callouts use muted gray-yellow backgrounds, borders, and text in both
+themes; other callout types retain their existing colors.
+
+## Tutorial SEO
+
+Tutorial front matter supplies `date`, optional `lastmod`, and an optional
+`author` map with `name`, `url`, and `avatar`. The parameter-free
+`tutorial-byline` shortcode and Article JSON-LD use these same fields.
+Keep existing publication dates, update `lastmod` only for meaningful content
+changes, and do not invent author credits for unattributed pages.
+
+Every tutorial requires `images: ['social.png']`. Its page-bundle PNG is a
+1200x630 raster preview derived from the existing banner. With Hugo running,
+run `npm run tutorial-social-images -- http://127.0.0.1:1313` in `playwright/`
+after changing artwork. Generate the preview before adding a new tutorial's
+`images` entry; the build explicitly rejects missing previews. Open Graph,
+Twitter large-image cards, and Article JSON-LD share the preview.
+Tutorial metadata also includes ordered BreadcrumbList JSON-LD.
+
+Production builds generate a plain-text `robots.txt` with the canonical sitemap;
+development builds disallow crawling. Nginx serves generated pages and static
+assets directly and returns the generated 404 page with HTTP 404 for missing
+URLs, rather than silently serving the homepage. The container smoke test
+checks those responses, crawler policy, and a published tutorial.
+
+Run `npm run test:navigation -- --grep 'tutorial SEO'` in `playwright/` to check
+the full tutorial catalog's metadata, bylines, image dimensions, sitemap,
+robots policy, and missing-page behavior. These tests are also included in the
+normal navigation suite. Publishing a release still requires a separate GitOps
+production promotion before the new pages and SEO fixes reach `learn.uug.ai`.
+
 ## Architecture drawings
 
 [Draw](https://draw.uug.ai/) is the single drawing and architecture
@@ -236,8 +272,9 @@ getting-started links on desktop and mobile.
 
 ### Code blocks
 
-Indented and fenced code use a single padded surface with a darkened product
-accent background. Pages outside product documentation use the default blue accent.
+Indented and fenced code use a single padded charcoal surface with a subtle
+6% product accent tint and a muted border. Pages outside product documentation
+use the same charcoal with a subtle blue tint.
 Code inside a block has no inline-code chip, border, or extra padding; inline
 code in prose keeps its existing treatment. Long lines scroll horizontally and
 retain whitespace.

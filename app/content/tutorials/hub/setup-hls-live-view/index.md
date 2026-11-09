@@ -3,6 +3,11 @@ podcast: tutorials-hub-setup-hls-live-view
 title: 'Set up HLS live view'
 description: 'Configure firewall-friendly HLS and low-latency HLS live video between Kerberos Agents, Hub API and operator browsers.'
 date: '2026-08-19'
+author:
+  name: 'Cedric Verstraeten'
+  url: 'https://github.com/cedricve'
+  avatar: 'https://github.com/cedricve.png?size=72'
+images: ['social.png']
 weight: 5
 toc: true
 product: 'Hub'
@@ -12,7 +17,7 @@ tags: ['HLS', 'Live video', 'Networking']
 illustration: 'tutorial-hub-hls'
 ---
 
-{{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 19, 2026" updated="Aug 19, 2026" >}}
+{{< tutorial-byline >}}
 
 {{< tutorial-header alt="A segmenter cuts the Agent's stream into numbered segments listed in an M3U8 playlist, which a browser player fetches." >}}
 

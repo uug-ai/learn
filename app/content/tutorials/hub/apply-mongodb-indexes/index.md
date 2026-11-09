@@ -2,6 +2,11 @@
 title: 'Apply MongoDB indexes with the CLI'
 description: 'Choose a versioned index set, preview missing MongoDB indexes, apply them safely, and verify the result locally or in Kubernetes.'
 date: '2026-11-04'
+author:
+  name: 'Cedric Verstraeten'
+  url: 'https://github.com/cedricve'
+  avatar: 'https://github.com/cedricve.png?size=72'
+images: ['social.png']
 weight: 6
 toc: true
 product: 'Hub'
@@ -11,7 +16,7 @@ tags: ['MongoDB', 'CLI', 'Kubernetes']
 header: 'images/tutorial-mongodb-cli.svg'
 ---
 
-{{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Nov 4, 2026" updated="Nov 4, 2026" >}}
+{{< tutorial-byline >}}
 
 {{< tutorial-header alt="MongoDB logo and a CLI terminal side by side on a black background." >}}
 

@@ -3,6 +3,11 @@ podcast: tutorials-agent-connect-any-camera
 title: 'Connect any IP camera to Agent'
 description: 'Find and test a camera RTSP stream, connect it to Kerberos Agent, and verify live video and recordings.'
 date: '2026-08-20'
+author:
+  name: 'Cedric Verstraeten'
+  url: 'https://github.com/cedricve'
+  avatar: 'https://github.com/cedricve.png?size=72'
+images: ['social.png']
 weight: 2
 toc: true
 product: 'Agent'
@@ -12,7 +17,7 @@ tags: ['Camera', 'RTSP', 'ONVIF']
 illustration: 'tutorial-agent-camera'
 ---
 
-{{< tutorial-byline author="Cedric Verstraeten" github="cedricve" created="Aug 20, 2026" updated="Aug 20, 2026" >}}
+{{< tutorial-byline >}}
 
 {{< tutorial-header alt="Bullet, dome, PTZ and turret cameras each send a main and a sub RTSP stream through a network switch to an Agent that shows them as verified." >}}
 

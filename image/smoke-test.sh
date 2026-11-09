@@ -42,8 +42,17 @@ for path in /docs/ /docs/hub/ /tutorials/; do
     exit 1
   fi
 done
-curl --fail --silent --show-error "$origin/missing-smoke-route" > "$directory/fallback.html"
-cmp "$directory/index.html" "$directory/fallback.html"
+for path in /missing-smoke-route /missing-smoke-route/ /missing-smoke-asset.js; do
+  status=$(curl --silent --show-error -o "$directory/not-found.html" -w '%{http_code}' "$origin$path")
+  test "$status" = 404
+  grep -q 'Page not found' "$directory/not-found.html"
+done
+curl --fail --silent --show-error -D "$directory/robots-headers" "$origin/robots.txt" > "$directory/robots.txt"
+grep -iq '^Content-Type: text/plain' "$directory/robots-headers"
+grep -q '^User-agent: \*' "$directory/robots.txt"
+grep -q '^Sitemap: https://learn.uug.ai/sitemap.xml' "$directory/robots.txt"
+curl --fail --silent --show-error "$origin/tutorials/hub/connect-your-vms-to-claude/" > "$directory/tutorial.html"
+grep -q 'application/ld+json' "$directory/tutorial.html"
 for extension in css js; do
   asset=$(grep -oE "(src|href)=[\"']?/[^\"'<>[:space:]]+\\.$extension(\\?[^\"'<>[:space:]]*)?" "$directory/index.html" | sed -n '1s/^[^/]*//p')
   test -n "$asset"

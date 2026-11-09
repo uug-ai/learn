@@ -4,6 +4,7 @@
 # to https://example.org/.
 baseURL: https://learn.uug.ai/
 title: Learn
+enableRobotsTXT: true
 
 services:
   googleAnalytics:

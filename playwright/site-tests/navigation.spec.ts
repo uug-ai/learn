@@ -65,6 +65,72 @@ test('uses UUG header and favicon artwork while retaining Learn metadata', async
   }
 });
 
+test('uses muted gray-yellow warning boxes in both themes', async ({ page }) => {
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const theme of ['light', 'dark']) {
+      await page.goto('/tutorials/hub/apply-mongodb-indexes/');
+      await page.evaluate(mode => document.documentElement.classList.toggle('dark', mode === 'dark'), theme);
+      const warning = page.locator('.content [class~="hx:bg-amber-100"]').first();
+      await expect(warning).toBeVisible();
+      await expect(warning).toContainText('The current checker compares and applies');
+      await expect(warning).toHaveCSS('background-color', theme === 'dark' ? 'rgb(41, 40, 32)' : 'rgb(243, 241, 231)');
+      await expect(warning).toHaveCSS('border-top-color', theme === 'dark' ? 'rgb(81, 76, 56)' : 'rgb(215, 208, 182)');
+      await expect(warning).toHaveCSS('color', theme === 'dark' ? 'rgb(212, 207, 185)' : 'rgb(98, 91, 69)');
+      await expect(warning.locator('svg')).toBeVisible();
+      expect(await textContrast(warning)).toBeGreaterThanOrEqual(4.5);
+      const bounds = await warning.boundingBox();
+      if (!bounds) throw new Error('The warning box must have layout bounds');
+      expect(bounds.x).toBeGreaterThanOrEqual(0);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+    }
+  }
+});
+
+test('uses blue-purple tutorial hyperlinks in both themes', async ({ page }) => {
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const theme of ['light', 'dark']) {
+      await page.goto('/tutorials/hub/apply-mongodb-indexes/');
+      await page.evaluate(mode => document.documentElement.classList.toggle('dark', mode === 'dark'), theme);
+      const color = theme === 'dark' ? 'rgb(156, 143, 255)' : 'rgb(39, 19, 255)';
+      const link = page.locator('.content p a').filter({ hasText: 'CLI' }).first();
+      await expect(link).toHaveCSS('color', color);
+      await expect(link).toHaveCSS('text-decoration-line', 'underline');
+      expect(await textContrast(link)).toBeGreaterThanOrEqual(4.5);
+      await link.hover();
+      await expect(link).toHaveCSS('color', color);
+      await link.focus();
+      await expect(link).toHaveCSS('color', color);
+      await expect(link).toBeFocused();
+      await expect(page.locator('.tutorial-byline__author')).not.toHaveCSS('color', color);
+    }
+  }
+});
+
+test('uses solid backgrounds for branded tutorial panels in both themes', async ({ page }) => {
+  for (const path of ['/tutorials/hub/apply-mongodb-indexes/', '/tutorials/agent/connect-any-camera/']) {
+    for (const width of [1440, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const theme of ['light', 'dark']) {
+        await page.goto(path);
+        await page.evaluate(mode => document.documentElement.classList.toggle('dark', mode === 'dark'), theme);
+        const panel = page.locator('.tutorial-panel--brand').first();
+        await expect(panel).toBeVisible();
+        await expect(panel).toHaveCSS('background-image', 'none');
+        await expect(panel).toHaveCSS('background-color', theme === 'dark' ? 'rgb(28, 28, 42)' : 'rgb(239, 234, 251)');
+        await expect(panel.locator('.tutorial-panel__title')).toHaveText("What you'll do");
+        expect(await textContrast(panel.locator('.tutorial-panel__title'))).toBeGreaterThanOrEqual(4.5);
+        expect(await textContrast(panel.locator('li').first())).toBeGreaterThanOrEqual(4.5);
+        const bounds = await panel.boundingBox();
+        if (!bounds) throw new Error('The tutorial panel must have layout bounds');
+        expect(bounds.x).toBeGreaterThanOrEqual(0);
+        expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+      }
+    }
+  }
+});
+
 test('shows the Claude and UUG banner on the tutorial and its catalog card', async ({ page, request }) => {
   const tutorials = [
     {
