@@ -3,7 +3,7 @@ title: "Hub"
 description: "One place for all your Agents, sites, recordings and alerts."
 lead: "One place for all your Agents, sites, recordings and alerts."
 date: 2020-10-06T08:49:15+00:00
-lastmod: 2026-10-29T17:26:00+00:00
+lastmod: 2026-11-09T00:00:00+00:00
 draft: false
 podcast: hub-overview
 images: []
@@ -36,3 +36,4 @@ Sign in using a password, 2FA, a passkey, or OIDC single sign-on; the [Authentic
 - [First things first](/docs/hub/first-things-first): why Hub exists and what it does.
 - [Getting started](/docs/hub/getting-started): a tour of the main features.
 - [Pipeline](/docs/hub/pipeline): the services every recording flows through.
+- [MCP server](/docs/hub/mcp): connect AI assistants to Hub with scoped, read-only access tokens.
