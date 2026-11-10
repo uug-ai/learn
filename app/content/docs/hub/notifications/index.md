@@ -80,6 +80,17 @@ Pushbullet, SMS and Alexa; webhooks and IFTTT keep receiving one notification
 per camera, unchanged, so existing integrations keep working. See
 [White-label](/docs/hub/whitelabel) for the grouped email template.
 
+The **Recording check** in the same panel alerts when a selected camera that
+records continuously is online but has not uploaded a recording for a set
+number of hours (1 to 72, default 2), and again once it records. It catches
+cameras that look healthy while their recordings never reach Hub, for example
+because storage is full, upload credentials were rejected or the account
+reached its upload limit (the alert says so in that case). Cameras that record
+on motion only, cameras whose Agent does not report its recording mode, and
+offline cameras are not checked. It uses the panel's channels, cameras and
+**Group notifications**. Webhooks and IFTTT get one message per camera with
+the status `no_recordings` or `recording`.
+
 Alert management is restricted to users with the relevant administrative page
 permission. See [Configuration](/docs/hub/configuration#alerts)
 for the existing alert setup reference.
