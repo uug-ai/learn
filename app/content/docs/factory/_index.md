@@ -13,8 +13,10 @@ sidebar:
   topicGroup: Topics
   introductoryPages:
     - first-things-first
+    - quickstart
     - getting-started
     - installation
+    - license
 ---
 
 Factory is the web application for deploying and managing [Kerberos Agents](/docs/agent) on Kubernetes. Instead of creating and maintaining every Agent by hand, you add camera streams, apply shared settings and manage deployments from one interface. The Agents keep doing the recording; Factory helps you run them as your camera estate grows.

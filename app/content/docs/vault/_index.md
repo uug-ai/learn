@@ -13,8 +13,10 @@ sidebar:
   topicGroup: Topics
   introductoryPages:
     - first-things-first
+    - quickstart
     - getting-started
     - installation
+    - license
 ---
 
 Vault is the bring-your-own-storage layer for your recordings. [Agents](/docs/agent) upload footage to Vault, which stores it on the providers you choose, at the edge or in the cloud. Vault also connects those recordings to [Hub](/docs/hub) and your own applications through events, integrations and APIs.
