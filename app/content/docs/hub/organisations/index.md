@@ -197,6 +197,8 @@ Permissions come from a versioned catalog in the shared models, such as `devices
 
 Some capabilities are graded: a higher permission implies the lower ones, for example `live.stream` implies `live.preview`, and `ptz.presets` implies `ptz.control`, which implies `ptz.panTilt` and `ptz.zoom`. A role stores the permissions it was given; implied ones are derived.
 
+For the full permission catalog, what each built-in role can and cannot do, and which permissions only owners can grant, see [Roles and permissions]({{< ref "/docs/hub/roles" >}}#the-new-permission-model).
+
 Every role states explicitly what it grants in `grants`:
 
 | `grants` | Meaning |
