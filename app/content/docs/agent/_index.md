@@ -13,8 +13,10 @@ sidebar:
   topicGroup: Topics
   introductoryPages:
     - first-things-first
+    - quickstart
     - getting-started
     - installation
+    - license
 ---
 
 Kerberos Agent is the recording service that runs next to, or on, your camera. Each Agent handles one camera stream, records motion or continuous footage, and gives you a web interface for live views, recordings and settings. Start with a single Agent and add the other Kerberos products when you need central management, shared storage or an overview across sites.
@@ -32,5 +34,6 @@ An Agent can run on its own. Its web interface and APIs let you configure and in
 ## Where to start
 
 - [First things first](/docs/agent/first-things-first): what an Agent does and how it fits into the platform.
+- [Quickstart](/docs/agent/quickstart): run one Agent for one camera with Docker or Kubernetes.
 - [Getting started](/docs/agent/getting-started): a tour of live views, recordings and settings.
 - [Installation](/docs/agent/installation): deploy your first Agent.
