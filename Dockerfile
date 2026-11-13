@@ -20,7 +20,7 @@ RUN test -s /site/index.html && \
     test -s /site/robots.txt && \
     test -s /site/sitemap.xml
 
-FROM cgr.dev/chainguard/nginx:latest@sha256:9aa6c46648f17b2835d009fd4338b38591b2396670a07270ee19b532f83dbbb5
+FROM cgr.dev/chainguard/nginx:latest@sha256:c9b4886a227029de68781204ace0c221c36efbddddd82cc40baa5f510cb30a46
 ARG VERSION=dev
 ARG REVISION=unknown
 ARG CREATED
