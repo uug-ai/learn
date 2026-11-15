@@ -92,7 +92,10 @@ A few rules apply to every role, owners included:
 | Create and delete projects | | | ✓ | ✓ |
 | Manage users who are owners, grant the Owner role | | | | ✓ |
 | Billing, subscription and storage (Vault) | | | | ✓ |
-| Audit log, access tokens, device system tags | | | | ✓ |
+| See the member list, with each user's role and camera access | | | ✓ | ✓ |
+| Pick people by name, for example when sharing a case or a videowall | ✓ | ✓ | ✓ | ✓ |
+| Audit log | | | ✓ | ✓ |
+| Access tokens, device system tags | | | | ✓ |
 
 ### Custom roles
 
