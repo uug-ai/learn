@@ -3,7 +3,7 @@ title: "Roles and permissions"
 description: "What each Hub role can and cannot do, and the permission model behind organisation and project roles."
 lead: "What each Hub role can and cannot do, and the permission model behind organisation and project roles."
 date: 2020-10-06T08:49:31+00:00
-lastmod: 2026-11-13T00:00:00+00:00
+lastmod: 2026-11-16T00:00:00+00:00
 draft: false
 images: []
 menu:
@@ -16,10 +16,11 @@ podcast: hub-roles
 
 Every Hub user has a role. The role decides **what** a user can do: watch live video, edit sites, manage members, and so on. Which cameras the user sees is decided separately, by the sites, groups and cameras assigned to them. A user with a broad role still only sees the cameras they are given.
 
-This page has two parts:
+This page has three parts:
 
 1. [The roles you use today](#roles-today): Owner, Admin, Editor, Guest and custom roles.
 2. [The new permission model](#the-new-permission-model): named permissions such as `members.read` or `live.stream`, bundled into organisation and project roles.
+3. [Access tokens](#access-tokens): what a token can do, and why it never does more than the person who created it.
 
 Existing users keep exactly the access they have today when Hub moves to the new model. See [Moving to the new model](#moving-to-the-new-model).
 
@@ -95,7 +96,7 @@ A few rules apply to every role, owners included:
 | See the member list, with each user's role and camera access | | | ✓ | ✓ |
 | Pick people by name, for example when sharing a case or a videowall | ✓ | ✓ | ✓ | ✓ |
 | Audit log | | | ✓ | ✓ |
-| Access tokens, device system tags | | | | ✓ |
+| [Access tokens](#access-tokens), device system tags | | | | ✓ |
 
 ### Custom roles
 
@@ -202,3 +203,45 @@ When your organisation moves to the new model, nobody gains or loses access:
 - The sites, groups and cameras each user can access move to their role assignment.
 
 You can then replace legacy roles with the built-in roles, or with your own, at your own pace. For the data model behind roles and assignments, see [Organisations and projects](/docs/hub/organisations#role-levels-and-permissions).
+
+## Access tokens
+
+People sign in; scripts and integrations, such as an [MCP client](/docs/hub/mcp), use an **access token**. A token carries a fixed list of **scopes**. Each scope is a project permission from the [permission catalog](#permission-catalog), such as `media.read` or `cases.create`.
+
+### Creating and managing tokens
+
+Only **owners** create, edit, rotate and revoke access tokens, in **Profile > Access tokens**. When you create a token you choose:
+
+- **Permissions**: the scopes the token holds.
+- **Expiry**: a quick choice or an exact date. After that date the token stops working.
+
+A token is bound to the organisation and project it was created in. A token cannot be used to create, change or rotate tokens, even its own.
+
+### What a token can do
+
+A request made with a token passes two checks:
+
+1. **The scope check.** Every API route names the permissions it needs. The token must hold at least one of them as a scope, or the request is refused. No route skips this check.
+2. **The creator check.** A token **never does more than the person who created it**. Its scopes count only while its creator still has that permission, now, in the token's organisation and project. If the creator's role changes or they leave the organisation, their tokens lose that access at the same moment, without being reissued. Sites, groups and cameras work the same way: a token sees the cameras its creator can see.
+
+A few routes only make sense for a person and refuse tokens altogether, such as your own profile and settings, switching or creating organisations, and managing tokens.
+
+### Scopes you can grant
+
+Hub offers these scopes for access tokens:
+
+| Area | Scopes |
+| --- | --- |
+| Recordings | `media.read`, `media.update`, `media.export`, `media.share`, `media.redact`, `media.delete`, `days.read` |
+| Markers | `markers.read`, `markers.write` |
+| Cases | `cases.read`, `cases.create`, `cases.update`, `cases.share`, `cases.export`, `cases.runWorkflow`, `cases.delete` |
+| Workflows | `workflows.read`, `workflows.create`, `workflows.update`, `workflows.delete`, `workflow-runs.read`, `workflow-runs.create`, `workflow-runs.update` |
+| Channels | `channels.read`, `channels.create`, `channels.update`, `channels.delete` |
+
+Other areas, such as cameras, sites, groups, members and settings, cannot be reached with an access token today. Give a token only the scopes the integration needs: a token that reads recordings needs `media.read` and nothing else.
+
+### Sessions and service tokens
+
+- **Signed-in sessions** are not limited by scopes. A person's role and assignments decide, as described above.
+- **Service tokens** belong to an application account and are used by the admin API (the `application` scope). Like access tokens, they never do more than the account they belong to.
+
