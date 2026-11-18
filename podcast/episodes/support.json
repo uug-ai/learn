@@ -6,8 +6,8 @@
   "description": "Gather a clear problem description, context and impact before contacting support.",
   "sourceUrl": "https://learn.uug.ai/support/",
   "sourcePath": "../app/content/support/_index.md",
-  "sourceSha256": "7662abda4469a67853d35df0021399f5e66acb5f83c8f6eb0aa03de9f88bca5c",
-  "reviewedOn": "2026-10-29",
+  "sourceSha256": "a8793ae2e4253aa3bba70b39ebe999c40daf05b8d6254aa0fc4c192f48ef6fc1",
+  "reviewedOn": "2026-11-18",
   "editorialStyle": {
     "tone": "A short, high-level introduction for a first-time listener. Explain why the topic matters, build one mental model, and suggest one next action. Sound like two colleagues, not a narrated manual.",
     "scope": "Aim for four to five minutes and roughly 500-550 spoken words. Use one fictional example and four short chapters. Leave identifiers, form limits, configuration, migration mechanics, and troubleshooting checklists in the linked guide. Keep essential caveats as practical consequences.",
