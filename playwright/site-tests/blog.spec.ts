@@ -4,12 +4,16 @@ import { textContrast } from './utils/contrast';
 
 const article = '/blog/arcules-vs-augment-vision/';
 const legacy = '/tutorials/hub/arcules-vs-augment-vision/';
-const title = 'Milestone Arcules vs Augment Vision: managed simplicity or architectural control?';
+const title = 'Milestone Arcules vs UUG: managed simplicity or architectural control?';
 const altaArticle = '/blog/avigilon-alta-vs-augment-vision/';
-const altaTitle = 'Avigilon Alta vs Augment Vision: cloud video service or composable stack?';
+const altaTitle = 'Avigilon Alta vs UUG: cloud video service or composable stack?';
 const comparisons = [
   {
     path: article, brand: 'Milestone Arcules', label: 'Arcules',
+    screenshot: {
+      file: 'arcules-views.webp', width: 1916, height: 910,
+      source: 'https://help.arcules.com/en/articles/2042903-views',
+    },
     diagrams: [
       { nodes: 7, connections: 5, label: /Responsibility boundaries/ },
       { nodes: 9, connections: 5, label: /Four recording paths/ },
@@ -18,6 +22,10 @@ const comparisons = [
   },
   {
     path: altaArticle, brand: 'Avigilon Alta', label: 'Alta',
+    screenshot: {
+      file: 'alta-video-view.webp', width: 1915, height: 1017,
+      source: 'https://docs.avigilon.com/bundle/alta-video/page/Products/aware/vidview/awarevideoview.htm',
+    },
     diagrams: [
       { nodes: 7, connections: 5, label: /Operating boundaries/ },
       { nodes: 7, connections: 5, label: /Storage choices/ },
@@ -81,7 +89,7 @@ comparisons.forEach(comparison => test(`blog comparison ${comparison.brand} uses
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(comparison.path, { waitUntil: 'domcontentloaded' });
   const banner = page.locator('.blog-article__artwork img');
-  await expect(banner).toHaveAttribute('alt', new RegExp(`${comparison.brand} versus UUG Augment Vision`));
+  await expect(banner).toHaveAttribute('alt', new RegExp(`^${comparison.brand} versus UUG,`));
   await expect(banner).toHaveAttribute('src', `${comparison.path}header-art.svg`);
   expect(await banner.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
   const response = await request.get(`${comparison.path}header-art.svg`);
@@ -91,6 +99,9 @@ comparisons.forEach(comparison => test(`blog comparison ${comparison.brand} uses
   expect(artwork).toContain('id="uug-wordmark"');
   expect(artwork).toContain(`>${comparison.label}</text>`);
   expect(artwork).not.toContain('Hercules');
+  expect(artwork).toContain(`<title>${comparison.brand} versus UUG</title>`);
+  expect(artwork).not.toMatch(/Augment Vision/i);
+  await expect(page.locator('.blog-article')).not.toContainText(/Augment Vision/i);
   const expected = comparison.diagrams;
   const figures = page.locator('.content .rete-diagram-figure');
   await expect(figures).toHaveCount(expected.length);
@@ -106,6 +117,8 @@ comparisons.forEach(comparison => test(`blog comparison ${comparison.brand} uses
         await diagram.scrollIntoViewIfNeeded();
         await expect(diagram).toHaveAttribute('role', 'img');
         await expect(diagram).toHaveAttribute('aria-label', counts.label);
+        expect(await diagram.getAttribute('aria-label')).not.toMatch(/Augment Vision/i);
+        expect(await diagram.getAttribute('data-rete-config')).not.toMatch(/Augment Vision/i);
         await expect(diagram.locator('.rete-node')).toHaveCount(counts.nodes);
         await expect(diagram.locator('.rete-connection')).toHaveCount(counts.connections);
         await expect(figure.locator('figcaption')).toBeVisible();
@@ -133,6 +146,100 @@ comparisons.forEach(comparison => test(`blog comparison ${comparison.brand} uses
     await expect(first).not.toHaveClass(/rete-diagram--pseudo-fullscreen/);
   }
   expect(errors).toEqual([]);
+}));
+
+comparisons.forEach(comparison => test(`blog comparison ${comparison.brand} includes sourced application screenshots`, async ({ page, request }) => {
+  await page.goto(comparison.path, { waitUntil: 'domcontentloaded' });
+  const expected = [
+    { ...comparison.screenshot, path: `${comparison.path}${comparison.screenshot.file}` },
+    {
+      path: '/docs/hub/analytics/hub-analytics-overview.png', width: 1450, height: 750,
+      source: '/docs/hub/analytics/',
+    },
+    {
+      path: '/docs/hub/workflows/images/hub-workflow-designer.png', width: 1944, height: 1328,
+      source: '/docs/hub/workflows/external-stages/',
+    },
+    {
+      path: '/images/blog/uug-hub-recordings.webp', width: 2900, height: 1500,
+      source: '/docs/hub/recordings/',
+    },
+  ];
+  const figures = page.locator('.content .blog-product-image');
+  await expect(figures).toHaveCount(expected.length);
+  await expect(figures.nth(1).locator('xpath=preceding-sibling::h2[1]'))
+    .toContainText('What is actually being compared?');
+  await expect(figures.nth(1).locator('figcaption')).toContainText(/UUG Hub.s analytics dashboard/);
+  for (const [index, screenshot] of expected.entries()) {
+    const figure = figures.nth(index);
+    const image = figure.locator('img');
+    expect(await image.evaluate((img: HTMLImageElement) => new URL(img.src).pathname)).toBe(screenshot.path);
+    await expect(image).toHaveAttribute('alt', /application.*showing/i);
+    await expect(image).toHaveAttribute('loading', 'lazy');
+    await expect(image).toHaveAttribute('width', String(screenshot.width));
+    await expect(image).toHaveAttribute('height', String(screenshot.height));
+    expect(await figure.locator(':scope > a').evaluate((link: HTMLAnchorElement) => new URL(link.href).pathname))
+      .toBe(screenshot.path);
+    await expect(figure.locator('figcaption a')).toHaveAttribute('href', screenshot.source);
+    const response = await request.get(screenshot.path);
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toContain(screenshot.path.endsWith('.png') ? 'image/png' : 'image/webp');
+    const body = await response.body();
+    expect(body.byteLength).toBeLessThan(400 * 1024);
+    const metadata = await sharp(body).metadata();
+    expect([metadata.width, metadata.height]).toEqual([screenshot.width, screenshot.height]);
+    if (screenshot.source.startsWith('/')) {
+      expect((await request.get(screenshot.source)).status()).toBe(200);
+    }
+  }
+  for (const width of [375, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const theme of ['light', 'dark']) {
+      await page.evaluate(mode => document.documentElement.classList.toggle('dark', mode === 'dark'), theme);
+      for (const [index, screenshot] of expected.entries()) {
+        const figure = figures.nth(index);
+        const image = figure.locator('img');
+        await image.scrollIntoViewIfNeeded();
+        await image.evaluate((img: HTMLImageElement) => img.decode());
+        expect(await image.evaluate((img: HTMLImageElement) => [img.naturalWidth, img.naturalHeight]))
+          .toEqual([screenshot.width, screenshot.height]);
+        const box = (await image.boundingBox())!;
+        expect(box.width / box.height).toBeCloseTo(screenshot.width / screenshot.height, 2);
+        expect(box.x).toBeGreaterThanOrEqual(0);
+        expect(box.x + box.width).toBeLessThanOrEqual(width);
+        await expect(image).toHaveCSS('object-fit', 'contain');
+        expect(await textContrast(figure.locator('figcaption'))).toBeGreaterThanOrEqual(4.5);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    }
+  }
+}));
+
+comparisons.forEach(comparison => test(`blog comparison ${comparison.brand} explains custom AI model workflows`, async ({ page, request }) => {
+  await page.goto(comparison.path, { waitUntil: 'domcontentloaded' });
+  const heading = page.getByRole('heading', { level: 2, name: 'AI: packaged analytics versus custom-model workflows' });
+  await expect(heading).toBeVisible();
+  const section = await heading.evaluate(element => {
+    const text: string[] = [];
+    for (let sibling = element.nextElementSibling; sibling && sibling.tagName !== 'H2'; sibling = sibling.nextElementSibling) {
+      text.push(sibling.textContent ?? '');
+    }
+    return text.join(' ');
+  });
+  for (const capability of ['Bring your own models', 'Chain AI stages', 'Choose where inference runs',
+    'Bring results back into Hub', 'Python', 'vision-language model', 'PPE detector',
+    'RabbitMQ or HTTPS', 'authenticated callback', 'detections', 'timeline markers',
+    'Helm deployment configuration', 'Hosted availability depends on the service scope',
+    'model quality']) {
+    expect(section).toContain(capability);
+  }
+  await expect(page.getByRole('row').filter({ hasText: 'AI and model choice' }))
+    .toContainText('Bring your own AI models through custom workflow stages');
+  for (const path of ['/docs/hub/workflows/stages/', '/docs/hub/workflows/external-stages/',
+    '/docs/hub/workflows/ingest/blocks/']) {
+    await expect(page.locator(`.content a[href="${path}"]`).first()).toBeVisible();
+    expect((await request.get(path)).status()).toBe(200);
+  }
 }));
 
 test('Alta blog comparison distinguishes products and covers documented storage and integration options', async ({ page, request }) => {
@@ -220,6 +327,11 @@ test('blog SEO uses BlogPosting data, original authors and the new social previe
     expect(breadcrumbs.itemListElement.at(-1)).toMatchObject({ name: post.headline, item: canonical });
     if ([article, altaArticle].includes(route)) {
       expect(post.author).toBeUndefined();
+      expect(post.headline).toContain(' vs UUG:');
+      expect(post.description).not.toMatch(/Augment Vision/i);
+      for (const selector of ['meta[name="description"]', 'meta[property="og:title"]', 'meta[property="og:description"]']) {
+        await expect(page.locator(selector)).not.toHaveAttribute('content', /Augment Vision/i);
+      }
       const imageURL = await page.locator('meta[property="og:image"]').getAttribute('content');
       expect(imageURL).toContain(`${route}social.png`);
       expect(post.image).toEqual([imageURL]);

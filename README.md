@@ -130,6 +130,37 @@ inline header SVG at [Avigilon Alta](https://www.avigilon.com/alta) on
 generator regenerates both articles' self-contained page-bundle headers and
 social previews. Both comparisons are intentional editorial-naming exceptions.
 
+Use **UUG** as the platform name in comparison titles, prose, diagrams and
+artwork descriptions. Keep the published `*-vs-augment-vision` URL slugs unchanged
+for compatibility with existing links.
+
+Comparison body imagery must show real application screens, not marketing
+composites or generated interfaces. The page-bundle `arcules-views.webp` comes
+from the [Arcules Views guide](https://help.arcules.com/en/articles/2042903-views);
+`alta-video-view.webp` comes from the
+[Alta Video view guide](https://docs.avigilon.com/bundle/alta-video/page/Products/aware/vidview/awarevideoview.htm)
+(`Resources/Images/screens/video-view2.png` in that documentation bundle).
+Both were retrieved on 18 November 2026. The shared
+`app/static/images/blog/uug-hub-recordings.webp` is derived from the existing
+`app/content/docs/hub/recordings/hub-recordings-grid.png` documentation capture.
+All three preserve the complete application screen and its native dimensions,
+encoded with Sharp WebP quality 90, effort 6. Each is under 400 KiB.
+Keep source-linked captions, descriptive alt text, explicit image dimensions,
+lazy loading and a link to the full-size image. Use the built-in `figure`
+shortcode with `class="blog-product-image"` for responsive, uncropped display.
+Do not present these different documentation deployments as a matched benchmark
+or evidence of feature parity. Vendor screenshot copyrights remain with their owners.
+Both articles also reuse the existing
+`/docs/hub/workflows/images/hub-workflow-designer.png` capture directly from the
+external-stages guide. It illustrates the forwarder connection to a custom-model
+worker, not model training or weights upload. Keep the distinction between
+production configuration-based workflow registration and the visual designer,
+and do not imply that custom stages or the forwarder are enabled in every offering.
+Both comparison introductions also reuse
+`/docs/hub/analytics/hub-analytics-overview.png` alongside the respective vendor's
+interface image. Its caption identifies the actual Hub Analytics dashboard shown, rather
+than presenting it as a new capture of the Dashboard home page.
+
 Run `npm run test:navigation -- --grep 'blog|tutorial SEO' --timeout=120000`
 in `playwright/` for the responsive blog layouts, comparison redirect, article
 metadata, social preview and tutorial SEO regressions. Use
