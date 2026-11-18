@@ -33,8 +33,8 @@
   {{- end -}}
 
   {{- partial "opengraph.html" . -}}
-  {{- if and .IsPage (eq .Section "tutorials") -}}
-    {{- partial "tutorial-seo.html" . -}}
+  {{- if and .IsPage (in (slice "tutorials" "blog") .Section) -}}
+    {{- partial "article-seo.html" . -}}
   {{- else -}}
     {{- partial "schema.html" . -}}
   {{- end -}}
@@ -69,6 +69,13 @@
     <link href="{{ $variablesCss.RelPermalink }}" rel="stylesheet" />
     <link href="{{ $customCss.RelPermalink }}" rel="stylesheet" />
   {{- end }}
+
+  {{- if eq .Section "blog" -}}
+    {{- range slice "css/tutorials.css" "css/blog.css" "css/iso-illustration.css" -}}
+      {{- $css := resources.Get . | minify | fingerprint -}}
+      <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
+    {{- end -}}
+  {{- end -}}
 
   {{ partial "components/analytics/analytics.html" . }}
 

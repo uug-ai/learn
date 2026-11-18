@@ -1,39 +1,70 @@
 {{ define "main" }}
-  {{- $readMore := (T "readMore") | default "Read more →" -}}
+  {{- $pages := partial "utils/sort-pages" (dict "page" . "by" site.Params.blog.list.sortBy "order" site.Params.blog.list.sortOrder) -}}
+  {{- $paginator := .Paginate $pages (site.Params.blog.list.pagerSize | default 10) -}}
+  {{- $topics := slice -}}
+  {{- range $pages -}}
+    {{- range .Params.tags -}}{{- $topics = $topics | append . -}}{{- end -}}
+  {{- end -}}
   <div class="hx:mx-auto hx:flex hextra-max-page-width">
-    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" true) }}
-    <article class="hx:w-full hx:break-words hx:flex hx:min-h-[calc(100vh-var(--navbar-height))] hx:min-w-0 hx:justify-center hx:pb-8 hx:pr-[calc(env(safe-area-inset-right)-1.5rem)]">
-      <main class="hx:w-full hx:min-w-0 hx:max-w-6xl hx:px-6 hx:pt-4 hx:md:px-12">
-        {{ partial "breadcrumb.html" (dict "page" . "enable" false) }}
-        <br class="hx:mt-1.5 hx:text-sm" />
-        {{ if .Title }}<h1 class="hx:text-center hx:mt-2 hx:text-4xl hx:font-bold hx:tracking-tight hx:text-slate-900 hx:dark:text-slate-100">{{ .Title }}</h1>{{ end }}
-        <div class="content">{{ .Content }}</div>
-        {{- $pages := partial "utils/sort-pages" (dict "page" . "by" site.Params.blog.list.sortBy "order" site.Params.blog.list.sortOrder) -}}
-        {{- $pagerSize := site.Params.blog.list.pagerSize | default 10 -}}
-        {{- $paginator := .Paginate $pages $pagerSize -}}
-        {{- range $paginator.Pages }}
-          <div class="hx:mb-10">
-            <h3><a style="color: inherit; text-decoration: none;" class="hx:block hx:font-semibold hx:mt-8 hx:text-2xl " href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-            {{ if site.Params.blog.list.displayTags }}
-              <div class="hx:text-sm hx:leading-7">
-                {{ partial "tags.html" (dict "context" .) }}
-              </div>
-            {{ end }}
-            <p class="hx:opacity-80 hx:mt-4 hx:leading-7">{{- partial "utils/page-description" . -}}</p>
-            <p class="hx:opacity-80 hx:mt-1 hx:leading-7">
-              <a class="hx:text-[color:hsl(var(--primary-hue),100%,50%)] hx:underline hx:underline-offset-2 hx:decoration-from-font" href="{{ .RelPermalink }}">
-                {{- $readMore -}}
-              </a>
-            </p>
-            <p class="hx:opacity-50 hx:text-sm hx:mt-4 hx:leading-7">{{ partial "utils/format-date" .Date }}</p>
+    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true) }}
+    <main id="content" class="blog-catalog tutorial-catalog">
+      <header class="tutorial-catalog__intro">
+        <div class="tutorial-catalog__intro-copy">
+          <span class="tutorial-catalog__eyebrow">Perspectives &amp; comparisons</span>
+          <h1>{{ .Title }}</h1>
+          <div class="tutorial-catalog__lead">{{ .Content }}</div>
+        </div>
+        <dl class="tutorial-catalog__stats" aria-label="Blog library summary">
+          <div><dt>{{ len $pages }}</dt><dd>Articles</dd></div>
+          <div><dt>{{ len (uniq $topics) }}</dt><dd>Topics</dd></div>
+        </dl>
+      </header>
+
+      {{- if and $pages (eq $paginator.PageNumber 1) }}
+        <section class="tutorial-latest" aria-labelledby="blog-latest-title">
+          <div class="tutorial-section-heading">
+            <div>
+              <span class="tutorial-section-heading__eyebrow">From the team</span>
+              <h2 id="blog-latest-title">Latest stories</h2>
+            </div>
+            <a href="#all-articles">View all</a>
           </div>
-        {{ end -}}
-        
-        {{- if gt $paginator.TotalPages 1 -}}
-          {{ partial "components/blog-pager.html" $paginator }}
-        {{- end -}}
-      </main>
-    </article>
-    <div class="hx:max-xl:hidden hx:h-0 hx:w-64 hx:shrink-0"></div>
+          <div class="tutorial-latest__layout{{ if eq (len $pages) 1 }} blog-latest--single{{ end }}">
+            {{- with index $pages 0 }}
+              {{ partial "blog-card.html" (dict "page" . "variant" "featured") }}
+            {{- end }}
+            {{- if gt (len $pages) 1 }}
+              <div class="tutorial-latest__rail">
+                {{- range first 2 (after 1 $pages) }}
+                  {{ partial "blog-card.html" (dict "page" . "variant" "recent") }}
+                {{- end }}
+              </div>
+            {{- end }}
+          </div>
+        </section>
+      {{- end }}
+
+      <section class="tutorial-browser" id="all-articles" aria-labelledby="blog-all-title">
+        <div class="tutorial-section-heading">
+          <div>
+            <span class="tutorial-section-heading__eyebrow">Explore the journal</span>
+            <h2 id="blog-all-title">All articles</h2>
+          </div>
+          <p class="tutorial-browser__count">{{ len $pages }} articles</p>
+        </div>
+        <div class="tutorial-browser__grid">
+          {{- range $paginator.Pages }}
+            {{ partial "blog-card.html" (dict "page" . "variant" "catalog") }}
+          {{- else }}
+            <p>No articles published yet.</p>
+          {{- end }}
+        </div>
+        {{- if gt $paginator.TotalPages 1 }}
+          <nav class="blog-pagination" aria-label="Blog pagination">
+            {{ partial "components/blog-pager.html" $paginator }}
+          </nav>
+        {{- end }}
+      </section>
+    </main>
   </div>
-{{- end -}}
+{{ end }}
