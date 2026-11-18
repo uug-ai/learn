@@ -627,6 +627,11 @@ Argo CD automatically reconciles the merged production manifest. Verify the
 public HTTPS site after rollout; publishing a GitHub release alone is not
 confirmation of a production deployment.
 
+On staging (`*.uug.lol`) only, `app/assets/js/inspect.js` loads the
+[inspect](https://inspect.uug.ai) bug-report tool (launcher button or
+Alt+Shift+I). Reports become issues in `uug-ai/learn`, which are public
+because the repository is public.
+
 For the first image using this runtime, include the container port change from
 80 to 8080 in the same GitOps change as the new image tag, in each environment.
 Services keep public port 80 and use the container's named `http` target port.
