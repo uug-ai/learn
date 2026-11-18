@@ -3,12 +3,11 @@
 <article class="blog-card tutorial-card tutorial-card--{{ $variant }}">
   <a class="tutorial-card__media {{ if $page.Params.header }}blog-artwork--image{{ else }}tutorial-card__media--iso{{ end }}" href="{{ $page.RelPermalink }}" aria-label="Read article: {{ $page.Title }}">
     {{ partial "blog-artwork.html" (dict "page" $page "variant" $variant) }}
-    <span class="tutorial-card__product">{{ $page.Params.category | default "Perspective" }}</span>
   </a>
   <div class="tutorial-card__body">
     <div class="tutorial-card__meta">
       <span>{{ $page.ReadingTime }} min read</span>
-      <span>{{ $page.Params.category | default "Perspective" }}</span>
+      {{- with $page.Params.category }}<span>{{ . }}</span>{{ end }}
     </div>
     <h3><a href="{{ $page.RelPermalink }}">{{ $page.Title }}</a></h3>
     <p>{{ $page.Description | default $page.Params.subtitle | default ($page.Summary | plainify) }}</p>
