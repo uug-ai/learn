@@ -80,6 +80,62 @@ robots policy, and missing-page behavior. These tests are also included in the
 normal navigation suite. Publishing a release still requires a separate GitOps
 production promotion before the new pages and SEO fixes reach `learn.uug.ai`.
 
+## Blog design and comparisons
+
+The blog catalog and article templates reuse the tutorial catalog's card,
+typography and illustration styles, with blog-specific layout rules in
+`app/assets/css/blog.css`. Blog cards show reading time and an editorial category,
+not tutorial level or prerequisites. They retain topic links and pagination.
+Articles retain the existing `authors` list (`name`, optional `link` and `image`),
+publication dates, podcast controls, page overview and previous/next navigation.
+Do not invent an author for an unattributed article.
+
+Blog pages can select an existing `illustration` from `app/assets/iso/` and an
+`artworkAlt`; the default is the ecosystem illustration. `category` defaults to
+Perspective. An optional `header` selects a page-bundle or `app/assets/` image
+instead, for both the article and its cards. Set `artworkAlt` to describe it;
+`headerWidth` and `headerHeight` default to 1200 and 675. Card images are contained
+so brand marks are not cropped. An optional page-bundle `images: ['social.png']` supplies the raster
+social preview. `article-seo.html` shares article/breadcrumb metadata with
+tutorials while retaining their required-image validation; blog articles emit
+BlogPosting metadata and support the existing authors list.
+
+The Arcules comparison lives at `/blog/arcules-vs-augment-vision/`. Its former
+tutorial URL is a Hugo alias, and the original social-image URL is retained under
+`app/static/tutorials/hub/arcules-vs-augment-vision/` for previously shared links.
+The comparison is an intentional exception to general editorial naming rules.
+It is a sourced, first-party comparison, not a setup tutorial or benchmark.
+Its black comparison banner is a page-bundle resource (`header-art.svg`), keeping
+the article and its image together, and follows the Claude tutorial: the official
+[Milestone wordmark](https://www.milestonesys.com/Static/Img/Global/logo.svg),
+retained at `app/assets/images/milestone-logo.svg`, identifies the current
+Arcules provider beside a typeset product label; the outlined UUG wordmark is
+reused unchanged from `tutorial-claude-uug.svg`. It is not a recreated legacy
+Arcules logo or a product screenshot. All marks belong to their owners and are
+used to identify the compared products. Regenerate the banner and its 1200x630
+social preview with `node scripts/generate-comparison-headers.mjs` in
+`playwright/`. The article's three `rete` drawings explain operating boundaries,
+storage choices and a WAN outage; keep their deployment-specific captions and
+editable Draw payloads intact.
+
+The matching Alta comparison is `/blog/avigilon-alta-vs-augment-vision/`. It
+focuses on Alta Video, not Alta Access or Avigilon Unity, and explicitly covers
+Alta's external S3-compatible storage, licensed CIFS backup, APIs and export
+verification. Its three editable diagrams explain camera paths, recording and
+backup placement, and example integration contracts. The official Avigilon
+wordmark is retained in `app/assets/images/avigilon-logo.svg`, extracted from the
+inline header SVG at [Avigilon Alta](https://www.avigilon.com/alta) on
+18 November 2026. Its paths are unchanged; the comparison banner uses white
+`currentColor` and a typeset Alta product label. The shared comparison-header
+generator regenerates both articles' self-contained page-bundle headers and
+social previews. Both comparisons are intentional editorial-naming exceptions.
+
+Run `npm run test:navigation -- --grep 'blog|tutorial SEO' --timeout=120000`
+in `playwright/` for the responsive blog layouts, comparison redirect, article
+metadata, social preview and tutorial SEO regressions. Use
+the `blog articles retain authors` test for the existing blog author's byline
+and podcast integration.
+
 ## Architecture drawings
 
 [Draw](https://draw.uug.ai/) is the single drawing and architecture

@@ -5,11 +5,12 @@ import { join, resolve } from 'node:path';
 import sharp from 'sharp';
 import { textContrast } from './utils/contrast';
 
-test('keeps company naming out of editorial content while preserving technical identifiers and legal notices', () => {
+test('keeps company naming out of general editorial content except explicit product comparisons', () => {
   const contentRoot = resolve(__dirname, '../../app/content');
   const companyNaming = /(?<![\w./@-])(?:augment\s+vision|uug(?:\.ai)?)(?![\w/@-]|\.\w)/i;
   for (const file of readdirSync(contentRoot, { recursive: true })) {
     if (!file.endsWith('.md')) continue;
+    if (['blog/arcules-vs-augment-vision/index.md', 'blog/avigilon-alta-vs-augment-vision/index.md'].includes(file)) continue;
     const editorial = readFileSync(join(contentRoot, file), 'utf8').replace(/^Copyright[^\n]*$/gm, '');
     expect(editorial, file).not.toMatch(companyNaming);
   }

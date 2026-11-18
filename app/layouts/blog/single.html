@@ -1,58 +1,57 @@
 {{ define "main" }}
   {{- $podcast := partial "podcast/data.html" . -}}
-  <div class="hx:mx-auto hx:flex hextra-max-page-width">
-    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" true) }}
+  <div class="blog-article-layout hx:mx-auto hx:flex hextra-max-page-width">
+    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true) }}
     {{ partial "toc.html" . }}
-    <article class="hx:w-full hx:break-words hx:flex hx:min-h-[calc(100vh-var(--navbar-height))] hx:min-w-0 hx:justify-center hx:pb-8 hx:pr-[calc(env(safe-area-inset-right)-1.5rem)]">
-      <main id="content" class="hx:w-full hx:min-w-0 hx:max-w-6xl hx:px-6 hx:pt-4 hx:md:px-12">
+    <article class="blog-article">
+      <main id="content">
         {{ partial "breadcrumb.html" (dict "page" . "enable" true) }}
-        {{ if $podcast }}
-          {{ partial "podcast/article-header.html" (dict "page" . "podcast" $podcast "contextMenu" false "titleClass" "hx:mt-2 hx:text-4xl hx:font-bold hx:tracking-tight hx:text-slate-900 hx:dark:text-slate-100") }}
-        {{ else }}
-          {{ if .Title }}<h1 class="hx:mt-2 hx:text-4xl hx:font-bold hx:tracking-tight hx:text-slate-900 hx:dark:text-slate-100">{{ .Title }}</h1>{{ end }}
-        {{ end }}
-        {{- if .Params.subtitle }}
-          <p class="hx:mt-2 hx:text-lg hx:text-slate-700 hx:dark:text-slate-300">{{ .Params.subtitle }}</p>
-        {{- end }}
-        <div class="hx:mt-4 hx:mb-16 hx:text-gray-500 hx:dark:text-gray-400 hx:text-sm hx:flex hx:items-center hx:flex-wrap hx:gap-y-2">
-          {{- with $date := .Date }}<span class="hx:mr-1">{{ partial "utils/format-date" $date }}</span>{{ end -}}
-          {{- $lazyLoading := site.Params.enableImageLazyLoading | default true -}}
-          {{ if and .Date .Params.authors }}<span class="hx:mx-1">·</span>{{ end -}}
-          {{- with $.Params.authors -}}
-            {{- range $i, $author := . -}}
-              {{- if reflect.IsMap $author -}}
-                {{- if and $i (not $author.image) }}<span class="hx:mr-1">,</span>{{ end -}}
-                <a
-                  {{ with $author.link }}href="{{ . }}" target="_blank"{{ end }}
-                  class="hx:group hx:inline-flex hx:items-center hx:text-current hx:gap-x-1.5 hx:mx-1"
-                  {{ with $author.name }}title="{{ . }}"{{ end }}
-                >
-                  {{- with $image := $author.image }}
-                    {{- $isLocal := not (urls.Parse $image).Scheme -}}
-                    {{- $startsWithSlash := hasPrefix $image "/" -}}
-                    {{- if and $isLocal $startsWithSlash }}
-                      {{- $image = (relURL (strings.TrimPrefix "/" $image)) -}}
-                    {{ end -}}
-                    <img src="{{ $image | safeURL }}" alt="{{ $author.name }}" class="hx:inline-block hx:h-4 hx:w-4 hx:rounded-full" {{ if $lazyLoading }}loading="lazy"{{ end }} />
-                  {{ end -}}
-                  <div class="hx:group-hover:underline">{{ $author.name }}</div>
-                </a>
-              {{- else -}}
-                {{- if $i }}<span class="hx:mr-1">,</span>{{ end -}}<span class="hx:mx-1">{{ $author }}</span>
-              {{- end -}}
-            {{- end -}}
-          {{- end -}}
-        </div>
+        <header class="blog-article__header">
+          <a class="blog-article__back" href="{{ "/blog/" | relLangURL }}">All articles</a>
+          <p class="tutorial-section-heading__eyebrow">{{ .Params.category | default "Perspective" }}</p>
+          {{ partial "podcast/article-header.html" (dict "page" . "podcast" $podcast "contextMenu" false "titleClass" "blog-article__title") }}
+          {{- with .Description | default .Params.subtitle }}
+            <p class="blog-article__lead">{{ . }}</p>
+          {{- end }}
+          <div class="blog-byline">
+            {{- range .Params.authors }}
+              {{- if reflect.IsMap . }}
+                {{- if .link }}
+                  <a class="blog-byline__author" href="{{ .link }}" title="{{ .name }}" target="_blank" rel="noreferrer noopener">
+                    {{- with .image }}<img src="{{ . | relURL }}" alt="" width="36" height="36" loading="lazy" />{{ end }}
+                    <span>{{ .name }}</span>
+                  </a>
+                {{- else }}
+                  <span class="blog-byline__author">{{ .name }}</span>
+                {{- end }}
+              {{- else }}
+                <span class="blog-byline__author">{{ . }}</span>
+              {{- end }}
+            {{- end }}
+            <span>Published <time datetime="{{ .Date.Format "2006-01-02" }}">{{ partial "utils/format-date" .Date }}</time></span>
+            {{- if gt .Lastmod.Unix .Date.Unix }}
+              <span>Updated <time datetime="{{ .Lastmod.Format "2006-01-02" }}">{{ partial "utils/format-date" .Lastmod }}</time></span>
+            {{- end }}
+            <span>{{ .ReadingTime }} min read</span>
+          </div>
+          {{- with .GetTerms "tags" }}
+            <nav class="blog-topics" aria-label="Article topics">
+              {{- range . }}<a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}
+            </nav>
+          {{- end }}
+        </header>
+        <figure class="blog-article__artwork tutorial-header {{ if .Params.header }}blog-artwork--image{{ else }}tutorial-header--iso{{ end }}" {{ if not .Params.header }}role="img" aria-label="{{ .Params.artworkAlt | default "The video platform ecosystem: capture, storage, management and applications." }}"{{ end }}>
+          {{ partial "blog-artwork.html" (dict "page" . "variant" "header") }}
+        </figure>
         <div class="content">
           {{ with $podcast }}{{ partial "podcast/player.html" . }}{{ end }}
-          <hr>
           {{ .Content }}
         </div>
         {{- partial "components/last-updated.html" . -}}
         {{- if (site.Params.blog.article.displayPagination | default true) -}}
           {{- .Store.Set "reversePagination" (.Params.reversePagination | default true) -}}
           {{- partial "components/pager.html" . -}}
-        {{ end }}
+        {{- end }}
         {{- partial "components/comments.html" . -}}
       </main>
     </article>

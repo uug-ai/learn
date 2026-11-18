@@ -1,0 +1,26 @@
+{{- $page := .page -}}
+{{- $variant := .variant -}}
+<article class="blog-card tutorial-card tutorial-card--{{ $variant }}">
+  <a class="tutorial-card__media {{ if $page.Params.header }}blog-artwork--image{{ else }}tutorial-card__media--iso{{ end }}" href="{{ $page.RelPermalink }}" aria-label="Read article: {{ $page.Title }}">
+    {{ partial "blog-artwork.html" (dict "page" $page "variant" $variant) }}
+    <span class="tutorial-card__product">{{ $page.Params.category | default "Perspective" }}</span>
+  </a>
+  <div class="tutorial-card__body">
+    <div class="tutorial-card__meta">
+      <span>{{ $page.ReadingTime }} min read</span>
+      <span>{{ $page.Params.category | default "Perspective" }}</span>
+    </div>
+    <h3><a href="{{ $page.RelPermalink }}">{{ $page.Title }}</a></h3>
+    <p>{{ $page.Description | default $page.Params.subtitle | default ($page.Summary | plainify) }}</p>
+    <div class="tutorial-card__footer">
+      <div class="tutorial-card__tags" aria-label="Topics">
+        {{- if site.Params.blog.list.displayTags | default true }}
+          {{- range first 3 ($page.GetTerms "tags") }}
+            <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+          {{- end }}
+        {{- end }}
+      </div>
+      <time datetime="{{ $page.Date.Format "2006-01-02" }}">{{ partial "utils/format-date" $page.Date }}</time>
+    </div>
+  </div>
+</article>

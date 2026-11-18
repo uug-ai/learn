@@ -1,0 +1,23 @@
+{{- $page := .page -}}
+{{- if $page.Params.header -}}
+  {{- $artwork := $page.Resources.GetMatch $page.Params.header -}}
+  {{- if not $artwork -}}
+    {{- $artwork = resources.Get $page.Params.header -}}
+  {{- end -}}
+  {{- if not $artwork -}}
+    {{- errorf "Blog header %q not found for %s" $page.Params.header $page.RelPermalink -}}
+  {{- else -}}
+    <img src="{{ $artwork.RelPermalink }}" alt="{{ $page.Params.artworkAlt | default $page.Title }}" width="{{ $page.Params.headerWidth | default 1200 }}" height="{{ $page.Params.headerHeight | default 675 }}" {{ if eq .variant "header" }}fetchpriority="high"{{ else }}loading="lazy"{{ end }} decoding="async" />
+  {{- end -}}
+{{- else -}}
+{{- $illustration := $page.Params.illustration | default "ecosystem" -}}
+{{- $artwork := resources.Get (printf "iso/%s.svg" $illustration) -}}
+{{- if not $artwork -}}
+  {{- errorf "Blog illustration %q not found for %s" $illustration $page.RelPermalink -}}
+{{- else -}}
+  {{- $svg := $artwork.Content | replaceRE "<a\\s[^>]*>" "<g>" | replaceRE "</a>" "</g>" -}}
+  <span class="iso-illustration iso-illustration--glow-auto" aria-hidden="true">
+    {{- replace $svg "ISO_ID" (printf "blog-%s-%s" $page.File.UniqueID .variant) | safeHTML -}}
+  </span>
+{{- end -}}
+{{- end -}}
