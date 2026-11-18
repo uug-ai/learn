@@ -1,6 +1,7 @@
 ---
 podcast: guides-security-image-hardening
 title: Image hardening
+weight: 10
 toc: true
 type: docs
 ---
@@ -260,6 +261,12 @@ Hardening is not complete when the Dockerfile builds. CI must:
 
 Scanning must be release-blocking. A scanner configured to report findings but
 always exit successfully is informational, not an enforcement control.
+
+Our shared release workflow implements these controls for every hardened
+release; see [Hardened releases and signing](/guides/security/release-signing).
+After release, [CVE scanning](/guides/security/vulnerability-scanning) keeps
+checking running images and [Kyverno policies](/guides/security/kyverno-policies)
+check signatures at admission.
 
 ## Image contract
 
