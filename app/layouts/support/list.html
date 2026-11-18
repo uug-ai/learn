@@ -1,0 +1,140 @@
+{{- /* Full-width support page (/support), in the same catalog style as the blog. */ -}}
+{{ define "main" }}
+  {{- with resources.Get "css/tutorials.css" | minify | fingerprint -}}
+    <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" />
+  {{- end -}}
+  {{- with resources.Get "css/support.css" | minify | fingerprint -}}
+    <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" />
+  {{- end -}}
+
+  {{- $podcast := partial "podcast/data.html" . -}}
+  {{- $arrow := partial "utils/icon.html" (dict "name" "arrow-right" "attributes" "aria-hidden=\"true\"") -}}
+  <div class="hx:mx-auto hx:flex hextra-max-page-width">
+    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true) }}
+    <main id="content" class="tutorial-catalog support-page">
+      {{- /* The podcast player links its chapters to headings inside the same .content element. */}}
+      <div class="content">
+        <header class="support-hero not-prose">
+          <div class="support-hero__copy">
+            {{ with .Params.eyebrow }}<span class="tutorial-catalog__eyebrow">{{ . }}</span>{{ end }}
+            {{ partial "podcast/article-header.html" (dict "page" . "podcast" $podcast "contextMenu" false "titleClass" "support-hero__title") }}
+            <div class="tutorial-catalog__lead">{{ .Content }}</div>
+          </div>
+          {{- with .Params.channels }}
+            <div class="support-hero__contact" aria-label="Contact the support team">
+              {{- range where . "icon" "in" (slice "mail" "phone") }}
+                {{- $channel := . }}
+                {{- with index .links 0 }}
+                  <a class="support-hero__action" href="{{ .url }}">
+                    <span class="support-icon">{{ partial "utils/icon.html" (dict "name" $channel.icon "attributes" "aria-hidden=\"true\"") }}</span>
+                    <span>
+                      <small>{{ $channel.title }}</small>
+                      <strong>{{ .label }}</strong>
+                    </span>
+                  </a>
+                {{- end }}
+              {{- end }}
+            </div>
+          {{- end }}
+        </header>
+
+        {{ with $podcast }}{{ partial "podcast/player.html" . }}{{ end }}
+
+        {{- with .Params.resources }}
+          <section class="support-section not-prose" aria-labelledby="support-resources-title">
+            <div class="tutorial-section-heading">
+              <div>
+                <span class="tutorial-section-heading__eyebrow">Self-service</span>
+                <h2 id="support-resources-title">Find an answer yourself</h2>
+              </div>
+              <p class="support-search-hint">Search everything with <kbd>Ctrl</kbd> <kbd>K</kbd></p>
+            </div>
+            <div class="support-grid support-grid--resources">
+              {{- range . }}
+                <a class="support-card support-card--link" href="{{ .link | relLangURL }}">
+                  <span class="support-icon">{{ partial "utils/icon.html" (dict "name" .icon "attributes" "aria-hidden=\"true\"") }}</span>
+                  <span class="support-card__body">
+                    <strong>{{ .title }}</strong>
+                    <span>{{ .text }}</span>
+                  </span>
+                  <span class="support-card__arrow">{{ $arrow }}</span>
+                </a>
+              {{- end }}
+            </div>
+          </section>
+        {{- end }}
+
+        {{- with .Params.channels }}
+          <section class="support-section not-prose" aria-labelledby="support-channels-title">
+            <div class="tutorial-section-heading">
+              <div>
+                <span class="tutorial-section-heading__eyebrow">Talk to us</span>
+                <h2 id="support-channels-title">Support channels</h2>
+              </div>
+            </div>
+            <div class="support-grid support-grid--channels">
+              {{- range . }}
+                <div class="support-card support-channel">
+                  <span class="support-icon">{{ partial "utils/icon.html" (dict "name" .icon "attributes" "aria-hidden=\"true\"") }}</span>
+                  <h3>{{ .title }}</h3>
+                  <p>{{ .text }}</p>
+                  <div class="support-channel__links">
+                    {{- range .links }}
+                      {{- $external := hasPrefix .url "http" }}
+                      <a href="{{ .url }}"{{ if $external }} target="_blank" rel="noopener"{{ end }}>{{ .label }} {{ $arrow }}</a>
+                    {{- end }}
+                  </div>
+                </div>
+              {{- end }}
+            </div>
+          </section>
+        {{- end }}
+
+        <section class="support-section not-prose">
+          <span class="tutorial-section-heading__eyebrow">Ready to reach out</span>
+          <h2 id="how-to-get-the-best-support" class="support-section__title">How to get the best support</h2>
+          <div class="support-grid support-grid--checklists">
+            {{- with .Params.before }}
+              <div class="support-checklist">
+                <h3>Before you reach out</h3>
+                <ul>
+                  {{- range . }}<li>{{ partial "utils/icon.html" (dict "name" "search" "attributes" "aria-hidden=\"true\"") }}<span>{{ . | markdownify }}</span></li>{{ end }}
+                </ul>
+              </div>
+            {{- end }}
+            {{- with .Params.include }}
+              <div class="support-checklist">
+                <h3>What to include</h3>
+                <ul>
+                  {{- range . }}<li>{{ partial "utils/icon.html" (dict "name" "check-circle" "attributes" "aria-hidden=\"true\"") }}<span>{{ . | markdownify }}</span></li>{{ end }}
+                </ul>
+              </div>
+            {{- end }}
+            {{- with .Params.never }}
+              <p class="support-never">{{ partial "utils/icon.html" (dict "name" "x-circle" "attributes" "aria-hidden=\"true\"") }}<span>{{ . | markdownify }}</span></p>
+            {{- end }}
+          </div>
+        </section>
+
+        {{- with .Params.emergency }}
+          <section class="support-section not-prose">
+            <span class="tutorial-section-heading__eyebrow">Production issues</span>
+            <h2 id="emergency-support" class="support-section__title">Emergency support</h2>
+            <div class="support-emergency">
+              <div class="support-emergency__intro">
+                <span class="support-icon support-icon--alert">{{ partial "utils/icon.html" (dict "name" "fire" "attributes" "aria-hidden=\"true\"") }}</span>
+                <div>
+                  <h3>Production down or recordings at risk?</h3>
+                  <p>Make the impact and urgency explicit, so the right person picks it up first.</p>
+                </div>
+              </div>
+              <ol>
+                {{- range . }}<li>{{ . | markdownify }}</li>{{ end }}
+              </ol>
+            </div>
+          </section>
+        {{- end }}
+      </div>
+    </main>
+  </div>
+{{ end }}
