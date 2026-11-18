@@ -249,7 +249,8 @@
             </li>
           {{- end -}}
           {{- with $topics -}}
-            {{- $shouldOpen := eq $pageURL $context.RelPermalink -}}
+            {{- /* Collapsed by default; open only when the current page is one of the topics. */ -}}
+            {{- $shouldOpen := false -}}
             {{- range . -}}
               {{- if or (eq $pageURL .RelPermalink) (.IsAncestor $page) -}}
                 {{- $shouldOpen = true -}}
