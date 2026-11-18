@@ -139,6 +139,34 @@
   max-width: 80ch;
 }
 
+.blog-article .blog-product-image {
+  margin: 2rem 0;
+  padding: clamp(0.65rem, 1.4vw, 1rem);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.blog-article .blog-product-image > a {
+  display: block;
+}
+
+.blog-article .blog-product-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+.blog-article .blog-product-image figcaption {
+  margin-top: 0.875rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
 .blog-catalog a:focus-visible,
 .blog-article a:focus-visible {
   outline: 2px solid var(--link-color);

@@ -18,7 +18,7 @@ for (const comparison of comparisons) {
   const logo = (await readFile(path.join(images, comparison.logo), 'utf8'))
     .replace('<svg', '<svg color="#fff"');
   const artwork = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
-  <title>${comparison.name} versus UUG Augment Vision</title>
+  <title>${comparison.name} versus UUG</title>
   <rect width="1200" height="675" fill="#000"/>
   <image x="175" y="267" width="350" height="63" href="data:image/svg+xml;base64,${Buffer.from(logo).toString('base64')}"/>
   <text x="350" y="408" fill="#fff" font-family="Arial, sans-serif" font-size="60" text-anchor="middle" letter-spacing="-1">${comparison.label}</text>
