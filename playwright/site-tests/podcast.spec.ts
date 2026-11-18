@@ -181,7 +181,7 @@ test('reports audio failures without suggesting transcripts or downloads', async
 });
 
 for (const route of ['/tutorials/', '/guides/', '/blog/', '/release-notes/', '/knowledge-base/',
-  '/designer/', '/guides/code-style/go/rest/routing/']) {
+  '/designer/', '/guides/code-style/go/rest/routing/', '/support/']) {
   test(`keeps navigation or placeholder page ${route} without podcast assets`, async ({ page }) => {
     const podcastAssets: string[] = [];
     page.on('request', request => {
@@ -201,7 +201,7 @@ test('preserves article metadata and fits each non-Hub layout on mobile', async 
   for (const route of ['/docs/agent/', '/docs/factory/', '/docs/vault/',
     '/guides/onboarding/', '/guides/onboarding/dev-containers/', '/tutorials/agent/connect-any-camera/',
     '/knowledge-base/vault/how-to-enable-cors/', '/blog/2025-11-14-new-learning-platform/',
-    '/release-notes/2026-10-23/', '/support/']) {
+    '/release-notes/2026-10-23/']) {
     await page.goto(route);
     const listen = page.getByRole('button', { name: 'Listen to the overview', exact: true });
     await expect(listen).toBeVisible();

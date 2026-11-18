@@ -4,13 +4,13 @@ Use one conversational episode format and one interactive player for any Learn
 documentation page. The first example is an adaptation of the
 [organisations and projects guide](https://learn.uug.ai/docs/hub/organisations/).
 Generation and review stay local. Approved episodes can be exported into Learn's
-static assets and enabled individually on articles. All 104 published,
-substantive Learn articles now have their own overview. This includes the 36 Hub
-guides and 68 additional articles across Agent, Factory, Vault, platform and CLI
-documentation, completed engineering guides, tutorials, the CORS knowledge-base
-article, blog posts, release notes, and support. The organisations guide keeps
-its second episode. Drafts, empty pages, "To be written" placeholders, catalogues,
-and navigation-only pages intentionally remain without podcasts.
+static assets and enabled individually on articles. Published, substantive
+Learn articles have their own overview. This includes the 36 Hub guides and the
+articles across Agent, Factory, Vault, platform and CLI documentation, completed
+engineering guides, tutorials, the CORS knowledge-base article, blog posts and
+release notes. The organisations guide keeps its second episode. Drafts, empty
+pages, "To be written" placeholders, catalogues, navigation-only pages and the
+support page intentionally remain without podcasts.
 Nothing under `output/`, `.cache/`, or `node_modules/` is part of the site.
 
 ## Episode coverage

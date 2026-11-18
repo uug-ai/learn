@@ -31,10 +31,6 @@
   max-width: 760px;
 }
 
-.support-hero .learn-article-header {
-  margin-bottom: 0;
-}
-
 .support-page .support-hero__title {
   margin: 0;
   font-family: var(--font-family-heading);
@@ -82,11 +78,6 @@
   margin-top: 0.2rem;
   color: var(--text-primary);
   font: 600 1.05rem/1.3 var(--font-family-heading);
-}
-
-/* The podcast player sits between the hero and the first section. */
-.support-page .learn-podcast {
-  margin-top: 1.5rem;
 }
 
 /* Sections. */
@@ -142,20 +133,6 @@
 
 .support-grid--resources {
   grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-/* Channels: three per row; a short last row of two shares the full width. */
-.support-grid--channels {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-}
-
-.support-grid--channels > * {
-  grid-column: span 2;
-}
-
-.support-grid--channels > :nth-child(3n + 1):nth-last-child(2),
-.support-grid--channels > :nth-child(3n + 1):nth-last-child(2) + * {
-  grid-column: span 3;
 }
 
 .support-grid--checklists {
@@ -242,65 +219,6 @@
   transform: translateX(3px);
 }
 
-.support-channel {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  padding: 1.35rem 1.25rem 1.2rem;
-  box-shadow: 0 10px 30px var(--shadow);
-  overflow: hidden;
-}
-
-.support-channel::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto;
-  height: 3px;
-  background: var(--brand-gradient);
-  opacity: 0.85;
-}
-
-.support-page .support-channel h3 {
-  margin-top: 1rem;
-}
-
-.support-channel p {
-  margin: 0.45rem 0 0;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  line-height: 1.55;
-}
-
-.support-channel__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem 1rem;
-  margin-top: auto;
-  padding-top: 1.1rem;
-}
-
-.support-channel__links a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--primary-color);
-  font-size: 0.92rem;
-  font-weight: 700;
-  text-decoration: none;
-  overflow-wrap: anywhere;
-}
-
-.support-channel__links svg {
-  width: 1em;
-  height: 1em;
-  flex: none;
-  transition: transform 160ms ease;
-}
-
-.support-channel__links a:hover svg {
-  transform: translateX(3px);
-}
-
 /* Checklists. */
 .support-checklist {
   padding: 1.35rem 1.4rem;
@@ -349,83 +267,343 @@
   color: var(--secondary-color);
 }
 
-/* Emergency panel. */
-.support-emergency {
+/* Guide: questions on the left, the recommended channel on the right. */
+.support-guide {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: 2rem;
-  align-items: center;
-  padding: 1.6rem 1.75rem;
-  border: 1px solid color-mix(in srgb, var(--secondary-color) 30%, var(--border));
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--secondary-color) 7%, transparent), transparent 60%),
-    var(--background);
+  background: var(--background);
   box-shadow: 0 10px 30px var(--shadow);
+  overflow: hidden;
 }
 
-.support-emergency__intro {
+.support-guide[hidden] {
+  display: none;
+}
+
+.support-guide__questions {
+  display: grid;
+  gap: 1.75rem;
+  align-content: start;
+  padding: 1.5rem;
+}
+
+.support-guide__step {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.support-guide__step[hidden] {
+  display: none;
+}
+
+.support-guide__step legend {
   display: flex;
-  align-items: flex-start;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+  padding: 0;
+  color: var(--text-primary);
+  font: 600 1.05rem/1.3 var(--font-family-heading);
 }
 
-.support-emergency__intro p {
+.support-guide__number {
+  display: inline-grid;
+  flex: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-strong);
+  color: var(--primary-color);
+  font: 700 0.8rem/1 var(--font-family-heading);
+}
+
+.support-guide__options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.support-option {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.support-option:hover {
+  border-color: var(--primary-color);
+}
+
+.support-option:has(input:checked) {
+  border-color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 8%, var(--background));
+  box-shadow: inset 0 0 0 1px var(--primary-color);
+}
+
+.support-option:has(input:focus-visible) {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* The radio stays in the accessibility tree; the whole tile shows its state. */
+.support-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.support-option__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.support-option__text strong {
+  color: var(--text-primary);
+  font-size: 0.93rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.support-option__text small {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.support-guide__result {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.support-guide__empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.support-guide__empty p {
+  max-width: 300px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.93rem;
+  line-height: 1.55;
+}
+
+.support-guide__empty[hidden],
+.support-guide__card[hidden],
+.support-guide__reset[hidden] {
+  display: none;
+}
+
+.support-guide__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.support-guide__label {
+  margin-top: 1rem;
+  color: var(--primary-color);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.support-guide__card--urgent .support-guide__label {
+  color: var(--secondary-color);
+}
+
+.support-page .support-guide__card h3 {
+  margin-top: 0.35rem;
+}
+
+.support-guide__card > p {
   margin: 0.45rem 0 0;
   color: var(--text-secondary);
   font-size: 0.93rem;
   line-height: 1.55;
 }
 
-.support-emergency ol {
+.support-guide__steps {
   display: grid;
-  gap: 0.7rem;
-  margin: 0;
+  gap: 0.6rem;
+  margin: 1rem 0 0;
   padding: 0;
   list-style: none;
   counter-reset: support-step;
 }
 
-.support-emergency li {
+.support-guide__steps li {
   position: relative;
-  padding-left: 2.4rem;
+  padding-left: 2.2rem;
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: 0.93rem;
   line-height: 1.55;
   counter-increment: support-step;
 }
 
-.support-emergency li::before {
+.support-guide__steps li::before {
   content: counter(support-step);
   position: absolute;
   top: 0;
   left: 0;
   display: grid;
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 1.5rem;
+  height: 1.5rem;
   place-items: center;
   border-radius: 50%;
   background: var(--secondary-color);
   color: #fff;
-  font: 700 0.8rem/1 var(--font-family-heading);
+  font: 700 0.75rem/1 var(--font-family-heading);
+}
+
+.support-guide__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+.support-guide__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 8px;
+  background: var(--primary-color);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.support-guide__card--urgent .support-guide__action {
+  background: var(--secondary-color);
+}
+
+.support-guide__action svg {
+  width: 1em;
+  height: 1em;
+  flex: none;
+  transition: transform 160ms ease;
+}
+
+.support-guide__action:hover svg {
+  transform: translateX(3px);
+}
+
+.support-guide__note {
+  margin: 1rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.support-guide__note a {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.support-guide__reset {
+  align-self: flex-start;
+  margin-top: 1.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.support-guide__reset:hover {
+  color: var(--primary-color);
+}
+
+/* Every channel at a glance, also without JavaScript. */
+.support-all-channels {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1.25rem;
+  margin-top: 1.1rem;
+}
+
+.support-all-channels__title {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.support-all-channels ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.support-all-channels a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.support-all-channels a:hover span {
+  text-decoration: underline;
+}
+
+.support-all-channels svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: none;
 }
 
 @media (max-width: 1024px) {
-  .support-grid--resources,
-  .support-grid--channels {
+  .support-grid--resources {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .support-grid--channels > *,
-  .support-grid--channels > :nth-child(3n + 1):nth-last-child(2),
-  .support-grid--channels > :nth-child(3n + 1):nth-last-child(2) + * {
-    grid-column: auto;
-  }
-
-  .support-hero,
-  .support-emergency {
+  .support-hero {
     grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
+  }
+
+  .support-guide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .support-guide__result {
+    border-top: 1px solid var(--border);
+    border-left: 0;
   }
 
   .support-hero__contact {
@@ -435,9 +613,9 @@
 
 @media (max-width: 640px) {
   .support-grid--resources,
-  .support-grid--channels,
   .support-grid--checklists,
-  .support-hero__contact {
+  .support-hero__contact,
+  .support-guide__options {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -445,8 +623,9 @@
     display: none;
   }
 
-  .support-emergency {
-    padding: 1.25rem;
+  .support-guide__questions,
+  .support-guide__result {
+    padding: 1.15rem;
   }
 }
 
@@ -454,7 +633,8 @@
   .support-hero__action,
   .support-card--link,
   .support-card__arrow,
-  .support-channel__links svg {
+  .support-option,
+  .support-guide__action svg {
     transition: none;
   }
 }
