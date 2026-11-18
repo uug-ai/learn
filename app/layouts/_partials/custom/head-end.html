@@ -397,3 +397,8 @@
     <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
   {{- end }}
 {{- end -}}
+{{- /* Bug-report tool; the script loads inspect only on the staging host. */ -}}
+{{- with resources.Get "js/inspect.js" -}}
+  {{- $js := . | minify | fingerprint -}}
+  <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+{{- end -}}
