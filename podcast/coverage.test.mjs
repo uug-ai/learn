@@ -37,12 +37,12 @@ const eligible = pages.filter((page) => {
   const path = relative(content, page.path);
   if (path.startsWith("docs/")) return true;
   if (!path.endsWith("_index.md")) return true;
-  return path === "support/_index.md" || (path.startsWith("guides/") && /^#{2,6} /m.test(body));
+  return path.startsWith("guides/") && /^#{2,6} /m.test(body);
 });
 
 test("every published Learn article has its own reviewed podcast", async () => {
   assert.ok(eligible.length >= 104, `Unexpectedly incomplete Learn inventory: ${eligible.length}`);
-  for (const section of ["docs", "guides", "tutorials", "knowledge-base", "blog", "release-notes", "support"]) {
+  for (const section of ["docs", "guides", "tutorials", "knowledge-base", "blog", "release-notes"]) {
     assert.ok(eligible.some((page) => relative(content, page.path).startsWith(`${section}/`)),
       `Missing article section: ${section}`);
   }
@@ -71,7 +71,7 @@ test("product overviews are included while drafts, placeholders and navigation p
   const excluded = pages.filter((page) => !eligible.includes(page));
   assert.ok(excluded.some((page) => page.path === join(hub, "workflows/anpr.md")));
   for (const path of ["_index.md", "tutorials/_index.md", "blog/_index.md",
-    "release-notes/_index.md", "guides/code-style/go/rest/routing.md"]) {
+    "release-notes/_index.md", "support/_index.md", "guides/code-style/go/rest/routing.md"]) {
     assert.ok(excluded.some((page) => page.path === join(content, path)), `Expected exclusion: ${path}`);
   }
   for (const page of excluded) assert.doesNotMatch(page.metadata, /^podcast:/m);
