@@ -8,7 +8,6 @@
         {{ partial "breadcrumb.html" (dict "page" . "enable" true) }}
         <header class="blog-article__header">
           <a class="blog-article__back" href="{{ "/blog/" | relLangURL }}">All articles</a>
-          <p class="tutorial-section-heading__eyebrow">{{ .Params.category | default "Perspective" }}</p>
           {{ partial "podcast/article-header.html" (dict "page" . "podcast" $podcast "contextMenu" false "titleClass" "blog-article__title") }}
           {{- with .Description | default .Params.subtitle }}
             <p class="blog-article__lead">{{ . }}</p>

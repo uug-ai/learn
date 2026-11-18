@@ -173,20 +173,6 @@
   font: 700 2rem/1 var(--font-family-heading);
 }
 
-.tutorial-card__product {
-  position: absolute;
-  left: 0.85rem;
-  bottom: 0.85rem;
-  padding: 0.32rem 0.55rem;
-  border-radius: 4px;
-  background: rgba(7, 25, 33, 0.88);
-  color: white;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  backdrop-filter: blur(8px);
-}
 
 .tutorial-card__body {
   display: flex;
