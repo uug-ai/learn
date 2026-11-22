@@ -8,14 +8,14 @@ type: docs
 
 Signing an image only helps if something checks the signature before the
 image runs. In our clusters that is [Kyverno](https://kyverno.io/), a policy
-engine that runs as a Kubernetes admission webhook. For every Pod with a
-UUG.AI image it checks three things:
+engine that runs as a Kubernetes admission webhook. For every Pod that
+runs one of our images, it checks three things:
 
 | Category | Policy | Passes when |
 | --- | --- | --- |
 | Image signing | `<image>-signed-images` | The image has a keyless signature from `release-create.yml` **for its own repository**. |
 | Image hardening | `<image>-hardened-images` | The image has a signed hardening attestation with `result: passed` and the matching `repository`. |
-| Image registry | `trusted-registry` | A UUG.AI image (`uugai/…`, `*/uugai/…`, `*/uug-ai/…`) is pulled from `ghcr.io/uug-ai`. |
+| Image registry | `trusted-registry` | One of our images (`uugai/…`, `*/uugai/…`, `*/uug-ai/…`) is pulled from `ghcr.io/uug-ai`. |
 
 What the signature and attestation contain is described in
 [Hardened releases and signing](/guides/security/release-signing).
@@ -113,7 +113,7 @@ requires the attestation type
 
 ### Adding an image
 
-When the chart gains a UUG.AI image:
+When the chart gains one of our images:
 
 1. Make sure its repository releases with `sign: true` (and `hardened: true`
    if it will run in production).

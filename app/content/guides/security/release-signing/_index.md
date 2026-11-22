@@ -67,7 +67,7 @@ tag points at the image.
    release fails on **any medium, high or critical vulnerability, including
    ones without a fix, or any secret**. There is no `.trivyignore`. Frontend
    images also scan the browser dependency inventory extracted from the image.
-6. **SBOM.** Trivy generates an SPDX SBOM. When the image has an Alpine/Wolfi
+6. **SBOM.** Trivy generates an SPDX SBOM ([SBOMs](/guides/security/sbom)). When the image has an Alpine/Wolfi
    package database, the installed packages must exactly match both the
    scanner's package list and the SBOM, so a package the scanner missed fails
    the release.
@@ -104,7 +104,7 @@ The certificate identifies **the shared workflow**, not the component, because
 | GitHub workflow repository | The component, for example `uug-ai/hub-api` |
 
 Always verify the **repository claim** as well as the subject. Checking only
-the subject accepts an image signed for any UUG.AI repository, so a signed
+the subject accepts an image signed for any of our repositories, so a signed
 `hub-vlm` image would pass as `hub-api`.
 
 Verify a release yourself:
@@ -164,7 +164,9 @@ cosign verify-attestation \
 every pull request and prints a Trivy table of all severities. It is
 **informational** (`exit-code: "0"`): it shows a reviewer what a change brings
 in, but it does not block the merge. The release gate above is where findings
-block.
+block. See [Pull request and commit scans](/guides/security/pull-request-scans)
+for the commit scan and the repositories that run this gate on every pull
+request.
 
 ## When the gate fails
 

@@ -9,4 +9,5 @@ Start with [onboarding](/guides/onboarding) to prepare your workspace.
 [Platform Engineering](/guides/platform-engineering) explains how that workspace
 connects to GitHub delivery, GitOps environments, and Argo CD reconciliation.
 Use [code style](/guides/code-style) for implementation conventions and
-[security](/guides/security) for secure-build guidance.
+[security](/guides/security) for how we scan, sign, admit and patch our
+images.
