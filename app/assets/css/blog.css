@@ -65,14 +65,6 @@
   padding-top: 1.5rem;
 }
 
-.blog-article__back {
-  display: inline-block;
-  margin-bottom: 1.75rem;
-  color: var(--link-color);
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
 .blog-article__title {
   margin: 0;
   color: var(--text-primary);
@@ -82,7 +74,6 @@
 }
 
 .blog-article__lead {
-  max-width: 800px;
   margin: 1.25rem 0;
   color: var(--text-secondary);
   font-size: 1.12rem;
@@ -135,10 +126,6 @@
   margin-top: 2rem;
 }
 
-.blog-article .content > :is(p, ul, ol) {
-  max-width: 80ch;
-}
-
 .blog-article .blog-product-image {
   margin: 2rem 0;
   padding: clamp(0.65rem, 1.4vw, 1rem);
@@ -165,6 +152,32 @@
   color: var(--text-secondary);
   font-size: 0.875rem;
   line-height: 1.6;
+}
+
+.blog-related {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.blog-related__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 1rem;
+}
+
+.blog-related .blog-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-related .tutorial-card__body {
+  flex: 1;
+}
+
+.blog-related :is(h2, h3) {
+  color: var(--text-primary);
+  font-family: var(--font-family-heading);
 }
 
 .blog-catalog a:focus-visible,

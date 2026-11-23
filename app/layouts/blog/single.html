@@ -7,7 +7,6 @@
       <main id="content">
         {{ partial "breadcrumb.html" (dict "page" . "enable" true) }}
         <header class="blog-article__header">
-          <a class="blog-article__back" href="{{ "/blog/" | relLangURL }}">All articles</a>
           {{ partial "podcast/article-header.html" (dict "page" . "podcast" $podcast "contextMenu" false "titleClass" "blog-article__title") }}
           {{- with .Description | default .Params.subtitle }}
             <p class="blog-article__lead">{{ . }}</p>
@@ -50,6 +49,29 @@
         {{- if (site.Params.blog.article.displayPagination | default true) -}}
           {{- .Store.Set "reversePagination" (.Params.reversePagination | default true) -}}
           {{- partial "components/pager.html" . -}}
+        {{- end }}
+        {{- $candidates := where (where site.RegularPages "Section" "blog") "RelPermalink" "ne" .RelPermalink -}}
+        {{- $matching := slice -}}
+        {{- $other := slice -}}
+        {{- $topics := apply (.Params.tags | default slice) "lower" "." -}}
+        {{- range $candidates.ByDate.Reverse -}}
+          {{- if intersect $topics (apply (.Params.tags | default slice) "lower" ".") -}}
+            {{- $matching = $matching | append . -}}
+          {{- else -}}
+            {{- $other = $other | append . -}}
+          {{- end -}}
+        {{- end -}}
+        {{- with first 3 ($matching | append $other) }}
+          <section class="blog-related" aria-labelledby="blog-related-title">
+            <div class="tutorial-section-heading">
+              <h2 id="blog-related-title">You might also be interested in</h2>
+            </div>
+            <div class="blog-related__grid">
+              {{- range . }}
+                {{ partial "blog-card.html" (dict "page" . "variant" "related") }}
+              {{- end }}
+            </div>
+          </section>
         {{- end }}
         {{- partial "components/comments.html" . -}}
       </main>
