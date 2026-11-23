@@ -7,6 +7,8 @@ const legacy = '/tutorials/hub/arcules-vs-augment-vision/';
 const title = 'Milestone Arcules vs UUG: managed simplicity or architectural control?';
 const altaArticle = '/blog/avigilon-alta-vs-augment-vision/';
 const altaTitle = 'Avigilon Alta vs UUG: cloud video service or composable stack?';
+const securityArticle = '/blog/zero-known-cves/';
+const securityTitle = 'No ignore file: how UUG ships video software with zero known CVEs';
 const comparisons = [
   {
     path: article, brand: 'Milestone Arcules', label: 'Arcules',
@@ -40,16 +42,18 @@ test('blog catalog uses illustrated editorial cards and working topic links', as
   await expect(page.getByRole('heading', { name: 'Latest stories' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'All articles' })).toBeVisible();
   const featured = page.locator('.blog-card.tutorial-card--featured');
-  await expect(featured.getByRole('heading')).toHaveText(altaTitle);
-  await expect(featured.locator('.tutorial-card__media')).toHaveAttribute('href', altaArticle);
-  await expect(featured.locator('.blog-artwork--image img')).toBeVisible();
-  await expect(featured.locator('.blog-artwork--image img')).toHaveCSS('object-fit', 'contain');
+  await expect(featured.getByRole('heading')).toHaveText(securityTitle);
+  await expect(featured.locator('.tutorial-card__media')).toHaveAttribute('href', securityArticle);
+  await expect(featured.locator('.iso-illustration svg.iso-figure--blog-release-gate')).toBeVisible();
+  const headerImage = page.locator('.blog-card .blog-artwork--image img').first();
+  await expect(headerImage).toBeVisible();
+  await expect(headerImage).toHaveCSS('object-fit', 'contain');
   await expect(page.locator('.blog-card .iso-illustration svg').first()).toBeVisible();
   await expect(page.locator('.blog-card .iso-front').first()).not.toHaveCSS('fill', 'rgb(0, 0, 0)');
   await expect(page.locator('.blog-card .iso-illustration a')).toHaveCount(0);
   await expect(featured.locator('.tutorial-card__meta')).toContainText(/\d+ min read/);
-  await expect(featured.locator('time')).toHaveAttribute('datetime', '2026-11-18');
-  await expect(page.locator('.blog-card.tutorial-card--catalog')).toHaveCount(4);
+  await expect(featured.locator('time')).toHaveAttribute('datetime', '2026-11-23');
+  await expect(page.locator('.blog-card.tutorial-card--catalog')).toHaveCount(5);
   const topics = await page.locator('.blog-card .tutorial-card__tags a').evaluateAll(links =>
     [...new Set(links.map(link => link.getAttribute('href')))],
   );
@@ -271,7 +275,7 @@ test('blog comparison is editorial, preserves the old URL and leaves the tutoria
   await page.goto(legacy, { waitUntil: 'domcontentloaded' });
   await expect(page).toHaveURL(new RegExp(`${article}$`));
   await expect(page.locator('h1')).toHaveText(title);
-  await expect(page.locator('.blog-article__header')).toContainText('Comparison');
+  await expect(page.locator('.blog-article__header .tutorial-section-heading__eyebrow')).toHaveCount(0);
   await expect(page.locator('.content')).toContainText('first-party comparison');
   await expect(page.locator('.tutorial-meta, .tutorial-byline')).toHaveCount(0);
   await expect(page.locator('.content h2').filter({ hasText: /^\d+\./ })).toHaveCount(0);
@@ -309,8 +313,66 @@ test('blog articles retain authors, podcast controls and dated metadata', async 
   const listen = page.getByRole('button', { name: 'Listen to the overview', exact: true });
   await listen.click();
   await expect(page.getByRole('region', { name: 'Article podcast' })).toBeVisible();
-  await page.getByRole('link', { name: 'All articles', exact: true }).click();
+  await expect(page.locator('.blog-article__header .tutorial-section-heading__eyebrow')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'All articles', exact: true })).toHaveCount(0);
+  await page.locator('main a[href$="/blog/"]', { hasText: 'Blog' }).first().click();
   await expect(page).toHaveURL(/\/blog\/$/);
+});
+
+test('blog articles recommend other posts with shared topics first', async ({ page, request }) => {
+  await page.goto('/blog/', { waitUntil: 'domcontentloaded' });
+  const routes = await page.locator('.blog-card.tutorial-card--catalog h3 a').evaluateAll(links =>
+    links.map(link => link.getAttribute('href')!),
+  );
+  const destinations = new Set<string>();
+  for (const route of routes) {
+    await page.goto(route, { waitUntil: 'domcontentloaded' });
+    const related = page.getByRole('region', { name: 'You might also be interested in', exact: true });
+    const cards = related.locator('.blog-card');
+    await expect(cards).toHaveCount(Math.min(3, routes.length - 1));
+    const links = await cards.locator('h3 a').evaluateAll(nodes => nodes.map(node => node.getAttribute('href')!));
+    expect(new Set(links).size).toBe(links.length);
+    expect(links).not.toContain(route);
+    for (const link of links) {
+      expect(routes).toContain(link);
+      destinations.add(link);
+    }
+    if ([article, altaArticle].includes(route)) {
+      expect(links[0]).toBe(route === article ? altaArticle : article);
+    }
+    for (const width of [375, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const theme of ['light', 'dark']) {
+        await page.evaluate(mode => document.documentElement.classList.toggle('dark', mode === 'dark'), theme);
+        await related.scrollIntoViewIfNeeded();
+        await expect(related.getByRole('heading', { level: 2 })).toHaveText('You might also be interested in');
+        expect(await textContrast(cards.first().locator('.tutorial-card__body > p'))).toBeGreaterThanOrEqual(4.5);
+        const boxes = [];
+        for (const card of await cards.all()) {
+          const box = (await card.boundingBox())!;
+          expect(box.x).toBeGreaterThanOrEqual(0);
+          expect(box.x + box.width).toBeLessThanOrEqual(width);
+          boxes.push(box);
+          const image = card.locator('.tutorial-card__media img');
+          if (await image.count()) {
+            await image.scrollIntoViewIfNeeded();
+            await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+          } else {
+            await expect(card.locator('.iso-illustration svg')).toBeVisible();
+          }
+        }
+        if (width === 375) {
+          expect(boxes[1].y).toBeGreaterThan(boxes[0].y);
+        } else {
+          expect(boxes[1].y).toBeCloseTo(boxes[0].y, 0);
+        }
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+      }
+    }
+  }
+  for (const destination of destinations) {
+    expect((await request.get(destination)).status()).toBe(200);
+  }
 });
 
 test('blog SEO uses BlogPosting data, original authors and the new social preview', async ({ page, request }) => {
@@ -325,8 +387,13 @@ test('blog SEO uses BlogPosting data, original authors and the new social previe
     expect(post.url).toBe(canonical);
     expect(post.datePublished.slice(0, 10)).toBe([article, altaArticle].includes(route) ? '2026-11-18' : '2025-11-14');
     expect(breadcrumbs.itemListElement.at(-1)).toMatchObject({ name: post.headline, item: canonical });
+    expect(post.author).toMatchObject({ '@type': 'Person', name: 'Cedric Verstraeten', url: 'https://github.com/cedricve' });
+    await expect(page.locator('.blog-byline__author')).toHaveText('Cedric Verstraeten');
+    await expect(page.locator('.blog-byline__author')).toHaveAttribute('href', 'https://github.com/cedricve');
+    await expect(page.locator('.blog-byline__author img')).toHaveAttribute('src', 'https://github.com/cedricve.png');
+    await expect(page.locator('meta[name="author"]')).toHaveAttribute('content', 'Cedric Verstraeten');
+    await expect(page.locator('meta[property="article:author"]')).toHaveAttribute('content', 'https://github.com/cedricve');
     if ([article, altaArticle].includes(route)) {
-      expect(post.author).toBeUndefined();
       expect(post.headline).toContain(' vs UUG:');
       expect(post.description).not.toMatch(/Augment Vision/i);
       for (const selector of ['meta[name="description"]', 'meta[property="og:title"]', 'meta[property="og:description"]']) {
@@ -339,8 +406,6 @@ test('blog SEO uses BlogPosting data, original authors and the new social previe
       const image = await request.get(imageURL!);
       expect(image.status()).toBe(200);
       expect(await sharp(await image.body()).metadata()).toMatchObject({ width: 1200, height: 630 });
-    } else {
-      expect(post.author).toMatchObject({ '@type': 'Person', name: 'Cedric Verstraeten', url: 'https://github.com/cedricve' });
     }
   }
 });

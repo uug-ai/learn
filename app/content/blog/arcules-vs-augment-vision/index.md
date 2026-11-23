@@ -3,6 +3,10 @@ title: 'Milestone Arcules vs UUG: managed simplicity or architectural control?'
 description: 'Two approaches to modern video management: how Arcules and UUG compare on deployment, storage, analytics, resilience and operational responsibility.'
 date: '2026-11-18'
 lastmod: '2026-11-18'
+authors:
+  - name: Cedric Verstraeten
+    link: https://github.com/cedricve
+    image: https://github.com/cedricve.png
 images: ['social.png']
 category: 'Comparison'
 tags: ['Architecture', 'VSaaS', 'Video management']

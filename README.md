@@ -90,6 +90,28 @@ Articles retain the existing `authors` list (`name`, optional `link` and `image`
 publication dates, podcast controls, page overview and previous/next navigation.
 Do not invent an author for an unattributed article.
 
+Articles end with **You might also be interested in**, reusing the blog cards.
+Show up to three other blog posts: shared-topic matches first, newest first in
+each group, then recent posts to fill any remaining slots. Never recommend the
+current article, and omit the section when there are no other posts.
+The comparison articles explicitly credit Cedric Verstraeten through the same
+`authors` front matter used by the existing blog, including byline, avatar and
+structured author metadata.
+
+Article headers start with the breadcrumb and the title: there is no
+**All articles** link or category label above the title, and body text, the
+lead, tables, panels and figures all use the full article width.
+
+The security article `/blog/zero-known-cves/` uses the `blog-release-gate`
+illustration: a build passing GOVULNCHECK, TRIVY (with a red alarm) and SBOM
+scanners and a release gate showing 0 CVEs, then signing and production. It
+is drawn in uug-ai/design (`renderIsoSvg('blog-release-gate', 'ISO_ID')` in
+`src/components/IsoIllustration/figures.ts`) and exported unchanged, with a
+trailing newline, to `app/assets/iso/blog-release-gate.svg`. Its page-bundle
+`social.png` is the dark-mode, reduced-motion render of that header, fitted
+to 1200x630 on `#0b0b12`, the same recipe as the tutorial previews. Its
+external figures were checked against the linked sources on 23 November 2026.
+
 Blog pages can select an existing `illustration` from `app/assets/iso/` and an
 `artworkAlt`; the default is the ecosystem illustration. `category` defaults to
 Perspective. An optional `header` selects a page-bundle or `app/assets/` image

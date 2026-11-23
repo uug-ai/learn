@@ -3,6 +3,10 @@ title: 'Avigilon Alta vs UUG: cloud video service or composable stack?'
 description: 'How Avigilon Alta Video and UUG compare on camera reuse, local and cloud storage, analytics, integrations, resilience and operating responsibility.'
 date: '2026-11-18T14:04:28Z'
 lastmod: '2026-11-18T14:04:28Z'
+authors:
+  - name: Cedric Verstraeten
+    link: https://github.com/cedricve
+    image: https://github.com/cedricve.png
 images: ['social.png']
 category: 'Comparison'
 tags: ['Architecture', 'VSaaS', 'Video management']
