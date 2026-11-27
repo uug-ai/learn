@@ -93,6 +93,13 @@ air-gapped installation. Model files and completed speech turns are cached in
 `.cache/`; changing a turn's text, voice, or speed invalidates its audio cache.
 `output/`, `.cache/`, and `node_modules/` are ignored by Git.
 
+`package.json` overrides `sharp` to 0.35.5. `kokoro-js` 1.2.1 requires
+`@huggingface/transformers` 3.x, which asks for `sharp` ^0.34.1, and every
+0.34 release inherits high-severity libvips, libheif and librsvg advisories.
+Transformers imports `sharp` only to load images, which speech synthesis
+never does. Remove the override once `kokoro-js` depends on a transformers
+release that accepts `sharp` 0.35.5 or later.
+
 ## Create an episode for another page
 
 ```bash
