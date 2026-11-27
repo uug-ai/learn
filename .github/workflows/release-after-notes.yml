@@ -1,0 +1,38 @@
+name: Release after release notes
+
+# When a generated release-notes page (branch docs/release-notes/<date>, opened
+# by the uug-ai/gitops "Draft Learn release notes" workflow) is merged, start a
+# hardened patch release. The release opens the staging pull request in
+# uug-ai/gitops, which that repository merges automatically; promoting staging
+# to production stays a manual step there.
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  release:
+    if: ${{ github.event.pull_request.merged && startsWith(github.event.pull_request.head.ref, 'docs/release-notes/') }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Start hardened patch release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          set -euo pipefail
+          gh workflow run release-bump.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref main \
+            -f bump=patch \
+            -f hardened=true \
+            -f publish=true
+          {
+            echo "Started [Bump release]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/workflows/release-bump.yml) (patch, hardened) for the merged release notes \`${HEAD_REF#docs/release-notes/}\` ($PR_URL)."
+          } >> "$GITHUB_STEP_SUMMARY"
